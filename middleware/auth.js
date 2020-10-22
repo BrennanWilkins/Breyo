@@ -11,9 +11,9 @@ module.exports = (req, res, next) => {
       }
       if (decoded.newUser) {
         // for signup
-        req.userId = decoded.newUser._id;
+        req.userID = decoded.newUser._id;
       } else {
-        req.userId = decoded.user._id;
+        req.userID = decoded.user._id;
       }
       next();
     });
