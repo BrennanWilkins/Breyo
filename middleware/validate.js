@@ -12,3 +12,5 @@ const validate = (validations, msg) => {
     res.status(400).json({ msg });
   };
 };
+
+module.exports = validate;

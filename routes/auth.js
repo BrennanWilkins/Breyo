@@ -8,7 +8,7 @@ const config = require('config');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 
-router.post('login', validate(
+router.post('/login', validate(
   [body('*').escape(),
   body('username').not().isEmpty().trim(),
   body('password').not().isEmpty().trim()],
@@ -25,12 +25,13 @@ router.post('login', validate(
       if (!same) { return res.status(400).json({ msg: 'Incorrect email or password.' }); }
       // create jwt token that expires in 7 days
       const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
-      res.status(200).json({ token, displayName: user.displayName, email: user.email, invites: user.invites, boards: user.boards });
+      res.status(200).json({ token, displayName: user.displayName, email: user.email,
+        invites: user.invites, boards: user.boards, activity: user.activity });
     } catch(err) { return res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
 );
 
-router.get('signup/verifyUsername/:username',
+router.get('/signup/verifyUsername/:username',
   [param('username').escape()],
   async (req, res) => {
     try {
@@ -42,13 +43,13 @@ router.get('signup/verifyUsername/:username',
   }
 );
 
-router.post('signup', validate(
+router.post('/signup', validate(
   [body('*').escape(),
   body('email').isEmail().normalizeEmail(),
   body('username').not().isEmpty().trim(),
   body('displayName').not().isEmpty().trim(),
-  check('password').trim().isLength({ min: 8, max: 100 }),
-  check('confirmPassword').trim().isLength({ min: 8, max: 100 })],
+  body('password').trim().isLength({ min: 8, max: 100 }),
+  body('confirmPassword').trim().isLength({ min: 8, max: 100 })],
   'There was an error in one of the fields.'),
   async (req, res) => {
     try {
@@ -61,28 +62,32 @@ router.post('signup', validate(
       if (checkEmail) { return res.status(400).json({ msg: 'That email is already taken.' }); }
       if (checkUsername) { return res.status(400).json({ msg: 'That username is already taken.' }); }
       const hashedPassword = await bcryptjs.hash(req.body.password, 10);
-      const user = new User({ username: req.body.username, email: req.body.email, password: hashedPassword, displayName: req.body.displayName, invites: [], boards: [] });
+      const user = new User({ username: req.body.username, email: req.body.email, password: hashedPassword,
+        displayName: req.body.displayName, invites: [], boards: [], activity: [] });
       await user.save();
       // signup was successful, login
       // create jwt token that expires in 7 days
       const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
-      res.status(200).json({ token, username: user.username, email: user.email, displayName: user.displayName, invites: [], boards: [] });
+      res.status(200).json({ token, username: user.username, email: user.email,
+         displayName: user.displayName, invites: [], boards: [], activity: [] });
     } catch(err) { return res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
 );
 
-router.post('autoLogin', auth,
+router.post('/autoLogin', auth,
   async (req, res) => {
     try {
       const user = await User.findOne({ _id: req.userID });
       if (!user) { throw 'err'; }
-      res.status(200).json({ username: user.username, email: user.email, displayName: user.displayName, invites: user.invites, boards: user.boards });
+      res.status(200).json({ username: user.username, email: user.email,
+        displayName: user.displayName, invites: user.invites, boards: user.boards, activity: user.activity });
     } catch(err) { return res.status(500); }
   }
 );
 
-router.post('changePass', auth, validate(
-  [body('*').not().isEmpty().escape()]
+router.post('/changePass', auth, validate(
+  [body('*').not().isEmpty().trim().escape(),
+  body('newPassword').isLength({ min: 8, max: 100 })]
   ,'The input fields cannot be empty.'),
   async (req, res) => {
     try {
@@ -90,7 +95,7 @@ router.post('changePass', auth, validate(
       if (req.body.newPassword !== req.body.confirmPassword) {
         return res.status(400).json({ msg: 'Confirm password must be equal to your new password.' });
       }
-      const same = await bcryptjs.compare(req.body.oldPassword, req.body.newPassword);
+      const same = await bcryptjs.compare(req.body.oldPassword, user.password);
       if (!same) { return res.status(400).json({ msg: 'Incorrect password.' }); }
       const hashedPass = await bcryptjs.hash(req.body.newPassword, 10);
       user.password = hashedPass;
@@ -99,3 +104,5 @@ router.post('changePass', auth, validate(
     } catch(err) { return res.status(500); }
   }
 );
+
+module.exports = router;
