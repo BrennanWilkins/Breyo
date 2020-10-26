@@ -8,10 +8,18 @@ const config = require('config');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 
+router.get('/userData', auth,
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.userID);
+      res.status(200).json({ boards: user.boards, invites: user.invites });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 router.post('/login', validate(
-  [body('*').escape(),
-  body('username').not().isEmpty().trim(),
-  body('password').not().isEmpty().trim()],
+  [body('email').not().isEmpty().trim().escape(),
+  body('password').not().isEmpty().trim().escape()],
   'Username and password cannot be empty.'),
   async (req, res) => {
     try {
@@ -26,28 +34,15 @@ router.post('/login', validate(
       // create jwt token that expires in 7 days
       const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
       res.status(200).json({ token, displayName: user.displayName, email: user.email,
-        invites: user.invites, boards: user.boards, activity: user.activity });
+        invites: user.invites, boards: user.boards });
     } catch(err) { return res.status(500).json({ msg: 'There was an error while logging in.' }); }
-  }
-);
-
-router.get('/signup/verifyUsername/:username',
-  [param('username').escape()],
-  async (req, res) => {
-    try {
-      const checkUser = User.findOne({ username: req.params.username });
-      // send 400 code if username taken, else send 200
-      if (checkUser) { return res.status(400); }
-      res.status(200);
-    } catch(err) { return res.status(500); }
   }
 );
 
 router.post('/signup', validate(
   [body('*').escape(),
   body('email').isEmail().normalizeEmail(),
-  body('username').not().isEmpty().trim(),
-  body('displayName').not().isEmpty().trim(),
+  body('fullName').not().isEmpty().trim(),
   body('password').trim().isLength({ min: 8, max: 100 }),
   body('confirmPassword').trim().isLength({ min: 8, max: 100 })],
   'There was an error in one of the fields.'),
@@ -57,20 +52,17 @@ router.post('/signup', validate(
         return res.status(400).json({ msg: 'Password must be equal to confirm password.' });
       }
       const checkEmail = await User.findOne({ email: req.body.email });
-      const checkUsername = await User.findOne({ username: req.body.username });
       // if email already taken
       if (checkEmail) { return res.status(400).json({ msg: 'That email is already taken.' }); }
-      if (checkUsername) { return res.status(400).json({ msg: 'That username is already taken.' }); }
       const hashedPassword = await bcryptjs.hash(req.body.password, 10);
-      const user = new User({ username: req.body.username, email: req.body.email, password: hashedPassword,
-        displayName: req.body.displayName, invites: [], boards: [], activity: [] });
+      const user = new User({ email: req.body.email, password: hashedPassword,
+        fullName: req.body.fullName, invites: [], boards: [] });
       await user.save();
       // signup was successful, login
       // create jwt token that expires in 7 days
       const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
-      res.status(200).json({ token, username: user.username, email: user.email,
-         displayName: user.displayName, invites: [], boards: [], activity: [] });
-    } catch(err) { return res.status(500).json({ msg: 'There was an error while logging in.' }); }
+      res.status(200).json({ token, email: user.email, fullName: user.fullName, invites: [], boards: [] });
+    } catch(err) { res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
 );
 
@@ -79,9 +71,8 @@ router.post('/autoLogin', auth,
     try {
       const user = await User.findOne({ _id: req.userID });
       if (!user) { throw 'err'; }
-      res.status(200).json({ username: user.username, email: user.email,
-        displayName: user.displayName, invites: user.invites, boards: user.boards, activity: user.activity });
-    } catch(err) { return res.status(500); }
+      res.status(200).json({ email: user.email, fullName: user.fullName, invites: user.invites, boards: user.boards });
+    } catch(err) { res.sendStatus(500); }
   }
 );
 
@@ -101,7 +92,7 @@ router.post('/changePass', auth, validate(
       user.password = hashedPass;
       await user.save();
       res.sendStatus(200);
-    } catch(err) { return res.status(500); }
+    } catch(err) { res.sendStatus(500); }
   }
 );
 
