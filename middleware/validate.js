@@ -9,7 +9,8 @@ const validate = (validations, msg) => {
     if (errors.isEmpty()) { return next(); }
 
     // if errors, respond w 400 error with the custom error message
-    res.status(400).json({ msg });
+    if (msg) { res.status(400).json({ msg }); }
+    else { res.sendStatus(400); }
   };
 };
 
