@@ -12,7 +12,7 @@
 }
 .Panel {
   box-shadow: var(--box-shadow1);
-  width: 400px;
+  width: 450px;
   height: 450px;
   border-radius: 2px;
   margin: auto;
@@ -25,7 +25,7 @@
   margin: 0;
 }
 .Form {
-  width: 300px;
+  width: 350px;
   margin: auto;
 }
 .Form input {
@@ -55,13 +55,18 @@
   border: 0;
   font-weight: bold;
   font-size: 16px;
-  padding: 6px 0;
+  padding: 7px 0;
   border-radius: 4px;
   cursor: pointer;
   transition: 250ms;
+  outline: none;
 }
 .Form button:hover {
   background: rgb(var(--darkRed));
+}
+.Form button:disabled {
+  background: rgb(200, 200, 200);
+  cursor: default;
 }
 .Links {
   position: absolute;
@@ -89,5 +94,18 @@
 }
 .SubTitle {
   font-size: 14px;
-  padding: 10px;
+  width: 350px;
+  margin: 20px auto;
+}
+.ShowErr, .HideErr {
+  width: 350px;
+  transition: 250ms;
+  font-size: 14px;
+  font-weight: 300;
+  text-align: center;
+  margin: auto;
+}
+.HideErr {
+  opacity: 0;
+  visibility: hidden;
 }

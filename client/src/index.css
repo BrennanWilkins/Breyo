@@ -14,4 +14,6 @@ body {
   --box-shadow3: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
   --red: 228, 67, 50;
   --darkRed: 190, 53, 39;
+  --red2: 247, 76, 84;
+  --orange: 255, 127, 78;
 }
