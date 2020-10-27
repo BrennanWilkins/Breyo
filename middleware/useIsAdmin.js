@@ -6,7 +6,7 @@ const useIsAdmin = async (req, res, next) => {
     const user = await User.findOne({ _id: req.userID });
     // boardID may be sent in body or in params
     const isAdmin = user.boards.find(board => (board._id === req.body.boardID || board._id === req.params.boardID) && board.isAdmin);
-    if (!isAdmin) { res.sendStatus(401); }
+    if (!isAdmin) { res.status(401).json({ msg: 'MUST BE ADMIN' }); }
     next();
   } catch(err) { res.sendStatus(500); }
 };

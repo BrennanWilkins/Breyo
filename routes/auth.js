@@ -20,12 +20,10 @@ router.get('/userData', auth,
 router.post('/login', validate(
   [body('email').not().isEmpty().trim().escape(),
   body('password').not().isEmpty().trim().escape()],
-  'Username and password cannot be empty.'),
+  'Email and password cannot be empty.'),
   async (req, res) => {
     try {
-      const user = req.body.username.indexOf('@') > 0 ?
-      await User.findOne({ email: req.body.username }) :
-      await User.findOne({ username: req.body.username });
+      const user = await User.findOne({ email: req.body.email });
       // return 400 error if no user found
       if (!user) { return res.status(400).json({ msg: 'Incorrect username or password.' }); }
       const same = await bcryptjs.compare(req.body.password, user.password);
@@ -33,7 +31,7 @@ router.post('/login', validate(
       if (!same) { return res.status(400).json({ msg: 'Incorrect email or password.' }); }
       // create jwt token that expires in 7 days
       const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
-      res.status(200).json({ token, displayName: user.displayName, email: user.email,
+      res.status(200).json({ token, fullName: user.fullName, email: user.email,
         invites: user.invites, boards: user.boards });
     } catch(err) { return res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
@@ -42,7 +40,7 @@ router.post('/login', validate(
 router.post('/signup', validate(
   [body('*').escape(),
   body('email').isEmail().normalizeEmail(),
-  body('fullName').not().isEmpty().trim(),
+  body('fullName').trim().isLength({ min: 1, max: 100 }),
   body('password').trim().isLength({ min: 8, max: 100 }),
   body('confirmPassword').trim().isLength({ min: 8, max: 100 })],
   'There was an error in one of the fields.'),

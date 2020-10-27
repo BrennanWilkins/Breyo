@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
   if (token) {
     jwt.verify(token, config.get('AUTH_KEY'), (err, decoded) => {
       if (err) {
-        return res.status(401).json({ msg: 'Token is not valid.' });
+        return res.status(401).json({ msg: 'TOKEN NOT VALID' });
       }
       if (decoded.newUser) {
         // for signup
@@ -18,6 +18,6 @@ module.exports = (req, res, next) => {
       next();
     });
   } else {
-    res.status(401).json({ msg: 'No token was received.' });
+    res.status(401).json({ msg: 'TOKEN NOT RECEIVED' });
   }
 };
