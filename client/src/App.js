@@ -1,6 +1,8 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
 import Spinner from './components/UI/Spinner/Spinner';
+import { connect } from 'react-redux';
+import { autoLogin } from './store/actions';
 const HomePage = React.lazy(() => import('./components/HomePage/HomePage/HomePage'));
 const DashboardPage = React.lazy(() => import('./components/DashboardPage/Dashboard/Dashboard'));
 const LoginPage = React.lazy(() => import('./components/AuthPages/LoginPage'));
@@ -8,6 +10,8 @@ const SignupPage = React.lazy(() => import('./components/AuthPages/SignupPage'))
 const ForgotPage = React.lazy(() => import('./components/AuthPages/ForgotPage'));
 
 const App = props => {
+  useEffect(() => props.autoLogin(), []);
+
   return (
     <BrowserRouter>
       {props.isAuth ?
@@ -28,4 +32,12 @@ const App = props => {
   );
 };
 
-export default App;
+const mapStateToProps = state => ({
+  isAuth: state.auth.isAuth
+});
+
+const mapDispatchToProps = dispatch => ({
+  autoLogin: () => dispatch(autoLogin())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
