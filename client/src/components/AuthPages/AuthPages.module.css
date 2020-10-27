@@ -1,0 +1,93 @@
+.Container {
+  min-width: 420px;
+}
+.Title {
+  min-width: 400px;
+  text-align: center;
+  margin: 20px auto 40px;
+}
+.Title a {
+  color: rgb(var(--red));
+  text-decoration: none;
+}
+.Panel {
+  box-shadow: var(--box-shadow1);
+  width: 400px;
+  height: 450px;
+  border-radius: 2px;
+  margin: auto;
+  text-align: center;
+  background: white;
+  position: relative;
+}
+.Panel h3 {
+  padding: 20px 0;
+  margin: 0;
+}
+.Form {
+  width: 300px;
+  margin: auto;
+}
+.Form input {
+  display: block;
+  margin: 10px 0;
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid #eee;
+  border-radius: 4px;
+  padding: 6px;
+  transition: all 250ms;
+  outline: none;
+  font-size: 15px;
+}
+.Form input:focus {
+  border: 2px solid rgb(var(--red), 0.8);
+}
+.Form input::placeholder {
+  color: rgb(180, 180, 180);
+}
+.Form button {
+  display: block;
+  margin: 10px 0;
+  width: 100%;
+  color: white;
+  background: rgb(var(--red));
+  border: 0;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 6px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 250ms;
+}
+.Form button:hover {
+  background: rgb(var(--darkRed));
+}
+.Links {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+}
+.Link {
+  margin: 10px 0;
+  font-size: 14px;
+}
+.Link a {
+  text-decoration: none;
+  color: rgb(var(--red));
+  margin: 0 3px;
+}
+.Link a:hover {
+  text-decoration: underline;
+}
+.FadeInInput {
+  animation: fadeIn 350ms forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.SubTitle {
+  font-size: 14px;
+  padding: 10px;
+}
