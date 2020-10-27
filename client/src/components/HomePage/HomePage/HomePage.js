@@ -2,7 +2,7 @@ import React from 'react';
 import classes from './HomePage.module.css';
 import { Link } from 'react-router-dom';
 
-const HomePage = props => {
+const HomePage = () => {
   return (
     <div>
       <div className={classes.NavBar}>

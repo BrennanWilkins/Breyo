@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import classes from './AuthPages.module.css';
 import { Link } from 'react-router-dom';
 import AuthSpinner from '../UI/AuthSpinner/AuthSpinner';
@@ -38,6 +39,15 @@ const LoginPage = props => {
       </div>
     </div>
   );
+};
+
+LoginPage.propTypes = {
+  loading: PropTypes.bool.isRequired,
+  err: PropTypes.bool.isRequired,
+  errMsg: PropTypes.string.isRequired,
+  login: PropTypes.func.isRequired,
+  loginErr: PropTypes.func.isRequired,
+  authReset: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({

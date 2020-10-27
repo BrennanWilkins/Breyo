@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import classes from './AuthPages.module.css';
 import { Link } from 'react-router-dom';
 import { signupValidation } from '../../utils/authValidation';
@@ -43,6 +44,15 @@ const SignupPage = props => {
       </div>
     </div>
   );
+};
+
+SignupPage.propTypes = {
+  loading: PropTypes.bool.isRequired,
+  err: PropTypes.bool.isRequired,
+  errMsg: PropTypes.string.isRequired,
+  signup: PropTypes.func.isRequired,
+  signupErr: PropTypes.func.isRequired,
+  authReset: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
