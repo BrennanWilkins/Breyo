@@ -1,0 +1,84 @@
+.ShowModal, .HideModal {
+  position: fixed;
+  top: 60px;
+  width: 400px;
+  left: calc(50% - 200px);
+  z-index: 2;
+  transition: 300ms;
+}
+.HideModal {
+  transform: translateY(-100%);
+  opacity: 0;
+  visibility: hidden;
+}
+.Input {
+  border-radius: 2px;
+  outline: none;
+  border: 0;
+  background: rgb(255,255,255,0.3);
+  transition: 250ms;
+  padding: 5px;
+  font-weight: bold;
+  color: white;
+  font-size: 16px;
+  width: 190px;
+  margin: 5px;
+}
+.Input:focus, .Input:hover {
+  background: rgb(255,255,255,0.5);
+}
+.Input::placeholder {
+  color: rgb(255,255,255,0.7);
+}
+.ModalContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.ModalLeft {
+  width: 250px;
+  height: 115px;
+  border-radius: 4px;
+}
+.InputDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 5px;
+}
+.ColorSelect {
+  width: 150px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  color: white;
+}
+.Color {
+  width: 35px;
+  height: 35px;
+  margin: 0 3px 3px 3px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.Btn {
+  margin-top: 10px;
+  width: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.Btn button {
+  background: rgba(22, 179, 29, 0.8);
+  padding: 15px;
+}
+.Btn button:hover {
+  background: rgb(22, 179, 29);
+}
+.Btn button:disabled {
+  background: rgba(0,0,0,0.1);
+}

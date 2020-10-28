@@ -1,1 +1,1 @@
-export { login, logout, loginErr, signupErr, signup, authReset, autoLogin } from './auth';
+export { login, logout, loginErr, signupErr, signup, authReset, autoLogin, getUserData } from './auth';

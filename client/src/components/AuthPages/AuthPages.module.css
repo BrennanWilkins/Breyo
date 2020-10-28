@@ -8,7 +8,6 @@
 }
 .Title a {
   color: rgb(var(--red));
-  text-decoration: none;
 }
 .Panel {
   box-shadow: var(--box-shadow1);
@@ -78,7 +77,6 @@
   font-size: 14px;
 }
 .Link a {
-  text-decoration: none;
   color: rgb(var(--red));
   margin: 0 3px;
 }

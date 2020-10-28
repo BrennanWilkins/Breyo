@@ -15,6 +15,15 @@ export const signupLoading = () => ({ type: actionTypes.SIGNUP_LOADING });
 
 export const authReset = () => ({ type: actionTypes.AUTH_RESET });
 
+export const getUserData = () => async dispatch => {
+  try {
+    const res = await axios.get('/auth/userData');
+    dispatch(() => ({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards }));
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const login = (email, password) => async dispatch => {
   try {
     dispatch(loginLoading());
