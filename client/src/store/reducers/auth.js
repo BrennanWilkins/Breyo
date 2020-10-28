@@ -56,6 +56,10 @@ const reducer = (state = initialState, action) => {
     };
     case actionTypes.AUTH_RESET: return { ...initialState };
     case actionTypes.LOGOUT: return { ...initialState };
+    case actionTypes.CREATE_BOARD: return {
+      ...state,
+      boards: [...state.boards, {...action.payload}]
+    };
     default: return state;
   }
 };

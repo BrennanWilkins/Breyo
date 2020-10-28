@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
 import Spinner from './components/UI/Spinner/Spinner';
 import { connect } from 'react-redux';
 import { autoLogin } from './store/actions';
+import Notifications from './components/Notifications/Notifications';
 const HomePage = React.lazy(() => import('./components/HomePage/HomePage/HomePage'));
 const DashboardPage = React.lazy(() => import('./components/DashboardPage/Dashboard/Dashboard'));
 const LoginPage = React.lazy(() => import('./components/AuthPages/LoginPage'));
@@ -15,10 +16,13 @@ const App = props => {
   return (
     <BrowserRouter>
       {props.isAuth ?
-        <Switch>
-          <Route exact path="/" render={() => <Suspense fallback={<Spinner />}><DashboardPage /></Suspense>} />
-          <Redirect to="/" />
-        </Switch>
+        <>
+          <Notifications />
+          <Switch>
+            <Route exact path="/" render={() => <Suspense fallback={<Spinner />}><DashboardPage /></Suspense>} />
+            <Redirect to="/" />
+          </Switch>
+        </>
         :
         <Switch>
           <Route exact path="/" render={() => <Suspense fallback={<Spinner />}><HomePage /></Suspense>} />

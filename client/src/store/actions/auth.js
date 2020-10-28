@@ -1,17 +1,18 @@
 import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
+import { addNotif } from './notifications';
 
-export const loginDispatch = payload => ({ type: actionTypes.LOGIN, payload });
+const loginDispatch = payload => ({ type: actionTypes.LOGIN, payload });
 
-export const logoutDispatch = () => ({ type: actionTypes.LOGOUT });
+const logoutDispatch = () => ({ type: actionTypes.LOGOUT });
+
+const loginLoading = () => ({ type: actionTypes.LOGIN_LOADING });
+
+const signupLoading = () => ({ type: actionTypes.SIGNUP_LOADING });
 
 export const loginErr = msg => ({ type: actionTypes.LOGIN_ERR, msg });
 
 export const signupErr = msg => ({ type: actionTypes.SIGNUP_ERR, msg });
-
-export const loginLoading = () => ({ type: actionTypes.LOGIN_LOADING });
-
-export const signupLoading = () => ({ type: actionTypes.SIGNUP_LOADING });
 
 export const authReset = () => ({ type: actionTypes.AUTH_RESET });
 
@@ -20,7 +21,8 @@ export const getUserData = () => async dispatch => {
     const res = await axios.get('/auth/userData');
     dispatch(() => ({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards }));
   } catch (err) {
-    console.log(err);
+    let msg = err.response ? err.response.data.msg : 'There was an error while retrieving your data.';
+    dispatch(addNotif(msg));
   }
 };
 

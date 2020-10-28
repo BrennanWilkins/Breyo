@@ -4,6 +4,8 @@ import classes from './CreateBoard.module.css';
 import { useModalToggle } from '../../../utils/customHooks';
 import Button, { CloseBtn } from '../../UI/Buttons/Buttons';
 import { checkIcon } from '../../UI/icons';
+import { connect } from 'react-redux';
+import { createBoard } from '../../../store/actions';
 
 const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
                 'rgb(0,121,191)', 'rgb(176, 32, 32)', 'rgb(56, 187, 244)',
@@ -27,6 +29,7 @@ const CreateBoard = props => {
   const submitHandler = () => {
     if (boardTitle === '' || boardTitle.length > 50) { return; }
     closeHandler();
+    props.createBoard(boardTitle, boardColor);
   };
 
   return (
@@ -54,7 +57,12 @@ const CreateBoard = props => {
 
 CreateBoard.propTypes = {
   show: PropTypes.bool.isRequired,
-  close: PropTypes.func.isRequired
+  close: PropTypes.func.isRequired,
+  createBoard: PropTypes.func.isRequired
 };
 
-export default CreateBoard;
+const mapDispatchToProps = dispatch => ({
+  createBoard: (title, color) => dispatch(createBoard(title, color))
+});
+
+export default connect(null, mapDispatchToProps)(CreateBoard);
