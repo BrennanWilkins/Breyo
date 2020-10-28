@@ -7,16 +7,18 @@ import { houseIcon, boardIcon, plusIcon } from '../../UI/icons';
 import { connect } from 'react-redux';
 import CreateBoard from '../CreateBoard/CreateBoard';
 import AccountModal from '../AccountModal/AccountModal';
+import BoardMenu from '../BoardMenu/BoardMenu';
 
 const NavBar = props => {
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [showBoardMenu, setShowBoardMenu] = useState(false);
 
   return (
     <div className={classes.NavBar}>
       <div className={classes.Section}>
         <Button><Link to="/">{houseIcon}</Link></Button>
-        <Button>{boardIcon}<span>Boards</span></Button>
+        <Button clicked={() => setShowBoardMenu(true)}>{boardIcon}<span>Boards</span></Button>
       </div>
       <div className={classes.Title}><Link to="/">Brello</Link></div>
       <div className={classes.Section}>
@@ -25,6 +27,7 @@ const NavBar = props => {
       </div>
       <CreateBoard show={showCreateBoard} close={() => setShowCreateBoard(false)} />
       <AccountModal show={showAccountModal} close={() => setShowAccountModal(false)} />
+      <BoardMenu show={showBoardMenu} close={() => setShowBoardMenu(false)} />
       {showCreateBoard && <div className={classes.Backdrop}></div>}
     </div>
   );

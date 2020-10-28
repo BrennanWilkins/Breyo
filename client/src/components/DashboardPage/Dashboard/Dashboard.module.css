@@ -1,6 +1,6 @@
 .Container {
   margin: 100px auto 0;
-  width: 600px;
+  width: 650px;
   padding: 10px;
 }
 .Title {
@@ -11,4 +11,5 @@
 }
 .Title svg {
   margin-right: 8px;
+  font-size: 22px;
 }

@@ -1,0 +1,54 @@
+.ShowModal, .HideModal {
+  position: fixed;
+  left: 5px;
+  top: 45px;
+  width: 300px;
+  max-height: calc(100vh - 55px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: white;
+  box-shadow: var(--box-shadow4);
+  transition: 250ms;
+  padding: 5px;
+  box-sizing: border-box;
+}
+.HideModal {
+  opacity: 0;
+  visibility: hidden;
+}
+.SearchDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.Input {
+  flex-grow: 1;
+  margin: 0 5px;
+  font-size: 15px;
+  padding: 7px;
+  outline: none;
+  border: 2px solid #eee;
+  border-radius: 4px;
+  transition: 250ms;
+}
+.Input:hover, .Input:focus {
+  border: 2px solid rgb(var(--red));
+}
+.Title {
+  font-size: 14px;
+  font-weight: 500;
+  padding-left: 10px;
+  margin: 15px 0;
+  color: rgb(82, 82, 82);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.Title span {
+  display: inline-flex;
+  align-items: center;
+}
+.Title span svg {
+  margin-right: 10px;
+  font-size: 18px;
+}

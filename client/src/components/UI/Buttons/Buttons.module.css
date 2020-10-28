@@ -48,7 +48,7 @@
 .AccountBtn:hover {
   background: rgb(225,225,225);
 }
-.CloseBtn {
+.CloseBtn, .ExpandBtn, .CollapseBtn {
   padding: 1px;
   border: 0;
   cursor: pointer;
@@ -63,4 +63,13 @@
 }
 .CloseBtn:hover {
   background: rgba(0,0,0,0.05);
+}
+.ExpandBtn, .CollapseBtn {
+  color: rgb(55, 55, 55);
+  transform: rotate(90deg);
+  transition: 200ms;
+  font-size: 16px;
+}
+.CollapseBtn {
+  transform: rotate(0deg);
 }

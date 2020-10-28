@@ -13,6 +13,7 @@
   box-sizing: border-box;
   cursor: pointer;
   position: relative;
+  margin: 5px;
 }
 .Overlay {
   transition: 250ms;
