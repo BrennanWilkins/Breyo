@@ -6,9 +6,11 @@ import { Link } from 'react-router-dom';
 import { houseIcon, boardIcon, plusIcon } from '../../UI/icons';
 import { connect } from 'react-redux';
 import CreateBoard from '../CreateBoard/CreateBoard';
+import AccountModal from '../AccountModal/AccountModal';
 
 const NavBar = props => {
   const [showCreateBoard, setShowCreateBoard] = useState(false);
+  const [showAccountModal, setShowAccountModal] = useState(false);
 
   return (
     <div className={classes.NavBar}>
@@ -19,9 +21,10 @@ const NavBar = props => {
       <div className={classes.Title}><Link to="/">Brello</Link></div>
       <div className={classes.Section}>
         <Button clicked={() => setShowCreateBoard(true)}>{plusIcon}</Button>
-        <AccountBtn>{props.fullName.slice(0, 1)}</AccountBtn>
+        <AccountBtn clicked={() => setShowAccountModal(true)}>{props.fullName.slice(0, 1)}</AccountBtn>
       </div>
       <CreateBoard show={showCreateBoard} close={() => setShowCreateBoard(false)} />
+      <AccountModal show={showAccountModal} close={() => setShowAccountModal(false)} />
       {showCreateBoard && <div className={classes.Backdrop}></div>}
     </div>
   );

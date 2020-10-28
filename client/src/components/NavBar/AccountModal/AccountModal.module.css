@@ -1,0 +1,70 @@
+.ShowModal, .HideModal {
+  position: fixed;
+  top: 50px;
+  right: 5px;
+  width: 300px;
+  height: 400px;
+  background: white;
+  transition: 250ms;
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  padding: 10px 0;
+  box-sizing: border-box;
+  font-size: 15px;
+}
+.HideModal {
+  transform: translateX(100%);
+  opacity: 0;
+  visibility: hidden;
+}
+.Title {
+  position: relative;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  color: rgb(112, 112, 112);
+  font-size: 15px;
+  line-height: 29px;
+  margin: 0 10px;
+}
+.Title button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+}
+.AccountInfo {
+  padding: 15px 0;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
+}
+.NameIcon {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  text-transform: uppercase;
+  border-radius: 25px;
+  background: #ddd;
+  line-height: 40px;
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 10px;
+}
+.Email {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgb(122, 122, 122);
+  margin-top: 3px;
+}
+.Options {
+  padding-top: 15px;
+}
+.Options div {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.Options div:hover {
+  background: rgb(241, 241, 241);
+}
