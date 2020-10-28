@@ -10,6 +10,10 @@ const validate = require('../middleware/validate');
 const useIsAdmin = require('../middleware/useIsAdmin');
 const useSSE = require('../middleware/useSSE');
 
+const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
+                'rgb(0,121,191)', 'rgb(176, 32, 32)', 'rgb(56, 187, 244)',
+                'rgb(173, 80, 147)', 'rgb(74, 50, 221)', 'rgb(4, 107, 139)'];
+
 router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useSSE,
   (req, res) => {
     const boardQuery = Board.findById(req.params.boardID);
@@ -28,18 +32,21 @@ router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape(
 );
 
 router.post('/', auth, validate(
-  [body('title').trim().isLength({ min: 1, max: 50 }).escape()]
+  [body('title').trim().isLength({ min: 1, max: 50 }).escape(),
+  body('color').not().isEmpty().escape()]
   , 'Please enter a valid title.'),
   async (req, res) => {
     try {
+      const color = COLORS.includes(req.body.color) ? req.body.color : COLORS[4];
       // user is admin of new board by default
-      const board = new Board({ title: req.body.title, members: [{ userID: req.userID, isAdmin: true }] });
+      const board = new Board({ title: req.body.title, members: [{ userID: req.userID, isAdmin: true }], activity: [], color });
       await board.save();
       // add board to user's boards
       const user = await User.findById(req.userID);
-      user.boards.unshift({ boardID: board._id, title: board.title, isStarred: false, isAdmin: true });
+      const newBoard = { boardID: board._id, title: board.title, isStarred: false, isAdmin: true, color: board.color };
+      user.boards.unshift(newBoard);
       await user.save();
-      res.status(200).json({ boardID: board._id });
+      res.status(200).json({ ...newBoard });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -157,7 +164,7 @@ router.put('/invites/accept', auth, validate(
       const user = await User.findById(req.userID);
       if (!board || !user) { throw 'err'; }
       user.invites = user.invites.filter(invite => invite.boardID !== req.body.boardID);
-      user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false }];
+      user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false, color: board.color }];
       board.members = [...board.members, { userID: req.userID, isAdmin: false }];
       await user.save();
       await board.save();
