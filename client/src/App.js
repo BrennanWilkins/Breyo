@@ -4,6 +4,7 @@ import Spinner from './components/UI/Spinner/Spinner';
 import { connect } from 'react-redux';
 import { autoLogin } from './store/actions';
 import Notifications from './components/Notifications/Notifications';
+import NavBar from './components/NavBar/NavBar/NavBar';
 const HomePage = React.lazy(() => import('./components/HomePage/HomePage/HomePage'));
 const DashboardPage = React.lazy(() => import('./components/DashboardPage/Dashboard/Dashboard'));
 const LoginPage = React.lazy(() => import('./components/AuthPages/LoginPage'));
@@ -17,6 +18,7 @@ const App = props => {
     <BrowserRouter>
       {props.isAuth ?
         <>
+          <NavBar />
           <Notifications />
           <Switch>
             <Route exact path="/" render={() => <Suspense fallback={<Spinner />}><DashboardPage /></Suspense>} />

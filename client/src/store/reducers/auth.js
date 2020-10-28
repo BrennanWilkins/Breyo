@@ -60,6 +60,11 @@ const reducer = (state = initialState, action) => {
       ...state,
       boards: [...state.boards, {...action.payload}]
     };
+    case actionTypes.TOGGLE_IS_STARRED:
+      const updatedBoards = [...state.boards].map(board => ({ ...board }));
+      const index = updatedBoards.findIndex(board => board.boardID === action.id);
+      updatedBoards[index].isStarred = !updatedBoards[index].isStarred;
+      return { ...state, boards: updatedBoards };
     default: return state;
   }
 };

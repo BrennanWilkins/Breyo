@@ -62,9 +62,9 @@ router.put('/title', auth, validate(
       await board.save();
       for (let member of board.members) {
         const user = await User.findById(member.userID);
-        const matchingBoard = user.boards.find(board => board.boardID === req.body.boardID);
-        if (!matchingBoard) { throw 'err'; }
-        matchingBoard.title = req.body.title;
+        const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+        if (index < 0) { throw 'err'; }
+        user.boards[index].title = req.body.title;
         await user.save();
       }
       res.sendStatus(200);
@@ -76,8 +76,9 @@ router.put('/starred', auth, validate([body('boardID').not().isEmpty()]),
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
-      const matchingBoard = user.boards.find(board => board.boardID === req.body.boardID);
-      matchingBoard.isStarred = !matchingBoard.isStarred;
+      const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+      user.boards[index].isStarred = !user.boards[index].isStarred;
+      user.markModified('boards');
       await user.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }

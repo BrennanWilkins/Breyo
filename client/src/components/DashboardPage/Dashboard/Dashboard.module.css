@@ -1,0 +1,14 @@
+.Container {
+  margin: 100px auto 0;
+  width: 600px;
+  padding: 10px;
+}
+.Title {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.Title svg {
+  margin-right: 8px;
+}
