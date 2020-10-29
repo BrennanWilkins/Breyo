@@ -46,3 +46,27 @@ export const sendInvite = (email, boardID) => async dispatch => {
     dispatch(addNotif(msg));
   }
 }
+
+const addAdminDispatch = (email, boardID) => ({ type: actionTypes.ADD_ADMIN, email, boardID });
+
+const removeAdminDispatch = (email, boardID) => ({ type: actionTypes.REMOVE_ADMIN, email, boardID });
+
+export const addAdmin = (email, boardID) => async dispatch => {
+  try {
+    await axios.put('/board/admin/add', { email, boardID });
+    dispatch(addAdminDispatch(email, boardID));
+  } catch (err) {
+    dispatch(addNotif('There was an error while changing user permissions'));
+  }
+};
+
+export const removeAdmin = (email, boardID) => async dispatch => {
+  try {
+    await axios.put('/board/admin/remove', { email, boardID });
+    dispatch(removeAdminDispatch(email, boardID));
+  } catch (err) {
+    dispatch(addNotif('There was an error while changing user permissions'));
+  }
+};
+
+export const demoteSelf = boardID => ({ type: actionTypes.DEMOTE_SELF, boardID });

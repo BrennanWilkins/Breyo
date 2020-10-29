@@ -47,7 +47,7 @@
 .AccountBtn:hover {
   background: rgb(232,232,232);
 }
-.CloseBtn, .ExpandBtn, .CollapseBtn {
+.CloseBtn, .ExpandBtn, .CollapseBtn, .BackBtn {
   padding: 1px;
   border: 0;
   cursor: pointer;
@@ -60,7 +60,13 @@
   border-radius: 4px;
   margin: 5px;
 }
-.CloseBtn:hover {
+.BackBtn {
+  padding: 0;
+  height: 26px;
+  width: 26px;
+  line-height: 26px;
+}
+.CloseBtn:hover, .BackBtn:hover {
   background: rgba(0,0,0,0.05);
 }
 .ExpandBtn, .CollapseBtn {

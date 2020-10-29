@@ -1,6 +1,6 @@
 import React from 'react';
 import classes from './Buttons.module.css';
-import { xIcon, caretIcon } from '../icons';
+import { xIcon, caretIcon, backIcon } from '../icons';
 
 const Button = props => (
   <button className={classes.Button} onClick={props.clicked} disabled={props.disabled}>{props.children}</button>
@@ -16,6 +16,10 @@ export const CloseBtn = props => (
 
 export const ExpandBtn = props => (
   <button className={props.expanded ? classes.ExpandBtn : classes.CollapseBtn} onClick={props.clicked}>{caretIcon}</button>
+);
+
+export const BackBtn = props => (
+  <button className={classes.BackBtn} onClick={props.back}>{backIcon}</button>
 );
 
 export default Button;

@@ -7,10 +7,14 @@ import AutosizeInput from 'react-input-autosize';
 import Button, { AccountBtn } from '../../UI/Buttons/Buttons';
 import { starIcon, dotsIcon } from '../../UI/icons';
 import InviteModal from '../InviteModal/InviteModal';
+import BoardMenu from '../BoardMenu/BoardMenu';
+import MemberModal from '../MemberModal/MemberModal';
 
 const BoardNavBar = props => {
   const [inputTitle, setInputTitle] = useState(props.title);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showBoardMenu, setShowBoardMenu] = useState(false);
+  const [showMember, setShowMember] = useState('');
 
   useEffect(() => setInputTitle(props.title), [props.title]);
 
@@ -24,6 +28,8 @@ const BoardNavBar = props => {
     setInputTitle(e.target.value);
   };
 
+  const adminCount = props.members.filter(member => member.isAdmin).length;
+
   return (
     <div className={classes.NavBar}>
       <div className={classes.Section}>
@@ -33,16 +39,22 @@ const BoardNavBar = props => {
         </span>
         <div className={classes.Separator}></div>
         {props.members.map(member => (
-          <span key={member.email} className={classes.AccountBtn}><AccountBtn>{member.fullName.slice(0,1)}</AccountBtn></span>
+          <span key={member.email} className={classes.Container}>
+            <span className={classes.AccountBtn}><AccountBtn clicked={() => setShowMember(member.email)}>{member.fullName.slice(0,1)}</AccountBtn></span>
+            {showMember === member.email &&
+              <MemberModal close={() => setShowMember('')} fullName={member.fullName} email={member.email} userEmail={props.userEmail}
+              isAdmin={member.isAdmin} adminCount={adminCount} userIsAdmin={member.email === props.userEmail && member.isAdmin} boardID={props.boardID} />}
+          </span>
         ))}
-        <span className={classes.Invite}>
+        <span className={classes.Container}>
           <span className={classes.Btn}><Button clicked={() => setShowInviteModal(true)}>Invite</Button></span>
           {showInviteModal && <InviteModal boardID={props.boardID} close={() => setShowInviteModal(false)} />}
         </span>
       </div>
       <div className={classes.Section}>
-        <span className={`${classes.Btn} ${classes.MenuBtn}`}><Button>{dotsIcon}Menu</Button></span>
+        <span className={`${classes.Btn} ${classes.MenuBtn}`}><Button clicked={() => setShowBoardMenu(true)}>{dotsIcon}Menu</Button></span>
       </div>
+      <BoardMenu show={showBoardMenu} close={() => setShowBoardMenu(false)} />
     </div>
   );
 };
@@ -54,7 +66,8 @@ BoardNavBar.propTypes = {
   boardID: PropTypes.string.isRequired,
   isStarred: PropTypes.bool.isRequired,
   updateTitle: PropTypes.func.isRequired,
-  toggleIsStarred: PropTypes.func.isRequired
+  toggleIsStarred: PropTypes.func.isRequired,
+  userEmail: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -62,7 +75,8 @@ const mapStateToProps = state => ({
   members: state.board.members,
   activity: state.board.activity,
   boardID: state.board.boardID,
-  isStarred: state.auth.boards.find(board => board.boardID === state.board.boardID).isStarred
+  isStarred: state.auth.boards.find(board => board.boardID === state.board.boardID).isStarred,
+  userEmail: state.auth.email
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -22,6 +22,24 @@ const reducer = (state = initialState, action) => {
       ...state,
       title: action.title
     };
+    case actionTypes.ADD_ADMIN: {
+      const updatedMembers = [...state.members].map(member => ({ ...member }));
+      const index = updatedMembers.find(member => member.email === action.email);
+      updatedMembers[index].isAdmin = true;
+      return {
+        ...state,
+        members: updatedMembers
+      };
+    }
+    case actionTypes.REMOVE_ADMIN: {
+      const updatedMembers = [...state.members].map(member => ({ ...member }));
+      const index = updatedMembers.find(member => member.email === action.email);
+      updatedMembers[index].isAdmin = false;
+      return {
+        ...state,
+        members: updatedMembers
+      };
+    }
     default: return state;
   }
 };

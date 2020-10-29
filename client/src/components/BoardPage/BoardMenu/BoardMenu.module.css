@@ -1,0 +1,35 @@
+.ShowModal, .HideModal {
+  position: fixed;
+  top: 40px;
+  right: 0;
+  width: 300px;
+  height: calc(100% - 40px);
+  background: white;
+  box-shadow: var(--box-shadow4);
+  padding: 10px 0;
+  box-sizing: border-box;
+  font-size: 15px;
+  transition: transform 250ms, opacity 0ms, visibility 0ms;
+}
+.HideModal {
+  transform: translateX(110%);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 250ms, opacity 0ms 250ms, visibility 0ms 250ms;
+}
+.Title {
+  position: relative;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  color: rgb(112, 112, 112);
+  font-size: 15px;
+  line-height: 29px;
+  margin: 0 10px;
+}
+.Title button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+}

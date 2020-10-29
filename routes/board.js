@@ -119,6 +119,8 @@ router.put('/admins/add', auth, validate(
           if (board.boardID === req.body.boardID) { return { ...board, isAdmin: true }; }
           return board;
         });
+        user.markModified('boards');
+        board.markModified('members');
         await user.save();
         await board.save();
         res.sendStatus(200);
@@ -145,6 +147,8 @@ router.put('/admins/remove', auth, validate(
           if (board.boardID === req.body.boardID) { return { ...board, isAdmin: false }; }
           return board;
         });
+        user.markModified('boards');
+        board.markModified('members');
         await user.save();
         await board.save();
         res.sendStatus(200);

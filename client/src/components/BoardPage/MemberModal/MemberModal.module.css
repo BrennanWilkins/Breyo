@@ -1,0 +1,92 @@
+.Container {
+  position: absolute;
+  width: 300px;
+  height: 200px;
+  background: white;
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  padding: 10px 0;
+  box-sizing: border-box;
+  font-size: 15px;
+  margin: 5px 0 0 3px;
+  overflow: hidden;
+}
+.CloseBtn, .BackBtn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+}
+.BackBtn {
+  left: 0;
+  right: auto;
+  width: auto;
+}
+.AccountInfo {
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
+}
+.NameIcon {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  text-transform: uppercase;
+  border-radius: 25px;
+  background: #ddd;
+  line-height: 40px;
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 10px;
+}
+.Email {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgb(122, 122, 122);
+  margin-top: 3px;
+}
+.Options div {
+  font-size: 14px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.Options div:hover {
+  background: rgb(241, 241, 241);
+}
+.Disabled, .Disabled span {
+  color: rgb(196, 196, 196) !important;
+  cursor: default !important;
+}
+.Disabled:hover {
+  background: inherit !important;
+}
+.Options span {
+  display: block;
+  font-size: 12px;
+  color: rgb(112, 112, 112);
+  margin-top: 4px;
+}
+.Options svg {
+  font-size: 14px;
+  position: relative;
+  left: 4px;
+  top: 2px;
+}
+.Title {
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  color: rgb(112, 112, 112);
+  font-size: 15px;
+  line-height: 29px;
+  margin: 0 10px;
+}
+.CannotChange {
+  margin: 10px 10px 0 10px;
+  font-size: 14px;
+  text-align: center;
+  padding-top: 15px;
+  border-top: 1px solid #ddd;
+}
