@@ -155,7 +155,7 @@ router.put('/admins/remove', auth, validate(
 
 // authorization: admin
 router.put('/invites/send', auth, validate(
-  [body('email').not().isEmpty().trim().escape(),
+  [body('email').isEmail().normalizeEmail(),
   body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
   async (req, res) => {
     try {
@@ -167,6 +167,7 @@ router.put('/invites/send', auth, validate(
       // no user found
       if (!invitee) { return res.status(400).json({ msg: 'No user was found for that email' }); }
       invitee.invites = [...invitee.invites, { inviterEmail: inviter.email, inviterName: inviter.fullName, title: board.title, boardID: board._id }];
+      invitee.markModified('invites');
       invitee.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }

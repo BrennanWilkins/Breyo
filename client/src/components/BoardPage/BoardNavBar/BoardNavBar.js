@@ -6,7 +6,7 @@ import { updateBoardTitle, toggleIsStarred } from '../../../store/actions';
 import AutosizeInput from 'react-input-autosize';
 import Button, { AccountBtn } from '../../UI/Buttons/Buttons';
 import { starIcon, dotsIcon } from '../../UI/icons';
-// import InviteModal from '../InviteModal/InviteModal';
+import InviteModal from '../InviteModal/InviteModal';
 
 const BoardNavBar = props => {
   const [inputTitle, setInputTitle] = useState(props.title);
@@ -37,7 +37,7 @@ const BoardNavBar = props => {
         ))}
         <span className={classes.Invite}>
           <span className={classes.Btn}><Button clicked={() => setShowInviteModal(true)}>Invite</Button></span>
-          {/*{showInviteModal && <InviteModal close={() => setShowInviteModal(false)} />}*/}
+          {showInviteModal && <InviteModal boardID={props.boardID} close={() => setShowInviteModal(false)} />}
         </span>
       </div>
       <div className={classes.Section}>

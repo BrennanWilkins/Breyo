@@ -1,0 +1,68 @@
+.Container {
+  position: absolute;
+  width: 250px;
+  height: 220px;
+  background: white;
+  transition: 250ms;
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  padding: 10px 0;
+  box-sizing: border-box;
+  font-size: 15px;
+  margin: 3px 0 0 3px;
+}
+.Title {
+  position: relative;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  color: rgb(112, 112, 112);
+  font-size: 15px;
+  line-height: 29px;
+  margin: 0 10px;
+}
+.Title button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+}
+.Input input {
+  display: block;
+  margin: 15px auto;
+  width: 200px;
+  box-sizing: border-box;
+  border: 2px solid #eee;
+  border-radius: 4px;
+  padding: 6px;
+  transition: all 250ms;
+  outline: none;
+  font-size: 15px;
+}
+.Input input:focus {
+  border: 2px solid rgb(var(--red), 0.8);
+}
+.Input input::placeholder {
+  color: rgb(180, 180, 180);
+}
+.Input button {
+  display: flex;
+  background: rgba(22, 179, 29, 0.8);
+  padding: 15px;
+  margin: 15px auto 0;
+}
+.Input button:hover {
+  background: rgb(22, 179, 29);
+}
+.Input button:disabled {
+  background: rgba(0,0,0,0.1);
+}
+.ErrMsg {
+  font-size: 14px;
+  font-weight: 300;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  text-align: center;
+  margin-top: 10px;
+}

@@ -37,3 +37,12 @@ export const updateBoardTitle = (title, id) => async dispatch => {
     console.log(err);
   }
 };
+
+export const sendInvite = (email, boardID) => async dispatch => {
+  try {
+    await axios.put('/board/invites/send', { email, boardID });
+  } catch (err) {
+    let msg = err.response && err.response.data.msg ? err.response.data.msg : 'There was an error while sending your invite.';
+    dispatch(addNotif(msg));
+  }
+}
