@@ -2,15 +2,15 @@ import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classes from './InviteModal.module.css';
 import Button, { CloseBtn } from '../../UI/Buttons/Buttons';
-import { useModalToggle } from '../../../utils/customHooks';
+import { useModalToggle, useModalPos } from '../../../utils/customHooks';
 import { connect } from 'react-redux';
 import { sendInvite } from '../../../store/actions';
 
 const InviteModal = props => {
   const [email, setEmail] = useState('');
   const modalRef = useRef();
-
   useModalToggle(true, modalRef, props.close);
+  useModalPos(true, modalRef);
 
   return (
     <div className={classes.Container} ref={modalRef}>

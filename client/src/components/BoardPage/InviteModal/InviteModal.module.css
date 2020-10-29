@@ -1,5 +1,5 @@
 .Container {
-  position: absolute;
+  position: fixed;
   width: 260px;
   height: 220px;
   background: white;

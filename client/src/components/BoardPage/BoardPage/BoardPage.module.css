@@ -4,6 +4,5 @@
   left: 0;
   width: 100%;
   height: calc(100% - 40px);
-  overflow-y: hidden;
-  overflow-x: auto;
+  overflow: hidden;
 }

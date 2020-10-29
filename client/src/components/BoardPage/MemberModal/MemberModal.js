@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classes from './MemberModal.module.css';
 import { CloseBtn, AccountBtn, BackBtn } from '../../UI/Buttons/Buttons';
-import { useModalToggle } from '../../../utils/customHooks';
+import { useModalToggle, useModalPos } from '../../../utils/customHooks';
 import { checkIcon } from '../../UI/icons';
 import { connect } from 'react-redux';
 import { addAdmin, removeAdmin, demoteSelf } from '../../../store/actions';
@@ -11,6 +11,7 @@ const MemberModal = props => {
   const [showPermission, setShowPermission] = useState(false);
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
+  useModalPos(true, modalRef);
 
   const adminDisabled = !props.userIsAdmin && !props.isAdmin;
   const memberDisabled = (!props.userIsAdmin && props.isAdmin) || (props.userIsAdmin && props.adminCount === 1);
