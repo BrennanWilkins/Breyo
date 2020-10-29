@@ -10,6 +10,8 @@ const loginLoading = () => ({ type: actionTypes.LOGIN_LOADING });
 
 const signupLoading = () => ({ type: actionTypes.SIGNUP_LOADING });
 
+const updateUserData = (invites, boards) => ({ type: actionTypes.UPDATE_USER_DATA, invites, boards });
+
 export const loginErr = msg => ({ type: actionTypes.LOGIN_ERR, msg });
 
 export const signupErr = msg => ({ type: actionTypes.SIGNUP_ERR, msg });
@@ -19,7 +21,7 @@ export const authReset = () => ({ type: actionTypes.AUTH_RESET });
 export const getUserData = () => async dispatch => {
   try {
     const res = await axios.get('/auth/userData');
-    dispatch(() => ({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards }));
+    dispatch(updateUserData(res.data.invites, res.data.boards));
   } catch (err) {
     let msg = err.response ? err.response.data.msg : 'There was an error while retrieving your data.';
     dispatch(addNotif(msg));

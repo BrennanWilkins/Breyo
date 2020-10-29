@@ -65,6 +65,11 @@ const reducer = (state = initialState, action) => {
       const index = updatedBoards.findIndex(board => board.boardID === action.id);
       updatedBoards[index].isStarred = !updatedBoards[index].isStarred;
       return { ...state, boards: updatedBoards };
+    case actionTypes.UPDATE_USER_DATA: return {
+      ...state,
+      boards: [...action.boards],
+      invites: [...action.invites]
+    };
     default: return state;
   }
 };

@@ -7,6 +7,7 @@ import { CloseBtn, ExpandBtn } from '../../UI/Buttons/Buttons';
 import { starIcon, personIcon } from '../../UI/icons';
 import BoardRect from './BoardRect/BoardRect';
 import { toggleIsStarred } from '../../../store/actions';
+import { withRouter } from 'react-router-dom';
 
 const BoardMenu = props => {
   const modalRef = useRef();
@@ -34,6 +35,10 @@ const BoardMenu = props => {
 
   useModalToggle(props.show, modalRef, props.close);
 
+  const navHandler = id => {
+    props.history.push('/board/' + id);
+  };
+
   return (
     <div ref={modalRef} className={props.show ? classes.ShowModal : classes.HideModal}>
       <div className={classes.SearchDiv}>
@@ -45,14 +50,16 @@ const BoardMenu = props => {
       <>
       <div className={classes.Title}><span>{starIcon} STARRED BOARDS</span><ExpandBtn clicked={() => setExpandStarred(prev => !prev)} expanded={expandStarred} /></div>
       {expandStarred && props.boards.filter(board => board.isStarred).map(board => (
-        <BoardRect {...board} key={board.boardID} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} />
+        <BoardRect {...board} key={board.boardID} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} nav={() => navHandler(board.boardID)} />
       ))}
       <div className={classes.Title}><span>{personIcon} PERSONAL BOARDS</span><ExpandBtn clicked={() => setExpandPersonal(prev => !prev)} expanded={expandPersonal} /></div>
       {expandPersonal && props.boards.map(board => (
-        <BoardRect {...board} key={board.boardID} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} />
+        <BoardRect {...board} key={board.boardID} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} nav={() => navHandler(board.boardID)} />
       ))}
       </> :
-      searchRes.map(board => <BoardRect key={board.boardID} {...board} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} />)}
+      searchRes.map(board => (
+        <BoardRect key={board.boardID} {...board} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} nav={() => navHandler(board.boardID)} />
+      ))}
     </div>
   );
 };
@@ -72,4 +79,4 @@ const mapDispatchToProps = dispatch => ({
   toggleIsStarred: id => dispatch(toggleIsStarred(id))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(BoardMenu);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(BoardMenu));

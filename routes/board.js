@@ -11,16 +11,30 @@ const useIsAdmin = require('../middleware/useIsAdmin');
 const useSSE = require('../middleware/useSSE');
 
 const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
-                'rgb(0,121,191)', 'rgb(176, 32, 32)', 'rgb(56, 187, 244)',
+                'rgb(0,121,191)', 'rgb(240, 85, 68)', 'rgb(56, 187, 244)',
                 'rgb(173, 80, 147)', 'rgb(74, 50, 221)', 'rgb(4, 107, 139)'];
 
-router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useSSE,
+router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]),
+  async (req, res) => {
+    try {
+      const board = await Board.findById(req.params.boardID);
+      const user = await User.findById(req.userID);
+      if (!board || !user) { throw 'err'; }
+      if (board.members.findIndex(member => String(member.email) === String(user.email)) < 0) { return res.sendStatus(401); }
+      const data = { color: board.color, activity: board.activity, members: board.members, title: board.title, boardID: board._id };
+      res.status(200).json({ data });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.get('/stream/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useSSE,
   (req, res) => {
     const boardQuery = Board.findById(req.params.boardID);
     // stream board data to client every 10 seconds
     const dataInterval = setInterval(() => {
       boardQuery.exec((err, board) => {
-        res.sendEventData(board);
+        const data = { color: board.color, activity: board.activity, members: board.members, title: board.title, boardID: board._id };
+        res.sendEventData(data);
       });
     }, 10000);
 
@@ -38,11 +52,12 @@ router.post('/', auth, validate(
   async (req, res) => {
     try {
       const color = COLORS.includes(req.body.color) ? req.body.color : COLORS[4];
+      const user = await User.findById(req.userID);
+      if (!user) { throw 'err'; }
       // user is admin of new board by default
-      const board = new Board({ title: req.body.title, members: [{ userID: req.userID, isAdmin: true }], activity: [], color });
+      const board = new Board({ title: req.body.title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }], activity: [], color });
       await board.save();
       // add board to user's boards
-      const user = await User.findById(req.userID);
       const newBoard = { boardID: board._id, title: board.title, isStarred: false, isAdmin: true, color: board.color };
       user.boards.unshift(newBoard);
       await user.save();
@@ -59,14 +74,15 @@ router.put('/title', auth, validate(
     try {
       const board = await Board.findOne({ _id: req.body.boardID });
       board.title = req.body.title;
-      await board.save();
       for (let member of board.members) {
-        const user = await User.findById(member.userID);
+        const user = await User.findOne({ email: member.email });
         const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
         if (index < 0) { throw 'err'; }
         user.boards[index].title = req.body.title;
+        user.markModified('boards');
         await user.save();
       }
+      await board.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
