@@ -35,18 +35,17 @@
 .Button:active {
   background: rgb(255,255,255,0.3);
 }
-
 .AccountBtn {
   border-radius: 25px;
   line-height: 35px;
   width: 32px;
   text-transform: uppercase;
   margin: 0 9px 0 3px;
-  background: rgb(230,230,230);
+  background: rgb(240, 240, 240);
   font-weight: bold;
 }
 .AccountBtn:hover {
-  background: rgb(225,225,225);
+  background: rgb(232,232,232);
 }
 .CloseBtn, .ExpandBtn, .CollapseBtn {
   padding: 1px;

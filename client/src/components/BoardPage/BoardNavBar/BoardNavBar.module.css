@@ -1,0 +1,83 @@
+.NavBar {
+  width: 100%;
+  padding: 8px 3px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.Section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.Input input {
+  cursor: pointer;
+  border: 0;
+  outline: none;
+  padding: 0 8px;
+  border-radius: 4px;
+  color: white;
+  background: transparent;
+  font-weight: bold;
+  font-size: 18px;
+  transition: 200ms;
+  height: 33px;
+  margin: 0 3px;
+}
+.Input input:hover {
+  background: rgb(255,255,255,0.4);
+}
+.Input input:focus {
+  cursor: text;
+  background: white;
+  color: black;
+}
+.StarBtn button {
+  height: 33px;
+  width: 33px;
+  line-height: 33px;
+  font-size: 14px;
+  background: rgb(255,255,255,0.4);
+  transition: 200ms;
+}
+.StarBtn svg {
+  transition: 200ms;
+}
+.Highlight svg {
+  color: rgb(255, 222, 0);
+}
+.StarBtn button:hover, .StarBtn button:active,
+.Btn button:hover, .Btn button:active {
+  background: rgb(255,255,255,0.5);
+}
+.StarBtn button:hover svg {
+  transform: scale(1.1);
+}
+.Separator {
+  height: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  margin: 0 8px 0 9px;
+}
+.AccountBtn button {
+  margin: 0 4px;
+  line-height: 31px;
+  width: 29px;
+  height: 29px;
+  font-size: 15px;
+}
+.Btn button {
+  height: 33px;
+  line-height: 33px;
+  padding: 0 6px;
+  background: rgb(255,255,255,0.4);
+  font-weight: 400;
+  font-size: 15px;
+}
+.MenuBtn button {
+  padding-right: 10px;
+}
+.Invite {
+  position: relative;
+}

@@ -10,30 +10,30 @@ import { addNotif, updateActiveBoard, getBoardData } from '../../../store/action
 import Spinner from '../../UI/Spinner/Spinner';
 
 const BoardPage = props => {
-  useEffect(() => {
-    const id = props.match.params.boardID;
-    const url = 'http://localhost:9000/api/board/stream/' + id;
-    const source = new EventSourcePolyfill(url, { headers: { 'x-auth-token': axios.defaults.headers.common['x-auth-token'] }});
-
-    source.onmessage = event => {
-      console.log('Received stream');
-      const data = JSON.parse(event.data);
-      props.updateActiveBoard(data);
-    };
-
-    source.onerror = errMsg => {
-      console.log('Error: connection closed');
-      source.close();
-      props.addNotif('There was an error while retrieving the board data.');
-    };
-
-    return () => {
-      console.log('Stream closed');
-      document.title = 'Brello';
-      document.body.style.overflow = 'auto';
-      source.close();
-    };
-  }, [props.match.params.boardID]);
+  // useEffect(() => {
+  //   const id = props.match.params.boardID;
+  //   const url = 'http://localhost:9000/api/board/stream/' + id;
+  //   const source = new EventSourcePolyfill(url, { headers: { 'x-auth-token': axios.defaults.headers.common['x-auth-token'] }});
+  //
+  //   source.onmessage = event => {
+  //     console.log('Received stream');
+  //     const data = JSON.parse(event.data);
+  //     props.updateActiveBoard(data);
+  //   };
+  //
+  //   source.onerror = errMsg => {
+  //     console.log('Error: connection closed');
+  //     source.close();
+  //     props.addNotif('There was an error while retrieving the board data.');
+  //   };
+  //
+  //   return () => {
+  //     console.log('Stream closed');
+  //     document.title = 'Brello';
+  //     document.body.style.overflow = 'auto';
+  //     source.close();
+  //   };
+  // }, [props.match.params.boardID]);
 
   useEffect(async () => {
     const id = props.match.params.boardID;
