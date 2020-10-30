@@ -51,7 +51,7 @@
   padding: 15px;
   margin: 15px auto 0;
 }
-.Input button:hover {
+.Input button:hover, .Input button:active {
   background: rgb(22, 179, 29);
 }
 .Input button:disabled {

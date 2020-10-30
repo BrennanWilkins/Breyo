@@ -35,19 +35,22 @@ const BoardPage = props => {
   //   };
   // }, [props.match.params.boardID]);
 
-  useEffect(async () => {
-    const id = props.match.params.boardID;
-    try {
-      const res = await axios.get('/board/' + id);
-      document.title = res.data.data.title;
-      document.body.style.overflow = 'hidden';
-      props.updateActiveBoard(res.data.data);
-    } catch (err) {
-      document.title = 'Brello';
-      document.body.style.overflow = 'auto';
-      props.addNotif('There was an error while retrieving the board data.');
-      props.history.push('/');
-    }
+  useEffect(() => {
+    const fetchData = async () => {
+      const id = props.match.params.boardID;
+      try {
+        const res = await axios.get('/board/' + id);
+        document.title = res.data.data.title;
+        document.body.style.overflow = 'hidden';
+        props.updateActiveBoard(res.data.data);
+      } catch (err) {
+        document.title = 'Brello';
+        document.body.style.overflow = 'auto';
+        props.addNotif('There was an error while retrieving the board data.');
+        props.history.push('/');
+      }
+    };
+    fetchData();
   }, []);
 
   return (

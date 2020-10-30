@@ -77,7 +77,7 @@
   background: rgba(22, 179, 29, 0.8);
   padding: 15px;
 }
-.Btn button:hover {
+.Btn button:hover, .Btn button:active {
   background: rgb(22, 179, 29);
 }
 .Btn button:disabled {

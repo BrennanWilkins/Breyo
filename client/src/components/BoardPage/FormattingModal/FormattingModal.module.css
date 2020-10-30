@@ -1,0 +1,49 @@
+.Container {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 300px;
+  height: calc(100% - 10px);
+  background: white;
+  box-shadow: var(--box-shadow4);
+  padding: 10px 0;
+  box-sizing: border-box;
+  font-size: 15px;
+}
+.Title {
+  position: relative;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1.2px solid #ddd;
+  color: rgb(124, 124, 124);
+  font-size: 15px;
+  line-height: 29px;
+  margin: 0 10px;
+  font-weight: 400;
+}
+.CloseBtn button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+}
+.Option {
+  padding: 18px 5px;
+  margin: 0 10px;
+  border-bottom: 1.2px solid #ddd;
+}
+.Option div {
+  font-weight: 500;
+  margin-bottom: 10px;
+  color: rgb(87, 87, 87);
+}
+.Option span {
+  font-size: 14px;
+  display: inline-block;
+}
+.Option svg {
+  font-size: 18px;
+  margin: 0 5px;
+  position: relative;
+  top: 3.5px;
+}

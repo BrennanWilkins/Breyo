@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classes from './MemberModal.module.css';
-import { CloseBtn, AccountBtn, BackBtn } from '../../UI/Buttons/Buttons';
+import { CloseBtn, BackBtn } from '../../UI/Buttons/Buttons';
 import { useModalToggle, useModalPos } from '../../../utils/customHooks';
 import { checkIcon } from '../../UI/icons';
 import { connect } from 'react-redux';
 import { addAdmin, removeAdmin, demoteSelf } from '../../../store/actions';
+import AccountInfo from '../../UI/AccountInfo/AccountInfo';
 
 const MemberModal = props => {
   const [showPermission, setShowPermission] = useState(false);
@@ -34,13 +35,7 @@ const MemberModal = props => {
     <div ref={modalRef} className={classes.Container} style={showPermission ? {width: '350px', height: '270px'} : null}>
       <div className={classes.CloseBtn}><CloseBtn close={props.close} /></div>
       {!showPermission ? <>
-      <div className={classes.AccountInfo}>
-        <div className={classes.NameIcon}>{props.fullName.slice(0, 1)}</div>
-        <div>
-          <div>{props.fullName}</div>
-          <div className={classes.Email}>{props.email}</div>
-        </div>
-      </div>
+      <AccountInfo fullName={props.fullName} email={props.email} />
       <div className={classes.Options} style={{ paddingTop: '15px'}}>
         <div onClick={() => setShowPermission(true)}>Change Permissions ({props.isAdmin ? 'Admin' : 'Member'})</div>
         <div>View Member's Board Activity</div>

@@ -9,31 +9,34 @@ const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsAdmin = require('../middleware/useIsAdmin');
 const useSSE = require('../middleware/useSSE');
+const useIsMember = require('../middleware/useIsMember');
 
 const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
                 'rgb(0,121,191)', 'rgb(240, 85, 68)', 'rgb(56, 187, 244)',
                 'rgb(173, 80, 147)', 'rgb(74, 50, 221)', 'rgb(4, 107, 139)'];
 
-router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]),
+router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.params.boardID);
       const user = await User.findById(req.userID);
       if (!board || !user) { throw 'err'; }
       if (board.members.findIndex(member => String(member.email) === String(user.email)) < 0) { return res.sendStatus(401); }
-      const data = { color: board.color, activity: board.activity, members: board.members, title: board.title, boardID: board._id };
+      const data = { color: board.color, activity: board.activity, members: board.members,
+        title: board.title, boardID: board._id, creatorEmail: board.creatorEmail, desc: board.desc };
       res.status(200).json({ data });
     } catch (err) { res.sendStatus(500); }
   }
 );
 
-router.get('/stream/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useSSE,
+router.get('/stream/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useIsMember, useSSE,
   (req, res) => {
     const boardQuery = Board.findById(req.params.boardID);
     // stream board data to client every 10 seconds
     const dataInterval = setInterval(() => {
       boardQuery.exec((err, board) => {
-        const data = { color: board.color, activity: board.activity, members: board.members, title: board.title, boardID: board._id };
+        const data = { color: board.color, activity: board.activity, members: board.members, title: board.title,
+          boardID: board._id, creatorEmail: board.creatorEmail, desc: board.desc };
         res.sendEventData(data);
       });
     }, 10000);
@@ -55,7 +58,8 @@ router.post('/', auth, validate(
       const user = await User.findById(req.userID);
       if (!user) { throw 'err'; }
       // user is admin of new board by default
-      const board = new Board({ title: req.body.title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }], activity: [], color });
+      const board = new Board({ title: req.body.title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
+        activity: [], color, creatorEmail: user.email, desc: '' });
       await board.save();
       // add board to user's boards
       const newBoard = { boardID: board._id, title: board.title, isStarred: false, isAdmin: true, color: board.color };
@@ -67,9 +71,43 @@ router.post('/', auth, validate(
 );
 
 // authorization: member
+router.put('/color', auth, validate(
+  [body('boardID').not().isEmpty().escape(), body('color').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const board = await Board.findById(req.body.boardID);
+      board.color = req.body.color;
+      for (let member of board.members) {
+        const user = await User.findOne({ email: member.email });
+        const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+        if (index < 0) { throw 'err'; }
+        user.boards[index].color = req.body.color;
+        user.markModified('boards');
+        await user.save();
+      }
+      await board.save();
+      res.sendStatus(200);
+    } catch(err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: member
+router.put('/desc', auth, validate(
+  [body('boardID').not().isEmpty().escape(), body('desc').escape().isLength({ max: 300 })]), useIsMember,
+  async (req, res) => {
+    try {
+      const board = await Board.findById(req.body.boardID);
+      board.desc = req.body.desc;
+      await board.save();
+      res.sendStatus(200);
+    } catch(err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: member
 router.put('/title', auth, validate(
   [body('title').trim().isLength({ min: 1, max: 50 }).escape(),
-  body('boardID').not().isEmpty().escape()], 'Please enter a valid title.'),
+  body('boardID').not().isEmpty().escape()], 'Please enter a valid title.'), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findOne({ _id: req.body.boardID });

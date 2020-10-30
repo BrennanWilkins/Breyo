@@ -22,31 +22,6 @@
   right: auto;
   width: auto;
 }
-.AccountInfo {
-  padding-bottom: 15px;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  margin: 0 10px;
-}
-.NameIcon {
-  width: 40px;
-  height: 40px;
-  text-align: center;
-  text-transform: uppercase;
-  border-radius: 25px;
-  background: #ddd;
-  line-height: 40px;
-  font-weight: bold;
-  font-size: 18px;
-  margin-right: 10px;
-}
-.Email {
-  font-size: 14px;
-  font-weight: 300;
-  color: rgb(122, 122, 122);
-  margin-top: 3px;
-}
 .Options div {
   font-size: 14px;
   padding: 8px 10px;

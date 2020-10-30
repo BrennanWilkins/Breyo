@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { logout } from '../../../store/actions';
 import { useModalToggle } from '../../../utils/customHooks';
 import { CloseBtn } from '../../UI/Buttons/Buttons';
+import AccountInfo from '../../UI/AccountInfo/AccountInfo';
 
 const AccountModal = props => {
   const modalRef = useRef();
@@ -16,13 +17,7 @@ const AccountModal = props => {
         Account
         <CloseBtn close={props.close} color="rgb(112, 112, 112)" />
       </div>
-      <div className={classes.AccountInfo}>
-        <div className={classes.NameIcon}>{props.fullName.slice(0, 1)}</div>
-        <div>
-          <div>{props.fullName}</div>
-          <div className={classes.Email}>{props.email}</div>
-        </div>
-      </div>
+      <AccountInfo fullName={props.fullName} email={props.email} givePadding />
       <div className={classes.Options}>
         <div>Help</div>
         <div onClick={props.logout}>Log Out</div>

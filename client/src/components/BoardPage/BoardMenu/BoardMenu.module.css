@@ -2,14 +2,15 @@
   position: fixed;
   top: 40px;
   right: 0;
-  width: 300px;
+  width: 350px;
   height: calc(100% - 40px);
-  background: white;
+  background: rgb(250,250,250);
   box-shadow: var(--box-shadow4);
   padding: 10px 0;
   box-sizing: border-box;
   font-size: 15px;
   transition: transform 250ms, opacity 0ms, visibility 0ms;
+  overflow: hidden;
 }
 .HideModal {
   transform: translateX(110%);
@@ -21,15 +22,183 @@
   position: relative;
   text-align: center;
   padding-bottom: 10px;
-  border-bottom: 1px solid #ddd;
-  color: rgb(112, 112, 112);
+  border-bottom: 1.2px solid #ddd;
+  color: rgb(103, 103, 103);
   font-size: 15px;
   line-height: 29px;
   margin: 0 10px;
+  font-weight: 500;
 }
-.Title button {
+.CloseBtn button {
   position: absolute;
   right: 0;
   top: 0;
   margin: 0;
+}
+.ShowBackBtn button, .HideBackBtn button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+}
+.HideBackBtn button {
+  left: -50px;
+}
+.Content {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.Options {
+  padding: 15px 0;
+  margin: 0 10px;
+  border-bottom: 1.2px solid #ddd;
+}
+.Option {
+  border-radius: 2px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+.Option:hover {
+  background: rgb(238,238,238);
+}
+.SmallColor {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.Option svg {
+  margin-right: 8px;
+}
+.Activities {
+  padding: 15px 0;
+  margin: 0 10px;
+}
+.ActivityTitle svg {
+  font-size: 20px;
+}
+.BackgroundMenu {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  animation: slideIn 200ms forwards;
+  position: relative;
+}
+.BackgroundMenu div {
+  width: 165px;
+  height: 60px;
+  border-radius: 4px;
+  position: relative;
+  font-size: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  margin: 5px;
+}
+.BackgroundMenu span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.BackgroundMenu div:hover span {
+  background: rgb(255,255,255,0.2);
+}
+.AboutMenu {
+  animation: slideIn 200ms forwards;
+  padding: 10px;
+}
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.AboutTitle {
+  font-weight: 500;
+  margin: 10px 0 5px 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 17px;
+}
+.AboutTitle svg {
+  font-size: 25px;
+  margin-right: 8px;
+}
+.NoDesc {
+  margin: 15px auto 10px;
+  padding: 10px;
+  text-align: center;
+  border-radius: 4px;
+  background: rgb(230, 230, 230);
+  font-size: 14px;
+  cursor: pointer;
+  box-sizing: border-box;
+  width: 255px;
+  height: 80px;
+}
+.NoDesc:hover {
+  background: rgb(221, 221, 221);
+}
+.DescText {
+  margin: 15px 12px 10px;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+.AboutMenu textarea {
+  display: block;
+  resize: none;
+  margin: 15px auto 10px;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  width: 305px;
+  border: 2px solid rgb(var(--red));
+  outline: none;
+  font-family: 'Roboto', -apple-system, sans-serif;
+}
+.AboutEditBtn button, .FormatBtn button {
+  margin: 0 0 0 20px;
+  background: rgb(235, 235, 235);
+  color: black;
+  font-weight: 400;
+  padding: 5px 8px;
+}
+.AboutEditBtn button:hover, .AboutEditBtn button:active,
+.FormatBtn button:hover, .FormatBtn button:active {
+  background: rgb(219, 219, 219);
+}
+.AboutCloseBtn svg {
+  width: 30px !important;
+  height: 30px !important;
+}
+.AboutBtns {
+  padding: 0 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.SaveBtn button {
+  background: rgba(22, 179, 29, 0.8);
+  padding: 15px;
+}
+.SaveBtn button:hover, .SaveBtn button:active {
+  background: rgb(22, 179, 29);
+}
+.SaveBtn button:disabled {
+  background: rgba(0,0,0,0.1);
+}
+.FormatBtn button {
+  margin: 0 0 0 80px;
+  font-size: 14px;
+  color: rgb(94, 94, 94);
 }

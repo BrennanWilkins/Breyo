@@ -70,3 +70,23 @@ export const removeAdmin = (email, boardID) => async dispatch => {
 };
 
 export const demoteSelf = boardID => ({ type: actionTypes.DEMOTE_SELF, boardID });
+
+const updateColorDispatch = color => ({ type: actionTypes.UPDATE_COLOR, color });
+
+export const updateColor = (color, boardID) => async dispatch => {
+  try {
+    dispatch(updateColorDispatch(color));
+    await axios.put('/board/color', { color, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const updateBoardDescDispatch = desc => ({ type: actionTypes.UPDATE_BOARD_DESC, desc });
+
+export const updateBoardDesc = (desc, boardID) => async dispatch => {
+  try {
+    dispatch(updateBoardDescDispatch(desc));
+    await axios.put('/board/desc', { desc, boardID });
+  } catch (err) { console.log(err); }
+};

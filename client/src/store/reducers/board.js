@@ -5,7 +5,9 @@ const initialState = {
   members: [],
   color: 'rgb(250, 250, 250)',
   activity: [],
-  boardID: ''
+  boardID: '',
+  creatorEmail: '',
+  desc: ''
 };
 
 const reducer = (state = initialState, action) => {
@@ -16,7 +18,9 @@ const reducer = (state = initialState, action) => {
       members: [...action.payload.members],
       activity: [...action.payload.activity],
       color: action.payload.color,
-      boardID: action.payload.boardID
+      boardID: action.payload.boardID,
+      creatorEmail: action.payload.creatorEmail,
+      desc: action.payload.desc
     };
     case actionTypes.UPDATE_BOARD_TITLE: return {
       ...state,
@@ -40,6 +44,14 @@ const reducer = (state = initialState, action) => {
         members: updatedMembers
       };
     }
+    case actionTypes.UPDATE_COLOR: return {
+      ...state,
+      color: action.color
+    }
+    case actionTypes.UPDATE_BOARD_DESC: return {
+      ...state,
+      desc: action.desc
+    };
     default: return state;
   }
 };
