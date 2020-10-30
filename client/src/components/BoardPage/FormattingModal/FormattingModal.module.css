@@ -39,11 +39,16 @@
 }
 .Option span {
   font-size: 14px;
-  display: inline-block;
+  display: block;
+  margin-top: 10px;
 }
 .Option svg {
   font-size: 18px;
-  margin: 0 5px;
+  margin-left: 5px;
   position: relative;
   top: 3.5px;
+}
+.Option a {
+  text-decoration: underline;
+  color: black;
 }

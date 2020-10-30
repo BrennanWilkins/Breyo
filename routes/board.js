@@ -49,7 +49,7 @@ router.get('/stream/:boardID', auth, validate([param('boardID').not().isEmpty().
 );
 
 router.post('/', auth, validate(
-  [body('title').trim().isLength({ min: 1, max: 50 }).escape(),
+  [body('title').trim().isLength({ min: 1, max: 50 }).isAlphanumeric(),
   body('color').not().isEmpty().escape()]
   , 'Please enter a valid title.'),
   async (req, res) => {
@@ -75,6 +75,7 @@ router.put('/color', auth, validate(
   [body('boardID').not().isEmpty().escape(), body('color').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
+      if (!COLORS.includes(String(req.body.color))) { throw 'err'; }
       const board = await Board.findById(req.body.boardID);
       board.color = req.body.color;
       for (let member of board.members) {
@@ -106,7 +107,7 @@ router.put('/desc', auth, validate(
 
 // authorization: member
 router.put('/title', auth, validate(
-  [body('title').trim().isLength({ min: 1, max: 50 }).escape(),
+  [body('title').trim().isLength({ min: 1, max: 50 }).isAlphanumeric(),
   body('boardID').not().isEmpty().escape()], 'Please enter a valid title.'), useIsMember,
   async (req, res) => {
     try {

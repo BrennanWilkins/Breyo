@@ -40,7 +40,7 @@ router.post('/login', validate(
 router.post('/signup', validate(
   [body('*').escape(),
   body('email').isEmail().normalizeEmail(),
-  body('fullName').trim().isLength({ min: 1, max: 100 }),
+  body('fullName').trim().isLength({ min: 1, max: 100 }).isAlpha(),
   body('password').trim().isLength({ min: 8, max: 100 }),
   body('confirmPassword').trim().isLength({ min: 8, max: 100 })],
   'There was an error in one of the fields.'),

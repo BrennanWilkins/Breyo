@@ -24,7 +24,7 @@ const BoardPage = props => {
   //   source.onerror = errMsg => {
   //     console.log('Error: connection closed');
   //     source.close();
-  //     props.addNotif('There was an error while retrieving the board data.');
+  //     props.addNotif('Connection to the server was lost.');
   //   };
   //
   //   return () => {

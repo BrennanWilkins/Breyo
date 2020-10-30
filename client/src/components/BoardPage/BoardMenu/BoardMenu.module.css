@@ -153,6 +153,10 @@
   font-size: 14px;
   white-space: pre-wrap;
 }
+.DescText a {
+  text-decoration: underline;
+  color: black;
+}
 .AboutMenu textarea {
   display: block;
   resize: none;

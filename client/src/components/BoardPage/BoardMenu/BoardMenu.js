@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardMenu.module.css';
 import Button, { CloseBtn, BackBtn } from '../../UI/Buttons/Buttons';
@@ -10,6 +10,7 @@ import { updateColor, updateBoardDesc } from '../../../store/actions';
 import AccountInfo from '../../UI/AccountInfo/AccountInfo';
 import TextArea from 'react-textarea-autosize';
 import FormattingModal from '../FormattingModal/FormattingModal';
+import parseToJSX from '../../../utils/parseToJSX';
 
 const BoardMenu = props => {
   const [showBoardDesc, setShowBoardDesc] = useState(false);
@@ -21,6 +22,8 @@ const BoardMenu = props => {
   const menuRef = useRef();
   const descRef = useRef();
   useModalToggle(props.show, menuRef, props.close);
+
+  const formattedDesc = useMemo(() => parseToJSX(props.desc), [props.desc]);
 
   const resetState = () => {
     setShowChangeBackground(false);
@@ -86,7 +89,7 @@ const BoardMenu = props => {
         <div className={classes.NoDesc} onClick={() => setShowEditDesc(true)}>
           Add a description to let others know what this board is used for and what they can expect.
         </div>
-      : <div className={classes.DescText}>{props.desc}</div>}
+      : <div className={classes.DescText}>{formattedDesc}</div>}
     </div>
   );
 
