@@ -21,3 +21,4 @@ export const UPDATE_COLOR = 'UPDATE_COLOR';
 export const UPDATE_BOARD_DESC = 'UPDATE_BOARD_DESC';
 
 export const UPDATE_LIST_TITLE = 'UPDATE_LIST_TITLE';
+export const ADD_LIST = 'ADD_LIST';

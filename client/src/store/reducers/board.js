@@ -15,7 +15,7 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.UPDATE_ACTIVE_BOARD: return {
       ...state,
-      title: action.payload.title,
+      title: Entities.decode(action.payload.title),
       members: [...action.payload.members],
       activity: [...action.payload.activity],
       color: action.payload.color,

@@ -1,7 +1,14 @@
+.Container {
+  position: relative;
+  width: 275px;
+  min-width: 275px;
+  margin: 5px 0 5px 5px;
+  padding-right: 10px;
+  align-self: flex-start;
+}
 .AddBtn {
   border-radius: 4px;
   width: 275px;
-  margin: 5px 10px 5px 5px;
   display: inline-flex;
   align-items: center;
   font-size: 15px;
@@ -20,4 +27,60 @@
 }
 .AddBtn:active {
   background: rgb(255,255,255,0.5);
+}
+.ShowForm, .HideForm {
+  display: inline-block;
+  border-radius: 4px;
+  width: 275px;
+  font-size: 15px;
+  background: rgb(237,237,237);
+  padding: 5px;
+  box-sizing: border-box;
+  max-height: 100px;
+  transition: 250ms;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.HideForm {
+  opacity: 0;
+  visibility: hidden;
+  max-height: 0;
+}
+.Input {
+  border: 2px solid rgb(var(--red));
+  border-radius: 3px;
+  outline: none;
+  padding: 8px 5px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 15px;
+  margin-bottom: 3px;
+}
+.Btns {
+  display: flex;
+  align-items: center;
+}
+.SubmitBtn {
+  background: white;
+}
+.SubmitBtn button {
+  padding: 7px 10px;
+  border-radius: 3px;
+  border: 0;
+  outline: none;
+  color: white;
+  background: rgb(22, 179, 29);
+  cursor: pointer;
+  font-size: 15px;
+}
+.SubmitBtn button:hover {
+  background: rgba(22, 179, 29, 0.85);
+}
+.SubmitBtn button:active {
+  background: rgb(19, 150, 25);
+}
+.CloseBtn svg {
+  width: 30px !important;
+  height: 30px !important;
 }

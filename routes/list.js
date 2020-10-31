@@ -16,7 +16,8 @@ router.post('/', auth, validate(
       const board = await Board.findById(req.body.boardID);
       if (!board) { throw 'err'; }
       const title = req.body.title.replace(/\n/g, ' ');
-      const list = new List({ boardID: board._id, title, cards: [] });
+      const lists = await List.find({ boardID: req.body.boardID });
+      const list = new List({ boardID: board._id, title, cards: [], indexInBoard: lists.length });
       const newList = await list.save();
       res.status(200).json({ listID: newList._id });
     } catch (err) { res.sendStatus(500); }

@@ -8,7 +8,7 @@ const ListContainer = props => {
   return (
     <div className={classes.Container}>
       {props.lists.map(list => <List key={list.listID} {...list} boardID={props.boardID} />)}
-      <AddList listCount={props.lists.length} />
+      <AddList listCount={props.lists.length} boardID={props.boardID} />
     </div>
   );
 };
