@@ -19,3 +19,5 @@ export const REMOVE_ADMIN = 'REMOVE_ADMIN';
 export const DEMOTE_SELF = 'DEMOTE_SELF';
 export const UPDATE_COLOR = 'UPDATE_COLOR';
 export const UPDATE_BOARD_DESC = 'UPDATE_BOARD_DESC';
+
+export const UPDATE_LIST_TITLE = 'UPDATE_LIST_TITLE';
