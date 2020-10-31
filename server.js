@@ -5,6 +5,7 @@ const cors = require('cors');
 const config = require('config');
 const authRouter = require('./routes/auth');
 const boardRouter = require('./routes/board');
+const listRouter = require('./routes/list');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);
 app.use('/api/board', boardRouter);
+app.use('/api/list', listRouter);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'));

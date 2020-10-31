@@ -3,13 +3,12 @@ const router = express.Router();
 const Board = require('../models/board');
 const User = require('../models/user');
 const { body, param } = require('express-validator');
-const jwt = require('jsonwebtoken');
-const config = require('config');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsAdmin = require('../middleware/useIsAdmin');
 const useSSE = require('../middleware/useSSE');
 const useIsMember = require('../middleware/useIsMember');
+const List = require('../models/list');
 
 const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
                 'rgb(0,121,191)', 'rgb(240, 85, 68)', 'rgb(56, 187, 244)',
@@ -20,10 +19,11 @@ router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape(
     try {
       const board = await Board.findById(req.params.boardID);
       const user = await User.findById(req.userID);
+      const listData = await List.find({ boardID: board._id });
       if (!board || !user) { throw 'err'; }
-      if (board.members.findIndex(member => String(member.email) === String(user.email)) < 0) { return res.sendStatus(401); }
+      const lists = listData.map(list => ({ listID: list._id, title: list.title, cards: list.cards, indexInBoard: list.indexInBoard }));
       const data = { color: board.color, activity: board.activity, members: board.members,
-        title: board.title, boardID: board._id, creatorEmail: board.creatorEmail, desc: board.desc };
+        title: board.title, boardID: board._id, creatorEmail: board.creatorEmail, desc: board.desc, lists };
       res.status(200).json({ data });
     } catch (err) { res.sendStatus(500); }
   }
@@ -49,7 +49,7 @@ router.get('/stream/:boardID', auth, validate([param('boardID').not().isEmpty().
 );
 
 router.post('/', auth, validate(
-  [body('title').trim().isLength({ min: 1, max: 50 }).isAlphanumeric(),
+  [body('title').trim().isLength({ min: 1, max: 50 }).escape(),
   body('color').not().isEmpty().escape()]
   , 'Please enter a valid title.'),
   async (req, res) => {
@@ -65,6 +65,11 @@ router.post('/', auth, validate(
       const newBoard = { boardID: board._id, title: board.title, isStarred: false, isAdmin: true, color: board.color };
       user.boards.unshift(newBoard);
       await user.save();
+      // add default lists to board (to do, doing, done)
+      const list1 = new List({ boardID: board._id, title: 'To Do', cards: [], indexInBoard: 0 });
+      const list2 = new List({ boardID: board._id, title: 'Doing', cards: [], indexInBoard: 1 });
+      const list3 = new List({ boardID: board._id, title: 'Done', cards: [], indexInBoard: 2 });
+      await list1.save(); await list2.save(); await list3.save();
       res.status(200).json({ ...newBoard });
     } catch(err) { res.sendStatus(500); }
   }
@@ -107,7 +112,7 @@ router.put('/desc', auth, validate(
 
 // authorization: member
 router.put('/title', auth, validate(
-  [body('title').trim().isLength({ min: 1, max: 50 }).isAlphanumeric(),
+  [body('title').trim().isLength({ min: 1, max: 50 }).escape(),
   body('boardID').not().isEmpty().escape()], 'Please enter a valid title.'), useIsMember,
   async (req, res) => {
     try {
