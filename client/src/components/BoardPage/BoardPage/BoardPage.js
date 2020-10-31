@@ -8,8 +8,10 @@ import EventSourcePolyfill from 'eventsource';
 import { instance as axios } from '../../../axios';
 import { addNotif, updateActiveBoard, getBoardData } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
+import ListContainer from '../Lists/ListContainer/ListContainer';
 
 const BoardPage = props => {
+  // UNCOMMENT TO ENABLE EVENT SOURCE
   // useEffect(() => {
   //   const id = props.match.params.boardID;
   //   const url = 'http://localhost:9000/api/board/stream/' + id;
@@ -57,6 +59,7 @@ const BoardPage = props => {
     props.boardID !== props.match.params.boardID ? <Spinner /> :
     <div className={classes.Container} style={{ background: props.color }}>
       <BoardNavBar />
+      <ListContainer />
     </div>
   );
 };

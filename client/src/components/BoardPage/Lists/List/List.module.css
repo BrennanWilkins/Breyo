@@ -1,0 +1,89 @@
+.List {
+  background: rgb(237,237,237);
+  border-radius: 4px;
+  box-shadow: var(--box-shadow5);
+  width: 275px;
+  min-width: 275px;
+  margin: 5px;
+  display: inline-block;
+  padding: 7px;
+  box-sizing: border-box;
+  max-height: calc(100% - 10px);
+  align-self: flex-start;
+  overflow: hidden;
+}
+.TitleInput {
+  background: transparent;
+  border: 0;
+  outline: none;
+  padding: 5px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 3px;
+  border: 2px solid transparent;
+  transition: 100ms;
+  width: 240px;
+  box-sizing: border-box;
+  font-family: 'Roboto', -apple-system, sans-serif;
+  resize: none;
+  overflow: hidden;
+}
+.TitleInput:focus {
+  background: white;
+  border: 2px solid rgb(var(--red));
+  cursor: auto;
+}
+.AddCardBtn {
+  margin-top: 10px;
+  width: 100%;
+  border-radius: 3px;
+  box-sizing: border-box;
+  height: 28px;
+  font-size: 14px;
+  cursor: pointer;
+  color: rgb(87, 87, 87);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.AddCardBtn svg {
+  width: 17px !important;
+  height: 17px !important;
+  margin: 0 5px;
+  color: rgb(80, 80, 80);
+}
+.AddCardBtn:hover, .CardOptionBtn:hover {
+  background: rgb(220,220,220);
+}
+.AddCardBtn:active, .CardOptionBtn:active {
+  background: rgb(210, 210, 210);
+}
+.CardOptionBtn {
+  border-radius: 3px;
+  cursor: pointer;
+  color: rgb(87, 87, 87);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: 5px;
+}
+.ListTop {
+  display: flex;
+  align-items: flex-start;
+}
+.CardContainer::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.CardContainer::-webkit-scrollbar {
+  width: 8px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.CardContainer::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}
