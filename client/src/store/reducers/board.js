@@ -19,7 +19,7 @@ const reducer = (state = initialState, action) => {
       members: [...action.payload.members],
       activity: [...action.payload.activity],
       color: action.payload.color,
-      boardID: action.payload.boardID,
+      boardID: action.payload._id,
       creatorEmail: action.payload.creatorEmail,
       desc: Entities.decode(action.payload.desc)
     };

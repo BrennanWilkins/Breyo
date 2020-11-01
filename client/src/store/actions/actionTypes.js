@@ -22,3 +22,7 @@ export const UPDATE_BOARD_DESC = 'UPDATE_BOARD_DESC';
 
 export const UPDATE_LIST_TITLE = 'UPDATE_LIST_TITLE';
 export const ADD_LIST = 'ADD_LIST';
+
+export const ADD_CARD = 'ADD_CARD';
+export const SET_CARD_DETAILS = 'SET_CARD_DETAILS';
+export const UPDATE_CARD_TITLE = 'UPDATE_CARD_TITLE';

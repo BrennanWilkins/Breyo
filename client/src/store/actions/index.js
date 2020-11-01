@@ -3,3 +3,4 @@ export { createBoard, toggleIsStarred, updateActiveBoard, updateBoardTitle, send
 addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc } from './board';
 export { addNotif, deleteNotif } from './notifications';
 export { updateListTitle, addList } from './lists';
+export { addCard, setCardDetails, updateCardTitle } from './card';
