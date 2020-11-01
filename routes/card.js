@@ -6,6 +6,8 @@ const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsMember = require('../middleware/useIsMember');
 
+const LABEL_COLORS = ['#F60000', '#FF8C00', '#FFEE00', '#4DE94C', '#3783FF', '#4815AA'];
+
 router.post('/', auth, validate(
   [body('boardID').not().isEmpty().escape(),
   body('listID').not().isEmpty().escape(),
@@ -36,6 +38,51 @@ router.put('/title', auth, validate(
       const title = req.body.title.replace(/\n/g, ' ');
       const card = list.cards.id(req.body.cardID);
       card.title = title;
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/desc', auth, validate(
+  [body('cardID').not().isEmpty().escape(),
+  body('boardID').not().isEmpty().escape(),
+  body('listID').not().isEmpty().escape(),
+  body('desc').isLength({ max: 300 }).escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      card.desc = req.body.desc;
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/label/add', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      if (!LABEL_COLORS.includes(req.body.color)) { throw 'err'; }
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      card.labels = [...card.labels, req.body.color];
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/label/remove', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      if (!LABEL_COLORS.includes(req.body.color)) { throw 'err'; }
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      card.labels.splice(card.labels.indexOf(req.body.color), 1);
       await list.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
