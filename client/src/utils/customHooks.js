@@ -4,6 +4,7 @@ export const useModalToggle = (show, ref, close) => {
   return useEffect(() => {
     const handleClick = e => {
       // close modal if user clicks outside of modal
+      if (!ref.current) { return; }
       if (ref.current.contains(e.target)) { return; }
       close();
     };

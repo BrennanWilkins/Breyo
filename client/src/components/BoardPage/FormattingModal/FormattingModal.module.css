@@ -9,6 +9,20 @@
   padding: 10px 0;
   box-sizing: border-box;
   font-size: 15px;
+  overflow-y: auto;
+}
+.Container::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Container::-webkit-scrollbar {
+  width: 8px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Container::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
 }
 .Title {
   position: relative;
