@@ -1,0 +1,22 @@
+.Container {
+  width: 20%;
+  display: inline-block;
+  margin-top: 10px;
+}
+.Title {
+  color: rgb(130, 130, 130);
+  font-size: 14px;
+  font-weight: 500;
+}
+.Btn button {
+  width: 100%;
+  justify-content: flex-start;
+  margin: 5px 0;
+}
+.Btn button svg {
+  margin: 0 10px 0 5px;
+  font-size: 15px;
+}
+.LabelBtn {
+  position: relative;
+}

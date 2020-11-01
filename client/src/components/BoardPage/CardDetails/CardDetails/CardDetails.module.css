@@ -15,13 +15,11 @@
   left: max(calc(50% - 375px), 2%);
   width: 96%;
   max-width: 750px;
-  background: rgb(237,237,237);
+  background: rgb(246,246,246);
   margin-bottom: 10px;
   padding: 15px;
   box-sizing: border-box;
   border-radius: 2px;
-
-  height: 1000px;
 }
 .CloseBtn {
   position: absolute;
@@ -35,4 +33,12 @@
 .CloseBtn svg {
   width: 30px !important;
   height: 30px !important;
+}
+.LeftDetails {
+  width: 80%;
+  display: inline-block;
+}
+.DetailContent {
+  display: flex;
+  align-items: flex-start;
 }

@@ -6,9 +6,33 @@
   font-size: 14px;
   background: white;
   box-shadow: var(--cardShadow);
-  margin: 8px 0;
   cursor: pointer;
+  position: relative;
+  margin-bottom: 8px;
 }
 .Card:hover {
   background: rgb(246, 246, 246);
+}
+.Card:hover .EditIcon {
+  display: block;
+}
+.EditIcon {
+  color: rgb(136, 136, 136);
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  display: none;
+}
+.Labels {
+  width: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.Labels div {
+  display: inline-block;
+  height: 8px;
+  width: 40px;
+  border-radius: 15px;
+  margin: 2px;
 }

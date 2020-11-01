@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 import classes from './CardDetails.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import { CloseBtn } from '../../../UI/Buttons/Buttons';
-import CardTitle from '../CardTitle/CardTitle';
 import { connect } from 'react-redux';
+import CardTitle from '../CardTitle/CardTitle';
+import CardDesc from '../CardDesc/CardDesc';
+import CardOptions from '../CardOptions/CardOptions';
+import CardActivity from '../CardActivity/CardActivity';
 
 const CardDetails = props => {
   const modalRef = useRef();
@@ -16,10 +19,16 @@ const CardDetails = props => {
         <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
         <CardTitle title={props.currentCard.title} listTitle={props.currentListTitle}
         boardID={props.boardID} listID={props.listID} cardID={props.cardID} />
-        {/*<CardDesc />
-        <CardChecklists />
-        <CardOptions />
-        <CardActivity />*/}
+        <div className={classes.DetailContent}>
+          <div className={classes.LeftDetails}>
+            {/*{!!props.currentCard.labels.length && <CardLabels />}
+            {!!props.currentCard.dueDate && <CardDueDate />}*/}
+            <CardDesc boardID={props.boardID} listID={props.listID} cardID={props.cardID} currentCard={props.currentCard} />
+            {/*<CardChecklists />*/}
+            <CardActivity />
+          </div>
+          <CardOptions />
+        </div>
       </div>
     </div>
   );
