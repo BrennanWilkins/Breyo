@@ -1,0 +1,38 @@
+.Container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgb(0,0,0,0.5);
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 100;
+}
+.CardDetails {
+  position: absolute;
+  top: 45px;
+  left: max(calc(50% - 375px), 2%);
+  width: 96%;
+  max-width: 750px;
+  background: rgb(237,237,237);
+  margin-bottom: 10px;
+  padding: 15px;
+  box-sizing: border-box;
+  border-radius: 2px;
+
+  height: 1000px;
+}
+.CloseBtn {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.CloseBtn button {
+  padding: 3px;
+  border-radius: 25px;
+}
+.CloseBtn svg {
+  width: 30px !important;
+  height: 30px !important;
+}

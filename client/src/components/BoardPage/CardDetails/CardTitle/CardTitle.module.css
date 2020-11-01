@@ -1,0 +1,40 @@
+.Row {
+  display: flex;
+  align-items: flex-start;
+}
+.Input {
+  border: 2px solid transparent;
+  background: transparent;
+  border-radius: 3px;
+  outline: none;
+  padding: 7px;
+  width: calc(100% - 70px);
+  box-sizing: border-box;
+  font-size: 18px;
+  font-weight: 500;
+  resize: none;
+  font-family: 'Roboto', -apple-system, sans-serif;
+  overflow: hidden;
+  cursor: pointer;
+}
+.Input:focus {
+  border: 2px solid rgb(var(--red));
+  background: white;
+  cursor: text;
+}
+.Icon {
+  font-size: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  margin: 0 10px 0 5px;
+}
+.ListTitle {
+  font-weight: 300;
+  font-size: 14px;
+  margin: 5px 0 0 45px;
+}
+.ListTitle span {
+  font-weight: 400;
+}

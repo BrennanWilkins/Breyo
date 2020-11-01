@@ -6,9 +6,10 @@ import { connect } from 'react-redux';
 import BoardNavBar from '../BoardNavBar/BoardNavBar';
 import EventSourcePolyfill from 'eventsource';
 import { instance as axios } from '../../../axios';
-import { addNotif, updateActiveBoard, getBoardData } from '../../../store/actions';
+import { addNotif, updateActiveBoard, getBoardData, setCardDetails } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
 import ListContainer from '../Lists/ListContainer/ListContainer';
+import CardDetails from '../CardDetails/CardDetails/CardDetails';
 
 const BoardPage = props => {
   // UNCOMMENT TO ENABLE EVENT SOURCE
@@ -57,10 +58,14 @@ const BoardPage = props => {
 
   return (
     props.boardID !== props.match.params.boardID ? <Spinner /> :
+    <>
     <div className={classes.Container} style={{ background: props.color }}>
       <BoardNavBar />
       <ListContainer />
     </div>
+    {props.shownCardID !== null && props.shownListID !== null &&
+      <CardDetails close={props.hideCardDetails} cardID={props.shownCardID} listID={props.shownListID} />}
+    </>
   );
 };
 
@@ -68,17 +73,21 @@ BoardPage.propTypes = {
   addNotif: PropTypes.func.isRequired,
   updateActiveBoard: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired
+  boardID: PropTypes.string.isRequired,
+  hideCardDetails: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
   color: state.board.color,
-  boardID: state.board.boardID
+  boardID: state.board.boardID,
+  shownCardID: state.lists.shownCardID,
+  shownListID: state.lists.shownListID
 });
 
 const mapDispatchToProps = dispatch => ({
   addNotif: msg => dispatch(addNotif(msg)),
-  updateActiveBoard: data => dispatch(updateActiveBoard(data))
+  updateActiveBoard: data => dispatch(updateActiveBoard(data)),
+  hideCardDetails: () => dispatch(setCardDetails(null, null))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(BoardPage));
