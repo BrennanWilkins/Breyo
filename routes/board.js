@@ -17,13 +17,10 @@ const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
 router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.params.boardID);
-      const user = await User.findById(req.userID);
-      const listData = await List.find({ boardID: board._id });
-      if (!board || !user) { throw 'err'; }
-      const lists = listData.map(list => ({ listID: list._id, title: list.title, cards: list.cards, indexInBoard: list.indexInBoard }));
-      const data = { color: board.color, activity: board.activity, members: board.members,
-        title: board.title, boardID: board._id, creatorEmail: board.creatorEmail, desc: board.desc, lists };
+      const board = await Board.findById(req.params.boardID).lean();
+      if (!board) { throw 'err'; }
+      const listData = await List.find({ boardID: board._id }).lean();
+      const data = { ...board, lists: listData };
       res.status(200).json({ data });
     } catch (err) { res.sendStatus(500); }
   }
@@ -57,12 +54,13 @@ router.post('/', auth, validate(
       const color = COLORS.includes(req.body.color) ? req.body.color : COLORS[4];
       const user = await User.findById(req.userID);
       if (!user) { throw 'err'; }
+      const title = req.body.title.replace(/\n/g, ' ');
       // user is admin of new board by default
-      const board = new Board({ title: req.body.title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
+      const board = new Board({ title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
         activity: [], color, creatorEmail: user.email, desc: '' });
       await board.save();
       // add board to user's boards
-      const newBoard = { boardID: board._id, title: board.title, isStarred: false, isAdmin: true, color: board.color };
+      const newBoard = { boardID: board._id, title, isStarred: false, isAdmin: true, color: board.color };
       user.boards.unshift(newBoard);
       await user.save();
       // add default lists to board (to do, doing, done)
@@ -117,7 +115,8 @@ router.put('/title', auth, validate(
   async (req, res) => {
     try {
       const board = await Board.findOne({ _id: req.body.boardID });
-      board.title = req.body.title;
+      const title = req.body.title.replace(/\n/g, ' ');
+      board.title = title;
       for (let member of board.members) {
         const user = await User.findOne({ email: member.email });
         const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));

@@ -49,7 +49,7 @@ router.put('/title', auth, validate(
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'err'; }
       list.title = req.body.title.replace(/\n/g, ' ');
-      list.save();
+      await list.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
