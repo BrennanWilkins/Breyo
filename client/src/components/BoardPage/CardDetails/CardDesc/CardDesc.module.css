@@ -1,0 +1,81 @@
+.Title {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  margin-top: 20px;
+}
+.Title svg {
+  font-size: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  margin: 0 20px 0 5px;
+}
+.NoDesc {
+  margin: 5px 0 10px 45px;
+  padding: 10px;
+  border-radius: 4px;
+  background: rgb(230, 230, 230);
+  font-size: 14px;
+  cursor: pointer;
+  box-sizing: border-box;
+  width: calc(100% - 60px);
+  height: 60px;
+}
+.NoDesc:hover {
+  background: rgb(221, 221, 221);
+}
+.DescText {
+  margin: 5px 0 10px 45px;
+  padding: 10px 0;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  width: calc(100% - 60px);
+}
+.DescText a {
+  text-decoration: underline;
+  color: black;
+}
+.Input {
+  display: block;
+  resize: none;
+  margin: 5px 0 10px 45px;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  width: calc(100% - 60px);
+  border: 2px solid rgb(var(--red));
+  outline: none;
+  font-family: 'Roboto', -apple-system, sans-serif;
+}
+.EditBtn button {
+  margin: 0 0 0 20px;
+  font-size: 16px;
+}
+.CloseBtn svg {
+  width: 30px !important;
+  height: 30px !important;
+}
+.Btns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 15px 0 45px;
+}
+.LeftBtns {
+  display: flex;
+  align-items: center;
+}
+.SaveBtn button {
+  background: rgba(22, 179, 29, 0.8);
+  padding: 15px;
+}
+.SaveBtn button:hover, .SaveBtn button:active {
+  background: rgb(22, 179, 29);
+}
+.SaveBtn button:disabled {
+  background: rgba(0,0,0,0.1);
+}

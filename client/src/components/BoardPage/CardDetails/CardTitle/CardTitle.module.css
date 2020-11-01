@@ -10,7 +10,7 @@
   padding: 7px;
   width: calc(100% - 70px);
   box-sizing: border-box;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 500;
   resize: none;
   font-family: 'Roboto', -apple-system, sans-serif;
@@ -33,7 +33,7 @@
 .ListTitle {
   font-weight: 300;
   font-size: 14px;
-  margin: 5px 0 0 45px;
+  margin: 5px 0 0 47px;
 }
 .ListTitle span {
   font-weight: 400;
