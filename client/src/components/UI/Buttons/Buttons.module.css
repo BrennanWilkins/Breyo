@@ -78,3 +78,23 @@
 .CollapseBtn {
   transform: rotate(0deg);
 }
+.ActionBtn {
+  padding: 7px 10px;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  outline: none;
+  transition: 250ms;
+  background: rgb(235, 235, 235);
+  color: rgb(83, 83, 83);
+  font-size: 14px;
+}
+.ActionBtn:hover {
+  background: rgb(219, 219, 219);
+}
+.ActionBtn:active {
+  background: rgb(254, 190, 183);
+}

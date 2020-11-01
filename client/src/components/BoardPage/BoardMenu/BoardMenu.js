@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardMenu.module.css';
-import Button, { CloseBtn, BackBtn } from '../../UI/Buttons/Buttons';
+import Button, { CloseBtn, BackBtn, ActionBtn } from '../../UI/Buttons/Buttons';
 import { useModalToggle } from '../../../utils/customHooks';
 import { connect } from 'react-redux';
 import { boardIcon, activityIcon, checkIcon, personIcon, descIcon } from '../../UI/icons';
@@ -76,14 +76,14 @@ const BoardMenu = props => {
       <AccountInfo fullName={props.creatorFullName} email={props.creatorEmail} givePadding noBorder />
       <div className={classes.AboutTitle}>{descIcon}Description
         {!showEditDesc && props.desc.length > 0 &&
-          <span className={classes.AboutEditBtn}><Button clicked={() => setShowEditDesc(true)}>Edit</Button></span>}
+          <span className={classes.AboutEditBtn}><ActionBtn clicked={() => setShowEditDesc(true)}>Edit</ActionBtn></span>}
       </div>
       {showEditDesc ? <>
         <TextArea minRows="3" maxRows="50" value={descInput} onChange={e => setDescInput(e.target.value)} ref={descRef} />
         <div className={classes.AboutBtns}>
           <span className={classes.SaveBtn}><Button clicked={saveDescHandler} disabled={descInput === props.desc}>Save</Button></span>
           <span className={classes.AboutCloseBtn}><CloseBtn close={() => { setShowEditDesc(false); setDescInput(props.desc); }} /></span>
-          <span className={classes.FormatBtn}><Button clicked={() => setShowFormattingHelp(true)}>Formatting help</Button></span>
+          <span className={classes.FormatBtn}><ActionBtn clicked={() => setShowFormattingHelp(true)}>Formatting help</ActionBtn></span>
         </div>
       </> : props.desc.length === 0 ?
         <div className={classes.NoDesc} onClick={() => setShowEditDesc(true)}>

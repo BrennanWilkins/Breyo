@@ -22,4 +22,8 @@ export const BackBtn = props => (
   <button className={classes.BackBtn} onClick={props.back}>{backIcon}</button>
 );
 
+export const ActionBtn = props => (
+  <button className={classes.ActionBtn} onClick={props.clicked}>{props.children}</button>
+);
+
 export default Button;
