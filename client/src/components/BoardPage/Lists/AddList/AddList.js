@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import classes from './AddList.module.css';
 import { plusIcon } from '../../../UI/icons';
 import { useModalToggle } from '../../../../utils/customHooks';
-import { CloseBtn } from '../../../UI/Buttons/Buttons';
 import { connect } from 'react-redux';
 import { addList } from '../../../../store/actions';
+import SubmitBtns from '../../../UI/SubmitBtns/SubmitBtns';
 
 const AddList = props => {
   const [showForm, setShowForm] = useState(false);
@@ -37,10 +37,7 @@ const AddList = props => {
       <form ref={formRef} className={showForm ? classes.ShowForm : classes.HideForm} onSubmit={submitHandler}>
         <input className={classes.Input} ref={inputRef} value={newListTitle} onChange={e => setNewListTitle(e.target.value)}
         placeholder="Enter list title" />
-        <div className={classes.Btns}>
-          <span className={classes.SubmitBtn}><button type="submit">Add List</button></span>
-          <span className={classes.CloseBtn}><CloseBtn close={() => setShowForm(false)} /></span>
-        </div>
+        <SubmitBtns text="Add List" close={() => setShowForm(false)} />
       </form>
     </div>
   );

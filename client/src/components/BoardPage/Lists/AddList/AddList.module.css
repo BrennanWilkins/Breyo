@@ -41,6 +41,7 @@
   position: absolute;
   top: 0;
   left: 0;
+  overflow: hidden;
 }
 .HideForm {
   opacity: 0;
@@ -56,31 +57,4 @@
   box-sizing: border-box;
   font-size: 15px;
   margin-bottom: 3px;
-}
-.Btns {
-  display: flex;
-  align-items: center;
-}
-.SubmitBtn {
-  background: white;
-}
-.SubmitBtn button {
-  padding: 7px 10px;
-  border-radius: 3px;
-  border: 0;
-  outline: none;
-  color: white;
-  background: rgb(22, 179, 29);
-  cursor: pointer;
-  font-size: 15px;
-}
-.SubmitBtn button:hover {
-  background: rgba(22, 179, 29, 0.85);
-}
-.SubmitBtn button:active {
-  background: rgb(19, 150, 25);
-}
-.CloseBtn svg {
-  width: 30px !important;
-  height: 30px !important;
 }
