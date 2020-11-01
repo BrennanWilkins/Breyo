@@ -56,6 +56,41 @@ const reducer = (state = initialState, action) => {
       lists[listIndex] = list;
       return { ...state, lists };
     }
+    case actionTypes.UPDATE_CARD_DESC: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex], desc: action.desc };
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.ADD_CARD_LABEL: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const labels = [...card.labels, action.color];
+      card.labels = labels;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.REMOVE_CARD_LABEL: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const labels = [...card.labels];
+      labels.splice(labels.indexOf(action.color), 1);
+      card.labels = labels;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
     default: return state;
   }
 };

@@ -26,3 +26,6 @@ export const ADD_LIST = 'ADD_LIST';
 export const ADD_CARD = 'ADD_CARD';
 export const SET_CARD_DETAILS = 'SET_CARD_DETAILS';
 export const UPDATE_CARD_TITLE = 'UPDATE_CARD_TITLE';
+export const UPDATE_CARD_DESC = 'UPDATE_CARD_DESC';
+export const ADD_CARD_LABEL = 'ADD_CARD_LABEL';
+export const REMOVE_CARD_LABEL = 'REMOVE_CARD_LABEL';

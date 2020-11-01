@@ -25,3 +25,36 @@ export const updateCardTitle = (title, cardID, listID, boardID) => async dispatc
     console.log(err);
   }
 };
+
+const updateCardDescDispatch = (desc, cardID, listID) => ({ type: actionTypes.UPDATE_CARD_DESC, desc, cardID, listID });
+
+export const updateCardDesc = (desc, cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch(updateCardDescDispatch(desc, cardID, listID));
+    await axios.put('/card/desc', { desc, cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const addLabel = (color, cardID, listID) => ({ type: actionTypes.ADD_CARD_LABEL, color, cardID, listID });
+
+export const addCardLabel = (color, cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch(addLabel(color, cardID, listID));
+    await axios.put('/card/label/add', { color, cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const removeLabel = (color, cardID, listID) => ({ type: actionTypes.REMOVE_CARD_LABEL, color, cardID, listID });
+
+export const removeCardLabel = (color, cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch(removeLabel(color, cardID, listID));
+    await axios.put('/card/label/remove', { color, cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+}
