@@ -91,6 +91,42 @@ const reducer = (state = initialState, action) => {
       lists[listIndex] = list;
       return { ...state, lists };
     }
+    case actionTypes.TOGGLE_DUE_DATE: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const dueDate = {...card.dueDate};
+      dueDate.isComplete = !dueDate.isComplete;
+      card.dueDate = dueDate;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.ADD_DUE_DATE: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const dueDate = { dueDate: action.dueDate, isComplete: false };
+      card.dueDate = dueDate;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.REMOVE_DUE_DATE: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      card.dueDate = null;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
     default: return state;
   }
 };

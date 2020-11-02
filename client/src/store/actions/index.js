@@ -4,4 +4,4 @@ addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc } from './board'
 export { addNotif, deleteNotif } from './notifications';
 export { updateListTitle, addList } from './lists';
 export { addCard, setCardDetails, updateCardTitle, updateCardDesc, addCardLabel,
-removeCardLabel } from './card';
+removeCardLabel, toggleDueDateIsComplete, addDueDate, removeDueDate } from './card';

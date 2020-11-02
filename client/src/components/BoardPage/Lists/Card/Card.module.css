@@ -36,3 +36,23 @@
   border-radius: 15px;
   margin: 2px;
 }
+.Btns {
+  font-size: 12.5px;
+  color: rgb(89, 89, 89);
+  display: flex;
+  align-items: center;
+}
+.DueDate {
+  margin: 8px 5px 0 5px;
+  display: inline-flex;
+  align-items: center;
+}
+.DueDate svg {
+  margin-right: 3px;
+}
+.DueDateComplete {
+  border-radius: 3px;
+  background: rgb(var(--green));
+  color: white;
+  padding: 3px 5px;
+}

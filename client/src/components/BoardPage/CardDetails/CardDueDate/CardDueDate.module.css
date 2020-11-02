@@ -1,0 +1,16 @@
+.Container {
+  margin: 15px 18px 10px 47px;
+}
+.Title {
+  color: rgb(130, 130, 130);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+.Input {
+  display: flex;
+  align-items: center;
+}
+.Btn {
+  margin-left: 5px;
+}

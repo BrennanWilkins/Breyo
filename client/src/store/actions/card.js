@@ -46,7 +46,7 @@ export const addCardLabel = (color, cardID, listID, boardID) => async dispatch =
   } catch (err) {
     console.log(err);
   }
-}
+};
 
 const removeLabel = (color, cardID, listID) => ({ type: actionTypes.REMOVE_CARD_LABEL, color, cardID, listID });
 
@@ -57,4 +57,37 @@ export const removeCardLabel = (color, cardID, listID, boardID) => async dispatc
   } catch (err) {
     console.log(err);
   }
-}
+};
+
+const toggleIsCompleteDispatch = (cardID, listID) => ({ type: actionTypes.TOGGLE_DUE_DATE, cardID, listID });
+
+export const toggleDueDateIsComplete = (cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch(toggleIsCompleteDispatch(cardID, listID));
+    await axios.put('/card/dueDate/isComplete', { cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const addDueDateDispatch = (dueDate, cardID, listID) => ({ type: actionTypes.ADD_DUE_DATE, dueDate, cardID, listID });
+
+export const addDueDate = (dueDate, cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch(addDueDateDispatch(dueDate, cardID, listID));
+    await axios.put('/card/dueDate/add', { dueDate, cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const removeDueDateDispatch = (cardID, listID) => ({ type: actionTypes.REMOVE_DUE_DATE, cardID, listID });
+
+export const removeDueDate = (cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch(removeDueDateDispatch(cardID, listID));
+    await axios.put('/card/dueDate/remove', { cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
