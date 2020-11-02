@@ -108,7 +108,7 @@ router.put('/dueDate/isComplete', auth, validate([body('*').not().isEmpty().esca
   }
 );
 
-router.put('/dueDate/add', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.post('/dueDate', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -131,6 +131,39 @@ router.put('/dueDate/remove', auth, validate([body('*').not().isEmpty().escape()
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
       card.dueDate = null;
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.post('/checklist', auth, validate(
+  [body('*').not().isEmpty().escape()],
+  [body('title').isLength({ min: 1, max: 100 })]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
+      const title = req.body.title.replace(/\n/g, ' ');
+      card.checklists.push({ title, items: [] });
+      const updatedList = await list.save();
+      const checklists = updatedList.cards.id(req.body.cardID).checklists;
+      const checklistID = checklists[checklists.length - 1]._id;
+      res.status(200).json({ checklistID });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/checklist/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
+      card.checklists.id(req.body.checklistID).remove();
       await list.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }

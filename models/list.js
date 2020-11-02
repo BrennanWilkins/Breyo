@@ -1,9 +1,14 @@
 const mongoose = require('mongoose');
 
+const ChecklistSchema = new mongoose.Schema({
+  title: String,
+  items: []
+});
+
 const CardSchema = new mongoose.Schema({
   title: String,
   desc: String,
-  checklists: [],
+  checklists: [ChecklistSchema],
   labels: [],
   dueDate: {}
 });
