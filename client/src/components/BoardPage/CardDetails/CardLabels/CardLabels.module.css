@@ -1,0 +1,25 @@
+.Container {
+  margin: 15px 18px 10px 47px;
+}
+.Title {
+  color: rgb(130, 130, 130);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+.Labels {
+  display: flex;
+  flex-wrap: wrap;
+}
+.Label {
+  width: 40px;
+  height: 32px;
+  border-radius: 4px;
+  margin-right: 4px;
+}
+.Btn {
+  position: relative;
+}
+.AddBtn button {
+  padding: 5px;
+}

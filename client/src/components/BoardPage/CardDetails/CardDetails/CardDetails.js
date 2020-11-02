@@ -8,6 +8,7 @@ import CardTitle from '../CardTitle/CardTitle';
 import CardDesc from '../CardDesc/CardDesc';
 import CardOptions from '../CardOptions/CardOptions';
 import CardActivity from '../CardActivity/CardActivity';
+import CardLabels from '../CardLabels/CardLabels';
 
 const CardDetails = props => {
   const modalRef = useRef();
@@ -21,8 +22,8 @@ const CardDetails = props => {
         boardID={props.boardID} listID={props.listID} cardID={props.cardID} />
         <div className={classes.DetailContent}>
           <div className={classes.LeftDetails}>
-            {/*{!!props.currentCard.labels.length && <CardLabels />}
-            {!!props.currentCard.dueDate && <CardDueDate />}*/}
+            {props.currentCard.labels.length > 0 && <CardLabels currentCard={props.currentCard} />}
+            {/*{!!props.currentCard.dueDate && <CardDueDate />}*/}
             <CardDesc boardID={props.boardID} listID={props.listID} cardID={props.cardID} currentCard={props.currentCard} />
             {/*<CardChecklists />*/}
             <CardActivity />

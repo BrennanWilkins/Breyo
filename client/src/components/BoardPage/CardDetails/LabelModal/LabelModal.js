@@ -21,7 +21,7 @@ const LabelModal = props => {
   };
 
   return (
-    <div ref={modalRef} className={classes.Container}>
+    <div ref={modalRef} className={props.openFromMiddle ? `${classes.Container} ${classes.MiddlePos}` : classes.Container}>
       <div className={classes.Title}>Labels<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
       {LABEL_COLORS.map((color, i) => (
         <div key={i} style={{background: color}} className={classes.Color} onClick={() => colorHandler(color)}>
@@ -39,7 +39,8 @@ LabelModal.propTypes = {
   cardID: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
   addCardLabel: PropTypes.func.isRequired,
-  removeCardLabel: PropTypes.func.isRequired
+  removeCardLabel: PropTypes.func.isRequired,
+  openFromMiddle: PropTypes.bool
 };
 
 const mapStateToProps = state => ({

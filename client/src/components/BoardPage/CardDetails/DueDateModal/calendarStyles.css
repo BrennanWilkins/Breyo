@@ -1,0 +1,14 @@
+.react-datepicker__day--selected, .react-datepicker__time-list-item--selected {
+  background: rgb(var(--red)) !important;
+}
+.react-datepicker__day--selected:hover, .react-datepicker__time-list-item--selected:hover {
+  background: rgba(var(--red), 0.9) !important;
+}
+.react-datepicker__day--keyboard-selected, .react-datepicker__day--keyboard-selected:hover {
+  background: rgba(var(--red), 0.7);
+}
+.react-datepicker__time-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
