@@ -37,6 +37,7 @@ router.put('/title', auth, validate(
       if (!list) { throw 'err'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
       card.title = title;
       await list.save();
       res.sendStatus(200);
@@ -54,6 +55,7 @@ router.put('/desc', auth, validate(
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
       card.desc = req.body.desc;
       await list.save();
       res.sendStatus(200);
@@ -68,6 +70,7 @@ router.put('/label/add', auth, validate([body('*').not().isEmpty().escape()]), u
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
       card.labels = [...card.labels, req.body.color];
       await list.save();
       res.sendStatus(200);
@@ -82,7 +85,52 @@ router.put('/label/remove', auth, validate([body('*').not().isEmpty().escape()])
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
       card.labels.splice(card.labels.indexOf(req.body.color), 1);
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/dueDate/isComplete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      if (!card || !card.dueDate) { throw 'err'; }
+      card.dueDate.isComplete = !card.dueDate.isComplete;
+      list.markModified('cards');
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/dueDate/add', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
+      if (isNaN(new Date(req.body.dueDate).getDate())) { throw 'err'; }
+      card.dueDate = { dueDate: req.body.dueDate, isComplete: false };
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/dueDate/remove', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
+      card.dueDate = null;
       await list.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }

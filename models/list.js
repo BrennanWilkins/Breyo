@@ -5,7 +5,7 @@ const CardSchema = new mongoose.Schema({
   desc: String,
   checklists: [],
   labels: [],
-  dueDate: String
+  dueDate: {}
 });
 
 const ListSchema = new mongoose.Schema({
