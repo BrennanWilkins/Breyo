@@ -4,7 +4,7 @@
   margin-top: 10px;
 }
 .Title {
-  color: rgb(130, 130, 130);
+  color: rgb(var(--darkGray));
   font-size: 14px;
   font-weight: 500;
 }

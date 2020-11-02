@@ -74,11 +74,11 @@
   align-items: center;
 }
 .Btn button {
-  background: rgba(22, 179, 29, 0.8);
+  background: rgba(var(--green), 0.8);
   padding: 15px;
 }
 .Btn button:hover, .Btn button:active {
-  background: rgb(22, 179, 29);
+  background: rgb(var(--green));
 }
 .Btn button:disabled {
   background: rgba(0,0,0,0.1);

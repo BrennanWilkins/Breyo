@@ -40,7 +40,7 @@
   outline: none;
 }
 .Input {
-  border: 2px solid rgb(219, 219, 219);
+  border: 2px solid rgb(var(--lightGray));
   border-radius: 4px;
   padding: 7px;
   background: rgb(244, 244, 244);
@@ -61,10 +61,10 @@
   font-size: 15px;
 }
 .SaveBtn button {
-  background: rgba(22, 179, 29, 0.8);
+  background: rgba(var(--green), 0.8);
 }
 .SaveBtn button:hover, .SaveBtn button:active {
-  background: rgb(22, 179, 29);
+  background: rgb(var(--green));
 }
 .RemoveBtn button {
   background: rgb(219, 55, 29);

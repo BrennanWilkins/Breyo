@@ -185,11 +185,11 @@
   align-items: center;
 }
 .SaveBtn button {
-  background: rgba(22, 179, 29, 0.8);
+  background: rgba(var(--green), 0.8);
   padding: 15px;
 }
 .SaveBtn button:hover, .SaveBtn button:active {
-  background: rgb(22, 179, 29);
+  background: rgb(var(--green));
 }
 .SaveBtn button:disabled {
   background: rgba(0,0,0,0.1);

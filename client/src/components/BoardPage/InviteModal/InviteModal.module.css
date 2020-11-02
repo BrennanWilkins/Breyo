@@ -47,12 +47,12 @@
 }
 .Input button {
   display: flex;
-  background: rgba(22, 179, 29, 0.8);
+  background: rgba(var(--green), 0.8);
   padding: 15px;
   margin: 15px auto 0;
 }
 .Input button:hover, .Input button:active {
-  background: rgb(22, 179, 29);
+  background: rgb(var(--green));
 }
 .Input button:disabled {
   background: rgba(0,0,0,0.1);

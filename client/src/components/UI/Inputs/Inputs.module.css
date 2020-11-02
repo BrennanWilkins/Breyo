@@ -1,5 +1,5 @@
 .Checkbox, .CheckboxCheck {
-  border: 2px solid rgb(219, 219, 219);
+  border: 2px solid rgb(var(--lightGray));
   border-radius: 4px;
   width: 20px;
   height: 20px;

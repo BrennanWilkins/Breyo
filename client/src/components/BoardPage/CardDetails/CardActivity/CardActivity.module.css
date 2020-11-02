@@ -52,19 +52,19 @@
 }
 .AccountBtn button {
   margin: 2px 5px 0 0;
-  background: rgb(219, 219, 219);
+  background: rgb(var(--lightGray));
 }
 .AccountBtn button:hover {
   background: rgb(195, 195, 195);
 }
 .SaveBtn button {
-  background: rgba(22, 179, 29, 0.8);
+  background: rgba(var(--green), 0.8);
   padding: 8px 10px;
   margin: 5px 0 8px 10px;
   font-weight: 400;
 }
 .SaveBtn button:hover, .SaveBtn button:active {
-  background: rgb(22, 179, 29);
+  background: rgb(var(--green));
 }
 .SaveBtn button:disabled {
   background: rgb(235, 235, 235);

@@ -11,12 +11,12 @@
   border: 0;
   outline: none;
   color: white;
-  background: rgb(22, 179, 29);
+  background: rgb(var(--green));
   cursor: pointer;
   font-size: 15px;
 }
 .SubmitBtn button:hover {
-  background: rgba(22, 179, 29, 0.85);
+  background: rgba(var(--green), 0.85);
 }
 .SubmitBtn button:active {
   background: rgb(19, 150, 25);

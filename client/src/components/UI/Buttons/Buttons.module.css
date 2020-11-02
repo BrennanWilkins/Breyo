@@ -93,7 +93,7 @@
   font-size: 14px;
 }
 .ActionBtn:hover {
-  background: rgb(219, 219, 219);
+  background: rgb(var(--lightGray));
 }
 .ActionBtn:active {
   background: rgb(254, 190, 183);
