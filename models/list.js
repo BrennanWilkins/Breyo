@@ -1,8 +1,13 @@
 const mongoose = require('mongoose');
 
+const ItemSchema = new mongoose.Schema({
+  title: String,
+  isComplete: Boolean
+});
+
 const ChecklistSchema = new mongoose.Schema({
   title: String,
-  items: []
+  items: [ItemSchema]
 });
 
 const CardSchema = new mongoose.Schema({

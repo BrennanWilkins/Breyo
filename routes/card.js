@@ -170,4 +170,67 @@ router.put('/checklist/delete', auth, validate([body('*').not().isEmpty().escape
   }
 );
 
+router.post('/checklist/item', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 })]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
+      const checklist = card.checklists.id(req.body.checklistID);
+      const title = req.body.title.replace(/\n/g, ' ');
+      checklist.items.push({ title, isComplete: false });
+      const updatedList = await list.save();
+      const updatedChecklist = updatedList.cards.id(req.body.cardID).checklists.id(req.body.checklistID);
+      const itemID = checklist.items[checklist.items.length - 1]._id;
+      res.status(200).json({ itemID });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/checklist/item/isComplete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
+      const item = card.checklists.id(req.body.checklistID).items.id(req.body.itemID);
+      item.isComplete = !item.isComplete;
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/checklist/item/title', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 })]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
+      const title = req.body.title.replace(/\n/g, ' ');
+      const item = card.checklists.id(req.body.checklistID).items.id(req.body.itemID);
+      item.title = title;
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/checklist/item/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
+      card.checklists.id(req.body.checklistID).items.id(req.body.itemID).remove();
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { console.log(err); res.sendStatus(500); }
+  }
+);
+
 module.exports = router;
