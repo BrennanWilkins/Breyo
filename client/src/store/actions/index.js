@@ -7,3 +7,4 @@ export { addCard, setCardDetails, updateCardTitle, updateCardDesc, addCardLabel,
 removeCardLabel, toggleDueDateIsComplete, addDueDate, removeDueDate, addChecklist,
 deleteChecklist, addChecklistItem, toggleChecklistItemIsComplete, editChecklistItem,
 deleteChecklistItem } from './card';
+export { dndHandler } from './dndActions';

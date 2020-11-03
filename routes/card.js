@@ -229,6 +229,33 @@ router.put('/checklist/item/delete', auth, validate([body('*').not().isEmpty().e
       card.checklists.id(req.body.checklistID).items.id(req.body.itemID).remove();
       await list.save();
       res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/moveCard/sameList', auth, validate([body('*').not().isEmpty().escape(), body('sourceIndex').isInt(), body('destIndex').isInt()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      const card = list.cards.splice(req.body.sourceIndex, 1)[0];
+      list.cards.splice(req.body.destIndex, 0, card);
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escape(), body('sourceIndex').isInt(), body('destIndex').isInt()]), useIsMember,
+  async (req, res) => {
+    try {
+      const sourceList = await List.findById(req.body.sourceID);
+      const destList = await List.findById(req.body.targetID);
+      const card = sourceList.cards.splice(req.body.sourceIndex, 1)[0];
+      card.listID = req.body.targetID;
+      destList.cards.splice(req.body.destIndex, 0, card);
+      await sourceList.save();
+      await destList.save();
+      res.sendStatus(200);
     } catch (err) { console.log(err); res.sendStatus(500); }
   }
 );

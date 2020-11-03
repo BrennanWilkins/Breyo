@@ -42,15 +42,15 @@
   display: flex;
   align-items: center;
 }
-.DueDate {
+.Btn {
   margin: 8px 5px 0 5px;
   display: inline-flex;
   align-items: center;
 }
-.DueDate svg {
+.Btn svg {
   margin-right: 3px;
 }
-.DueDateComplete {
+.BtnComplete {
   border-radius: 3px;
   background: rgb(var(--green));
   color: white;

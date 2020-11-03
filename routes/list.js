@@ -67,4 +67,21 @@ router.delete('/', auth, validate(
   }
 );
 
+router.put('/moveList', auth, validate([body('sourceIndex').isInt(), body('destIndex').isInt(), body('boardID').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const lists = await List.find({ boardID: req.body.boardID }).sort({ indexInBoard: 'asc' }).lean();
+      const list = lists.splice(req.body.sourceIndex, 1)[0];
+      lists.splice(req.body.destIndex, 0, list);
+      for (let i = 0; i < lists.length; i++) {
+        if (lists[i].indexInBoard !== i) { lists[i].indexInBoard = i; }
+      }
+      for (let list of lists) {
+        await List.findByIdAndUpdate(list._id, { indexInBoard: list.indexInBoard });
+      }
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;

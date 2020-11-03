@@ -13,6 +13,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  outline: none;
 }
 .TitleInput {
   background: transparent;

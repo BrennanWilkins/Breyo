@@ -237,6 +237,50 @@ const reducer = (state = initialState, action) => {
       lists[listIndex] = list;
       return { ...state, lists };
     }
+    case actionTypes.MOVE_LIST: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.indexInBoard === action.sourceIndex);
+      const list = { ...lists[listIndex] };
+      lists.splice(action.sourceIndex, 1);
+      lists.splice(action.destIndex, 0, list);
+      for (let i = 0; i < lists.length; i++) {
+        if (lists[i].indexInBoard !== i) {
+          const list = { ...lists[i] };
+          list.indexInBoard = i;
+          lists[i] = list;
+        }
+      }
+      return { ...state, lists };
+    }
+    case actionTypes.MOVE_CARD_SAME_LIST: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cards = [...list.cards];
+      const card = {...cards[action.sourceIndex]};
+      cards.splice(action.sourceIndex, 1);
+      cards.splice(action.destIndex, 0, card);
+      list.cards = cards;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.MOVE_CARD_DIFF_LIST: {
+      const lists = [...state.lists];
+      const sourceIndex = lists.findIndex(list => list.listID === action.sourceID);
+      const destIndex = lists.findIndex(list => list.listID === action.destID);
+      const sourceList = { ...lists[sourceIndex] };
+      const destList = { ...lists[destIndex] };
+      const sourceCards = [...sourceList.cards];
+      const card = { ...sourceCards[action.sourceIndex], listID: action.destID };
+      sourceCards.splice(action.sourceIndex, 1);
+      const destCards = [...destList.cards];
+      destCards.splice(action.destIndex, 0, card);
+      sourceList.cards = sourceCards;
+      destList.cards = destCards;
+      lists[sourceIndex] = sourceList;
+      lists[destIndex] = destList;
+      return { ...state, lists };
+    }
     default: return state;
   }
 };
