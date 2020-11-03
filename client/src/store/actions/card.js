@@ -75,7 +75,7 @@ const addDueDateDispatch = (dueDate, cardID, listID) => ({ type: actionTypes.ADD
 export const addDueDate = (dueDate, cardID, listID, boardID) => async dispatch => {
   try {
     dispatch(addDueDateDispatch(dueDate, cardID, listID));
-    await axios.put('/card/dueDate/add', { dueDate, cardID, listID, boardID });
+    await axios.post('/card/dueDate', { dueDate, cardID, listID, boardID });
   } catch (err) {
     console.log(err);
   }
@@ -87,6 +87,72 @@ export const removeDueDate = (cardID, listID, boardID) => async dispatch => {
   try {
     dispatch(removeDueDateDispatch(cardID, listID));
     await axios.put('/card/dueDate/remove', { cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const addChecklistDispatch = (title, checklistID, cardID, listID) => ({ type: actionTypes.ADD_CHECKLIST, title, checklistID, cardID, listID });
+
+export const addChecklist = (title, cardID, listID, boardID) => async dispatch => {
+  try {
+    const res = await axios.post('/card/checklist', { title, cardID, listID, boardID });
+    dispatch(addChecklistDispatch(title, res.data.checklistID, cardID, listID));
+  } catch (err) {
+    dispatch(addNotif('Your checklist could not be created.'));
+  }
+};
+
+const deleteChecklistDispatch = (checklistID, cardID, listID) => ({ type: actionTypes.DELETE_CHECKLIST, checklistID, cardID, listID });
+
+export const deleteChecklist = (checklistID, cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch(deleteChecklistDispatch(checklistID, cardID, listID));
+    await axios.put('/card/checklist/delete', { checklistID, cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const addChecklistItemDispatch = (title, itemID, checklistID, cardID, listID) => ({ type: actionTypes.ADD_CHECKLIST_ITEM, title, itemID, checklistID, cardID, listID });
+
+export const addChecklistItem = (title, checklistID, cardID, listID, boardID) => async dispatch => {
+  try {
+    const res = await axios.post('/card/checklist/item', { title, checklistID, cardID, listID, boardID });
+    dispatch(addChecklistItemDispatch(title, res.data.itemID, checklistID, cardID, listID));
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const toggleItemDispatch = (itemID, checklistID, cardID, listID) => ({ type: actionTypes.TOGGLE_CHECKLIST_ITEM, itemID, checklistID, cardID, listID });
+
+export const toggleChecklistItemIsComplete = (itemID, checklistID, cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch(toggleItemDispatch(itemID, checklistID, cardID, listID));
+    await axios.put('/card/checklist/item/isComplete', { itemID, checklistID, cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const editItemDispatch = (title, itemID, checklistID, cardID, listID) => ({ type: actionTypes.EDIT_CHECKLIST_ITEM, title, itemID, checklistID, cardID, listID });
+
+export const editChecklistItem = (title, itemID, checklistID, cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch(editItemDispatch(title, itemID, checklistID, cardID, listID));
+    await axios.put('/card/checklist/item/title', { title, itemID, checklistID, cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const deleteItemDispatch = (itemID, checklistID, cardID, listID) => ({ type: actionTypes.DELETE_CHECKLIST_ITEM, itemID, checklistID, cardID, listID });
+
+export const deleteChecklistItem = (itemID, checklistID, cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch(deleteItemDispatch(itemID, checklistID, cardID, listID));
+    await axios.put('/card/checklist/item/delete', { itemID, checklistID, cardID, listID, boardID });
   } catch (err) {
     console.log(err);
   }

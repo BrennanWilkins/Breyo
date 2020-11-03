@@ -16,7 +16,15 @@ const reducer = (state = initialState, action) => {
         title: Entities.decode(list.title),
         cards: list.cards.map(card => ({
           cardID: card._id,
-          checklists: card.checklists,
+          checklists: card.checklists.map(checklist => ({
+            title: checklist.title,
+            checklistID: checklist._id,
+            items: checklist.items.map(item => ({
+              itemID: item._id,
+              title: item.title,
+              isComplete: item.isComplete
+            }))
+          })),
           dueDate: card.dueDate,
           labels: card.labels,
           title: Entities.decode(card.title),
@@ -123,6 +131,108 @@ const reducer = (state = initialState, action) => {
       const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
       const card = { ...list.cards[cardIndex] };
       card.dueDate = null;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.ADD_CHECKLIST: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const checklists = [...card.checklists];
+      checklists.push({ title: action.title, items: [], checklistID: action.checklistID });
+      card.checklists = checklists;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.DELETE_CHECKLIST: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const checklists = [...card.checklists];
+      const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
+      checklists.splice(checklistIndex, 1);
+      card.checklists = checklists;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.ADD_CHECKLIST_ITEM: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const checklists = [...card.checklists];
+      const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
+      const checklist = {...checklists[checklistIndex]};
+      const items = [...checklist.items];
+      items.push({ title: action.title, isComplete: false, itemID: action.itemID });
+      checklist.items = items;
+      checklists[checklistIndex] = checklist;
+      card.checklists = checklists;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.TOGGLE_CHECKLIST_ITEM: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const checklists = [...card.checklists];
+      const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
+      const checklist = {...checklists[checklistIndex]};
+      const items = [...checklist.items];
+      const itemIndex = items.findIndex(item => item.itemID === action.itemID);
+      items[itemIndex].isComplete = !items[itemIndex].isComplete;
+      checklist.items = items;
+      checklists[checklistIndex] = checklist;
+      card.checklists = checklists;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.EDIT_CHECKLIST_ITEM: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const checklists = [...card.checklists];
+      const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
+      const checklist = {...checklists[checklistIndex]};
+      const items = [...checklist.items];
+      const itemIndex = items.findIndex(item => item.itemID === action.itemID);
+      items[itemIndex].title = action.title;
+      checklist.items = items;
+      checklists[checklistIndex] = checklist;
+      card.checklists = checklists;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists };
+    }
+    case actionTypes.DELETE_CHECKLIST_ITEM: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const checklists = [...card.checklists];
+      const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
+      const checklist = {...checklists[checklistIndex]};
+      const items = [...checklist.items];
+      const itemIndex = items.findIndex(item => item.itemID === action.itemID);
+      items.splice(itemIndex, 1);
+      checklist.items = items;
+      checklists[checklistIndex] = checklist;
+      card.checklists = checklists;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
       return { ...state, lists };
