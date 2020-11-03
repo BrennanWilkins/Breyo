@@ -10,6 +10,7 @@ import CardOptions from '../CardOptions/CardOptions';
 import CardActivity from '../CardActivity/CardActivity';
 import CardLabels from '../CardLabels/CardLabels';
 import CardDueDate from '../CardDueDate/CardDueDate';
+import CardChecklist from '../CardChecklist/CardChecklist';
 
 const CardDetails = props => {
   const modalRef = useRef();
@@ -27,7 +28,9 @@ const CardDetails = props => {
             {!!props.currentCard.dueDate &&
               <CardDueDate currentCard={props.currentCard} listID={props.listID} cardID={props.cardID} boardID={props.boardID} />}
             <CardDesc boardID={props.boardID} listID={props.listID} cardID={props.cardID} currentCard={props.currentCard} />
-            {/*<CardChecklists />*/}
+            {props.currentCard.checklists.map(checklist => (
+              <CardChecklist key={checklist.checklistID} {...checklist} cardID={props.cardID} listID={props.listID} boardID={props.boardID} />
+            ))}
             <CardActivity />
           </div>
           <CardOptions />
@@ -41,6 +44,7 @@ CardDetails.propTypes = {
   close: PropTypes.func.isRequired,
   cardID: PropTypes.string.isRequired,
   listID: PropTypes.string.isRequired,
+  boardID: PropTypes.string.isRequired,
   currentCard: PropTypes.object.isRequired,
   currentListTitle: PropTypes.string.isRequired
 };

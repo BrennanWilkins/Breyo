@@ -33,7 +33,7 @@ const CardDesc = props => {
       <span className={classes.EditBtn}><ActionBtn clicked={() => setShowEdit(true)}>Edit</ActionBtn></span>}</div>
       {showEdit ? <>
         <TextArea className={classes.Input} minRows="2" maxRows="50" value={descInput} onChange={e => setDescInput(e.target.value)}
-        ref={descRef} onBlur={() => setShowEdit(false)} placeholder="Add a description for this card" />
+        ref={descRef} placeholder="Add a description for this card" />
         <div className={classes.Btns}>
           <div className={classes.LeftBtns}>
             <span className={classes.SaveBtn}><Button clicked={saveDescHandler} disabled={descInput === props.currentCard.desc}>Save</Button></span>

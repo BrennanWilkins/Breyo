@@ -1,0 +1,25 @@
+.Container {
+  margin: 10px 15px 10px 8px;
+  display: flex;
+  align-items: center;
+}
+.Percent {
+  font-size: 13px;
+  margin-right: 20px;
+}
+.Bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 25px;
+  background: rgb(var(--lightGray));
+  position: relative;
+}
+.Overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 8px;
+  border-radius: 25px;
+  background: rgb(var(--green));
+  transition: 300ms;
+}

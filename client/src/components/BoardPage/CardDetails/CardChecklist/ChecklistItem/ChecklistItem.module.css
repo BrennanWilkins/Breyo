@@ -1,0 +1,72 @@
+.Container {
+  margin: 0 15px 0 0;
+  display: flex;
+  align-items: center;
+  padding: 9px 5px;
+  border-radius: 3px;
+  position: relative;
+}
+.Container:hover {
+  background: rgb(235, 235, 235);
+}
+.Title, .TitleCompleted {
+  margin-left: 20px;
+  font-size: 14px;
+}
+.TitleCompleted {
+  text-decoration: line-through;
+  text-decoration-color: rgb(42, 42, 42);
+}
+.CloseBtn {
+  display: none;
+}
+.CloseBtn button {
+  margin: 0;
+  color: rgb(var(--darkGray));
+}
+.CloseBtn button:hover {
+  color: black;
+}
+.Container:hover .CloseBtn, .Container:hover .EditBtn {
+  display: inline-flex;
+}
+.EditBtn {
+  color: rgb(var(--darkGray));
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  display: none;
+  margin-right: 6px;
+  cursor: pointer;
+}
+.EditBtn:hover {
+  color: black;
+  background: rgba(0,0,0,0.05);
+}
+.Btns {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 5px;
+}
+.EditItem {
+  width: 100%;
+  margin-left: 20px;
+}
+.Input {
+  resize: none;
+  border: 2px solid rgb(230,230,230);
+  border-radius: 3px;
+  outline: none;
+  background: white;
+  padding: 7px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Roboto', -apple-system, sans-serif;
+  overflow: hidden;
+  font-size: 14px;
+}
