@@ -9,6 +9,7 @@
   padding: 5px 5px 10px 5px;
   box-sizing: border-box;
   width: 200px;
+  z-index: 2;
 }
 .MiddlePos {
   left: -1px;

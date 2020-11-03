@@ -10,6 +10,7 @@
   box-sizing: border-box;
   font-size: 15px;
   overflow-y: auto;
+  z-index: 2;
 }
 .Container::-webkit-scrollbar-track {
   border-radius: 15px;

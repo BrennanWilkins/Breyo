@@ -1,8 +1,8 @@
 .Checkbox, .CheckboxCheck {
   border: 2px solid rgb(var(--lightGray));
   border-radius: 4px;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background: white;
   display: inline-flex;
   justify-content: center;
@@ -14,6 +14,9 @@
   border: 2px solid rgb(var(--red));
   background: rgb(var(--red));
   color: white;
+}
+.CheckboxCheck:hover {
+  filter: brightness(110%);
 }
 .Checkbox:hover {
   background: rgb(244, 244, 244);
