@@ -35,7 +35,7 @@ InviteModal.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  isAdmin: state.auth.boards.find(board => board.boardID === state.board.boardID).isAdmin
+  isAdmin: state.board.userIsAdmin
 });
 
 const mapDispatchToProps = dispatch => ({

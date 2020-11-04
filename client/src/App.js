@@ -1,16 +1,16 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, lazy } from 'react';
 import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
 import Spinner from './components/UI/Spinner/Spinner';
 import { connect } from 'react-redux';
 import { autoLogin } from './store/actions';
 import Notifications from './components/Notifications/Notifications';
 import NavBar from './components/NavBar/NavBar/NavBar';
-const HomePage = React.lazy(() => import('./components/HomePage/HomePage/HomePage'));
-const DashboardPage = React.lazy(() => import('./components/DashboardPage/Dashboard/Dashboard'));
-const LoginPage = React.lazy(() => import('./components/AuthPages/LoginPage'));
-const SignupPage = React.lazy(() => import('./components/AuthPages/SignupPage'));
-const ForgotPage = React.lazy(() => import('./components/AuthPages/ForgotPage'));
-const BoardPage = React.lazy(() => import('./components/BoardPage/BoardPage/BoardPage'));
+const HomePage = lazy(() => import('./components/HomePage/HomePage/HomePage'));
+const DashboardPage = lazy(() => import('./components/DashboardPage/Dashboard/Dashboard'));
+const LoginPage = lazy(() => import('./components/AuthPages/LoginPage'));
+const SignupPage = lazy(() => import('./components/AuthPages/SignupPage'));
+const ForgotPage = lazy(() => import('./components/AuthPages/ForgotPage'));
+const BoardPage = lazy(() => import('./components/BoardPage/BoardPage/BoardPage'));
 
 const App = props => {
   useEffect(() => props.autoLogin(), []);

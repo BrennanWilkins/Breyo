@@ -51,7 +51,7 @@ DueDateModal.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  dueDate: state.lists.lists.find(list => list.listID === state.lists.shownListID).cards.find(card => card.cardID === state.lists.shownCardID).dueDate,
+  dueDate: state.lists.currentCard.dueDate,
   listID: state.lists.shownListID,
   cardID: state.lists.shownCardID,
   boardID: state.board.boardID

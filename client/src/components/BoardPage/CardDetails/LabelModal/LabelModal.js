@@ -44,7 +44,7 @@ LabelModal.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  labels: state.lists.lists.find(list => list.listID === state.lists.shownListID).cards.find(card => card.cardID === state.lists.shownCardID).labels,
+  labels: state.lists.currentCard.labels,
   listID: state.lists.shownListID,
   cardID: state.lists.shownCardID,
   boardID: state.board.boardID

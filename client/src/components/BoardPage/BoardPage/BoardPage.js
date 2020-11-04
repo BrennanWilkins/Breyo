@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardPage.module.css';
 import { withRouter } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { instance as axios } from '../../../axios';
 import { addNotif, updateActiveBoard, getBoardData, setCardDetails } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
 import ListContainer from '../Lists/ListContainer/ListContainer';
-import CardDetails from '../CardDetails/CardDetails/CardDetails';
+const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'));
 
 const BoardPage = props => {
   const [windowClosed, setWindowClosed] = useState(false);
@@ -69,6 +69,8 @@ const BoardPage = props => {
     return () => { document.title = 'Brello'; document.body.style.overflow = 'auto'; }
   }, []);
 
+  const fallback = <div className={classes.Fallback}><Spinner /></div>;
+
   return (
     props.boardID !== props.match.params.boardID ? <Spinner /> :
     <>
@@ -77,7 +79,7 @@ const BoardPage = props => {
       <ListContainer />
     </div>
     {props.shownCardID !== null && props.shownListID !== null &&
-      <CardDetails close={props.hideCardDetails} cardID={props.shownCardID} listID={props.shownListID} />}
+      <Suspense fallback={fallback}><CardDetails close={props.hideCardDetails} cardID={props.shownCardID} listID={props.shownListID} /></Suspense>}
     </>
   );
 };

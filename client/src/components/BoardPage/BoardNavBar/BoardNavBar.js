@@ -75,13 +75,13 @@ const mapStateToProps = state => ({
   members: state.board.members,
   activity: state.board.activity,
   boardID: state.board.boardID,
-  isStarred: state.auth.boards.find(board => board.boardID === state.board.boardID).isStarred,
+  isStarred: state.board.isStarred,
   userEmail: state.auth.email
 });
 
 const mapDispatchToProps = dispatch => ({
   updateTitle: (title, id) => dispatch(updateBoardTitle(title, id)),
-  toggleIsStarred: id => dispatch(toggleIsStarred(id))
+  toggleIsStarred: id => dispatch(toggleIsStarred(id, true))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BoardNavBar);

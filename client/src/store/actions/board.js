@@ -12,9 +12,10 @@ export const createBoard = (title, color) => async dispatch => {
   }
 };
 
-export const toggleIsStarred = id => async dispatch => {
+export const toggleIsStarred = (id, isActive) => async dispatch => {
   try {
     dispatch({ type: actionTypes.TOGGLE_IS_STARRED, id });
+    if (isActive) { dispatch({ type: actionTypes.TOGGLE_IS_STARRED_ACTIVE }); }
     await axios.put('/board/starred', { boardID: id });
   } catch (err) {
     console.log(err);
@@ -22,8 +23,12 @@ export const toggleIsStarred = id => async dispatch => {
 };
 
 export const updateActiveBoard = payload => (dispatch, getState) => {
-  const refreshEnabled = getState().auth.boards.find(board => board.boardID === payload._id).refreshEnabled;
-  dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload, refreshEnabled });
+  const activeBoard = getState().auth.boards.find(board => board.boardID === payload._id);
+  const refreshEnabled = activeBoard.refreshEnabled;
+  const isStarred = activeBoard.isStarred;
+  const creatorFullName = payload.members.find(member => member.email === payload.creatorEmail).fullName;
+  const userIsAdmin = activeBoard.isAdmin;
+  dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload, refreshEnabled, isStarred, creatorFullName, userIsAdmin });
 };
 
 export const updateBoardTitle = (title, id) => async dispatch => {

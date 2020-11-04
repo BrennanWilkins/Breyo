@@ -158,8 +158,8 @@ const mapStateToProps = state => ({
   boardID: state.board.boardID,
   activity: state.board.activity,
   creatorEmail: state.board.creatorEmail,
-  creatorFullName: state.board.members.find(member => member.email === state.board.creatorEmail).fullName,
-  userIsAdmin: state.auth.boards.find(board => board.boardID === state.board.boardID).isAdmin,
+  creatorFullName: state.board.creatorFullName,
+  userIsAdmin: state.board.userIsAdmin,
   desc: state.board.desc,
   refreshEnabled: state.board.refreshEnabled
 });

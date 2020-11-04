@@ -8,8 +8,11 @@ const initialState = {
   activity: [],
   boardID: '',
   creatorEmail: '',
+  creatorFullName: '',
   desc: '',
-  refreshEnabled: true
+  refreshEnabled: true,
+  isStarred: false,
+  userIsAdmin: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -23,7 +26,10 @@ const reducer = (state = initialState, action) => {
       boardID: action.payload._id,
       creatorEmail: action.payload.creatorEmail,
       desc: Entities.decode(action.payload.desc),
-      refreshEnabled: action.refreshEnabled
+      refreshEnabled: action.refreshEnabled,
+      isStarred: action.isStarred,
+      creatorFullName: action.creatorFullName,
+      userIsAdmin: action.userIsAdmin
     };
     case actionTypes.UPDATE_BOARD_TITLE: return {
       ...state,
@@ -60,6 +66,7 @@ const reducer = (state = initialState, action) => {
       return { ...state, refreshEnabled };
     }
     case actionTypes.DELETE_BOARD: return { ...initialState };
+    case actionTypes.TOGGLE_IS_STARRED_ACTIVE: return { ...state, isStarred: !state.isStarred };
     default: return state;
   }
 };
