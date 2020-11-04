@@ -1,0 +1,131 @@
+.Container {
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  border: 1px solid rgb(227, 227, 227);
+  background: white;
+  position: absolute;
+  top: 299px;
+  right: 15px;
+  padding: 5px 5px 10px 5px;
+  box-sizing: border-box;
+  width: 350px;
+  z-index: 2;
+}
+.Title {
+  position: relative;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1.2px solid #ddd;
+  color: rgb(103, 103, 103);
+  font-size: 15px;
+  line-height: 29px;
+  margin: 5px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.CloseBtn button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+}
+.Input {
+  resize: none;
+  width: 300px;
+  border: 2px solid rgb(var(--lightGray));
+  outline: none;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: 'Roboto', -apple-system, sans-serif;
+  padding: 8px;
+  font-size: 14px;
+  background: rgb(245,245,245);
+  margin: 5px auto;
+  display: block;
+}
+.Input:hover {
+  background: rgb(235,235,235);
+}
+.Input:focus {
+  background: white;
+  border: 2px solid rgb(var(--red));
+}
+.Keeps {
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px 0;
+}
+.Keeps div {
+  margin-right: 5px;
+}
+.Checkbox {
+  margin-right: 15px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.CopyTitle {
+  color: rgb(var(--darkGray));
+  font-size: 12.5px;
+  font-weight: 500;
+  margin: 15px 10px 5px;
+}
+.Selects {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 10px;
+}
+.ListSelect, .PositionSelect {
+  background: rgb(240, 240, 240);
+  border-radius: 4px;
+  width: 60%;
+  padding: 5px 8px;
+  box-sizing: border-box;
+  cursor: pointer;
+  position: relative;
+}
+.ListSelect:hover, .PositionSelect:hover {
+  background: rgb(230,230,230);
+}
+.PositionSelect {
+  width: 40%;
+  margin-left: 5px;
+}
+.SelectTitle {
+  color: rgb(var(--darkGray));
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+.SelectVal {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14.5px;
+}
+.SelectModal {
+  width: 100%;
+  position: absolute;
+  bottom: 50px;
+  left: 0;
+  background: white;
+  box-shadow: var(--box-shadow4);
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.Option, .ActiveOption {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14.5px;
+  padding: 10px 5px;
+}
+.Option:hover {
+  background: rgb(var(--red), 0.3);
+}
+.ActiveOption {
+  background: rgb(var(--red), 0.5);
+}

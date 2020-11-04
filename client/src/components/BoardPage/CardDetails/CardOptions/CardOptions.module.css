@@ -3,10 +3,13 @@
   display: inline-block;
   margin-top: 10px;
 }
-.Title {
+.Title, .Title2 {
   color: rgb(var(--darkGray));
   font-size: 14px;
   font-weight: 500;
+}
+.Title2 {
+  margin-top: 20px;
 }
 .Btn button {
   width: 100%;
