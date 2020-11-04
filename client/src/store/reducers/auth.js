@@ -77,6 +77,14 @@ const reducer = (state = initialState, action) => {
       updatedBoards[index].isAdmin = false;
       return { ...state, boards: updatedBoards };
     }
+    case actionTypes.UPDATE_REFRESH_ENABLED: {
+      const boards = [...state.boards];
+      const index = boards.findIndex(board => board.boardID === action.boardID);
+      const board = { ...boards[index] };
+      board.refreshEnabled = !board.refreshEnabled;
+      boards[index] = board;
+      return { ...state, boards };
+    }
     default: return state;
   }
 };

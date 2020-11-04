@@ -25,7 +25,10 @@ export const toggleIsStarred = id => async dispatch => {
   }
 };
 
-export const updateActiveBoard = payload => ({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload });
+export const updateActiveBoard = payload => (dispatch, getState) => {
+  const refreshEnabled = getState().auth.boards.find(board => board.boardID === payload._id).refreshEnabled;
+  dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload, refreshEnabled });
+};
 
 const updateTitleDispatch = title => ({ type: actionTypes.UPDATE_BOARD_TITLE, title });
 
@@ -88,5 +91,14 @@ export const updateBoardDesc = (desc, boardID) => async dispatch => {
   try {
     dispatch(updateBoardDescDispatch(desc));
     await axios.put('/board/desc', { desc, boardID });
+  } catch (err) { console.log(err); }
+};
+
+const updateRefreshEnabledDispatch = boardID => ({ type: actionTypes.UPDATE_REFRESH_ENABLED, boardID });
+
+export const updateRefreshEnabled = boardID => async dispatch => {
+  try {
+    dispatch(updateRefreshEnabledDispatch(boardID));
+    await axios.put('/board/refreshEnabled', { boardID });
   } catch (err) { console.log(err); }
 };

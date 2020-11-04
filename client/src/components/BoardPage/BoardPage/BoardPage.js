@@ -12,31 +12,29 @@ import ListContainer from '../Lists/ListContainer/ListContainer';
 import CardDetails from '../CardDetails/CardDetails/CardDetails';
 
 const BoardPage = props => {
-  // UNCOMMENT TO ENABLE EVENT SOURCE
-  // useEffect(() => {
-  //   const id = props.match.params.boardID;
-  //   const url = 'http://localhost:9000/api/board/stream/' + id;
-  //   const source = new EventSourcePolyfill(url, { headers: { 'x-auth-token': axios.defaults.headers.common['x-auth-token'] }});
-  //
-  //   source.onmessage = event => {
-  //     console.log('Received stream');
-  //     const data = JSON.parse(event.data);
-  //     props.updateActiveBoard(data);
-  //   };
-  //
-  //   source.onerror = errMsg => {
-  //     console.log('Error: connection closed');
-  //     source.close();
-  //     props.addNotif('Connection to the server was lost.');
-  //   };
-  //
-  //   return () => {
-  //     console.log('Stream closed');
-  //     document.title = 'Brello';
-  //     document.body.style.overflow = 'auto';
-  //     source.close();
-  //   };
-  // }, [props.match.params.boardID]);
+  useEffect(() => {
+    if (!props.refreshEnabled) { return; }
+    const id = props.match.params.boardID;
+    const url = 'http://localhost:9000/api/board/stream/' + id;
+    const source = new EventSourcePolyfill(url, { headers: { 'x-auth-token': axios.defaults.headers.common['x-auth-token'] }});
+
+    source.onmessage = event => {
+      console.log('Received stream');
+      const data = JSON.parse(event.data);
+      props.updateActiveBoard(data);
+    };
+
+    source.onerror = errMsg => {
+      console.log('Error: connection closed', errMsg);
+      source.close();
+      props.addNotif('Connection to the server was lost.');
+    };
+
+    return () => {
+      console.log('Stream closed');
+      source.close();
+    };
+  }, [props.match.params.boardID, props.refreshEnabled]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,6 +52,7 @@ const BoardPage = props => {
       }
     };
     fetchData();
+    return () => { document.title = 'Brello'; document.body.style.overflow = 'auto'; }
   }, []);
 
   return (
@@ -74,14 +73,16 @@ BoardPage.propTypes = {
   updateActiveBoard: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
-  hideCardDetails: PropTypes.func.isRequired
+  hideCardDetails: PropTypes.func.isRequired,
+  refreshEnabled: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
   color: state.board.color,
   boardID: state.board.boardID,
   shownCardID: state.lists.shownCardID,
-  shownListID: state.lists.shownListID
+  shownListID: state.lists.shownListID,
+  refreshEnabled: state.board.refreshEnabled
 });
 
 const mapDispatchToProps = dispatch => ({

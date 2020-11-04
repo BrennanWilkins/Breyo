@@ -8,7 +8,8 @@ const initialState = {
   activity: [],
   boardID: '',
   creatorEmail: '',
-  desc: ''
+  desc: '',
+  refreshEnabled: true
 };
 
 const reducer = (state = initialState, action) => {
@@ -21,7 +22,8 @@ const reducer = (state = initialState, action) => {
       color: action.payload.color,
       boardID: action.payload._id,
       creatorEmail: action.payload.creatorEmail,
-      desc: Entities.decode(action.payload.desc)
+      desc: Entities.decode(action.payload.desc),
+      refreshEnabled: action.refreshEnabled
     };
     case actionTypes.UPDATE_BOARD_TITLE: return {
       ...state,
@@ -53,6 +55,10 @@ const reducer = (state = initialState, action) => {
       ...state,
       desc: action.desc
     };
+    case actionTypes.UPDATE_REFRESH_ENABLED: {
+      const refreshEnabled = !state.refreshEnabled;
+      return { ...state, refreshEnabled };
+    }
     default: return state;
   }
 };

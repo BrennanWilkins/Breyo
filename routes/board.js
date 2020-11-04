@@ -28,15 +28,20 @@ router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape(
 
 router.get('/stream/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useIsMember, useSSE,
   (req, res) => {
-    const boardQuery = Board.findById(req.params.boardID);
-    // stream board data to client every 10 seconds
-    const dataInterval = setInterval(() => {
-      boardQuery.exec((err, board) => {
-        const data = { color: board.color, activity: board.activity, members: board.members, title: board.title,
-          boardID: board._id, creatorEmail: board.creatorEmail, desc: board.desc };
+    const boardQuery = Board.findById(req.params.boardID).lean();
+    const listQuery = List.find({ boardID: req.params.boardID }).lean();
+
+    const query = async () => {
+      try {
+        const board = await boardQuery;
+        const lists = await listQuery;
+        const data = { ...board, lists };
         res.sendEventData(data);
-      });
-    }, 10000);
+      } catch (err) { res.close(); }
+    };
+
+    // stream board/list data to client every 10 seconds
+    const dataInterval = setInterval(query, 10000);
 
     res.on('close', () => {
       clearInterval(dataInterval);
@@ -60,7 +65,7 @@ router.post('/', auth, validate(
         activity: [], color, creatorEmail: user.email, desc: '' });
       await board.save();
       // add board to user's boards
-      const newBoard = { boardID: board._id, title, isStarred: false, isAdmin: true, color: board.color };
+      const newBoard = { boardID: board._id, title, isStarred: false, isAdmin: true, color: board.color, refreshEnabled: true };
       user.boards.unshift(newBoard);
       await user.save();
       // add default lists to board (to do, doing, done)
@@ -229,7 +234,7 @@ router.put('/invites/accept', auth, validate(
       const user = await User.findById(req.userID);
       if (!board || !user) { throw 'err'; }
       user.invites = user.invites.filter(invite => invite.boardID !== req.body.boardID);
-      user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false, color: board.color }];
+      user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false, color: board.color, refreshEnabled: true }];
       board.members = [...board.members, { userID: req.userID, isAdmin: false }];
       await user.save();
       await board.save();
@@ -283,6 +288,19 @@ router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty().trim
       await Board.findByIdAndDelete(req.params.boardID);
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/refreshEnabled', auth, validate([body('boardID').not().isEmpty()]),
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.userID);
+      const board = user.boards.find(board => String(board.boardID) === String(req.body.boardID));
+      if (!board) { throw 'err'; }
+      board.refreshEnabled = !board.refreshEnabled;
+      user.markModified('boards');
+      await user.save();
+    } catch (err) { console.log(err); res.sendStatus(500); }
   }
 );
 

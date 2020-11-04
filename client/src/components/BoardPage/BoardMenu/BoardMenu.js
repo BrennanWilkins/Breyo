@@ -4,9 +4,9 @@ import classes from './BoardMenu.module.css';
 import Button, { CloseBtn, BackBtn, ActionBtn } from '../../UI/Buttons/Buttons';
 import { useModalToggle } from '../../../utils/customHooks';
 import { connect } from 'react-redux';
-import { boardIcon, activityIcon, checkIcon, personIcon, descIcon } from '../../UI/icons';
+import { boardIcon, activityIcon, checkIcon, personIcon, descIcon, settingsIcon } from '../../UI/icons';
 import COLORS from '../../../utils/colors';
-import { updateColor, updateBoardDesc } from '../../../store/actions';
+import { updateColor, updateBoardDesc, updateRefreshEnabled } from '../../../store/actions';
 import AccountInfo from '../../UI/AccountInfo/AccountInfo';
 import TextArea from 'react-textarea-autosize';
 import FormattingModal from '../FormattingModal/FormattingModal';
@@ -15,6 +15,7 @@ import parseToJSX from '../../../utils/parseToJSX';
 const BoardMenu = props => {
   const [showBoardDesc, setShowBoardDesc] = useState(false);
   const [showChangeBackground, setShowChangeBackground] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [showEditDesc, setShowEditDesc] = useState(false);
   const [showFormattingHelp, setShowFormattingHelp] = useState(false);
@@ -32,6 +33,7 @@ const BoardMenu = props => {
     setShowEditDesc(false);
     setDescInput(props.desc);
     setShowFormattingHelp(false);
+    setShowSettings(false);
   };
 
   useEffect(() => resetState(), [props.show]);
@@ -45,8 +47,8 @@ const BoardMenu = props => {
     setShowEditDesc(false);
   };
 
-  const showBackBtn = showChangeBackground || showBoardDesc || showAllActivity;
-  const title = showBoardDesc ? 'About this board' : showChangeBackground ? 'Change Background' : showAllActivity ? 'Activity' : 'Menu';
+  const showBackBtn = showChangeBackground || showBoardDesc || showAllActivity || showSettings;
+  const title = showBoardDesc ? 'About this board' : showChangeBackground ? 'Change Background' : showAllActivity ? 'Activity' : showSettings ? 'Board Settings' : 'Menu';
 
   const defaultContent = (
     <><div className={classes.Options}>
@@ -54,6 +56,7 @@ const BoardMenu = props => {
       <div onClick={() => setShowChangeBackground(true)} className={classes.Option}>
         <span style={{ background: props.color }} className={classes.SmallColor}></span>Change background
       </div>
+      <div onClick={() => setShowSettings(true)} className={classes.Option}><span className={classes.SettingsIcon}>{settingsIcon}</span>Settings</div>
     </div>
     <div className={classes.Activities}>
       <div onClick={() => setShowAllActivity(true)} className={`${classes.Option} ${classes.ActivityTitle}`}>{activityIcon}Activity</div>
@@ -93,6 +96,15 @@ const BoardMenu = props => {
     </div>
   );
 
+  const settingsMenu = (
+    <div className={classes.SettingsMenu}>
+      <div className={classes.RefreshBtn}>
+        <ActionBtn clicked={() => props.updateRefreshEnabled(props.boardID)}>{props.refreshEnabled ? 'Disable' : 'Enable'} auto refresh</ActionBtn>
+        <div>Disabling auto refresh will cause your board not to automatically update when other members create changes on the board.</div>
+      </div>
+    </div>
+  );
+
   return (
     <div ref={menuRef} className={props.show ? classes.ShowModal : classes.HideModal}>
       <div className={classes.Title}>
@@ -100,7 +112,7 @@ const BoardMenu = props => {
         {title}
         <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
       </div>
-      <div className={classes.Content}>{showBoardDesc ? aboutMenu : showChangeBackground ? backgroundMenu : defaultContent}</div>
+      <div className={classes.Content}>{showBoardDesc ? aboutMenu : showChangeBackground ? backgroundMenu : showSettings ? settingsMenu : defaultContent}</div>
       {showFormattingHelp && <FormattingModal close={() => setShowFormattingHelp(false)} />}
     </div>
   );
@@ -116,7 +128,9 @@ BoardMenu.propTypes = {
   creatorEmail: PropTypes.string.isRequired,
   creatorFullName: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
-  updateDesc: PropTypes.func.isRequired
+  updateDesc: PropTypes.func.isRequired,
+  refreshEnabled: PropTypes.bool.isRequired,
+  updateRefreshEnabled: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -125,12 +139,14 @@ const mapStateToProps = state => ({
   activity: state.board.activity,
   creatorEmail: state.board.creatorEmail,
   creatorFullName: state.board.members.find(member => member.email === state.board.creatorEmail).fullName,
-  desc: state.board.desc
+  desc: state.board.desc,
+  refreshEnabled: state.board.refreshEnabled
 });
 
 const mapDispatchToProps = dispatch => ({
   updateColor: (color, boardID) => dispatch(updateColor(color, boardID)),
-  updateDesc: (desc, boardID) => dispatch(updateBoardDesc(desc, boardID))
+  updateDesc: (desc, boardID) => dispatch(updateBoardDesc(desc, boardID)),
+  updateRefreshEnabled: boardID => dispatch(updateRefreshEnabled(boardID))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BoardMenu);
