@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classes from './List.module.css';
 import { plusIcon, dotsIcon } from '../../../UI/icons';
@@ -12,20 +12,28 @@ import { Droppable, Draggable } from 'react-beautiful-dnd';
 const List = props => {
   const [titleInput, setTitleInput] = useState(props.title);
   const [showAddCard, setShowAddCard] = useState(false);
+  const inputRef = useRef();
+  const [showTitleInput, setShowTitleInput] = useState(false);
 
   const titleBlurHandler = () => {
-    if (titleInput === props.title) { return; }
-    if (titleInput.length === 0 || titleInput.length >= 200) { return setTitleInput(props.title); }
+    if (titleInput === props.title) { return setShowTitleInput(false); }
+    if (titleInput.length === 0 || titleInput.length >= 200) { setShowTitleInput(false); return setTitleInput(props.title); }
     props.updateListTitle(titleInput, props.listID, props.boardID);
+    setShowTitleInput(false);
   };
 
+  useEffect(() => {
+    if (showTitleInput) { inputRef.current.focus(); }
+  }, [showTitleInput]);
+
   return (
-    <Draggable draggableId={props.listID} index={props.indexInBoard} disableInteractiveElementBlocking>
+    <Draggable draggableId={props.listID} index={props.indexInBoard}>
       {(provided, snapshot) => (
         <div className={classes.List} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
           <div className={classes.ListTop}>
-            <TextArea maxRows="20" value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.TitleInput}
-            onFocus={e => e.target.select()} onBlur={titleBlurHandler} onMouseDown={e => e.preventDefault()} onMouseUp={e => e.target.focus()} />
+            {!showTitleInput ? <div className={classes.ListTitle} onClick={() => setShowTitleInput(true)}>{titleInput}</div> :
+            <TextArea ref={inputRef} maxRows="20" value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.TitleInput}
+            onFocus={e => e.target.select()} onBlur={titleBlurHandler} />}
             <div className={classes.CardOptionBtn}>{dotsIcon}</div>
           </div>
           <Droppable droppableId={props.listID}>

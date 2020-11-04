@@ -15,9 +15,8 @@
   flex-direction: column;
   outline: none;
 }
-.TitleInput {
+.TitleInput, .ListTitle {
   background: transparent;
-  border: 0;
   outline: none;
   padding: 5px;
   font-size: 15px;
