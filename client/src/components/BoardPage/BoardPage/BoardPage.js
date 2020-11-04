@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardPage.module.css';
 import { withRouter } from 'react-router-dom';
@@ -12,8 +12,11 @@ import ListContainer from '../Lists/ListContainer/ListContainer';
 import CardDetails from '../CardDetails/CardDetails/CardDetails';
 
 const BoardPage = props => {
+  const [windowClosed, setWindowClosed] = useState(false);
+
   useEffect(() => {
-    if (!props.refreshEnabled) { return; }
+    if (!props.refreshEnabled || windowClosed) { return; }
+    console.log('stream opened');
     const id = props.match.params.boardID;
     const url = 'http://localhost:9000/api/board/stream/' + id;
     const source = new EventSourcePolyfill(url, { headers: { 'x-auth-token': axios.defaults.headers.common['x-auth-token'] }});
@@ -34,6 +37,17 @@ const BoardPage = props => {
       console.log('Stream closed');
       source.close();
     };
+  }, [props.match.params.boardID, props.refreshEnabled, windowClosed]);
+
+  useEffect(() => {
+    const visibilityHandler = e => {
+      if (document.visibilityState !== 'visible') { setWindowClosed(true); }
+      else { setWindowClosed(false); }
+    };
+
+    if (props.refreshEnabled) { document.addEventListener('visibilitychange', visibilityHandler); }
+
+    return () => { document.removeEventListener('visibilitychange', visibilityHandler); }
   }, [props.match.params.boardID, props.refreshEnabled]);
 
   useEffect(() => {

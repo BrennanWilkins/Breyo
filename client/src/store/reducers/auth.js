@@ -85,6 +85,10 @@ const reducer = (state = initialState, action) => {
       boards[index] = board;
       return { ...state, boards };
     }
+    case actionTypes.DELETE_BOARD: {
+      const boards = state.boards.filter(board => board.boardID !== action.boardID);
+      return { ...state, boards };
+    }
     default: return state;
   }
 };

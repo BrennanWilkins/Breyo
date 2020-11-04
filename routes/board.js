@@ -276,16 +276,17 @@ router.put('/members/remove', auth, validate(
   }
 );
 
-router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
+router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty()]), useIsAdmin,
   async (req, res) => {
     try {
       const board = await Board.findById(req.params.boardID);
       for (let member of board.members) {
-        const user = await User.findById(member.userID);
-        user.boards = user.boards.filter(board => board.boardID !== board._id);
+        const user = await User.findOne({ email: member.email });
+        user.boards = user.boards.filter(board => String(board.boardID) !== String(req.params.boardID));
         await user.save();
       }
       await Board.findByIdAndDelete(req.params.boardID);
+      await List.deleteMany({ boardID: req.params.boardID });
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
@@ -300,7 +301,7 @@ router.put('/refreshEnabled', auth, validate([body('boardID').not().isEmpty()]),
       board.refreshEnabled = !board.refreshEnabled;
       user.markModified('boards');
       await user.save();
-    } catch (err) { console.log(err); res.sendStatus(500); }
+    } catch (err) { res.sendStatus(500); }
   }
 );
 

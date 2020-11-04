@@ -102,3 +102,14 @@ export const updateRefreshEnabled = boardID => async dispatch => {
     await axios.put('/board/refreshEnabled', { boardID });
   } catch (err) { console.log(err); }
 };
+
+const deleteBoardDispatch = boardID => ({ type: actionTypes.DELETE_BOARD, boardID });
+
+export const deleteBoard = boardID => async dispatch => {
+  try {
+    await axios.delete('/board/' + boardID);
+    dispatch(deleteBoardDispatch(boardID));
+  } catch (err) {
+    dispatch(addNotif('There was an error while deleting the board.'));
+  }
+}

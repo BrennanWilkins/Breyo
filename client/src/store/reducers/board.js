@@ -59,6 +59,7 @@ const reducer = (state = initialState, action) => {
       const refreshEnabled = !state.refreshEnabled;
       return { ...state, refreshEnabled };
     }
+    case actionTypes.DELETE_BOARD: return { ...initialState };
     default: return state;
   }
 };
