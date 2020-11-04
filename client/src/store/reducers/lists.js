@@ -4,7 +4,9 @@ const Entities = require('entities');
 const initialState = {
   lists: [],
   shownCardID: null,
-  shownListID: null
+  shownListID: null,
+  currentCard: null,
+  currentListTitle: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -53,7 +55,15 @@ const reducer = (state = initialState, action) => {
       lists[index].cards = cards;
       return { ...state, lists };
     }
-    case actionTypes.SET_CARD_DETAILS: return { ...state, shownCardID: action.cardID, shownListID: action.listID };
+    case actionTypes.SET_CARD_DETAILS: {
+      return {
+        ...state,
+        shownCardID: action.cardID,
+        shownListID: action.listID,
+        currentCard: action.currentCard,
+        currentListTitle: action.currentListTitle
+      };
+    }
     case actionTypes.UPDATE_CARD_TITLE: {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
@@ -62,7 +72,7 @@ const reducer = (state = initialState, action) => {
       const card = { ...list.cards[cardIndex], title: action.title };
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.UPDATE_CARD_DESC: {
       const lists = [...state.lists];
@@ -72,7 +82,7 @@ const reducer = (state = initialState, action) => {
       const card = { ...list.cards[cardIndex], desc: action.desc };
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.ADD_CARD_LABEL: {
       const lists = [...state.lists];
@@ -84,7 +94,7 @@ const reducer = (state = initialState, action) => {
       card.labels = labels;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.REMOVE_CARD_LABEL: {
       const lists = [...state.lists];
@@ -97,7 +107,7 @@ const reducer = (state = initialState, action) => {
       card.labels = labels;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.TOGGLE_DUE_DATE: {
       const lists = [...state.lists];
@@ -110,7 +120,7 @@ const reducer = (state = initialState, action) => {
       card.dueDate = dueDate;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.ADD_DUE_DATE: {
       const lists = [...state.lists];
@@ -122,7 +132,7 @@ const reducer = (state = initialState, action) => {
       card.dueDate = dueDate;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.REMOVE_DUE_DATE: {
       const lists = [...state.lists];
@@ -133,7 +143,7 @@ const reducer = (state = initialState, action) => {
       card.dueDate = null;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.ADD_CHECKLIST: {
       const lists = [...state.lists];
@@ -146,7 +156,7 @@ const reducer = (state = initialState, action) => {
       card.checklists = checklists;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.DELETE_CHECKLIST: {
       const lists = [...state.lists];
@@ -160,7 +170,7 @@ const reducer = (state = initialState, action) => {
       card.checklists = checklists;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.ADD_CHECKLIST_ITEM: {
       const lists = [...state.lists];
@@ -178,7 +188,7 @@ const reducer = (state = initialState, action) => {
       card.checklists = checklists;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.TOGGLE_CHECKLIST_ITEM: {
       const lists = [...state.lists];
@@ -197,7 +207,7 @@ const reducer = (state = initialState, action) => {
       card.checklists = checklists;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.EDIT_CHECKLIST_ITEM: {
       const lists = [...state.lists];
@@ -216,7 +226,7 @@ const reducer = (state = initialState, action) => {
       card.checklists = checklists;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.DELETE_CHECKLIST_ITEM: {
       const lists = [...state.lists];
@@ -235,7 +245,7 @@ const reducer = (state = initialState, action) => {
       card.checklists = checklists;
       list.cards[cardIndex] = card;
       lists[listIndex] = list;
-      return { ...state, lists };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.MOVE_LIST: {
       const lists = [...state.lists];

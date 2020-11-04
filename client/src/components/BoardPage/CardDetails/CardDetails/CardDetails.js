@@ -50,9 +50,9 @@ CardDetails.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  currentCard: state.lists.lists.find(list => list.listID === state.lists.shownListID).cards.find(card => card.cardID === state.lists.shownCardID),
-  currentListTitle: state.lists.lists.find(list => list.listID === state.lists.shownListID).title,
-  boardID: state.board.boardID
+  boardID: state.board.boardID,
+  currentCard: state.lists.currentCard,
+  currentListTitle: state.lists.currentListTitle
 });
 
 export default connect(mapStateToProps)(CardDetails);
