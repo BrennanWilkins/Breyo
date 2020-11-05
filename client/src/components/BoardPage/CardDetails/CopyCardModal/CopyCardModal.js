@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import classes from './CopyCardModal.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
-import { CloseBtn } from '../../../UI/Buttons/Buttons';
+import Button, { CloseBtn } from '../../../UI/Buttons/Buttons';
 import TextArea from 'react-textarea-autosize';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Checkbox } from '../../../UI/Inputs/Inputs';
+import { copyCard } from '../../../../store/actions';
 
 const CopyCardModal = props => {
   const modalRef = useRef();
@@ -32,6 +33,11 @@ const CopyCardModal = props => {
   }, [selectedListID]);
 
   useEffect(() => setShowPositionSelect(false), [cardPosition]);
+
+  const copyHandler = () => {
+    props.copyCard(cardTitle, keepChecklists, keepLabels, props.currentCardID, props.currentCard, props.currentListID, selectedListID, cardPosition, props.boardID);
+    props.close();
+  };
 
   return (
     <div ref={modalRef} className={classes.Container}>
@@ -65,6 +71,7 @@ const CopyCardModal = props => {
           </div>}
         </div>
       </div>
+      <div className={classes.CopyBtn}><Button clicked={copyHandler}>Copy Card</Button></div>
     </div>
   );
 };
@@ -75,7 +82,9 @@ CopyCardModal.propTypes = {
   lists: PropTypes.array.isRequired,
   currentListID: PropTypes.string.isRequired,
   currentCardID: PropTypes.string.isRequired,
-  currentListTitle: PropTypes.string.isRequired
+  currentListTitle: PropTypes.string.isRequired,
+  boardID: PropTypes.string.isRequired,
+  copyCard: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -83,7 +92,13 @@ const mapStateToProps = state => ({
   lists: state.lists.lists,
   currentListID: state.lists.shownListID,
   currentCardID: state.lists.shownCardID,
-  currentListTitle: state.lists.currentListTitle
+  currentListTitle: state.lists.currentListTitle,
+  boardID: state.board.boardID
 });
 
-export default connect(mapStateToProps)(CopyCardModal);
+const mapDispatchToProps = dispatch => ({
+  copyCard: (title, keepChecklists, keepLabels, cardID, currentCard, sourceListID, destListID, destIndex, boardID) => (
+    dispatch(copyCard(title, keepChecklists, keepLabels, cardID, currentCard, sourceListID, destListID, destIndex, boardID)))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CopyCardModal);

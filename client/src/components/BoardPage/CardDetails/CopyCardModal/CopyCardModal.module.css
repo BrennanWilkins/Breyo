@@ -129,3 +129,16 @@
 .ActiveOption {
   background: rgb(var(--red), 0.5);
 }
+.CopyBtn button {
+  background: rgb(var(--green));
+  margin: 10px 10px 5px;
+  font-weight: 400;
+  font-size: 15px;
+  padding: 5px 10px;
+}
+.CopyBtn button:hover {
+  background: rgba(var(--green), 0.85);
+}
+.CopyBtn button:active {
+  background: rgb(19, 150, 25);
+}

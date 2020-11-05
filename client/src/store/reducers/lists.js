@@ -267,8 +267,7 @@ const reducer = (state = initialState, action) => {
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
       const cards = [...list.cards];
-      const card = {...cards[action.sourceIndex]};
-      cards.splice(action.sourceIndex, 1);
+      const card = cards.splice(action.sourceIndex, 1)[0];
       cards.splice(action.destIndex, 0, card);
       list.cards = cards;
       lists[listIndex] = list;
@@ -289,6 +288,29 @@ const reducer = (state = initialState, action) => {
       destList.cards = destCards;
       lists[sourceIndex] = sourceList;
       lists[destIndex] = destList;
+      return { ...state, lists };
+    }
+    case actionTypes.COPY_CARD: {
+      const lists = [...state.lists];
+      const listIndex = action.sourceListID === action.destListID ?
+      lists.findIndex(list => list.listID === action.sourceListID) :
+      lists.findIndex(list => list.listID === action.destListID);
+      const list = { ...lists[listIndex] };
+      const cards = [...list.cards];
+      const checklists = action.checklists.map(checklist => ({
+        title: checklist.title,
+        checklistID: checklist._id,
+        items: checklist.items.map(item => ({
+          itemID: item._id,
+          title: item.title,
+          isComplete: item.isComplete
+        }))
+      }));
+      const newCard = { title: action.title, desc: '', checklists, dueDate: null, cardID: action.newCardID };
+      newCard.labels = action.keepLabels ? [...action.currentCard.labels] : [];
+      cards.splice(action.destIndex, 0, newCard);
+      list.cards = cards;
+      lists[listIndex] = list;
       return { ...state, lists };
     }
     default: return state;

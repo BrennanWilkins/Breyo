@@ -256,7 +256,31 @@ router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escap
       await sourceList.save();
       await destList.save();
       res.sendStatus(200);
-    } catch (err) { console.log(err); res.sendStatus(500); }
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 100 }), body('destIndex').isInt()]), useIsMember,
+  async (req, res) => {
+    try {
+      const sourceList = await List.findById(req.body.sourceListID);
+      const destList = await List.findById(req.body.destListID);
+      const title = req.body.title.replace(/\n/g, ' ');
+      const sourceCard = sourceList.cards.id(req.body.cardID);
+      const labels = req.body.keepLabels === 'true' ? sourceCard.labels : [];
+      const checklists = [];
+      if (req.body.keepChecklists === 'true') {
+        for (let checklist of sourceCard.checklists) {
+          const items = checklist.items.map(item => ({ title: item.title, isComplete: item.isComplete }));
+          checklists.push({ title: checklist.title, items });
+        }
+      }
+      const newCard = { title, labels, checklists, desc: '', dueDate: null };
+      destList.cards.splice(req.body.destIndex, 0, newCard);
+      const updatedList = await destList.save();
+      const updatedCard = updatedList.cards[req.body.destIndex];
+      res.status(200).json({ cardID: updatedCard._id, checklists: updatedCard.checklists });
+    } catch (err) { res.sendStatus(500); }
   }
 );
 

@@ -133,3 +133,12 @@ export const deleteChecklistItem = (itemID, checklistID, cardID, listID, boardID
     console.log(err);
   }
 };
+
+export const copyCard = (title, keepChecklists, keepLabels, cardID, currentCard, sourceListID, destListID, destIndex, boardID) => async dispatch => {
+  try {
+    const res = await axios.post('/card/copy', { title, keepChecklists, keepLabels, cardID, sourceListID, destListID, destIndex, boardID });
+    dispatch({ type: actionTypes.COPY_CARD, title, checklists: res.data.checklists, currentCard, newCardID: res.data.cardID, keepLabels, sourceListID, destListID, destIndex });
+  } catch (err) {
+    dispatch(addNotif('There was an error while copying the card.'));
+  }
+};

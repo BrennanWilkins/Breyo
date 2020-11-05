@@ -3,7 +3,7 @@
   bottom: 10px;
   left: 10px;
   min-width: 220px;
-  z-index: 3;
+  z-index: 200;
 }
 .Icon {
   margin: 0 7px;
