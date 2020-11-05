@@ -197,7 +197,7 @@
 .FormatBtn button {
   margin: 0 0 0 80px;
 }
-.SettingsMenu {
+.SettingsMenu, .ArchiveMenu {
   animation: slideIn 200ms forwards;
   padding: 10px;
 }
@@ -206,6 +206,13 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
+}
+.ArchiveIcon {
+  font-size: 18px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 1px;
 }
 .RefreshBtn {
   margin: 10px;

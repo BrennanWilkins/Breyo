@@ -17,7 +17,7 @@ router.post('/', auth, validate(
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'err'; }
       const title = req.body.title.replace(/\n/g, ' ');
-      const card = { title, desc: '', checklists: [], labels: [], dueDate: null };
+      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, isArchived: false };
       list.cards.push(card);
       const updatedList = await list.save();
       const cardID = updatedList.cards[updatedList.cards.length - 1]._id;
@@ -38,6 +38,7 @@ router.put('/title', auth, validate(
       const title = req.body.title.replace(/\n/g, ' ');
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       card.title = title;
       await list.save();
       res.sendStatus(200);
@@ -56,6 +57,7 @@ router.put('/desc', auth, validate(
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       card.desc = req.body.desc;
       await list.save();
       res.sendStatus(200);
@@ -71,6 +73,7 @@ router.put('/label/add', auth, validate([body('*').not().isEmpty().escape()]), u
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       card.labels = [...card.labels, req.body.color];
       await list.save();
       res.sendStatus(200);
@@ -86,6 +89,7 @@ router.put('/label/remove', auth, validate([body('*').not().isEmpty().escape()])
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       card.labels.splice(card.labels.indexOf(req.body.color), 1);
       await list.save();
       res.sendStatus(200);
@@ -99,7 +103,8 @@ router.put('/dueDate/isComplete', auth, validate([body('*').not().isEmpty().esca
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card || !card.dueDate) { throw 'err'; }
+      if (!card) { throw 'err'; }
+      if (card.isArchived || !card.dueDate) { throw 'err'; }
       card.dueDate.isComplete = !card.dueDate.isComplete;
       list.markModified('cards');
       await list.save();
@@ -115,6 +120,7 @@ router.post('/dueDate', auth, validate([body('*').not().isEmpty().escape()]), us
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       if (isNaN(new Date(req.body.dueDate).getDate())) { throw 'err'; }
       card.dueDate = { dueDate: req.body.dueDate, isComplete: false };
       await list.save();
@@ -130,6 +136,7 @@ router.put('/dueDate/remove', auth, validate([body('*').not().isEmpty().escape()
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       card.dueDate = null;
       await list.save();
       res.sendStatus(200);
@@ -146,6 +153,7 @@ router.post('/checklist', auth, validate(
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       const title = req.body.title.replace(/\n/g, ' ');
       card.checklists.push({ title, items: [] });
       const updatedList = await list.save();
@@ -163,6 +171,7 @@ router.put('/checklist/delete', auth, validate([body('*').not().isEmpty().escape
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       card.checklists.id(req.body.checklistID).remove();
       await list.save();
       res.sendStatus(200);
@@ -177,6 +186,7 @@ router.post('/checklist/item', auth, validate([body('*').not().isEmpty().escape(
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       const checklist = card.checklists.id(req.body.checklistID);
       const title = req.body.title.replace(/\n/g, ' ');
       checklist.items.push({ title, isComplete: false });
@@ -195,6 +205,7 @@ router.put('/checklist/item/isComplete', auth, validate([body('*').not().isEmpty
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       const item = card.checklists.id(req.body.checklistID).items.id(req.body.itemID);
       item.isComplete = !item.isComplete;
       await list.save();
@@ -210,6 +221,7 @@ router.put('/checklist/item/title', auth, validate([body('*').not().isEmpty().es
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const item = card.checklists.id(req.body.checklistID).items.id(req.body.itemID);
       item.title = title;
@@ -226,6 +238,7 @@ router.put('/checklist/item/delete', auth, validate([body('*').not().isEmpty().e
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
+      if (card.isArchived) { throw 'err'; }
       card.checklists.id(req.body.checklistID).items.id(req.body.itemID).remove();
       await list.save();
       res.sendStatus(200);
@@ -238,6 +251,7 @@ router.put('/moveCard/sameList', auth, validate([body('*').not().isEmpty().escap
     try {
       const list = await List.findById(req.body.listID);
       const card = list.cards.splice(req.body.sourceIndex, 1)[0];
+      if (card.isArchived) { throw 'err'; }
       list.cards.splice(req.body.destIndex, 0, card);
       await list.save();
       res.sendStatus(200);
@@ -251,6 +265,7 @@ router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escap
       const sourceList = await List.findById(req.body.sourceID);
       const destList = await List.findById(req.body.targetID);
       const card = sourceList.cards.splice(req.body.sourceIndex, 1)[0];
+      if (card.isArchived) { throw 'err'; }
       card.listID = req.body.targetID;
       destList.cards.splice(req.body.destIndex, 0, card);
       await sourceList.save();
@@ -267,6 +282,7 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
       const destList = await List.findById(req.body.destListID);
       const title = req.body.title.replace(/\n/g, ' ');
       const sourceCard = sourceList.cards.id(req.body.cardID);
+      if (sourceCard.isArchived) { throw 'err'; }
       const labels = req.body.keepLabels === 'true' ? sourceCard.labels : [];
       const checklists = [];
       if (req.body.keepChecklists === 'true') {
@@ -275,11 +291,48 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
           checklists.push({ title: checklist.title, items });
         }
       }
-      const newCard = { title, labels, checklists, desc: '', dueDate: null };
+      const newCard = { title, labels, checklists, desc: '', dueDate: null, isArchived: false };
       destList.cards.splice(req.body.destIndex, 0, newCard);
       const updatedList = await destList.save();
       const updatedCard = updatedList.cards[req.body.destIndex];
       res.status(200).json({ cardID: updatedCard._id, checklists: updatedCard.checklists });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      const card = list.cards.id(req.body.cardID);
+      if (!card || card.isArchived) { throw 'err'; }
+      card.isArchived = true;
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'err'; }
+      card.isArchived = false;
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      const card = list.cards.id(req.body.cardID).remove();
+      await list.save();
+      res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
 );

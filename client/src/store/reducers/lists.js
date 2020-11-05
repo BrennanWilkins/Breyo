@@ -6,7 +6,9 @@ const initialState = {
   shownCardID: null,
   shownListID: null,
   currentCard: null,
-  currentListTitle: null
+  currentListTitle: null,
+  archivedCards: [],
+  archivedLists: []
 };
 
 const reducer = (state = initialState, action) => {
@@ -16,7 +18,7 @@ const reducer = (state = initialState, action) => {
         indexInBoard: list.indexInBoard,
         listID: list._id,
         title: Entities.decode(list.title),
-        cards: list.cards.map(card => ({
+        cards: list.cards.filter(card => !card.isArchived).map(card => ({
           cardID: card._id,
           checklists: card.checklists.map(checklist => ({
             title: checklist.title,
@@ -30,10 +32,34 @@ const reducer = (state = initialState, action) => {
           dueDate: card.dueDate,
           labels: card.labels,
           title: Entities.decode(card.title),
-          desc: Entities.decode(card.desc)
+          desc: Entities.decode(card.desc),
+          isArchived: false
         }))
       })).sort((a,b) => a.indexInBoard - b.indexInBoard);
-      return { ...state, lists };
+      const archivedCards = [];
+      action.payload.lists.forEach(list => {
+        list.cards.forEach(card => {
+          if (card.isArchived) { archivedCards.push({
+            cardID: card._id,
+            checklists: card.checklists.map(checklist => ({
+              title: checklist.title,
+              checklistID: checklist._id,
+              items: checklist.items.map(item => ({
+                itemID: item._id,
+                title: item.title,
+                isComplete: item.isComplete
+              }))
+            })),
+            dueDate: card.dueDate,
+            labels: card.labels,
+            title: Entities.decode(card.title),
+            desc: Entities.decode(card.desc),
+            listID: list._id,
+            isArchived: true });
+          }
+        });
+      });
+      return { ...state, lists, archivedCards };
     }
     case actionTypes.UPDATE_LIST_TITLE: {
       const lists = [...state.lists];
@@ -50,7 +76,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ADD_CARD: {
       const index = state.lists.findIndex(list => list.listID === action.listID);
       const cards = [...state.lists[index].cards];
-      cards.push({ title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID });
+      cards.push({ title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID, isArchived: false });
       const lists = [...state.lists];
       lists[index].cards = cards;
       return { ...state, lists };
@@ -312,6 +338,39 @@ const reducer = (state = initialState, action) => {
       list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists };
+    }
+    case actionTypes.ARCHIVE_CARD: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const cards = [...list.cards];
+      const card = cards.splice(cardIndex, 1)[0];
+      list.cards = cards;
+      lists[listIndex] = list;
+      const archivedCards = [...state.archivedCards];
+      archivedCards.push({ ...card, listID: action.listID, isArchived: true });
+      return { ...state, lists, archivedCards };
+    }
+    case actionTypes.RECOVER_CARD: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const archivedCards = [...state.archivedCards];
+      const cardIndex = archivedCards.findIndex(card => card.cardID === action.cardID);
+      const card = archivedCards.splice(cardIndex, 1)[0];
+      delete card.listID;
+      const cards = [...list.cards];
+      cards.push({ ...card, isArchived: false });
+      list.cards = cards;
+      lists[listIndex] = list;
+      return { ...state, lists, archivedCards };
+    }
+    case actionTypes.DELETE_CARD: {
+      const archivedCards = [...state.archivedCards];
+      const cardIndex = archivedCards.findIndex(card => card.cardID === action.cardID);
+      archivedCards.splice(cardIndex, 1);
+      return { ...state, archivedCards };
     }
     default: return state;
   }

@@ -142,3 +142,37 @@ export const copyCard = (title, keepChecklists, keepLabels, cardID, currentCard,
     dispatch(addNotif('There was an error while copying the card.'));
   }
 };
+
+export const archiveCard = (cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch({ type: actionTypes.ARCHIVE_CARD, cardID, listID });
+    await axios.post('/card/archive', { cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const setCardDetailsArchived = (cardID, listID, currentCard) => (dispatch, getState) => {
+  // current list may be active or archived
+  const currentList = getState().lists.lists.find(list => list.listID === listID) || getState().lists.archivedLists.find(list => list.listID === listID);
+  const currentListTitle = currentList.title;
+  dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID, listID, currentCard, currentListTitle });
+};
+
+export const recoverCard = (cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch({ type: actionTypes.RECOVER_CARD, cardID, listID });
+    await axios.put('/card/archive/recover', { cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const deleteCard = (cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch({ type: actionTypes.DELETE_CARD, cardID, listID });
+    await axios.put('/card/archive/delete', { cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};

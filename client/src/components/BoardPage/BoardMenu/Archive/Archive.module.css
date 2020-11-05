@@ -1,0 +1,39 @@
+.Btns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.Btns button {
+  margin: 0 8px;
+  width: 120px;
+}
+.Active button {
+  background: rgb(205,205,205);
+}
+.Active button:hover {
+  background: rgb(205,205,205);
+}
+.CardContainer {
+  width: 256px;
+  margin: 20px auto;
+}
+.Card {
+  width: 100%;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 15px 8px;
+  font-size: 13px;
+  background: white;
+  box-shadow: var(--cardShadow);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.CardBtns span {
+  text-decoration: underline;
+  margin: 0 5px;
+  font-size: 13px;
+  cursor: pointer;
+}

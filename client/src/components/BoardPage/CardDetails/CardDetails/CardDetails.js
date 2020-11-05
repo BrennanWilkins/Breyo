@@ -11,15 +11,27 @@ import CardActivity from '../CardActivity/CardActivity';
 import CardLabels from '../CardLabels/CardLabels';
 import CardDueDate from '../CardDueDate/CardDueDate';
 import CardChecklist from '../CardChecklist/CardChecklist';
+import { archiveCard } from '../../../../store/actions';
+import { alertIcon } from '../../../UI/icons';
 
 const CardDetails = props => {
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
 
+  const archiveCardHandler = () => {
+    props.archiveCard(props.cardID, props.listID, props.boardID);
+    props.close();
+  };
+
   return (
     <div className={classes.Container}>
-      <div ref={modalRef} className={classes.CardDetails}>
+      <div ref={modalRef} className={classes.CardDetails} style={props.currentCard.isArchived ? { paddingTop: '55px'} : null}>
         <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
+        {props.currentCard.isArchived &&
+          <div className={classes.DisabledOverlay}>
+            <div><span className={classes.AlertIcon}>{alertIcon}</span> This card is currently archived.
+            <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
+          </div>}
         <CardTitle title={props.currentCard.title} listTitle={props.currentListTitle}
         boardID={props.boardID} listID={props.listID} cardID={props.cardID} />
         <div className={classes.DetailContent}>
@@ -33,7 +45,7 @@ const CardDetails = props => {
             ))}
             <CardActivity />
           </div>
-          <CardOptions />
+          <CardOptions archiveCard={archiveCardHandler} />
         </div>
       </div>
     </div>
@@ -55,4 +67,8 @@ const mapStateToProps = state => ({
   currentListTitle: state.lists.currentListTitle
 });
 
-export default connect(mapStateToProps)(CardDetails);
+const mapDispatchToProps = dispatch => ({
+  archiveCard: (cardID, listID, boardID) => dispatch(archiveCard(cardID, listID, boardID))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CardDetails);

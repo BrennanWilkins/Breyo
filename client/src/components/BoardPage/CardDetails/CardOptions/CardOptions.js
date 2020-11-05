@@ -26,7 +26,7 @@ const CardOptions = props => {
       <div className={classes.Title2}>ACTIONS</div>
       <span className={classes.Btn}><ActionBtn clicked={() => setShowCopyModal(true)}>{copyIcon} Copy</ActionBtn></span>
       {showCopyModal && <CopyCardModal close={() => setShowCopyModal(false)} />}
-      <span className={classes.Btn}><ActionBtn>{archiveIcon} Archive</ActionBtn></span>
+      <span className={classes.Btn}><ActionBtn clicked={props.archiveCard}>{archiveIcon} Archive</ActionBtn></span>
       {showDueDateModal && <DueDateModal close={() => setShowDueDateModal(false)} />}
     </div>
   );

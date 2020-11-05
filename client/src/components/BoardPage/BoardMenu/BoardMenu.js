@@ -4,7 +4,7 @@ import classes from './BoardMenu.module.css';
 import Button, { CloseBtn, BackBtn, ActionBtn } from '../../UI/Buttons/Buttons';
 import { useModalToggle } from '../../../utils/customHooks';
 import { connect } from 'react-redux';
-import { boardIcon, activityIcon, checkIcon, personIcon, descIcon, settingsIcon } from '../../UI/icons';
+import { boardIcon, activityIcon, checkIcon, personIcon, descIcon, settingsIcon, archiveFillIcon } from '../../UI/icons';
 import COLORS from '../../../utils/colors';
 import { updateColor, updateBoardDesc, updateRefreshEnabled, deleteBoard } from '../../../store/actions';
 import AccountInfo from '../../UI/AccountInfo/AccountInfo';
@@ -12,6 +12,7 @@ import TextArea from 'react-textarea-autosize';
 import FormattingModal from '../FormattingModal/FormattingModal';
 import parseToJSX from '../../../utils/parseToJSX';
 import { withRouter } from 'react-router-dom';
+import Archive from './Archive/Archive';
 
 const BoardMenu = props => {
   const [showBoardDesc, setShowBoardDesc] = useState(false);
@@ -22,6 +23,7 @@ const BoardMenu = props => {
   const [showFormattingHelp, setShowFormattingHelp] = useState(false);
   const [descInput, setDescInput] = useState(props.desc);
   const [showDeleteBoard, setShowDeleteBoard] = useState(false);
+  const [showArchive, setShowArchive] = useState(false);
   const menuRef = useRef();
   const descRef = useRef();
   const deleteRef = useRef();
@@ -39,6 +41,7 @@ const BoardMenu = props => {
     setShowFormattingHelp(false);
     setShowSettings(false);
     setShowDeleteBoard(false);
+    setShowArchive(false);
   };
 
   useEffect(() => resetState(), [props.show]);
@@ -57,8 +60,10 @@ const BoardMenu = props => {
     props.history.push('/');
   };
 
-  const showBackBtn = showChangeBackground || showBoardDesc || showAllActivity || showSettings;
-  const title = showBoardDesc ? 'About this board' : showChangeBackground ? 'Change Background' : showAllActivity ? 'Activity' : showSettings ? 'Board Settings' : 'Menu';
+  const showBackBtn = showChangeBackground || showBoardDesc || showAllActivity || showSettings || showArchive;
+
+  const title = showBoardDesc ? 'About this board' : showChangeBackground ? 'Change Background' :
+  showAllActivity ? 'Activity' : showSettings ? 'Board Settings' : showArchive ? 'Archive' : 'Menu';
 
   const defaultContent = (
     <><div className={classes.Options}>
@@ -67,6 +72,7 @@ const BoardMenu = props => {
         <span style={{ background: props.color }} className={classes.SmallColor}></span>Change background
       </div>
       <div onClick={() => setShowSettings(true)} className={classes.Option}><span className={classes.SettingsIcon}>{settingsIcon}</span>Settings</div>
+      <div onClick={() => setShowArchive(true)} className={classes.Option}><span className={classes.ArchiveIcon}>{archiveFillIcon}</span>Archive</div>
     </div>
     <div className={classes.Activities}>
       <div onClick={() => setShowAllActivity(true)} className={`${classes.Option} ${classes.ActivityTitle}`}>{activityIcon}Activity</div>
@@ -123,6 +129,10 @@ const BoardMenu = props => {
     </div>
   );
 
+  const archiveMenu = <div className={classes.ArchiveMenu}><Archive /></div>;
+
+  const content = showBoardDesc ? aboutMenu : showChangeBackground ? backgroundMenu : showSettings ? settingsMenu : showArchive ? archiveMenu : defaultContent;
+
   return (
     <div ref={menuRef} className={props.show ? classes.ShowModal : classes.HideModal}>
       <div className={classes.Title}>
@@ -130,7 +140,7 @@ const BoardMenu = props => {
         {title}
         <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
       </div>
-      <div className={classes.Content}>{showBoardDesc ? aboutMenu : showChangeBackground ? backgroundMenu : showSettings ? settingsMenu : defaultContent}</div>
+      <div className={classes.Content}>{content}</div>
       {showFormattingHelp && <FormattingModal close={() => setShowFormattingHelp(false)} />}
     </div>
   );
