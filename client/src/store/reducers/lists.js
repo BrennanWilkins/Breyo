@@ -14,11 +14,9 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.UPDATE_ACTIVE_BOARD: {
-      const lists = action.payload.lists.map(list => ({
-        indexInBoard: list.indexInBoard,
-        listID: list._id,
-        title: Entities.decode(list.title),
-        cards: list.cards.filter(card => !card.isArchived).map(card => ({
+      let archivedCards = [];
+      let lists = action.payload.lists.map(list => {
+        const cards = list.cards.map(card => ({
           cardID: card._id,
           checklists: card.checklists.map(checklist => ({
             title: checklist.title,
@@ -33,33 +31,22 @@ const reducer = (state = initialState, action) => {
           labels: card.labels,
           title: Entities.decode(card.title),
           desc: Entities.decode(card.desc),
-          isArchived: false
-        }))
-      })).sort((a,b) => a.indexInBoard - b.indexInBoard);
-      const archivedCards = [];
-      action.payload.lists.forEach(list => {
-        list.cards.forEach(card => {
-          if (card.isArchived) { archivedCards.push({
-            cardID: card._id,
-            checklists: card.checklists.map(checklist => ({
-              title: checklist.title,
-              checklistID: checklist._id,
-              items: checklist.items.map(item => ({
-                itemID: item._id,
-                title: item.title,
-                isComplete: item.isComplete
-              }))
-            })),
-            dueDate: card.dueDate,
-            labels: card.labels,
-            title: Entities.decode(card.title),
-            desc: Entities.decode(card.desc),
-            listID: list._id,
-            isArchived: true });
-          }
-        });
-      });
-      return { ...state, lists, archivedCards };
+          isArchived: card.isArchived
+        }));
+        if (!list.isArchived) {
+          archivedCards = archivedCards.concat(cards.filter(card => card.isArchived).map(card => ({ ...card, listID: list._id })));
+        }
+        return {
+          indexInBoard: list.indexInBoard,
+          listID: list._id,
+          title: Entities.decode(list.title),
+          isArchived: list.isArchived,
+          cards: cards.filter(card => !card.isArchived)
+        };
+      }).sort((a,b) => a.indexInBoard - b.indexInBoard);
+      const archivedLists = lists.filter(list => list.isArchived);
+      lists = lists.filter(list => !list.isArchived);
+      return { ...state, lists, archivedCards, archivedLists };
     }
     case actionTypes.UPDATE_LIST_TITLE: {
       const lists = [...state.lists];
@@ -378,6 +365,7 @@ const reducer = (state = initialState, action) => {
         indexInBoard: action.newList.indexInBoard,
         listID: action.newList._id,
         title: Entities.decode(action.newList.title),
+        isArchived: false,
         cards: action.newList.cards.map(card => ({
           cardID: card._id,
           checklists: card.checklists.map(checklist => ({
@@ -398,6 +386,41 @@ const reducer = (state = initialState, action) => {
       };
       lists.push(newList);
       return { ...state, lists };
+    }
+    case actionTypes.ARCHIVE_LIST: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const archivedList = { ...lists.splice(listIndex, 1)[0] };
+      archivedList.isArchived = true;
+      archivedList.indexInBoard = lists.length;
+      for (let i = 0; i < lists.length; i++) {
+        if (lists[i].indexInBoard !== i) {
+          const list = { ...lists[i] };
+          list.indexInBoard = i;
+          lists[i] = list;
+        }
+      }
+      const archivedLists = [...state.archivedLists];
+      archivedLists.push(archivedList);
+      // remove any archived cards in the archived list since they will be archived too
+      const archivedCards = state.archivedCards.filter(card => card.listID !== archivedList.listID);
+      return { ...state, lists, archivedLists, archivedCards };
+    }
+    case actionTypes.RECOVER_LIST: {
+      const lists = [...state.lists];
+      const archivedLists = [...state.archivedLists];
+      const listIndex = archivedLists.findIndex(list => list.listID === action.listID);
+      const archivedList = { ...archivedLists.splice(listIndex, 1)[0] };
+      archivedList.isArchived = false;
+      archivedList.indexInBoard = lists.length;
+      lists.push(archivedList);
+      return { ...state, lists, archivedLists };
+    }
+    case actionTypes.DELETE_LIST: {
+      const archivedLists = [...state.archivedLists];
+      const listIndex = archivedLists.findIndex(list => list.listID === action.listID);
+      archivedLists.splice(listIndex, 1);
+      return { ...state, archivedLists };
     }
     default: return state;
   }

@@ -70,7 +70,7 @@ router.delete('/', auth, validate(
 router.put('/moveList', auth, validate([body('sourceIndex').isInt(), body('destIndex').isInt(), body('boardID').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
-      const lists = await List.find({ boardID: req.body.boardID }).sort({ indexInBoard: 'asc' }).lean();
+      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
       const list = lists.splice(req.body.sourceIndex, 1)[0];
       lists.splice(req.body.destIndex, 0, list);
       for (let i = 0; i < lists.length; i++) {
@@ -103,11 +103,51 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
         dueDate: card.dueDate,
         isArchived: false
       }));
-      const lists = await List.find({ boardID: req.body.boardID }).sort({ indexInBoard: 'asc' }).lean();
-      const newList = new List({ boardID: req.body.boardID, title: req.body.title, desc: list.desc, indexInBoard: lists.length, cards });
+      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
+      const newList = new List({ boardID: req.body.boardID, title: req.body.title, desc: list.desc, indexInBoard: lists.length, cards, isArchived: false });
       const updatedList = await newList.save();
       res.status(200).json({ newList: updatedList });
     } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
+      if (!lists.length) { throw 'err'; }
+      const listIndex = lists.findIndex(list => String(list._id) === req.body.listID);
+      if (listIndex === -1) { throw 'err'; }
+      lists.splice(listIndex, 1);
+      for (let i = 0; i < lists.length; i++) {
+        if (lists[i].indexInBoard !== i) { lists[i].indexInBoard = i; }
+      }
+      for (let list of lists) {
+        await List.findByIdAndUpdate(list._id, { indexInBoard: list.indexInBoard });
+      }
+      await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: true });
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).lean();
+      if (!lists.length) { throw 'err'; }
+      const list = await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: false });
+      res.sendStatus(200);
+    } catch(err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findByIdAndDelete(req.body.listID);
+      res.sendStatus(200);
+    } catch(err) { res.sendStatus(500); }
   }
 );
 

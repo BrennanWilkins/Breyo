@@ -23,7 +23,8 @@ const ListSchema = new mongoose.Schema({
   boardID: String,
   title: String,
   cards: [CardSchema],
-  indexInBoard: Number
+  indexInBoard: Number,
+  isArchived: Boolean
 });
 
 module.exports = mongoose.model('List', ListSchema);

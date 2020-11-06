@@ -317,6 +317,7 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
       card.isArchived = false;
@@ -330,6 +331,7 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID).remove();
       await list.save();
       res.sendStatus(200);
