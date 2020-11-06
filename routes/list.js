@@ -84,4 +84,31 @@ router.put('/moveList', auth, validate([body('sourceIndex').isInt(), body('destI
   }
 );
 
+router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('title').trim().isLength({ min: 1, max: 70 })]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      const cards = list.cards.filter(card => !card.isArchived).map(card => ({
+        title: card.title,
+        desc: card.desc,
+        checklists: card.checklists.map(checklist => ({
+          title: checklist.title,
+          items: checklist.items.map(item => ({
+            title: item.title,
+            isComplete: item.isComplete
+          }))
+        })),
+        labels: card.labels,
+        dueDate: card.dueDate,
+        isArchived: false
+      }));
+      const lists = await List.find({ boardID: req.body.boardID }).sort({ indexInBoard: 'asc' }).lean();
+      const newList = new List({ boardID: req.body.boardID, title: req.body.title, desc: list.desc, indexInBoard: lists.length, cards });
+      const updatedList = await newList.save();
+      res.status(200).json({ newList: updatedList });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;

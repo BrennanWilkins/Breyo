@@ -10,7 +10,6 @@
   box-sizing: border-box;
   max-height: calc(100% - 10px);
   align-self: flex-start;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   outline: none;
@@ -60,6 +59,9 @@
 }
 .AddCardBtn:active, .CardOptionBtn:active {
   background: rgb(210, 210, 210);
+}
+.ListActionsContainer {
+  position: relative;
 }
 .CardOptionBtn {
   border-radius: 3px;

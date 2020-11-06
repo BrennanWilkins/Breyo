@@ -19,3 +19,12 @@ export const addList = (title, boardID) => async dispatch => {
     dispatch(addNotif('Your list could not be created.'));
   }
 };
+
+export const copyList = (title, listID, boardID) => async dispatch => {
+  try {
+    const res = await axios.post('/list/copy', { title, listID, boardID });
+    dispatch({ type: actionTypes.COPY_LIST, newList: res.data.newList });
+  } catch (err) {
+    dispatch(addNotif('There was an error while copying the list.'));
+  }
+}

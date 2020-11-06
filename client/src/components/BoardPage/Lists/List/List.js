@@ -8,12 +8,14 @@ import { updateListTitle, setCardDetails } from '../../../../store/actions';
 import AddCard from '../AddCard/AddCard';
 import Card from '../Card/Card';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
+import ListActions from '../ListActions/ListActions';
 
 const List = props => {
   const [titleInput, setTitleInput] = useState(props.title);
   const [showAddCard, setShowAddCard] = useState(false);
   const inputRef = useRef();
   const [showTitleInput, setShowTitleInput] = useState(false);
+  const [showListActions, setShowListActions] = useState(false);
 
   const titleBlurHandler = () => {
     if (titleInput === props.title) { return setShowTitleInput(false); }
@@ -34,7 +36,10 @@ const List = props => {
             {!showTitleInput ? <div className={classes.ListTitle} onClick={() => setShowTitleInput(true)}>{titleInput}</div> :
             <TextArea ref={inputRef} maxRows="20" value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.TitleInput}
             onFocus={e => e.target.select()} onBlur={titleBlurHandler} />}
-            <div className={classes.CardOptionBtn}>{dotsIcon}</div>
+            <div className={classes.ListActionsContainer}>
+              <div className={classes.CardOptionBtn} onClick={() => setShowListActions(true)}>{dotsIcon}</div>
+              {showListActions && <ListActions close={() => setShowListActions(false)} title={props.title} listID={props.listID} boardID={props.boardID} />}
+            </div>
           </div>
           <Droppable droppableId={props.listID}>
             {(provided, snapshot) => (

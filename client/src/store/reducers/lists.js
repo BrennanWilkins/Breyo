@@ -372,6 +372,33 @@ const reducer = (state = initialState, action) => {
       archivedCards.splice(cardIndex, 1);
       return { ...state, archivedCards };
     }
+    case actionTypes.COPY_LIST: {
+      const lists = [...state.lists];
+      const newList = {
+        indexInBoard: action.newList.indexInBoard,
+        listID: action.newList._id,
+        title: Entities.decode(action.newList.title),
+        cards: action.newList.cards.map(card => ({
+          cardID: card._id,
+          checklists: card.checklists.map(checklist => ({
+            title: checklist.title,
+            checklistID: checklist._id,
+            items: checklist.items.map(item => ({
+              itemID: item._id,
+              title: item.title,
+              isComplete: item.isComplete
+            }))
+          })),
+          dueDate: card.dueDate,
+          labels: card.labels,
+          title: Entities.decode(card.title),
+          desc: Entities.decode(card.desc),
+          isArchived: false
+        }))
+      };
+      lists.push(newList);
+      return { ...state, lists };
+    }
     default: return state;
   }
 };

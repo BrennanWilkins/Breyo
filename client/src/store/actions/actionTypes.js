@@ -25,6 +25,7 @@ export const DELETE_BOARD = 'DELETE_BOARD';
 
 export const UPDATE_LIST_TITLE = 'UPDATE_LIST_TITLE';
 export const ADD_LIST = 'ADD_LIST';
+export const COPY_LIST = 'COPY_LIST';
 
 export const ADD_CARD = 'ADD_CARD';
 export const SET_CARD_DETAILS = 'SET_CARD_DETAILS';
