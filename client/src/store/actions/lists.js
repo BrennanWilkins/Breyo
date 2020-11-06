@@ -55,3 +55,21 @@ export const deleteList = (listID, boardID) => async dispatch => {
     console.log(err);
   }
 };
+
+export const archiveAllCards = (listID, boardID) => async dispatch => {
+  try {
+    dispatch({ type: actionTypes.ARCHIVE_ALL_CARDS, listID });
+    await axios.put('/list/archive/allCards', { listID, boardID });
+  } catch(err) {
+    console.log(err);
+  }
+};
+
+export const moveAllCards = (oldListID, newListID, boardID) => async dispatch => {
+  try {
+    dispatch({ type: actionTypes.MOVE_ALL_CARDS, oldListID, newListID });
+    await axios.put('/list/moveAllCards', { oldListID, newListID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};

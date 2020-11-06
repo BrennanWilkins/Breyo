@@ -29,6 +29,8 @@ export const COPY_LIST = 'COPY_LIST';
 export const ARCHIVE_LIST = 'ARCHIVE_LIST';
 export const RECOVER_LIST = 'RECOVER_LIST';
 export const DELETE_LIST = 'DELETE_LIST';
+export const ARCHIVE_ALL_CARDS = 'ARCHIVE_ALL_CARDS';
+export const MOVE_ALL_CARDS = 'MOVE_ALL_CARDS';
 
 export const ADD_CARD = 'ADD_CARD';
 export const SET_CARD_DETAILS = 'SET_CARD_DETAILS';

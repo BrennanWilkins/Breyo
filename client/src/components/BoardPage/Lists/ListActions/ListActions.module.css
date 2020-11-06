@@ -90,3 +90,21 @@
   background: rgb(230,230,230);
   cursor: default;
 }
+.MoveContainer {
+  max-height: 200px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.MoveOption, .MoveOptionCurrent {
+  padding: 8px;
+  word-wrap: break-word;
+  cursor: pointer;
+  font-size: 15px;
+}
+.MoveOptionCurrent {
+  color: rgb(180,180,180);
+  cursor: default;
+}
+.MoveOption:hover {
+  background: rgb(238,238,238);
+}

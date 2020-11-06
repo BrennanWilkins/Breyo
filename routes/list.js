@@ -151,4 +151,31 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
   }
 );
 
+router.put('/archive/allCards', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'err'; }
+      list.cards.forEach(card => { card.isArchived = true; });
+      await list.save();
+      res.sendStatus(200);
+    } catch(err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/moveAllCards', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const oldList = await List.findById(req.body.oldListID);
+      const newList = await List.findById(req.body.newListID);
+      if (!oldList || !newList) { throw 'err'; }
+      newList.cards = newList.cards.concat([...oldList.cards]);
+      oldList.cards = [];
+      await oldList.save();
+      await newList.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;

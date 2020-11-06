@@ -3,8 +3,9 @@ import classes from './ListActions.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { BackBtn, CloseBtn } from '../../../UI/Buttons/Buttons';
-import { copyList, archiveList } from '../../../../store/actions';
+import { copyList, archiveList, archiveAllCards } from '../../../../store/actions';
 import { connect } from 'react-redux';
+import MoveCards from './MoveCards';
 
 const ListActions = props => {
   const modalRef = useRef();
@@ -12,12 +13,14 @@ const ListActions = props => {
   useModalToggle(true, modalRef, props.close);
   const [showCopyList, setShowCopyList] = useState(false);
   const [copyListTitle, setCopyListTitle] = useState(props.title);
+  const [showMoveCards, setShowMoveCards] = useState(false);
 
   useEffect(() => { if (showCopyList) { setTimeout(() => inputRef.current.focus(), 200); }}, [showCopyList]);
 
   const resetState = () => {
     setShowCopyList(false);
     setCopyListTitle(props.title);
+    setShowMoveCards(false);
   };
 
   const copyHandler = () => {
@@ -25,12 +28,17 @@ const ListActions = props => {
     props.close();
   };
 
+  const archiveAllHandler = () => {
+    props.archiveAllCards(props.listID, props.boardID);
+    props.close();
+  };
+
   const defaultContent = (
     <>
       <div className={classes.Option} onClick={() => setShowCopyList(true)}>Copy list</div>
       <div className={classes.Option} onClick={() => props.archiveList(props.listID, props.boardID)}>Archive list</div>
-      <div className={classes.Option}>Archive all cards in this list</div>
-      <div className={classes.Option}>Move all cards in this list</div>
+      <div className={classes.Option} onClick={archiveAllHandler}>Archive all cards in this list</div>
+      <div className={classes.Option} onClick={() => setShowMoveCards(true)}>Move all cards in this list</div>
     </>
   );
 
@@ -47,10 +55,10 @@ const ListActions = props => {
   return (
     <div ref={modalRef} className={classes.Container}>
       <div className={classes.Title}>
-        <span className={showCopyList ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
-        {showCopyList ? 'Copy List' : 'List Actions'}
+        <span className={showCopyList || showMoveCards ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
+        {showCopyList ? 'Copy List' : showMoveCards ? 'Move all cards in this list' : 'List Actions'}
         <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
-      {showCopyList ? copyListContent : defaultContent}
+      {showCopyList ? copyListContent : showMoveCards ? <MoveCards listID={props.listID} boardID={props.boardID} close={props.close} /> : defaultContent}
     </div>
   );
 };
@@ -61,12 +69,14 @@ ListActions.propTypes = {
   listID: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
   copyList: PropTypes.func.isRequired,
-  archiveList: PropTypes.func.isRequired
+  archiveList: PropTypes.func.isRequired,
+  archiveAllCards: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
   copyList: (title, listID, boardID) => dispatch(copyList(title, listID, boardID)),
-  archiveList: (listID, boardID) => dispatch(archiveList(listID, boardID))
+  archiveList: (listID, boardID) => dispatch(archiveList(listID, boardID)),
+  archiveAllCards: (listID, boardID) => dispatch(archiveAllCards(listID, boardID))
 });
 
 export default connect(null, mapDispatchToProps)(ListActions);

@@ -422,6 +422,27 @@ const reducer = (state = initialState, action) => {
       archivedLists.splice(listIndex, 1);
       return { ...state, archivedLists };
     }
+    case actionTypes.ARCHIVE_ALL_CARDS: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const archivedCards = state.archivedCards.concat(list.cards.map(card => ({ ...card, listID: list.listID, isArchived: true })));
+      list.cards = [];
+      lists[listIndex] = list;
+      return { ...state, lists, archivedCards };
+    }
+    case actionTypes.MOVE_ALL_CARDS: {
+      const lists = [...state.lists];
+      const oldListIndex = lists.findIndex(list => list.listID === action.oldListID);
+      const newListIndex = lists.findIndex(list => list.listID === action.newListID);
+      const oldList = { ...lists[oldListIndex] };
+      const newList = { ...lists[newListIndex] };
+      newList.cards = newList.cards.concat([...oldList.cards]);
+      oldList.cards = [];
+      lists[oldListIndex] = oldList;
+      lists[newListIndex] = newList;
+      return { ...state, lists };
+    }
     default: return state;
   }
 };
