@@ -38,14 +38,17 @@ router.post('/login', validate(
 );
 
 router.post('/signup', validate(
-  [body('*').escape(),
+  [body('*').trim().escape(),
   body('email').isEmail().normalizeEmail(),
-  body('fullName').trim().isLength({ min: 1, max: 100 }).isAlpha(),
-  body('password').trim().isLength({ min: 8, max: 100 }),
-  body('confirmPassword').trim().isLength({ min: 8, max: 100 })],
+  body('fullName').isLength({ min: 1, max: 100 }),
+  body('password').isLength({ min: 8, max: 100 }),
+  body('confirmPassword').isLength({ min: 8, max: 100 })],
   'There was an error in one of the fields.'),
   async (req, res) => {
     try {
+      if (!req.body.fullName.match(/^[ a-zA-Z]+$/)) {
+        return res.status(400).json({ msg: 'Please enter a valid full name.' });
+      }
       if (req.body.password !== req.body.confirmPassword) {
         return res.status(400).json({ msg: 'Password must be equal to confirm password.' });
       }
