@@ -42,7 +42,7 @@ export const updateBoardTitle = (title, id) => async dispatch => {
 
 export const sendInvite = (email, boardID) => async dispatch => {
   try {
-    await axios.put('/board/invites/send', { email, boardID });
+    await axios.post('/board/invites', { email, boardID });
   } catch (err) {
     let msg = err.response && err.response.data.msg ? err.response.data.msg : 'There was an error while sending your invite.';
     dispatch(addNotif(msg));
@@ -51,19 +51,20 @@ export const sendInvite = (email, boardID) => async dispatch => {
 
 export const addAdmin = (email, boardID) => async dispatch => {
   try {
-    await axios.put('/board/admin/add', { email, boardID });
+    await axios.put('/board/admins/add', { email, boardID });
     dispatch({ type: actionTypes.ADD_ADMIN, email, boardID });
   } catch (err) {
-    dispatch(addNotif('There was an error while changing user permissions'));
+    console.log(err);
+    dispatch(addNotif('There was an error while changing user permissions.'));
   }
 };
 
 export const removeAdmin = (email, boardID) => async dispatch => {
   try {
-    await axios.put('/board/admin/remove', { email, boardID });
+    await axios.put('/board/admins/remove', { email, boardID });
     dispatch({ type: actionTypes.REMOVE_ADMIN, email, boardID });
   } catch (err) {
-    dispatch(addNotif('There was an error while changing user permissions'));
+    dispatch(addNotif('There was an error while changing user permissions.'));
   }
 };
 
@@ -99,4 +100,24 @@ export const deleteBoard = boardID => async dispatch => {
   } catch (err) {
     dispatch(addNotif('There was an error while deleting the board.'));
   }
-}
+};
+
+export const acceptInvite = boardID => async dispatch => {
+  try {
+    await axios.put('/board/invites/accept', { boardID });
+    const res = await axios.get('/auth/userData');
+    dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards });
+    dispatch({ type: actionTypes.REMOVE_INVITE, boardID });
+  } catch (err) {
+    dispatch(addNotif('There was an error while joining the board.'));
+  }
+};
+
+export const rejectInvite = boardID => async dispatch => {
+  try {
+    dispatch({ type: actionTypes.REMOVE_INVITE, boardID });
+    await axios.put('/board/invites/reject', { boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};

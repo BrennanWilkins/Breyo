@@ -20,7 +20,7 @@ const InviteModal = props => {
       </div>
       <div className={classes.Input}>
         <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter user's email" />
-        <Button disabled={email === '' || !props.isAdmin} clicked={() => props.sendInvite(email, props.boardID)}>Send Invite</Button>
+        <Button disabled={email === '' || !props.isAdmin} clicked={() => { props.sendInvite(email, props.boardID); props.close(); }}>Send Invite</Button>
       </div>
       {!props.isAdmin && <div className={classes.ErrMsg}>You must be an admin of this board to invite other members.</div>}
     </div>

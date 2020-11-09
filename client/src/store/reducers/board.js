@@ -36,23 +36,18 @@ const reducer = (state = initialState, action) => {
       title: action.title
     };
     case actionTypes.ADD_ADMIN: {
-      const updatedMembers = [...state.members].map(member => ({ ...member }));
-      const index = updatedMembers.find(member => member.email === action.email);
-      updatedMembers[index].isAdmin = true;
-      return {
-        ...state,
-        members: updatedMembers
-      };
+      const members = [...state.members];
+      const index = members.findIndex(member => member.email === action.email);
+      members[index].isAdmin = true;
+      return { ...state, members };
     }
     case actionTypes.REMOVE_ADMIN: {
-      const updatedMembers = [...state.members].map(member => ({ ...member }));
-      const index = updatedMembers.find(member => member.email === action.email);
-      updatedMembers[index].isAdmin = false;
-      return {
-        ...state,
-        members: updatedMembers
-      };
+      const members = [...state.members];
+      const index = members.findIndex(member => member.email === action.email);
+      members[index].isAdmin = false;
+      return { ...state, members };
     }
+    case actionTypes.DEMOTE_SELF: return { ...state, userIsAdmin: false };
     case actionTypes.UPDATE_COLOR: return {
       ...state,
       color: action.color

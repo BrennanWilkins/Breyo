@@ -14,8 +14,8 @@ const MemberModal = props => {
   useModalToggle(true, modalRef, props.close);
   useModalPos(true, modalRef);
 
-  const adminDisabled = !props.userIsAdmin && !props.isAdmin;
-  const memberDisabled = (!props.userIsAdmin && props.isAdmin) || (props.userIsAdmin && props.adminCount === 1);
+  const adminDisabled = !props.userIsAdmin;
+  const memberDisabled = !props.userIsAdmin || (props.isAdmin && props.adminCount === 1);
 
   const changeHandler = mode => {
     if (!props.userIsAdmin) { return; }
@@ -52,10 +52,11 @@ const MemberModal = props => {
           <span>Members can view and edit cards, and change some board settings.</span>
         </div>
       </div>
-      {props.adminCount === 1 &&
-      <div className={classes.CannotChange}>{props.userEmail === props.email ? 'You' : 'This member'} can't change roles because there must be at least one admin.</div>}
-      {!props.userIsAdmin &&
-      <div className={classes.CannotChange}>You must be an admin of this board to change member permissions.</div>}
+      {!props.userIsAdmin ?
+      <div className={classes.CannotChange}>You must be an admin of this board to change member permissions.</div> :
+      props.adminCount === 1 && props.isAdmin ?
+      <div className={classes.CannotChange}>{props.userEmail === props.email ? 'You' : 'This member'} can't change roles because there must be at least one admin.</div> :
+      null}
       </>}
     </div>
   );

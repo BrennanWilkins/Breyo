@@ -1,6 +1,6 @@
 .ShowModal, .HideModal {
   position: fixed;
-  top: 50px;
+  top: 45px;
   right: 5px;
   width: 300px;
   height: 400px;
@@ -11,6 +11,7 @@
   padding: 10px 0;
   box-sizing: border-box;
   font-size: 15px;
+  overflow: hidden;
 }
 .HideModal {
   transform: translateX(100%);
@@ -42,4 +43,13 @@
 }
 .Options div:hover {
   background: rgb(241, 241, 241);
+}
+.ShowBackBtn button, .HideBackBtn button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+}
+.HideBackBtn button {
+  left: -50px;
 }

@@ -43,7 +43,7 @@ const BoardNavBar = props => {
             <span className={classes.AccountBtn}><AccountBtn clicked={() => setShowMember(member.email)}>{member.fullName.slice(0,1)}</AccountBtn></span>
             {showMember === member.email &&
               <MemberModal close={() => setShowMember('')} fullName={member.fullName} email={member.email} userEmail={props.userEmail}
-              isAdmin={member.isAdmin} adminCount={adminCount} userIsAdmin={member.email === props.userEmail && member.isAdmin} boardID={props.boardID} />}
+              isAdmin={member.isAdmin} adminCount={adminCount} userIsAdmin={props.userIsAdmin} boardID={props.boardID} />}
           </span>
         ))}
         <span className={classes.Container}>
@@ -76,7 +76,8 @@ const mapStateToProps = state => ({
   activity: state.board.activity,
   boardID: state.board.boardID,
   isStarred: state.board.isStarred,
-  userEmail: state.auth.email
+  userEmail: state.auth.email,
+  userIsAdmin: state.board.userIsAdmin
 });
 
 const mapDispatchToProps = dispatch => ({

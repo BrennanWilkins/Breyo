@@ -158,21 +158,19 @@ router.put('/admins/add', auth, validate(
       const board = await Board.findById(req.body.boardID);
       const user = await User.findOne({ email: req.body.email });
       if (!board || !user) { throw 'err'; }
-      const members = board.members;
       // find user in board's members and change user to admin if found
-      const matchingMember = members.findIndex(member => member.userID === user._id && !member.isAdmin);
-      if (members.length > 1 && matchingMember) {
-        members[i].isAdmin = true;
-        user.boards = user.boards.map(board => {
-          if (board.boardID === req.body.boardID) { return { ...board, isAdmin: true }; }
-          return board;
-        });
-        user.markModified('boards');
-        board.markModified('members');
-        await user.save();
-        await board.save();
-        res.sendStatus(200);
-      } else { throw 'err'; }
+      const memberIndex = board.members.findIndex(member => member.email === user.email && !member.isAdmin);
+      if (board.members.length <= 1 || memberIndex === -1) { throw 'err'; }
+      board.members[memberIndex].isAdmin = true;
+      user.boards = user.boards.map(board => {
+        if (String(board.boardID) === String(req.body.boardID)) { return { ...board, isAdmin: true }; }
+        return board;
+      });
+      user.markModified('boards');
+      board.markModified('members');
+      await user.save();
+      await board.save();
+      res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -186,27 +184,26 @@ router.put('/admins/remove', auth, validate(
       const board = await Board.findById(req.body.boardID);
       const user = await User.findOne({ email: req.body.email });
       if (!board || !user) { throw 'err'; }
-      const members = board.members;
       // find user in board's members and change user isAdmin to false if found
-      const matchingMember = members.findIndex(member => member.userID === user._id && !member.isAdmin);
-      if (members.length > 1 && matchingMember) {
-        members[i].isAdmin = false;
-        user.boards = user.boards.map(board => {
-          if (board.boardID === req.body.boardID) { return { ...board, isAdmin: false }; }
-          return board;
-        });
-        user.markModified('boards');
-        board.markModified('members');
-        await user.save();
-        await board.save();
-        res.sendStatus(200);
-      } else { throw 'err'; }
+      const memberIndex = board.members.findIndex(member => member.email === user.email && member.isAdmin);
+      const adminCount = board.members.filter(member => member.isAdmin).length;
+      if (adminCount <= 1 || memberIndex === -1) { throw 'err'; }
+      board.members[memberIndex].isAdmin = false;
+      user.boards = user.boards.map(board => {
+        if (String(board.boardID) === String(req.body.boardID)) { return { ...board, isAdmin: false }; }
+        return board;
+      });
+      user.markModified('boards');
+      board.markModified('members');
+      await user.save();
+      await board.save();
+      res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
 );
 
 // authorization: admin
-router.put('/invites/send', auth, validate(
+router.post('/invites', auth, validate(
   [body('email').isEmail().normalizeEmail(),
   body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
   async (req, res) => {
@@ -217,9 +214,15 @@ router.put('/invites/send', auth, validate(
       // find user based on user's email
       const invitee = await User.findOne({ email: req.body.email });
       // no user found
-      if (!invitee) { return res.status(400).json({ msg: 'No user was found for that email' }); }
+      if (!invitee) { return res.status(400).json({ msg: 'No user was found for that email.' }); }
+      // user already invited
+      if (invitee.invites.find(invite => String(invite.boardID) === String(board._id))) {
+        return res.status(400).json({ msg: 'You have already invited this person to this board.' });
+      }
+      if (invitee.boards.find(userBoard => String(userBoard.boardID) === String(board._id))) {
+        return res.status(400).json({ msg: 'This user is already a member of this board.' });
+      }
       invitee.invites = [...invitee.invites, { inviterEmail: inviter.email, inviterName: inviter.fullName, title: board.title, boardID: board._id }];
-      invitee.markModified('invites');
       invitee.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
@@ -233,9 +236,9 @@ router.put('/invites/accept', auth, validate(
       const board = await Board.findById(req.body.boardID);
       const user = await User.findById(req.userID);
       if (!board || !user) { throw 'err'; }
-      user.invites = user.invites.filter(invite => invite.boardID !== req.body.boardID);
+      user.invites = user.invites.filter(invite => String(invite.boardID) !== req.body.boardID);
       user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false, color: board.color, refreshEnabled: true }];
-      board.members = [...board.members, { userID: req.userID, isAdmin: false }];
+      board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
       await user.save();
       await board.save();
       res.sendStatus(200);
@@ -250,7 +253,7 @@ router.put('/invites/reject', auth, validate(
       const board = await Board.findById(req.body.boardID);
       const user = await User.findById(req.userID);
       if (!board || !user) { throw 'err'; }
-      user.invites = user.invites.filter(invite => invite.boardID !== req.body.boardID);
+      user.invites = user.invites.filter(invite => String(invite.boardID) !== req.body.boardID);
       await user.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
@@ -267,7 +270,7 @@ router.put('/members/remove', auth, validate(
       const user = await User.findOne({ email: req.body.email });
       if (!board || !user) { throw 'err'; }
       // remove user from board's members and remove board from user's boards
-      board.members = board.members.filter(member => member.userID !== user._id);
+      board.members = board.members.filter(member => member.email !== user.email);
       user.boards = user.boards.filter(board => board.boardID !== board._id);
       await board.save();
       await user.save();

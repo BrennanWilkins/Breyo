@@ -89,6 +89,10 @@ const reducer = (state = initialState, action) => {
       const boards = state.boards.filter(board => board.boardID !== action.boardID);
       return { ...state, boards };
     }
+    case actionTypes.REMOVE_INVITE: {
+      const invites = state.invites.filter(invite => invite.boardID !== action.boardID);
+      return { ...state, invites };
+    }
     default: return state;
   }
 };

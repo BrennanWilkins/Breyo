@@ -1,0 +1,59 @@
+.Invites {
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 340px;
+  margin: 0 10px;
+}
+.Invites::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Invites::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Invites::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}
+.NoInvites {
+  color: rgb(112, 112, 112);
+  font-size: 15px;
+  margin-top: 20px;
+  text-align: center;
+}
+.Invite {
+  padding: 15px 5px;
+  font-size: 15px;
+  text-align: center;
+}
+.Email {
+  color: rgb(110,110,110);
+}
+.Title {
+  font-weight: 500;
+}
+.Btns {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+.Btns button {
+  font-weight: 400;
+  width: 70px;
+  font-size: 14px;
+  margin: 0 5px;
+}
+.AcceptBtn button {
+  background: rgba(var(--green), 0.8);
+}
+.AcceptBtn button:hover, .AcceptBtn button:active {
+  background: rgb(var(--green));
+}
+.RejectBtn button {
+  background: rgb(219, 55, 29);
+}
+.RejectBtn button:hover, .RejectBtn button:active {
+  background: rgb(213, 5, 5);
+}
