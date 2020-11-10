@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const List = require('../models/list');
+const User = require('../models/user');
+const Board = require('../models/board');
 const { body } = require('express-validator');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
@@ -17,7 +19,7 @@ router.post('/', auth, validate(
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'err'; }
       const title = req.body.title.replace(/\n/g, ' ');
-      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, isArchived: false };
+      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, isArchived: false, members: [] };
       list.cards.push(card);
       const updatedList = await list.save();
       const cardID = updatedList.cards[updatedList.cards.length - 1]._id;
@@ -291,7 +293,7 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
           checklists.push({ title: checklist.title, items });
         }
       }
-      const newCard = { title, labels, checklists, desc: '', dueDate: null, isArchived: false };
+      const newCard = { title, labels, checklists, desc: '', dueDate: null, isArchived: false, members: [] };
       destList.cards.splice(req.body.destIndex, 0, newCard);
       const updatedList = await destList.save();
       const updatedCard = updatedList.cards[req.body.destIndex];
@@ -333,6 +335,42 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'err'; }
       const card = list.cards.id(req.body.cardID).remove();
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.post('/members', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      const user = await User.findOne({ email: req.body.email });
+      const board = await Board.findById(req.body.boardID);
+      if (!list || !user || !board) { throw 'err'; }
+      // if user not member of the board
+      if (!board.members.find(member => member.email === user.email)) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      // if user already member of the card
+      if (card.members.find(member => member.email === user.email)) { throw 'err'; }
+      card.members.push({ email: user.email, fullName: user.fullName });
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { console.log(err); res.sendStatus(500); }
+  }
+);
+
+router.put('/members/remove', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      const user = await User.findOne({ email: req.body.email });
+      const board = await Board.findById(req.body.boardID);
+      if (!list || !user || !board) { throw 'err'; }
+      // if user not member of the board
+      if (!board.members.find(member => member.email === user.email)) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      card.members = card.members.filter(member => member.email !== user.email);
       await list.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }

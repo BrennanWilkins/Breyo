@@ -101,7 +101,8 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
         })),
         labels: card.labels,
         dueDate: card.dueDate,
-        isArchived: false
+        isArchived: false,
+        members: card.members
       }));
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
       const newList = new List({ boardID: req.body.boardID, title: req.body.title, desc: list.desc, indexInBoard: lists.length, cards, isArchived: false });
