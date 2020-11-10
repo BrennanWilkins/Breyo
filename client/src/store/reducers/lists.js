@@ -31,7 +31,8 @@ const reducer = (state = initialState, action) => {
           labels: card.labels,
           title: Entities.decode(card.title),
           desc: Entities.decode(card.desc),
-          isArchived: card.isArchived
+          isArchived: card.isArchived,
+          members: card.members
         }));
         if (!list.isArchived) {
           archivedCards = archivedCards.concat(cards.filter(card => card.isArchived).map(card => ({ ...card, listID: list._id })));
@@ -63,7 +64,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ADD_CARD: {
       const index = state.lists.findIndex(list => list.listID === action.listID);
       const cards = [...state.lists[index].cards];
-      cards.push({ title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID, isArchived: false });
+      cards.push({ title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID, isArchived: false, members: [] });
       const lists = [...state.lists];
       lists[index].cards = cards;
       return { ...state, lists };
@@ -319,7 +320,7 @@ const reducer = (state = initialState, action) => {
           isComplete: item.isComplete
         }))
       }));
-      const newCard = { title: action.title, desc: '', checklists, dueDate: null, cardID: action.newCardID };
+      const newCard = { title: action.title, desc: '', checklists, dueDate: null, cardID: action.newCardID, isArchived: false, members: [] };
       newCard.labels = action.keepLabels ? [...action.currentCard.labels] : [];
       cards.splice(action.destIndex, 0, newCard);
       list.cards = cards;
@@ -442,6 +443,32 @@ const reducer = (state = initialState, action) => {
       lists[oldListIndex] = oldList;
       lists[newListIndex] = newList;
       return { ...state, lists };
+    }
+    case actionTypes.ADD_CARD_MEMBER: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
+      card.members = [...card.members, { email: action.email, fullName: action.fullName }];
+      cards[cardIndex] = card;
+      list.cards = cards;
+      lists[listIndex] = list;
+      return { ...state, lists, currentCard: card };
+    }
+    case actionTypes.REMOVE_CARD_MEMBER: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
+      card.members = card.members.filter(member => member.email !== action.email);
+      cards[cardIndex] = card;
+      list.cards = cards;
+      lists[listIndex] = list;
+      return { ...state, lists, currentCard: card };
     }
     default: return state;
   }

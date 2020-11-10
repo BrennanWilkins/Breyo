@@ -176,3 +176,21 @@ export const deleteCard = (cardID, listID, boardID) => async dispatch => {
     console.log(err);
   }
 };
+
+export const addCardMember = (email, fullName, cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch({ type: actionTypes.ADD_CARD_MEMBER, email, fullName, cardID, listID });
+    await axios.post('/card/members', { email, cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const removeCardMember = (email, cardID, listID, boardID) => async dispatch => {
+  try {
+    dispatch({ type: actionTypes.REMOVE_CARD_MEMBER, email, cardID, listID });
+    await axios.put('/card/members/remove', { email, cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};

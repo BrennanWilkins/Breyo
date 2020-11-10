@@ -52,6 +52,8 @@ export const COPY_CARD = 'COPY_CARD';
 export const ARCHIVE_CARD = 'ARCHIVE_CARD';
 export const RECOVER_CARD = 'RECOVER_CARD';
 export const DELETE_CARD = 'DELETE_CARD';
+export const ADD_CARD_MEMBER = 'ADD_CARD_MEMBER';
+export const REMOVE_CARD_MEMBER = 'REMOVE_CARD_MEMBER';
 
 export const MOVE_LIST = 'MOVE_LIST';
 export const MOVE_CARD_SAME_LIST = 'MOVE_CARD_SAME_LIST';
