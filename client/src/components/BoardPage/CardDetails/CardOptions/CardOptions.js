@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import classes from './CardOptions.module.css';
-import { checklistIcon, labelIcon, clockIcon, copyIcon, archiveIcon } from '../../../UI/icons';
+import { checklistIcon, labelIcon, clockIcon, copyIcon, archiveIcon, personIcon } from '../../../UI/icons';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import LabelModal from '../LabelModal/LabelModal';
 import DueDateModal from '../DueDateModal/DueDateModal';
 import ChecklistModal from '../ChecklistModal/ChecklistModal';
 import CopyCardModal from '../CopyCardModal/CopyCardModal';
+import AddCardMember from '../AddCardMember/AddCardMember';
 
 const CardOptions = props => {
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [showDueDateModal, setShowDueDateModal] = useState(false);
   const [showChecklistModal, setShowChecklistModal] = useState(false);
   const [showCopyModal, setShowCopyModal] = useState(false);
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 
   return (
     <div className={classes.Container}>
@@ -21,6 +23,8 @@ const CardOptions = props => {
         {showLabelModal && <LabelModal close={() => setShowLabelModal(false)} />}
         <span className={classes.Btn}><ActionBtn clicked={() => setShowChecklistModal(true)}>{checklistIcon}Checklist</ActionBtn></span>
         {showChecklistModal && <ChecklistModal close={() => setShowChecklistModal(false)} />}
+        <span className={classes.Btn}><ActionBtn clicked={() => setShowAddMemberModal(true)}>{personIcon}Member</ActionBtn></span>
+        {showAddMemberModal && <AddCardMember close={() => setShowAddMemberModal(false)} />}
       </span>
       <span className={classes.Btn}><ActionBtn clicked={() => setShowDueDateModal(true)}>{clockIcon}Due Date</ActionBtn></span>
       <div className={classes.Title2}>ACTIONS</div>

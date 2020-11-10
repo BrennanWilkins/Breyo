@@ -1,0 +1,30 @@
+.Container, .FixedContainer {
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  border: 1px solid rgb(227, 227, 227);
+  background: white;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  padding: 10px 5px 5px;
+  box-sizing: border-box;
+  width: 300px;
+  z-index: 2;
+}
+.FixedContainer {
+  position: fixed;
+}
+.CloseBtn {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.RemoveBtn {
+  margin-top: 5px;
+  font-size: 14px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+.RemoveBtn:hover {
+  background: rgb(240,240,240);
+}

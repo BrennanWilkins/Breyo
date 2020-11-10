@@ -1,0 +1,23 @@
+.Container {
+  margin: 15px 18px 10px 47px;
+}
+.Title {
+  color: rgb(var(--darkGray));
+  font-size: 14px;
+  font-weight: 500;
+}
+.Member {
+  display: inline-block;
+  vertical-align: bottom;
+  position: relative;
+}
+.AccountBtn button, .AddBtn button {
+  margin: 5px 5px 0 0;
+  background: rgb(230,230,230);
+}
+.AccountBtn button:hover, .AddBtn button:hover {
+  background: rgb(220,220,220);
+}
+.AddContainer {
+  position: relative;
+}

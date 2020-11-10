@@ -44,7 +44,7 @@ const List = props => {
           <Droppable droppableId={props.listID}>
             {(provided, snapshot) => (
               <div className={classes.CardContainer} ref={provided.innerRef}>
-                {props.cards.map((card, i) => <Card key={card.cardID} index={i} {...card} showDetails={() => props.setCardDetails(card.cardID, props.listID)} />)}
+                {props.cards.map((card, i) => <Card key={card.cardID} index={i} {...card} listID={props.listID} showDetails={() => props.setCardDetails(card.cardID, props.listID)} />)}
                 {showAddCard && <AddCard close={() => setShowAddCard(false)} boardID={props.boardID} listID={props.listID} />}
                 {provided.placeholder}
               </div>

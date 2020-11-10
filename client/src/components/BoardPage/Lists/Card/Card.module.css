@@ -56,3 +56,22 @@
   color: white;
   padding: 3px 5px;
 }
+.Members {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 5px;
+}
+.Member {
+  position: relative;
+}
+.AccountBtn button {
+  margin: 2px;
+  width: 28px;
+  height: 28px;
+  font-size: 13.5px;
+  background: rgb(228,228,228);
+}
+.AccountBtn button:hover {
+  background: rgb(220,220,220);
+}

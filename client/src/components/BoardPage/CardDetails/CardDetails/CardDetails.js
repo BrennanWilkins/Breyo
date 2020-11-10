@@ -13,6 +13,7 @@ import CardDueDate from '../CardDueDate/CardDueDate';
 import CardChecklist from '../CardChecklist/CardChecklist';
 import { archiveCard } from '../../../../store/actions';
 import { alertIcon } from '../../../UI/icons';
+import CardMembers from '../CardMembers/CardMembers';
 
 const CardDetails = props => {
   const modalRef = useRef();
@@ -36,6 +37,7 @@ const CardDetails = props => {
         boardID={props.boardID} listID={props.listID} cardID={props.cardID} />
         <div className={classes.DetailContent}>
           <div className={classes.LeftDetails}>
+            {props.currentCard.members.length > 0 && <CardMembers members={props.currentCard.members} cardID={props.cardID} listID={props.listID} />}
             {props.currentCard.labels.length > 0 && <CardLabels currentCard={props.currentCard} />}
             {!!props.currentCard.dueDate &&
               <CardDueDate currentCard={props.currentCard} listID={props.listID} cardID={props.cardID} boardID={props.boardID} />}
