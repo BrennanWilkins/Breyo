@@ -1,0 +1,40 @@
+.Container {
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  border: 1px solid rgb(227, 227, 227);
+  background: white;
+  position: absolute;
+  bottom: 20px;
+  left: 32px;
+  padding: 10px 5px;
+  box-sizing: border-box;
+  width: 300px;
+  z-index: 2;
+}
+.CloseBtn {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.Title {
+  margin: 20px 0 15px;
+  text-align: center;
+  font-size: 15px;
+}
+.DeleteBtn {
+  margin: auto;
+  display: block;
+  width: 90%;
+  border: 0;
+  outline: none;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 7px 0;
+  font-size: 15px;
+  color: white;
+  background: rgb(219, 55, 29);
+  cursor: pointer;
+}
+.DeleteBtn:hover, .DeleteBtn:active {
+  background: rgb(213, 5, 5);
+}

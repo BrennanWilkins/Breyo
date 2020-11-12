@@ -1,0 +1,57 @@
+.AddComment {
+  display: flex;
+  align-items: flex-start;
+}
+.CommentInputShow, .CommentInputHide {
+  margin: 0 12px 0 7px;
+  width: 100%;
+}
+.CommentInputShow {
+  box-shadow: var(--box-shadow4);
+  background: white;
+  border-radius: 3px;
+  border: 1.2px solid rgb(218, 218, 218);
+}
+.CommentInputHide .SaveBtn {
+  display: none;
+}
+.Input, .FocusInput {
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 10px;
+  width: 100%;
+  border: 1.2px solid rgb(218, 218, 218);
+  resize: none;
+  overflow: hidden;
+  font-family: 'Roboto', -apple-system, sans-serif;
+  outline: none;
+  box-shadow: 0 1px 2px -1px rgb(204, 204, 204);
+  box-sizing: border-box;
+}
+.Input:hover {
+  box-shadow: 0 1px 2px -1px rgb(154, 154, 154);
+}
+.FocusInput {
+  cursor: text;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+.AccountBtn button {
+  margin: 2px 5px 0 0;
+  background: rgb(var(--lightGray));
+}
+.AccountBtn button:hover {
+  background: rgb(195, 195, 195);
+}
+.SaveBtn button {
+  background: rgba(var(--green), 0.8);
+  padding: 8px 10px;
+  margin: 5px 0 8px 10px;
+  font-weight: 400;
+}
+.SaveBtn button:hover, .SaveBtn button:active {
+  background: rgb(var(--green));
+}
+.SaveBtn button:disabled {
+  background: rgb(235, 235, 235);
+}

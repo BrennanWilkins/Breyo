@@ -1,0 +1,55 @@
+.Comment {
+  margin: 15px 0;
+  display: flex;
+  align-items: flex-start;
+}
+.AccountInfo {
+  position: relative;
+}
+.AccountBtn button {
+  margin: 2px 5px 0 0;
+  background: rgb(var(--lightGray));
+}
+.AccountBtn button:hover {
+  background: rgb(195, 195, 195);
+}
+.CommentDetail {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.FullName {
+  font-weight: bold;
+  font-size: 15px;
+  margin: 0 7px;
+}
+.Date {
+  font-size: 12.5px;
+  color: rgb(111, 111, 111);
+}
+.Msg {
+  background: white;
+  padding: 10px;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin: 5px 11px 0 7px;
+  border-radius: 4px;
+  word-break: break-all;
+  border: 1px solid rgb(227, 227, 227);
+  box-shadow: var(--box-shadow6);
+  align-self: flex-start;
+}
+.Btns {
+  margin: -5px 0 5px 45px;
+  position: relative;
+}
+.Btn {
+  margin: 0 4px;
+  text-decoration: underline;
+  cursor: pointer;
+  color: rgb(100,100,100);
+  font-size: 13px;
+}
+.Btn:hover {
+  color: rgb(50,50,50);
+}
