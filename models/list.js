@@ -10,6 +10,15 @@ const ChecklistSchema = new mongoose.Schema({
   items: [ItemSchema]
 });
 
+const CommentSchema = new mongoose.Schema({
+  email: String,
+  fullName: String,
+  msg: String,
+  date: String,
+  cardID: String,
+  listID: String
+});
+
 const CardSchema = new mongoose.Schema({
   title: String,
   desc: String,
@@ -17,7 +26,8 @@ const CardSchema = new mongoose.Schema({
   labels: [],
   dueDate: {},
   isArchived: Boolean,
-  members: []
+  members: [],
+  comments: [CommentSchema]
 });
 
 const ListSchema = new mongoose.Schema({

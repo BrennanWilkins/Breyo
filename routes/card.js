@@ -19,7 +19,7 @@ router.post('/', auth, validate(
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'err'; }
       const title = req.body.title.replace(/\n/g, ' ');
-      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, isArchived: false, members: [] };
+      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, isArchived: false, members: [], comments: [] };
       list.cards.push(card);
       const updatedList = await list.save();
       const cardID = updatedList.cards[updatedList.cards.length - 1]._id;
@@ -293,7 +293,7 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
           checklists.push({ title: checklist.title, items });
         }
       }
-      const newCard = { title, labels, checklists, desc: '', dueDate: null, isArchived: false, members: [] };
+      const newCard = { title, labels, checklists, desc: '', dueDate: null, isArchived: false, members: [], comments: [] };
       destList.cards.splice(req.body.destIndex, 0, newCard);
       const updatedList = await destList.save();
       const updatedCard = updatedList.cards[req.body.destIndex];
@@ -371,6 +371,52 @@ router.put('/members/remove', auth, validate([body('*').not().isEmpty().escape()
       if (!board.members.find(member => member.email === user.email)) { throw 'err'; }
       const card = list.cards.id(req.body.cardID);
       card.members = card.members.filter(member => member.email !== user.email);
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.post('/comments', auth, validate([body('*').not().isEmpty().escape(), body('msg').isLength({ min: 1, max: 300 })]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      const user = await User.findById(req.userID);
+      if (!list || !user) { throw 'err'; }
+      const card = list.cards.id(req.body.cardID);
+      card.comments.push({ email: user.email, fullName: user.fullName, date: req.body.date, msg: req.body.msg, cardID: req.body.cardID, listID: req.body.listID });
+      const updatedList = await list.save();
+      const updatedComments = updatedList.cards.id(req.body.cardID).comments;
+      const commentID = updatedComments[updatedComments.length - 1]._id;
+      res.status(200).json({ commentID });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/comments', auth, validate([body('*').not().isEmpty().escape(), body('msg').isLength({ min: 1, max: 300 })]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      const user = await User.findById(req.userID);
+      if (!list || !user) { throw 'err'; }
+      const comment = list.cards.id(req.body.cardID).comments.id(req.body.commentID);
+      if (user.email !== comment.email) { throw 'err'; }
+      comment.msg = req.body.msg;
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.put('/comments/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.body.listID);
+      const user = await User.findById(req.userID);
+      if (!list || !user) { throw 'err'; }
+      const comment = list.cards.id(req.body.cardID).comments.id(req.body.commentID);
+      if (user.email !== comment.email) { throw 'err'; }
+      comment.remove();
       await list.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
