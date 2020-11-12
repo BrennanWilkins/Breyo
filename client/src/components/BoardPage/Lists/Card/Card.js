@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classes from './Card.module.css';
-import { editIcon, clockIcon, checklistIcon } from '../../../UI/icons';
+import { editIcon, clockIcon, checklistIcon, commentIcon } from '../../../UI/icons';
 import { format } from 'date-fns';
 import { Draggable } from 'react-beautiful-dnd';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
@@ -55,6 +55,7 @@ const Card = props => {
               <div className={completedChecklists === totalChecklists ? `${classes.Btn} ${classes.BtnComplete}` : classes.Btn}>
                 {checklistIcon}{completedChecklists}/{totalChecklists}
               </div>}
+            {props.comments.length > 0 && <div className={classes.CommentBtn}>{commentIcon}{props.comments.length}</div>}
           </div>
           {props.members.length > 0 &&
           <div className={classes.Members}>
@@ -85,7 +86,8 @@ Card.propTypes = {
   showDetails: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
   members: PropTypes.array.isRequired,
-  listID: PropTypes.string.isRequired
+  listID: PropTypes.string.isRequired,
+  comments: PropTypes.array.isRequired
 };
 
 export default Card;
