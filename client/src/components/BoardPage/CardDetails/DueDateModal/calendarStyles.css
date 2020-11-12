@@ -12,3 +12,6 @@
   align-items: center;
   justify-content: center;
 }
+.react-datepicker-popper {
+  transform: translate3d(10px, 88px, 0px) !important;
+}

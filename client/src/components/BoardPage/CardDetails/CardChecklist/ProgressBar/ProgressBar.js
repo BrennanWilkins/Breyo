@@ -6,8 +6,16 @@ const ProgressBar = props => {
   const [width, setWidth] = useState(0);
 
   useEffect(() => {
-    const barWidth = barRef.current.getBoundingClientRect().width;
-    setWidth(props.progress * barWidth);
+    const resizeHandler = () => {
+      const barWidth = barRef.current.getBoundingClientRect().width;
+      setWidth(props.progress * barWidth);
+    };
+
+    resizeHandler();
+
+    // update progress width on window resize
+    window.addEventListener('resize', resizeHandler);
+    return () => window.removeEventListener('resize', resizeHandler);
   }, [props.progress]);
 
   return (
