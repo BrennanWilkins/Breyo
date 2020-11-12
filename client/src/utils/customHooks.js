@@ -14,6 +14,22 @@ export const useModalToggle = (show, ref, close) => {
   }, [show]);
 };
 
+// same as useModalToggle but takes an array of refs, if any ref is not clicked then closes
+export const useModalToggleMultiple = (show, refs, close) => {
+  return useEffect(() => {
+    const handleClick = e => {
+      for (let ref of refs) {
+        if (!ref.current) { return; }
+        if (ref.current.contains(e.target)) { return; }
+      }
+      close();
+    };
+
+    if (show) { document.addEventListener('mousedown', handleClick); }
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [show]);
+};
+
 export const useModalPos = (show, ref) => {
   return useEffect(() => {
     const updatePos = () => {
