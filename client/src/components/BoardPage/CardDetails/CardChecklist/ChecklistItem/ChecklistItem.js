@@ -17,6 +17,11 @@ const ChecklistItem = props => {
     setShowEdit(false);
   };
 
+  const blurHandler = () => {
+    setShowEdit(false);
+    setItemTitle(props.title);
+  };
+
   return (
     <div className={classes.Container}>
       <Checkbox checked={props.isComplete} clicked={props.toggleItemComplete} />
@@ -29,7 +34,7 @@ const ChecklistItem = props => {
       <div className={classes.EditItem}>
         <form onSubmit={editHandler}>
           <TextArea maxRows="5" value={itemTitle} onChange={e => setItemTitle(e.target.value)} className={classes.Input}
-          onKeyPress={e => { if (e.key === 'Enter') { e.preventDefault(); editHandler(); }}} autoFocus />
+          onKeyPress={e => { if (e.key === 'Enter') { e.preventDefault(); editHandler(); }}} autoFocus onBlur={blurHandler} />
           <SubmitBtns close={() => setShowEdit(false)} text="Edit" />
         </form>
       </div>}

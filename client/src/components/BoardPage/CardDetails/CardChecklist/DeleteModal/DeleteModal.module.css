@@ -9,6 +9,7 @@
   padding: 10px;
   box-sizing: border-box;
   width: 300px;
+  z-index: 2;
 }
 .Body {
   margin: 30px 20px 15px;
