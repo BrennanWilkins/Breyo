@@ -3,10 +3,9 @@
   top: 5px;
   right: 5px;
   width: 300px;
-  height: calc(100% - 10px);
   background: white;
   box-shadow: var(--box-shadow4);
-  padding: 10px 0;
+  padding: 10px 0 15px;
   box-sizing: border-box;
   font-size: 15px;
   overflow-y: auto;

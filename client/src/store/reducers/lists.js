@@ -487,7 +487,7 @@ const reducer = (state = initialState, action) => {
       const cardIndex = cards.findIndex(card => card.cardID === action.payload.cardID);
       const card = { ...cards[cardIndex] };
       const comments = [...card.comments];
-      comments.push({ ...action.payload });
+      comments.unshift({ ...action.payload });
       card.comments = comments;
       cards[cardIndex] = card;
       list.cards = cards;

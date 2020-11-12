@@ -20,8 +20,9 @@ const DueDateModal = props => {
   };
 
   const removeHandler = () => {
-    props.removeDueDate(props.cardID, props.listID, props.boardID);
     props.close();
+    if (!props.dueDate) { return; }
+    props.removeDueDate(props.cardID, props.listID, props.boardID);
   };
 
   return (
