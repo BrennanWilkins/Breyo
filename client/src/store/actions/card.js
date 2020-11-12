@@ -194,3 +194,38 @@ export const removeCardMember = (email, cardID, listID, boardID) => async dispat
     console.log(err);
   }
 };
+
+export const addComment = msg => async (dispatch, getState) => {
+  try {
+    const cardID = getState().lists.shownCardID;
+    const listID = getState().lists.shownListID;
+    const date = String(new Date());
+    const res = await axios.post('/card/comments', { msg, cardID, listID, date, boardID: getState().board.boardID });
+    const payload = { msg, commentID: res.data.commentID, cardID, date, listID, email: getState().auth.email, fullName: getState().auth.fullName };
+    dispatch({ type: actionTypes.ADD_COMMENT, payload });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const updateComment = (msg, commentID) => async (dispatch, getState) => {
+  try {
+    const cardID = getState().lists.shownCardID;
+    const listID = getState().lists.shownListID;
+    dispatch({ type: actionTypes.UPDATE_COMMENT, msg, commentID, cardID, listID });
+    await axios.put('/card/comments', { msg, commentID, cardID, listID, boardID: getState().board.boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const deleteComment = commentID => async (dispatch, getState) => {
+  try {
+    const cardID = getState().lists.shownCardID;
+    const listID = getState().lists.shownListID;
+    dispatch({ type: actionTypes.DELETE_COMMENT, commentID, cardID, listID });
+    await axios.put('/card/comments/delete', { commentID, cardID, listID, boardID: getState().board.boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};

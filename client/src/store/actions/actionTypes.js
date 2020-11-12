@@ -54,6 +54,9 @@ export const RECOVER_CARD = 'RECOVER_CARD';
 export const DELETE_CARD = 'DELETE_CARD';
 export const ADD_CARD_MEMBER = 'ADD_CARD_MEMBER';
 export const REMOVE_CARD_MEMBER = 'REMOVE_CARD_MEMBER';
+export const ADD_COMMENT = 'ADD_COMMENT';
+export const UPDATE_COMMENT = 'UPDATE_COMMENT';
+export const DELETE_COMMENT = 'DELETE_COMMENT';
 
 export const MOVE_LIST = 'MOVE_LIST';
 export const MOVE_CARD_SAME_LIST = 'MOVE_CARD_SAME_LIST';

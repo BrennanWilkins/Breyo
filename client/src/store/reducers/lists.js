@@ -32,7 +32,16 @@ const reducer = (state = initialState, action) => {
           title: Entities.decode(card.title),
           desc: Entities.decode(card.desc),
           isArchived: card.isArchived,
-          members: card.members
+          members: card.members,
+          comments: card.comments.map(comment => ({
+            email: comment.email,
+            fullName: comment.fullName,
+            cardID: comment.cardID,
+            listID: comment.listID,
+            date: comment.date,
+            commentID: comment._id,
+            msg: Entities.decode(comment.msg)
+          })).sort((a,b) => new Date(b.date) - new Date(a.date))
         }));
         if (!list.isArchived) {
           archivedCards = archivedCards.concat(cards.filter(card => card.isArchived).map(card => ({ ...card, listID: list._id })));
@@ -64,7 +73,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ADD_CARD: {
       const index = state.lists.findIndex(list => list.listID === action.listID);
       const cards = [...state.lists[index].cards];
-      cards.push({ title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID, isArchived: false, members: [] });
+      cards.push({ title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID, isArchived: false, members: [], comments: [] });
       const lists = [...state.lists];
       lists[index].cards = cards;
       return { ...state, lists };
@@ -320,7 +329,7 @@ const reducer = (state = initialState, action) => {
           isComplete: item.isComplete
         }))
       }));
-      const newCard = { title: action.title, desc: '', checklists, dueDate: null, cardID: action.newCardID, isArchived: false, members: [] };
+      const newCard = { title: action.title, desc: '', checklists, dueDate: null, cardID: action.newCardID, isArchived: false, members: [], comments: [] };
       newCard.labels = action.keepLabels ? [...action.currentCard.labels] : [];
       cards.splice(action.destIndex, 0, newCard);
       list.cards = cards;
@@ -465,6 +474,55 @@ const reducer = (state = initialState, action) => {
       const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
       const card = { ...cards[cardIndex] };
       card.members = card.members.filter(member => member.email !== action.email);
+      cards[cardIndex] = card;
+      list.cards = cards;
+      lists[listIndex] = list;
+      return { ...state, lists, currentCard: card };
+    }
+    case actionTypes.ADD_COMMENT: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.payload.listID);
+      const list = { ...lists[listIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.payload.cardID);
+      const card = { ...cards[cardIndex] };
+      const comments = [...card.comments];
+      comments.push({ ...action.payload });
+      card.comments = comments;
+      cards[cardIndex] = card;
+      list.cards = cards;
+      lists[listIndex] = list;
+      return { ...state, lists, currentCard: card };
+    }
+    case actionTypes.UPDATE_COMMENT: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
+      const comments = [...card.comments];
+      const commentIndex = comments.findIndex(comment => comment.commentID === action.commentID);
+      const comment = { ...comments[commentIndex] };
+      comment.msg = action.msg;
+      comments[commentIndex] = comment;
+      card.comments = comments;
+      cards[cardIndex] = card;
+      list.cards = cards;
+      lists[listIndex] = list;
+      return { ...state, lists, currentCard: card };
+    }
+    case actionTypes.DELETE_COMMENT: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
+      const comments = [...card.comments];
+      const commentIndex = comments.findIndex(comment => comment.commentID === action.commentID);
+      comments.splice(commentIndex, 1);
+      card.comments = comments;
       cards[cardIndex] = card;
       list.cards = cards;
       lists[listIndex] = list;
