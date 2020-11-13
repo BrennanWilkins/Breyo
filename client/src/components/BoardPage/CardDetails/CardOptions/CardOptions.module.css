@@ -24,3 +24,18 @@
   position: relative;
   z-index: 1;
 }
+@media (max-width: 610px) {
+  .Container {
+    width: 100%;
+    display: block;
+    margin-top: 30px;
+  }
+  .BtnContainer, .BtnContainer2 {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .Btn {
+    width: 48%;
+  }
+}

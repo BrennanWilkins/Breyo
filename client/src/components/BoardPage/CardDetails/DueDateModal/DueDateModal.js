@@ -26,7 +26,7 @@ const DueDateModal = props => {
   };
 
   return (
-    <div ref={modalRef} className={classes.Container}>
+    <div ref={modalRef} className={props.fromDueDate ? classes.DueDateContainer : classes.Container}>
       <div className={classes.Title}>Due Date<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
       <div className={classes.DatePicker}>
         <DatePicker selected={selectedDate} onChange={date => setSelectedDate(date)}
@@ -48,7 +48,8 @@ DueDateModal.propTypes = {
   cardID: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
   addDueDate: PropTypes.func.isRequired,
-  removeDueDate: PropTypes.func.isRequired
+  removeDueDate: PropTypes.func.isRequired,
+  fromDueDate: PropTypes.bool
 };
 
 const mapStateToProps = state => ({

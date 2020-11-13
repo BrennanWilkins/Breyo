@@ -11,6 +11,12 @@
   width: 300px;
   z-index: 2;
 }
+@media (max-width: 900px) {
+  .Container {
+    right: 0;
+    left: auto;
+  }
+}
 .Body {
   margin: 30px 20px 15px;
   text-align: center;

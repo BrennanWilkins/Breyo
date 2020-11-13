@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import classes from './AddCardMember.module.css';
 import { CloseBtn, AccountBtn } from '../../../UI/Buttons/Buttons';
 import { useModalToggle } from '../../../../utils/customHooks';
@@ -19,6 +19,15 @@ const AddCardMember = props => {
     setBoardMembers(members);
   }, []);
 
+  useLayoutEffect(() => {
+    if (!props.fromList) { return; }
+    if (modalRef.current.getBoundingClientRect().right + 5 >= window.innerWidth) {
+      modalRef.current.style.right = '0';
+    } else {
+      modalRef.current.style.left = '0';
+    }
+  }, [props.fromList]);
+
   const memberHandler = index => {
     const members = [...boardMembers];
     if (boardMembers[index].isMember) {
@@ -32,7 +41,7 @@ const AddCardMember = props => {
   };
 
   return (
-    <div ref={modalRef} className={props.fromList ? `${classes.Container} ${classes.FromList}` : classes.Container}>
+    <div ref={modalRef} className={props.fromList ? classes.FromListContainer : classes.Container}>
       <div className={classes.Title}>Members<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
       <div className={classes.SubTitle}>BOARD MEMBERS</div>
       {boardMembers.map((member, i) => (

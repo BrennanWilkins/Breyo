@@ -50,7 +50,7 @@ const CardChecklist = props => {
   return (
     <div>
       <div className={classes.Title}>
-        <div className={classes.TitleLeft}>{checklistIcon}Checklist {props.title}</div>
+        <div className={classes.TitleLeft}>{checklistIcon}{props.title}</div>
         <div>
           {progress !== 0 && <ActionBtn clicked={() => setHideCompleted(prev => !prev)}>{hideCompleted ? 'Show' : 'Hide'} completed items</ActionBtn>}
           <span className={classes.BtnContainer}>

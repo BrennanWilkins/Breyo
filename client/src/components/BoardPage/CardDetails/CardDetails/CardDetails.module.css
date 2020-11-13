@@ -71,3 +71,18 @@
   justify-content: center;
   align-items: center;
 }
+@media (max-width: 610px) {
+  .DetailContent {
+    display: block;
+  }
+  .LeftDetails {
+    width: 100%;
+    display: block;
+  }
+  .TopDetailsContainer {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin: 10px 18px 10px 37px;
+  }
+}

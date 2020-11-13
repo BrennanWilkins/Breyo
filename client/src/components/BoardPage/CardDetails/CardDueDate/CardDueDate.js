@@ -26,7 +26,7 @@ const CardDueDate = props => {
           </ActionBtn>
         </span>
       </div>
-      {showModal && <DueDateModal close={() => setShowModal(false)} />}
+      {showModal && <DueDateModal close={() => setShowModal(false)} fromDueDate />}
     </div>
   );
 };

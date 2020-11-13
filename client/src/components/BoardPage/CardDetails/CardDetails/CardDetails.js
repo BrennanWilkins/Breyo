@@ -37,10 +37,12 @@ const CardDetails = props => {
         boardID={props.boardID} listID={props.listID} cardID={props.cardID} />
         <div className={classes.DetailContent}>
           <div className={classes.LeftDetails}>
-            {props.currentCard.members.length > 0 && <CardMembers members={props.currentCard.members} cardID={props.cardID} listID={props.listID} />}
-            {props.currentCard.labels.length > 0 && <CardLabels currentCard={props.currentCard} />}
-            {!!props.currentCard.dueDate &&
-              <CardDueDate currentCard={props.currentCard} listID={props.listID} cardID={props.cardID} boardID={props.boardID} />}
+            <div className={classes.TopDetailsContainer}>
+              {props.currentCard.members.length > 0 && <CardMembers members={props.currentCard.members} cardID={props.cardID} listID={props.listID} />}
+              {props.currentCard.labels.length > 0 && <CardLabels currentCard={props.currentCard} />}
+              {!!props.currentCard.dueDate &&
+                <CardDueDate currentCard={props.currentCard} listID={props.listID} cardID={props.cardID} boardID={props.boardID} />}
+            </div>
             <CardDesc boardID={props.boardID} listID={props.listID} cardID={props.cardID} currentCard={props.currentCard} />
             {props.currentCard.checklists.map(checklist => (
               <CardChecklist key={checklist.checklistID} {...checklist} cardID={props.cardID} listID={props.listID} boardID={props.boardID} />

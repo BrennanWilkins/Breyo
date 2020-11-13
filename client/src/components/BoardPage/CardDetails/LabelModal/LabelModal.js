@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
 import classes from './LabelModal.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
@@ -20,8 +20,17 @@ const LabelModal = props => {
     }
   };
 
+  useLayoutEffect(() => {
+    if (!props.openFromMiddle) { return; }
+    if (modalRef.current.getBoundingClientRect().right + 5 >= window.innerWidth) {
+      modalRef.current.style.right = '0';
+    } else {
+      modalRef.current.style.left = '-1px';
+    }
+  }, [props.openFromMiddle]);
+
   return (
-    <div ref={modalRef} className={props.openFromMiddle ? `${classes.Container} ${classes.MiddlePos}` : classes.Container}>
+    <div ref={modalRef} className={props.openFromMiddle ? classes.MiddleContainer : classes.Container}>
       <div className={classes.Title}>Labels<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
       {LABEL_COLORS.map((color, i) => (
         <div key={i} style={{background: color}} className={classes.Color} onClick={() => colorHandler(color)}>

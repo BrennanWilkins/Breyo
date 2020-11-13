@@ -1,18 +1,27 @@
-.Container {
+.Container, .FromListContainer {
   box-shadow: var(--box-shadow4);
   border-radius: 4px;
   border: 1px solid rgb(227, 227, 227);
   background: white;
   position: absolute;
-  top: 105px;
-  right: 0;
   padding: 5px 5px 10px 5px;
   box-sizing: border-box;
   width: 275px;
   z-index: 2;
 }
-.FromList {
-  left: 0;
+.Container {
+  top: 105px;
+  right: 0;
+}
+@media (max-width: 610px) {
+  .Container {
+    left: 0;
+    right: auto;
+    top: auto;
+    bottom: 40px;
+  }
+}
+.FromListContainer {
   top: 23px;
 }
 .Title {

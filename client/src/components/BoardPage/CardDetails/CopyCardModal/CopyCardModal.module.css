@@ -4,12 +4,20 @@
   border: 1px solid rgb(227, 227, 227);
   background: white;
   position: absolute;
-  top: 299px;
+  top: 15px;
   right: 15px;
   padding: 5px 5px 10px 5px;
   box-sizing: border-box;
   width: 350px;
   z-index: 2;
+}
+@media (max-width: 610px) {
+  .Container {
+    bottom: 15px;
+    left: 15px;
+    top: auto;
+    right: auto;
+  }
 }
 .Title {
   position: relative;

@@ -10,6 +10,12 @@
   box-sizing: border-box;
   width: 300px;
 }
+@media (max-width: 610px) {
+  .Container {
+    top: auto;
+    bottom: 80px;
+  }
+}
 .Title {
   position: relative;
   text-align: center;
