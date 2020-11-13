@@ -11,6 +11,7 @@ import Item from './ChecklistItem/ChecklistItem';
 import AddItem from './AddItem/AddItem';
 import { deleteChecklist, toggleChecklistItemIsComplete, deleteChecklistItem,
 editChecklistItem } from '../../../../store/actions';
+import EditChecklistTitle from './EditChecklistTitle/EditChecklistTitle';
 
 const CardChecklist = props => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -18,6 +19,7 @@ const CardChecklist = props => {
   const [shownItems, setShownItems] = useState(props.items);
   const [hideCompleted, setHideCompleted] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showEditTitle, setShowEditTitle] = useState(false);
 
   useEffect(() => {
     if (hideCompleted) { setShownItems(props.items.filter(item => !item.isComplete)); }
@@ -50,14 +52,19 @@ const CardChecklist = props => {
   return (
     <div>
       <div className={classes.Title}>
-        <div className={classes.TitleLeft}>{checklistIcon}{props.title}</div>
+        <div className={classes.TitleLeft} style={showEditTitle ? { width: '100%'} : null}>
+          <span className={classes.Icon}>{checklistIcon}</span>
+          {showEditTitle ? <EditChecklistTitle title={props.title} close={() => setShowEditTitle(false)} checklistID={props.checklistID} /> :
+          <span onClick={() => setShowEditTitle(true)}>{props.title}</span>}
+        </div>
+        {!showEditTitle &&
         <div>
           {progress !== 0 && <ActionBtn clicked={() => setHideCompleted(prev => !prev)}>{hideCompleted ? 'Show' : 'Hide'} completed items</ActionBtn>}
           <span className={classes.BtnContainer}>
             <ActionBtn clicked={() => setShowDeleteModal(true)}>Delete</ActionBtn>
             {showDeleteModal && <DeleteModal delete={deleteHandler} title={props.title} close={() => setShowDeleteModal(false)} />}
           </span>
-        </div>
+        </div>}
       </div>
       <ProgressBar progress={progress} />
       {shownItems.map(item => (

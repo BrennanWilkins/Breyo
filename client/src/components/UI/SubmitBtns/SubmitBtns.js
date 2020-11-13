@@ -4,7 +4,7 @@ import { CloseBtn } from '../Buttons/Buttons';
 
 const SubmitBtns = props => (
   <div className={classes.Btns}>
-    <span className={classes.SubmitBtn}><button type="submit">{props.text}</button></span>
+    <span className={classes.SubmitBtn}><button type="submit" disabled={props.disabled}>{props.text}</button></span>
     <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
   </div>
 );

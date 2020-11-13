@@ -195,6 +195,22 @@ const reducer = (state = initialState, action) => {
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
+    case actionTypes.EDIT_CHECKLIST_TITLE: {
+      const lists = [...state.lists];
+      const listIndex = lists.findIndex(list => list.listID === action.listID);
+      const list = { ...lists[listIndex] };
+      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...list.cards[cardIndex] };
+      const checklists = [...card.checklists];
+      const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
+      const checklist = { ...checklists[checklistIndex] };
+      checklist.title = action.title;
+      checklists[checklistIndex] = checklist;
+      card.checklists = checklists;
+      list.cards[cardIndex] = card;
+      lists[listIndex] = list;
+      return { ...state, lists, currentCard: card };
+    }
     case actionTypes.ADD_CHECKLIST_ITEM: {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);

@@ -3,7 +3,10 @@
   align-items: center;
   font-weight: 500;
 }
-.TitleLeft svg {
+.TitleLeft span {
+  cursor: pointer;
+}
+.Icon {
   font-size: 20px;
   display: inline-flex;
   justify-content: center;

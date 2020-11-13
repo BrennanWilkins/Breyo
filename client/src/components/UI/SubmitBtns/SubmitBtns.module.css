@@ -25,3 +25,6 @@
   width: 30px !important;
   height: 30px !important;
 }
+.SubmitBtn button:disabled {
+  background: rgb(221,221,221);
+}

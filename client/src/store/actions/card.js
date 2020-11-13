@@ -98,6 +98,18 @@ export const deleteChecklist = (checklistID, cardID, listID, boardID) => async d
   }
 };
 
+export const editChecklistTitle = (title, checklistID) => async (dispatch, getState) => {
+  try {
+    const cardID = getState().lists.shownCardID;
+    const listID = getState().lists.shownListID;
+    const boardID = getState().board.boardID;
+    dispatch({ type: actionTypes.EDIT_CHECKLIST_TITLE, title, checklistID, cardID, listID });
+    await axios.put('/card/checklist/title', { title, checklistID, cardID, listID, boardID });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const addChecklistItem = (title, checklistID, cardID, listID, boardID) => async dispatch => {
   try {
     const res = await axios.post('/card/checklist/item', { title, checklistID, cardID, listID, boardID });

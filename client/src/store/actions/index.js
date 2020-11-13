@@ -9,5 +9,6 @@ export { addCard, setCardDetails, updateCardTitle, updateCardDesc, addCardLabel,
 removeCardLabel, toggleDueDateIsComplete, addDueDate, removeDueDate, addChecklist,
 deleteChecklist, addChecklistItem, toggleChecklistItemIsComplete, editChecklistItem,
 deleteChecklistItem, copyCard, archiveCard, setCardDetailsArchived, recoverCard,
-deleteCard, addCardMember, removeCardMember, addComment, updateComment, deleteComment } from './card';
+deleteCard, addCardMember, removeCardMember, addComment, updateComment, deleteComment,
+editChecklistTitle } from './card';
 export { dndHandler } from './dndActions';
