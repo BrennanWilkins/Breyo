@@ -30,7 +30,7 @@
   margin-bottom: 8px;
   cursor: pointer;
 }
-.Options span {
+.Option {
   text-decoration: underline;
   margin: 0 5px;
   font-size: 13px;
@@ -49,4 +49,7 @@
   padding: 10px 5px 15px;
   box-sizing: border-box;
   border-radius: 3px;
+}
+.ListOuterContainer {
+  position: relative;
 }

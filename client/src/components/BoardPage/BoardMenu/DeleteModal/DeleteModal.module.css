@@ -1,0 +1,46 @@
+.DeleteModal {
+  border-radius: 4px;
+  margin-top: 5px;
+  box-shadow: var(--box-shadow5);
+  border: 0.8px solid rgb(var(--lightGray));
+  background: rgb(245,245,245);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px 10px 20px;
+  font-size: 14px;
+  z-index: 2;
+}
+.DeleteModal div {
+  margin: 25px 0 0;
+  text-align: center;
+}
+.CloseBtn {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.DeleteBtn button {
+  background: rgb(219, 55, 29);
+  color: white;
+}
+.DeleteBtn button:hover, .DeleteBtn button:active {
+  background: rgb(213, 5, 5);
+}
+.Input {
+  margin: 15px auto;
+  width: 230px;
+  box-sizing: border-box;
+  border: 2px solid rgb(210, 210, 210);
+  border-radius: 4px;
+  padding: 6px;
+  transition: all 250ms;
+  outline: none;
+  font-size: 15px;
+}
+.Input:focus {
+  border: 2px solid rgb(var(--red), 0.8);
+}
