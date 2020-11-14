@@ -29,8 +29,8 @@ const Comment = props => {
 
   // show year in date if not current year
   const date = isThisYear(new Date(props.date)) ?
-  format(new Date(props.date), `MMM d 'at' H:mm aa`) :
-  format(new Date(props.date), `MMM d, yyyy 'at' H:mm aa`);
+  format(new Date(props.date), `MMM d 'at' h:mm aa`) :
+  format(new Date(props.date), `MMM d, yyyy 'at' h:mm aa`);
 
   return (
     <><div className={classes.Comment}>
