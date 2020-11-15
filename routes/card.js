@@ -7,6 +7,10 @@ const { body } = require('express-validator');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsMember = require('../middleware/useIsMember');
+const { addActivity } = require('./activity');
+const Activity = require('../models/activity');
+const { format } = require('date-fns');
+const isThisYear = require('date-fns/isThisYear');
 
 const LABEL_COLORS = ['#F60000', '#FF8C00', '#FFEE00', '#4DE94C', '#3783FF', '#4815AA'];
 
@@ -23,6 +27,7 @@ router.post('/', auth, validate(
       list.cards.push(card);
       const updatedList = await list.save();
       const cardID = updatedList.cards[updatedList.cards.length - 1]._id;
+      await addActivity(`created this card`, `added **(link)${card.title}** to ${list.title}`, cardID, list._id, req.body.boardID, req.userID);
       res.status(200).json({ cardID });
     } catch (err) { res.sendStatus(500); }
   }
@@ -43,6 +48,8 @@ router.put('/title', auth, validate(
       if (card.isArchived) { throw 'err'; }
       card.title = title;
       await list.save();
+      await addActivity(`renamed this card from ${card.title} to ${title}`, `renamed **(link)${card.title}** from ${card.title} to ${title}`,
+      card._id, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -110,6 +117,9 @@ router.put('/dueDate/isComplete', auth, validate([body('*').not().isEmpty().esca
       card.dueDate.isComplete = !card.dueDate.isComplete;
       list.markModified('cards');
       await list.save();
+      const completeText = card.dueDate.isComplete ? 'complete' : 'incomplete';
+      await addActivity(`marked the due date as ${completeText}`, `marked the due date on **(link)${card.title}** as ${completeText}`,
+         card._id, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -126,6 +136,15 @@ router.post('/dueDate', auth, validate([body('*').not().isEmpty().escape()]), us
       if (isNaN(new Date(req.body.dueDate).getDate())) { throw 'err'; }
       card.dueDate = { dueDate: req.body.dueDate, isComplete: false };
       await list.save();
+
+      // format date in action & show year in date if not current year
+      const date = isThisYear(new Date(req.body.dueDate)) ?
+      format(new Date(req.body.dueDate), `MMM d 'at' h:mm aa`) :
+      format(new Date(req.body.dueDate), `MMM d, yyyy 'at' h:mm aa`);
+
+      await addActivity(`set this card to be due ${date}`, `set **(link)${card.title}** to be due ${date}`,
+        card._id, list._id, req.body.boardID, req.userID);
+
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -141,6 +160,8 @@ router.put('/dueDate/remove', auth, validate([body('*').not().isEmpty().escape()
       if (card.isArchived) { throw 'err'; }
       card.dueDate = null;
       await list.save();
+      await addActivity(`removed the due date from this card`, `removed the due date from **(link)${card.title}**`,
+        card._id, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -159,6 +180,8 @@ router.post('/checklist', auth, validate([body('*').not().isEmpty().escape(), bo
       const updatedList = await list.save();
       const checklists = updatedList.cards.id(req.body.cardID).checklists;
       const checklistID = checklists[checklists.length - 1]._id;
+      await addActivity(`added checklist ${title} to this card`, `added checklist ${title} to **(link)${card.title}**`,
+        card._id, list._id, req.body.boardID, req.userID);
       res.status(200).json({ checklistID });
     } catch (err) { res.sendStatus(500); }
   }
@@ -172,8 +195,11 @@ router.put('/checklist/delete', auth, validate([body('*').not().isEmpty().escape
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
       if (card.isArchived) { throw 'err'; }
-      card.checklists.id(req.body.checklistID).remove();
+      const checklist = card.checklists.id(req.body.checklistID);
+      checklist.remove();
       await list.save();
+      await addActivity(`removed checklist ${checklist.title} from this card`, `removed checklist ${checklist.title} from **(link)${card.title}**`,
+        card._id, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -188,8 +214,12 @@ router.put('/checklist/title', auth, validate([body('*').not().isEmpty().escape(
       if (!card) { throw 'err'; }
       if (card.isArchived) { throw 'err'; }
       const title = req.body.title.replace(/\n/g, ' ');
-      card.checklists.id(req.body.checklistID).title = title;
+      const checklist = card.checklists.id(req.body.checklistID);
+      const oldTitle = checklist.title;
+      checklist.title = title;
       await list.save();
+      await addActivity(`renamed checklist ${oldTitle} to ${title}`, `renamed checklist ${oldTitle} to ${title} in **(link)${card.title}**`,
+        card._id, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -222,9 +252,12 @@ router.put('/checklist/item/isComplete', auth, validate([body('*').not().isEmpty
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'err'; }
       if (card.isArchived) { throw 'err'; }
-      const item = card.checklists.id(req.body.checklistID).items.id(req.body.itemID);
+      const checklist = card.checklists.id(req.body.checklistID);
+      const item = checklist.items.id(req.body.itemID);
       item.isComplete = !item.isComplete;
       await list.save();
+      await addActivity(`completed ${item.title} in checklist ${checklist.title}`, `completed ${item.title} in **(link)${card.title}**`,
+        card._id, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -280,12 +313,14 @@ router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escap
     try {
       const sourceList = await List.findById(req.body.sourceID);
       const destList = await List.findById(req.body.targetID);
+      if (!sourceList || !destList) { throw 'err'; }
       const card = sourceList.cards.splice(req.body.sourceIndex, 1)[0];
       if (card.isArchived) { throw 'err'; }
       card.listID = req.body.targetID;
       destList.cards.splice(req.body.destIndex, 0, card);
       await sourceList.save();
       await destList.save();
+      await Activity.updateMany({ listID: req.body.sourceID }, { listID: req.body.targetID });
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -296,6 +331,7 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
     try {
       const sourceList = await List.findById(req.body.sourceListID);
       const destList = await List.findById(req.body.destListID);
+      if (!sourceList || !destList) { throw 'err'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const sourceCard = sourceList.cards.id(req.body.cardID);
       if (sourceCard.isArchived) { throw 'err'; }
@@ -311,6 +347,8 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
       destList.cards.splice(req.body.destIndex, 0, newCard);
       const updatedList = await destList.save();
       const updatedCard = updatedList.cards[req.body.destIndex];
+      await addActivity(`copied this card to list ${destList.title}`, `copied **(link)${card.title}** to list ${destList.title}`,
+        card._id, list._id, req.body.boardID, req.userID);
       res.status(200).json({ cardID: updatedCard._id, checklists: updatedCard.checklists });
     } catch (err) { res.sendStatus(500); }
   }
@@ -324,6 +362,7 @@ router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), us
       if (!card || card.isArchived) { throw 'err'; }
       card.isArchived = true;
       await list.save();
+      await addActivity(`archived this card`, `archived **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -338,6 +377,7 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
       if (!card) { throw 'err'; }
       card.isArchived = false;
       await list.save();
+      await addActivity(`recovered this card`, `recovered **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -348,8 +388,11 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'err'; }
-      const card = list.cards.id(req.body.cardID).remove();
+      const card = list.cards.id(req.body.cardID);
+      card.remove();
       await list.save();
+      await addActivity(null, `deleted ${card.title} from list ${list.title}`, null, null, req.body.boardID, req.userID);
+      await Archive.deleteMany({ cardID: card._id });
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -369,6 +412,7 @@ router.post('/members', auth, validate([body('*').not().isEmpty().escape()]), us
       if (card.members.find(member => member.email === user.email)) { throw 'err'; }
       card.members.push({ email: user.email, fullName: user.fullName });
       await list.save();
+      await addActivity(`added ${user.fullName} to this card`, `added ${user.fullName} to **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
     } catch (err) { console.log(err); res.sendStatus(500); }
   }
@@ -386,6 +430,7 @@ router.put('/members/remove', auth, validate([body('*').not().isEmpty().escape()
       const card = list.cards.id(req.body.cardID);
       card.members = card.members.filter(member => member.email !== user.email);
       await list.save();
+      await addActivity(`removed ${user.fullName} from this card`, `removed ${user.fullName} from **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }

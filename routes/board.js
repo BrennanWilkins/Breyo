@@ -9,6 +9,8 @@ const useIsAdmin = require('../middleware/useIsAdmin');
 const useSSE = require('../middleware/useSSE');
 const useIsMember = require('../middleware/useIsMember');
 const List = require('../models/list');
+const { addActivity } = require('./activity');
+const Activity = require('../models/activity');
 
 const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
                 'rgb(0,121,191)', 'rgb(240, 85, 68)', 'rgb(56, 187, 244)',
@@ -62,17 +64,18 @@ router.post('/', auth, validate(
       const title = req.body.title.replace(/\n/g, ' ');
       // user is admin of new board by default
       const board = new Board({ title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
-        activity: [], color, creatorEmail: user.email, desc: '' });
+        color, creatorEmail: user.email, desc: '' });
       await board.save();
       // add board to user's boards
       const newBoard = { boardID: board._id, title, isStarred: false, isAdmin: true, color: board.color, refreshEnabled: true };
       user.boards.unshift(newBoard);
       await user.save();
       // add default lists to board (to do, doing, done)
-      const list1 = new List({ boardID: board._id, title: 'To Do', cards: [], indexInBoard: 0 });
-      const list2 = new List({ boardID: board._id, title: 'Doing', cards: [], indexInBoard: 1 });
-      const list3 = new List({ boardID: board._id, title: 'Done', cards: [], indexInBoard: 2 });
+      const list1 = new List({ boardID: board._id, title: 'To Do', cards: [], indexInBoard: 0, isArchived: false });
+      const list2 = new List({ boardID: board._id, title: 'Doing', cards: [], indexInBoard: 1, isArchived: false });
+      const list3 = new List({ boardID: board._id, title: 'Done', cards: [], indexInBoard: 2, isArchived: false });
       await list1.save(); await list2.save(); await list3.save();
+      await addActivity(null, 'created this board', null, null, board._id, null, user.email, user.fullName);
       res.status(200).json({ ...newBoard });
     } catch(err) { res.sendStatus(500); }
   }
@@ -108,6 +111,7 @@ router.put('/desc', auth, validate(
       const board = await Board.findById(req.body.boardID);
       board.desc = req.body.desc;
       await board.save();
+      await addActivity(null, 'updated the board description', null, null, newBoard._id, null, user.email, user.fullName);
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
@@ -119,8 +123,9 @@ router.put('/title', auth, validate(
   body('boardID').not().isEmpty().escape()], 'Please enter a valid title.'), useIsMember,
   async (req, res) => {
     try {
-      const board = await Board.findOne({ _id: req.body.boardID });
+      const board = await Board.findById(req.body.boardID);
       const title = req.body.title.replace(/\n/g, ' ');
+      const oldTitle = board.title;
       board.title = title;
       for (let member of board.members) {
         const user = await User.findOne({ email: member.email });
@@ -131,6 +136,7 @@ router.put('/title', auth, validate(
         await user.save();
       }
       await board.save();
+      await addActivity(null, `renamed this board from ${oldTitle} to ${title}`, null, null, board._id, req.userID);
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
@@ -170,6 +176,7 @@ router.put('/admins/add', auth, validate(
       board.markModified('members');
       await user.save();
       await board.save();
+      await addActivity(null, `changed ${user.fullName} permissions to admin`, null, null, board._id, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -197,6 +204,7 @@ router.put('/admins/remove', auth, validate(
       board.markModified('members');
       await user.save();
       await board.save();
+      await addActivity(null, `changed ${user.fullName} permissions to member`, null, null, board._id, req.userID);
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
@@ -241,6 +249,7 @@ router.put('/invites/accept', auth, validate(
       board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
       await user.save();
       await board.save();
+      await addActivity(null, `was added to this board`, null, null, board._id, null, user.email, user.fullName);
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
@@ -274,6 +283,7 @@ router.put('/members/remove', auth, validate(
       user.boards = user.boards.filter(board => board.boardID !== board._id);
       await board.save();
       await user.save();
+      await addActivity(null, `removed ${user.fullName} from this board`, null, null, board._id, req.userID);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -290,6 +300,7 @@ router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty()]), u
       }
       await Board.findByIdAndDelete(req.params.boardID);
       await List.deleteMany({ boardID: req.params.boardID });
+      await Activity.deleteMany({ boardID: req.params.boardID });
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
@@ -304,6 +315,7 @@ router.put('/refreshEnabled', auth, validate([body('boardID').not().isEmpty()]),
       board.refreshEnabled = !board.refreshEnabled;
       user.markModified('boards');
       await user.save();
+      res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
 );
