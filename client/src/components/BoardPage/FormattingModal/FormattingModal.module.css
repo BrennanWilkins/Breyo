@@ -5,11 +5,12 @@
   width: 300px;
   background: white;
   box-shadow: var(--box-shadow4);
-  padding: 10px 0 15px;
+  padding: 10px 0;
   box-sizing: border-box;
   font-size: 15px;
   overflow-y: auto;
   z-index: 2;
+  margin-bottom: 5px;
 }
 .Container::-webkit-scrollbar-track {
   border-radius: 15px;
