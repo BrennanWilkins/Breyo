@@ -1,4 +1,4 @@
-.ShowModal, .HideModal {
+.Menu {
   position: fixed;
   top: 40px;
   right: 0;
@@ -10,13 +10,27 @@
   box-sizing: border-box;
   font-size: 15px;
   transition: transform 250ms, opacity 0ms, visibility 0ms;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
-.HideModal {
+.HideMenu {
   transform: translateX(110%);
   opacity: 0;
   visibility: hidden;
   transition: transform 250ms, opacity 0ms 250ms, visibility 0ms 250ms;
+}
+.Menu::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Menu::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Menu::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
 }
 .Title {
   position: relative;
@@ -43,10 +57,6 @@
 }
 .HideBackBtn button {
   left: -50px;
-}
-.Content {
-  overflow-x: hidden;
-  overflow-y: auto;
 }
 .Options {
   padding: 15px 0;
@@ -111,10 +121,6 @@
 .BackgroundMenu div:hover span {
   background: rgb(255,255,255,0.2);
 }
-.AboutMenu {
-  animation: slideIn 200ms forwards;
-  padding: 10px;
-}
 @keyframes slideIn {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
@@ -157,7 +163,7 @@
   text-decoration: underline;
   color: black;
 }
-.AboutMenu textarea {
+.DescInput {
   display: block;
   resize: none;
   margin: 15px auto 10px;
@@ -197,7 +203,7 @@
 .FormatBtn button {
   margin: 0 0 0 80px;
 }
-.SettingsMenu, .ArchiveMenu {
+.Content {
   animation: slideIn 200ms forwards;
   padding: 10px;
 }
@@ -222,35 +228,9 @@
   font-size: 12.5px;
   color: rgb(83,83,83);
 }
+.DeleteBoard {
+  position: relative;
+}
 .DeleteBtn {
   margin: 10px;
-}
-.DeleteModal {
-  border-radius: 4px;
-  margin: 10px auto;
-  box-shadow: var(--box-shadow5);
-  border: 0.8px solid rgb(var(--lightGray));
-  background: rgb(245,245,245);
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  padding: 10px;
-  font-size: 15px;
-}
-.DeleteModal div {
-  margin: 25px 0 20px;
-  text-align: center;
-}
-.DeleteCloseBtn {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-.ConfirmDeleteBtn button {
-  background: rgb(219, 55, 29);
-  color: white;
-}
-.ConfirmDeleteBtn button:hover, .ConfirmDeleteBtn button:active {
-  background: rgb(213, 5, 5);
 }

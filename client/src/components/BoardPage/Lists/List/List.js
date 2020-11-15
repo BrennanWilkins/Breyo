@@ -9,6 +9,7 @@ import AddCard from '../AddCard/AddCard';
 import Card from '../Card/Card';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import ListActions from '../ListActions/ListActions';
+import { withRouter } from 'react-router-dom';
 
 const List = props => {
   const [titleInput, setTitleInput] = useState(props.title);
@@ -28,6 +29,19 @@ const List = props => {
     if (showTitleInput) { inputRef.current.focus(); }
   }, [showTitleInput]);
 
+  const setCardDetailsHandler = cardID => {
+    props.history.push(`/board/${props.boardID}/l/${props.listID}/c/${cardID}`);
+  };
+
+  useEffect(() => {
+    const listPath = `/l/${props.listID}/`;
+    const path = props.location.pathname;
+    if (path.includes(listPath)) {
+      const cardID = path.slice(path.indexOf('/c/') + 3);
+      props.setCardDetails(cardID, props.listID);
+    }
+  }, [props.location.pathname]);
+
   return (
     <Draggable draggableId={props.listID} index={props.indexInBoard}>
       {(provided, snapshot) => (
@@ -44,7 +58,7 @@ const List = props => {
           <Droppable droppableId={props.listID}>
             {(provided, snapshot) => (
               <div className={classes.CardContainer} ref={provided.innerRef}>
-                {props.cards.map((card, i) => <Card key={card.cardID} index={i} {...card} listID={props.listID} showDetails={() => props.setCardDetails(card.cardID, props.listID)} />)}
+                {props.cards.map((card, i) => <Card key={card.cardID} index={i} {...card} listID={props.listID} showDetails={() => setCardDetailsHandler(card.cardID)} />)}
                 {showAddCard && <AddCard close={() => setShowAddCard(false)} boardID={props.boardID} listID={props.listID} />}
                 {provided.placeholder}
               </div>
@@ -78,4 +92,4 @@ const mapDispatchToProps = dispatch => ({
   setCardDetails: (cardID, listID) => dispatch(setCardDetails(cardID, listID))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(List);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(List));

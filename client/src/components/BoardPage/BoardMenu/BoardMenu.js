@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardMenu.module.css';
 import Button, { CloseBtn, BackBtn, ActionBtn } from '../../UI/Buttons/Buttons';
-import { useModalToggle } from '../../../utils/customHooks';
 import { connect } from 'react-redux';
 import { boardIcon, activityIcon, checkIcon, personIcon, descIcon, settingsIcon, archiveFillIcon } from '../../UI/icons';
 import COLORS from '../../../utils/colors';
@@ -13,6 +12,8 @@ import FormattingModal from '../FormattingModal/FormattingModal';
 import parseToJSX from '../../../utils/parseToJSX';
 import { withRouter } from 'react-router-dom';
 import Archive from './Archive/Archive';
+import Action from '../CardDetails/CardActivity/Action/Action';
+import DeleteModal from './DeleteModal/DeleteModal';
 
 const BoardMenu = props => {
   const [showBoardDesc, setShowBoardDesc] = useState(false);
@@ -24,11 +25,7 @@ const BoardMenu = props => {
   const [descInput, setDescInput] = useState(props.desc);
   const [showDeleteBoard, setShowDeleteBoard] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
-  const menuRef = useRef();
   const descRef = useRef();
-  const deleteRef = useRef();
-  useModalToggle(props.show, menuRef, props.close);
-  useModalToggle(showDeleteBoard, deleteRef, () => setShowDeleteBoard(false));
 
   const formattedDesc = useMemo(() => parseToJSX(props.desc), [props.desc]);
 
@@ -76,6 +73,10 @@ const BoardMenu = props => {
     </div>
     <div className={classes.Activities}>
       <div onClick={() => setShowAllActivity(true)} className={`${classes.Option} ${classes.ActivityTitle}`}>{activityIcon}Activity</div>
+      {props.activity.map(action => (
+        <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
+        msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />
+      ))}
     </div></>
   );
 
@@ -90,7 +91,7 @@ const BoardMenu = props => {
   );
 
   const aboutMenu = (
-    <div className={classes.AboutMenu}>
+    <div className={classes.Content}>
       <div className={classes.AboutTitle}>{personIcon}Created by</div>
       <AccountInfo fullName={props.creatorFullName} email={props.creatorEmail} givePadding noBorder />
       <div className={classes.AboutTitle}>{descIcon}Description
@@ -98,7 +99,7 @@ const BoardMenu = props => {
           <span className={classes.AboutEditBtn}><ActionBtn clicked={() => setShowEditDesc(true)}>Edit</ActionBtn></span>}
       </div>
       {showEditDesc ? <>
-        <TextArea minRows="3" maxRows="50" value={descInput} onChange={e => setDescInput(e.target.value)} ref={descRef} />
+        <TextArea className={classes.DescInput} minRows="3" maxRows="50" value={descInput} onChange={e => setDescInput(e.target.value)} ref={descRef} />
         <div className={classes.AboutBtns}>
           <span className={classes.SaveBtn}><Button clicked={saveDescHandler} disabled={descInput === props.desc}>Save</Button></span>
           <span className={classes.AboutCloseBtn}><CloseBtn close={() => { setShowEditDesc(false); setDescInput(props.desc); }} /></span>
@@ -113,34 +114,31 @@ const BoardMenu = props => {
   );
 
   const settingsMenu = (
-    <div className={classes.SettingsMenu}>
+    <div className={classes.Content}>
       <div className={classes.RefreshBtn}>
         <ActionBtn clicked={() => props.updateRefreshEnabled(props.boardID)}>{props.refreshEnabled ? 'Disable' : 'Enable'} auto refresh</ActionBtn>
         <div>Disabling auto refresh will cause your board not to automatically update when other members create changes on the board.</div>
       </div>
-      <div className={classes.DeleteBtn}><ActionBtn clicked={() => setShowDeleteBoard(true)}>Delete Board</ActionBtn></div>
-      {showDeleteBoard && <div ref={deleteRef} className={classes.DeleteModal}>
-        <span className={classes.DeleteCloseBtn}><CloseBtn close={() => setShowDeleteBoard(false)} /></span>
-        {props.userIsAdmin ? <>
-        <div>Are you sure you want to delete this board? This action cannot be undone.</div>
-        <span className={classes.ConfirmDeleteBtn}><ActionBtn clicked={deleteBoardHandler}>DELETE</ActionBtn></span></>
-        : <div>You must be an admin to delete this board.</div>}
-      </div>}
+      <div className={classes.DeleteBoard}>
+        <div className={classes.DeleteBtn}><ActionBtn clicked={() => setShowDeleteBoard(true)}>Delete Board</ActionBtn></div>
+        {showDeleteBoard && <DeleteModal confirmText="DELETE THIS BOARD" close={() => setShowDeleteBoard(false)}
+        delete={deleteBoardHandler} userIsAdmin={props.userIsAdmin} mode="board" />}
+      </div>
     </div>
   );
 
-  const archiveMenu = <div className={classes.ArchiveMenu}><Archive /></div>;
+  const archiveMenu = <div className={classes.Content}><Archive /></div>;
 
   const content = showBoardDesc ? aboutMenu : showChangeBackground ? backgroundMenu : showSettings ? settingsMenu : showArchive ? archiveMenu : defaultContent;
 
   return (
-    <div ref={menuRef} className={props.show ? classes.ShowModal : classes.HideModal}>
+    <div className={props.show ? classes.Menu : `${classes.Menu} ${classes.HideMenu}`}>
       <div className={classes.Title}>
         <span className={showBackBtn ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
         {title}
         <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
       </div>
-      <div className={classes.Content}>{content}</div>
+      {content}
       {showFormattingHelp && <FormattingModal close={() => setShowFormattingHelp(false)} />}
     </div>
   );
@@ -152,7 +150,6 @@ BoardMenu.propTypes = {
   color: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
   updateColor: PropTypes.func.isRequired,
-  activity: PropTypes.array.isRequired,
   creatorEmail: PropTypes.string.isRequired,
   creatorFullName: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
@@ -160,18 +157,19 @@ BoardMenu.propTypes = {
   refreshEnabled: PropTypes.bool.isRequired,
   updateRefreshEnabled: PropTypes.func.isRequired,
   userIsAdmin: PropTypes.bool.isRequired,
-  deleteBoard: PropTypes.func.isRequired
+  deleteBoard: PropTypes.func.isRequired,
+  activity: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
   color: state.board.color,
   boardID: state.board.boardID,
-  activity: state.board.activity,
   creatorEmail: state.board.creatorEmail,
   creatorFullName: state.board.creatorFullName,
   userIsAdmin: state.board.userIsAdmin,
   desc: state.board.desc,
-  refreshEnabled: state.board.refreshEnabled
+  refreshEnabled: state.board.refreshEnabled,
+  activity: state.activity.boardActivity
 });
 
 const mapDispatchToProps = dispatch => ({

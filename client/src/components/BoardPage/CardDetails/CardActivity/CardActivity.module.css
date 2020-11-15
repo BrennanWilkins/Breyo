@@ -3,6 +3,12 @@
   align-items: center;
   font-weight: 500;
   margin-top: 20px;
+  justify-content: space-between;
+  margin: 20px 12px 5px 0;
+}
+.Title div {
+  display: flex;
+  align-items: center;
 }
 .Title svg {
   font-size: 20px;
@@ -11,4 +17,7 @@
   align-items: center;
   height: 40px;
   margin: 0 20px 0 5px;
+}
+.Spinner {
+  margin-bottom: 20px;
 }

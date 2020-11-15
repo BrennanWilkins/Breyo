@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import BoardNavBar from '../BoardNavBar/BoardNavBar';
 import EventSourcePolyfill from 'eventsource';
 import { instance as axios } from '../../../axios';
-import { addNotif, updateActiveBoard, getBoardData, setCardDetails } from '../../../store/actions';
+import { addNotif, updateActiveBoard, getBoardData, setCardDetails, updateBoardActivity } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
 import ListContainer from '../Lists/ListContainer/ListContainer';
 const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'));
@@ -55,9 +55,11 @@ const BoardPage = props => {
       const id = props.match.params.boardID;
       try {
         const res = await axios.get('/board/' + id);
+        const activity = await axios.get('/activity/recent/' + id);
         document.title = res.data.data.title;
         document.body.style.overflow = 'hidden';
         props.updateActiveBoard(res.data.data);
+        props.updateBoardActivity(activity.data.activity);
       } catch (err) {
         document.title = 'Brello';
         document.body.style.overflow = 'auto';
@@ -69,6 +71,11 @@ const BoardPage = props => {
     return () => { document.title = 'Brello'; document.body.style.overflow = 'auto'; }
   }, []);
 
+  const closeDetailsHandler = () => {
+    props.history.push(`/board/${props.boardID}`);
+    props.hideCardDetails();
+  };
+
   const fallback = <div className={classes.Fallback}><Spinner /></div>;
 
   return (
@@ -79,7 +86,7 @@ const BoardPage = props => {
       <ListContainer />
     </div>
     {props.shownCardID !== null && props.shownListID !== null &&
-      <Suspense fallback={fallback}><CardDetails close={props.hideCardDetails} cardID={props.shownCardID} listID={props.shownListID} /></Suspense>}
+      <Suspense fallback={fallback}><CardDetails close={closeDetailsHandler} cardID={props.shownCardID} listID={props.shownListID} /></Suspense>}
     </>
   );
 };
@@ -104,7 +111,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   addNotif: msg => dispatch(addNotif(msg)),
   updateActiveBoard: data => dispatch(updateActiveBoard(data)),
-  hideCardDetails: () => dispatch(setCardDetails(null, null))
+  hideCardDetails: () => dispatch(setCardDetails(null, null)),
+  updateBoardActivity: activity => dispatch(updateBoardActivity(activity))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(BoardPage));
