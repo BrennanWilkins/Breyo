@@ -111,7 +111,7 @@ router.put('/desc', auth, validate(
       const board = await Board.findById(req.body.boardID);
       board.desc = req.body.desc;
       await board.save();
-      await addActivity(null, 'updated the board description', null, null, newBoard._id, null, user.email, user.fullName);
+      await addActivity(null, 'updated the board description', null, null, board._id, req.userID);
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
