@@ -1,23 +1,20 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardMenu.module.css';
-import Button, { CloseBtn, BackBtn, ActionBtn } from '../../UI/Buttons/Buttons';
+import { CloseBtn, BackBtn } from '../../UI/Buttons/Buttons';
 import { connect } from 'react-redux';
-import { boardIcon, activityIcon, checkIcon, settingsIcon, archiveFillIcon } from '../../UI/icons';
-import COLORS from '../../../utils/colors';
-import { updateColor, updateRefreshEnabled, deleteBoard } from '../../../store/actions';
-import { withRouter } from 'react-router-dom';
+import { boardIcon, activityIcon, settingsIcon, archiveFillIcon } from '../../UI/icons';
 import Archive from './Archive/Archive';
 import Action from '../CardDetails/CardActivity/Action/Action';
-import DeleteModal from './DeleteModal/DeleteModal';
 import AboutMenu from './AboutMenu/AboutMenu';
+import SettingsMenu from './SettingsMenu/SettingsMenu';
+import BackgroundMenu from './BackgroundMenu/BackgroundMenu';
 
 const BoardMenu = props => {
   const [showBoardDesc, setShowBoardDesc] = useState(false);
   const [showChangeBackground, setShowChangeBackground] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showAllActivity, setShowAllActivity] = useState(false);
-  const [showDeleteBoard, setShowDeleteBoard] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
 
   const resetState = () => {
@@ -25,16 +22,10 @@ const BoardMenu = props => {
     setShowBoardDesc(false);
     setShowAllActivity(false);
     setShowSettings(false);
-    setShowDeleteBoard(false);
     setShowArchive(false);
   };
 
   useEffect(() => resetState(), [props.show]);
-
-  const deleteBoardHandler = () => {
-    props.deleteBoard(props.boardID);
-    props.history.push('/');
-  };
 
   const showBackBtn = showChangeBackground || showBoardDesc || showAllActivity || showSettings || showArchive;
 
@@ -61,31 +52,7 @@ const BoardMenu = props => {
     </div>
   );
 
-  const backgroundMenu = (
-    <div className={classes.Colors}>
-      {COLORS.map(color => (
-        <div key={color} onClick={() => props.updateColor(color, props.boardID)} style={{background: color}}>
-          {color === props.color && checkIcon}<span></span>
-        </div>
-      ))}
-    </div>
-  );
-
-  const settingsMenu = (
-    <>
-      <div className={classes.RefreshBtn}>
-        <ActionBtn clicked={() => props.updateRefreshEnabled(props.boardID)}>{props.refreshEnabled ? 'Disable' : 'Enable'} auto refresh</ActionBtn>
-        <div>Disabling auto refresh will cause your board not to automatically update when other members create changes on the board.</div>
-      </div>
-      <div className={classes.DeleteBoard}>
-        <div className={classes.DeleteBtn}><ActionBtn clicked={() => setShowDeleteBoard(true)}>Delete Board</ActionBtn></div>
-        {showDeleteBoard && <DeleteModal confirmText="DELETE THIS BOARD" close={() => setShowDeleteBoard(false)}
-        delete={deleteBoardHandler} userIsAdmin={props.userIsAdmin} mode="board" />}
-      </div>
-    </>
-  );
-
-  const content = showBoardDesc ? <AboutMenu /> : showChangeBackground ? backgroundMenu : showSettings ? settingsMenu : showArchive ? <Archive /> : defaultContent;
+  const content = showBoardDesc ? <AboutMenu /> : showChangeBackground ? <BackgroundMenu /> : showSettings ? <SettingsMenu /> : showArchive ? <Archive /> : defaultContent;
 
   return (
     <div className={props.show ? classes.Menu : `${classes.Menu} ${classes.HideMenu}`}>
@@ -104,26 +71,13 @@ BoardMenu.propTypes = {
   close: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
-  updateColor: PropTypes.func.isRequired,
-  refreshEnabled: PropTypes.bool.isRequired,
-  updateRefreshEnabled: PropTypes.func.isRequired,
-  userIsAdmin: PropTypes.bool.isRequired,
-  deleteBoard: PropTypes.func.isRequired,
   activity: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
   color: state.board.color,
   boardID: state.board.boardID,
-  userIsAdmin: state.board.userIsAdmin,
-  refreshEnabled: state.board.refreshEnabled,
   activity: state.activity.boardActivity
 });
 
-const mapDispatchToProps = dispatch => ({
-  updateColor: (color, boardID) => dispatch(updateColor(color, boardID)),
-  updateRefreshEnabled: boardID => dispatch(updateRefreshEnabled(boardID)),
-  deleteBoard: boardID => dispatch(deleteBoard(boardID))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(BoardMenu));
+export default connect(mapStateToProps)(BoardMenu);

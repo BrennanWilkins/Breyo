@@ -91,7 +91,7 @@
 .ActivityTitle svg {
   font-size: 20px;
 }
-.Colors {
+/* .Colors {
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -121,7 +121,7 @@
 }
 .Colors div:hover span {
   background: rgb(255,255,255,0.2);
-}
+} */
 @keyframes slideIn {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
@@ -143,7 +143,7 @@
   align-items: center;
   margin: 0 1px;
 }
-.RefreshBtn {
+/* .RefreshBtn {
   margin: 10px;
 }
 .RefreshBtn div {
@@ -156,4 +156,4 @@
 }
 .DeleteBtn {
   margin: 10px;
-}
+} */

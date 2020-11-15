@@ -70,8 +70,9 @@ export const removeAdmin = (email, boardID) => async dispatch => {
 
 export const demoteSelf = boardID => ({ type: actionTypes.DEMOTE_SELF, boardID });
 
-export const updateColor = (color, boardID) => async dispatch => {
+export const updateColor = (color, boardID) => async (dispatch, getState) => {
   try {
+    const boardID = getState().board.boardID;
     dispatch({ type: actionTypes.UPDATE_COLOR, color });
     await axios.put('/board/color', { color, boardID });
   } catch (err) {
@@ -87,15 +88,17 @@ export const updateBoardDesc = desc => async (dispatch, getState) => {
   } catch (err) { console.log(err); }
 };
 
-export const updateRefreshEnabled = boardID => async dispatch => {
+export const updateRefreshEnabled = () => async (dispatch, getState) => {
   try {
+    const boardID = getState().board.boardID;
     dispatch({ type: actionTypes.UPDATE_REFRESH_ENABLED, boardID });
     await axios.put('/board/refreshEnabled', { boardID });
   } catch (err) { console.log(err); }
 };
 
-export const deleteBoard = boardID => async dispatch => {
+export const deleteBoard = () => async (dispatch, getState) => {
   try {
+    const boardID = getState().board.boardID;
     await axios.delete('/board/' + boardID);
     dispatch({ type: actionTypes.DELETE_BOARD, boardID });
   } catch (err) {
