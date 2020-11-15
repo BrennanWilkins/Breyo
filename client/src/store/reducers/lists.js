@@ -56,7 +56,9 @@ const reducer = (state = initialState, action) => {
       }).sort((a,b) => a.indexInBoard - b.indexInBoard);
       const archivedLists = lists.filter(list => list.isArchived);
       lists = lists.filter(list => !list.isArchived);
-      return { ...state, lists, archivedCards, archivedLists };
+      const currentCard = state.currentCard && state.shownCardID && state.shownListID && !state.currentCard.isArchived ?
+      lists.find(list => list.listID === state.shownListID).cards.find(card => card.cardID === state.shownCardID) : null;
+      return { ...state, lists, archivedCards, archivedLists, currentCard };
     }
     case actionTypes.UPDATE_LIST_TITLE: {
       const lists = [...state.lists];

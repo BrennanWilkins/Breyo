@@ -15,6 +15,9 @@ const BoardNavBar = props => {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showBoardMenu, setShowBoardMenu] = useState(false);
   const [showMember, setShowMember] = useState('');
+  const [adminCount, setAdminCount] = useState(props.members.filter(member => member.isAdmin).length);
+
+  useEffect(() => setAdminCount(props.members.filter(member => member.isAdmin).length), [props.members]);
 
   useEffect(() => setInputTitle(props.title), [props.title]);
 
@@ -27,8 +30,6 @@ const BoardNavBar = props => {
     if (e.target.value.length > 50) { return; }
     setInputTitle(e.target.value);
   };
-
-  const adminCount = props.members.filter(member => member.isAdmin).length;
 
   return (
     <div className={classes.NavBar}>
@@ -62,7 +63,6 @@ const BoardNavBar = props => {
 BoardNavBar.propTypes = {
   title: PropTypes.string.isRequired,
   members: PropTypes.array.isRequired,
-  activity: PropTypes.array.isRequired,
   boardID: PropTypes.string.isRequired,
   isStarred: PropTypes.bool.isRequired,
   updateTitle: PropTypes.func.isRequired,
@@ -73,7 +73,6 @@ BoardNavBar.propTypes = {
 const mapStateToProps = state => ({
   title: state.board.title,
   members: state.board.members,
-  activity: state.board.activity,
   boardID: state.board.boardID,
   isStarred: state.board.isStarred,
   userEmail: state.auth.email,
