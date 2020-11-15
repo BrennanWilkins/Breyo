@@ -1,0 +1,78 @@
+.Title {
+  font-weight: 500;
+  margin: 10px 0 5px 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 17px;
+}
+.Title svg {
+  font-size: 25px;
+  margin-right: 8px;
+}
+.EditBtn button {
+  margin: 0 0 0 20px;
+  font-size: 16px;
+}
+.DescInput {
+  display: block;
+  resize: none;
+  margin: 15px auto 10px;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  width: 305px;
+  border: 2px solid rgb(var(--red));
+  outline: none;
+  font-family: 'Roboto', -apple-system, sans-serif;
+}
+.Btns {
+  padding: 0 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.SaveBtn button {
+  background: rgba(var(--green), 0.8);
+  padding: 15px;
+}
+.SaveBtn button:hover, .SaveBtn button:active {
+  background: rgb(var(--green));
+}
+.SaveBtn button:disabled {
+  background: rgba(0,0,0,0.1);
+}
+.CloseBtn svg {
+  width: 30px !important;
+  height: 30px !important;
+}
+.FormatBtn button {
+  margin: 0 0 0 80px;
+}
+.NoDesc {
+  margin: 15px auto 10px;
+  padding: 10px;
+  text-align: center;
+  border-radius: 4px;
+  background: rgb(230, 230, 230);
+  font-size: 14px;
+  cursor: pointer;
+  box-sizing: border-box;
+  width: 255px;
+  height: 80px;
+}
+.NoDesc:hover {
+  background: rgb(221, 221, 221);
+}
+.DescText {
+  margin: 15px 12px 10px;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+.DescText a {
+  text-decoration: underline;
+  color: black;
+}

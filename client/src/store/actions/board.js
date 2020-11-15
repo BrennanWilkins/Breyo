@@ -79,8 +79,9 @@ export const updateColor = (color, boardID) => async dispatch => {
   }
 };
 
-export const updateBoardDesc = (desc, boardID) => async dispatch => {
+export const updateBoardDesc = desc => async (dispatch, getState) => {
   try {
+    const boardID = getState().board.boardID;
     dispatch({ type: actionTypes.UPDATE_BOARD_DESC, desc });
     await axios.put('/board/desc', { desc, boardID });
   } catch (err) { console.log(err); }
