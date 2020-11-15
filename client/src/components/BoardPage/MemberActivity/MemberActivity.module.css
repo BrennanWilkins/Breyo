@@ -1,0 +1,55 @@
+.Container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgb(0,0,0,0.5);
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 100;
+}
+.Modal {
+  position: absolute;
+  top: 45px;
+  left: max(calc(50% - 300px), 2%);
+  width: 96%;
+  max-width: 600px;
+  background: rgb(246,246,246);
+  margin-bottom: 45px;
+  padding: 15px;
+  box-sizing: border-box;
+  border-radius: 2px;
+  min-height: 300px;
+}
+.Title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  width: calc(100% - 30px);
+}
+.Title svg {
+  font-size: 22px;
+}
+.Name {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 5px 0 15px;
+}
+.Email {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(80,80,80);
+}
+.Activity {
+  position: relative;
+}
+.ErrMsg {
+  text-align: center;
+  font-weight: 500;
+  font-size: 17px;
+  margin: 20px 0;
+}
+.Spinner {
+  margin: 20px 0;
+}

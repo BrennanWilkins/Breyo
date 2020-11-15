@@ -6,10 +6,12 @@ import { connect } from 'react-redux';
 import BoardNavBar from '../BoardNavBar/BoardNavBar';
 import EventSourcePolyfill from 'eventsource';
 import { instance as axios } from '../../../axios';
-import { addNotif, updateActiveBoard, getBoardData, setCardDetails, updateBoardActivity } from '../../../store/actions';
+import { addNotif, updateActiveBoard, getBoardData, setCardDetails,
+  updateBoardActivity, setShownMemberActivity } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
 import ListContainer from '../Lists/ListContainer/ListContainer';
 const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'));
+const MemberActivity = lazy(() => import('../MemberActivity/MemberActivity'));
 
 const BoardPage = props => {
   const [windowClosed, setWindowClosed] = useState(false);
@@ -87,6 +89,11 @@ const BoardPage = props => {
     </div>
     {props.shownCardID !== null && props.shownListID !== null &&
       <Suspense fallback={fallback}><CardDetails close={closeDetailsHandler} cardID={props.shownCardID} listID={props.shownListID} /></Suspense>}
+    {props.shownMember &&
+      <Suspense fallback={fallback}>
+        <MemberActivity close={props.closeMemberActivity} email={props.shownMember.email} fullName={props.shownMember.fullName}
+          boardID={props.boardID} path={props.location.pathname} />
+      </Suspense>}
     </>
   );
 };
@@ -97,7 +104,9 @@ BoardPage.propTypes = {
   color: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
   hideCardDetails: PropTypes.func.isRequired,
-  refreshEnabled: PropTypes.bool.isRequired
+  refreshEnabled: PropTypes.bool.isRequired,
+  shownMember: PropTypes.object,
+  closeMemberActivity: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -105,14 +114,16 @@ const mapStateToProps = state => ({
   boardID: state.board.boardID,
   shownCardID: state.lists.shownCardID,
   shownListID: state.lists.shownListID,
-  refreshEnabled: state.board.refreshEnabled
+  refreshEnabled: state.board.refreshEnabled,
+  shownMember: state.activity.shownMemberActivity
 });
 
 const mapDispatchToProps = dispatch => ({
   addNotif: msg => dispatch(addNotif(msg)),
   updateActiveBoard: data => dispatch(updateActiveBoard(data)),
   hideCardDetails: () => dispatch(setCardDetails(null, null)),
-  updateBoardActivity: activity => dispatch(updateBoardActivity(activity))
+  updateBoardActivity: activity => dispatch(updateBoardActivity(activity)),
+  closeMemberActivity: () => dispatch(setShownMemberActivity(null))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(BoardPage));

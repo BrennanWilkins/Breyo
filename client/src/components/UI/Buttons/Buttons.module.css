@@ -50,7 +50,7 @@
 .AccountBtn:hover {
   background: rgb(232,232,232);
 }
-.CloseBtn, .ExpandBtn, .CollapseBtn, .BackBtn {
+.CloseBtn, .ExpandBtn, .CollapseBtn, .BackBtn, .CloseBtnCircle {
   padding: 1px;
   border: 0;
   cursor: pointer;
@@ -69,7 +69,7 @@
   width: 26px;
   line-height: 26px;
 }
-.CloseBtn:hover, .BackBtn:hover {
+.CloseBtn:hover, .BackBtn:hover, .CloseBtnCircle:hover {
   background: rgba(0,0,0,0.05);
 }
 .ExpandBtn, .CollapseBtn {
@@ -100,4 +100,15 @@
 }
 .ActionBtn:active {
   background: rgb(254, 190, 183);
+}
+.CloseBtnCircle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 3px;
+  border-radius: 25px;
+}
+.CloseBtnCircle svg {
+  width: 30px !important;
+  height: 30px !important;
 }

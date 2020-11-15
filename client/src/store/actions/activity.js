@@ -19,3 +19,5 @@ export const getRecentCardActivity = () => async (dispatch, getState) => {
 export const updateBoardActivity = activity => ({ type: actionTypes.UPDATE_BOARD_ACTIVITY, activity });
 
 export const resetCardActivity = () => ({ type: actionTypes.RESET_CARD_ACTIVITY });
+
+export const setShownMemberActivity = member => ({ type: actionTypes.SET_SHOWN_MEMBER_ACTIVITY, member });

@@ -12,4 +12,5 @@ deleteChecklistItem, copyCard, archiveCard, setCardDetailsArchived, recoverCard,
 deleteCard, addCardMember, removeCardMember, addComment, updateComment, deleteComment,
 editChecklistTitle } from './card';
 export { dndHandler } from './dndActions';
-export { getRecentCardActivity, resetCardActivity, updateBoardActivity } from './activity';
+export { getRecentCardActivity, resetCardActivity, updateBoardActivity,
+setShownMemberActivity } from './activity';

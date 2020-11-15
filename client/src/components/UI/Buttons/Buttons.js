@@ -14,6 +14,10 @@ export const CloseBtn = props => (
   <button style={{color: props.color}} className={classes.CloseBtn} onClick={props.close}>{xIcon}</button>
 );
 
+export const CloseBtnCircle = props => (
+  <button className={classes.CloseBtnCircle} onClick={props.close}>{xIcon}</button>
+);
+
 export const ExpandBtn = props => (
   <button className={props.expanded ? classes.ExpandBtn : classes.CollapseBtn} onClick={props.clicked}>{caretIcon}</button>
 );

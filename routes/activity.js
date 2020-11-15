@@ -60,5 +60,14 @@ router.get('/all/:boardID/:cardID/:page', auth, validate([param('*').not().isEmp
   }
 );
 
+router.get('/member/:email/:boardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
+  async (req, res) => {
+    try {
+      const activity = await Activity.find({ boardID: req.params.boardID, email: req.params.email }).sort('-date').lean();
+      res.status(200).json({ activity });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;
 module.exports.addActivity = addActivity;

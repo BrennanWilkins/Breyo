@@ -5,7 +5,7 @@ import { CloseBtn, BackBtn } from '../../UI/Buttons/Buttons';
 import { useModalToggle, useModalPos } from '../../../utils/customHooks';
 import { checkIcon } from '../../UI/icons';
 import { connect } from 'react-redux';
-import { addAdmin, removeAdmin, demoteSelf } from '../../../store/actions';
+import { addAdmin, removeAdmin, demoteSelf, setShownMemberActivity } from '../../../store/actions';
 import AccountInfo from '../../UI/AccountInfo/AccountInfo';
 
 const MemberModal = props => {
@@ -38,7 +38,7 @@ const MemberModal = props => {
       <AccountInfo fullName={props.fullName} email={props.email} />
       <div className={classes.Options} style={{ paddingTop: '15px'}}>
         <div onClick={() => setShowPermission(true)}>Change Permissions ({props.isAdmin ? 'Admin' : 'Member'})</div>
-        <div>View Member's Board Activity</div>
+        <div onClick={() => props.setShownMemberActivity({ email: props.email, fullName: props.fullName})}>View Member's Board Activity</div>
       </div>
       </> : <>
       <div className={classes.BackBtn}><BackBtn back={() => setShowPermission(false)} /></div>
@@ -73,13 +73,15 @@ MemberModal.propTypes = {
   addAdmin: PropTypes.func.isRequired,
   removeAdmin: PropTypes.func.isRequired,
   boardID: PropTypes.string.isRequired,
-  demoteSelf: PropTypes.func.isRequired
+  demoteSelf: PropTypes.func.isRequired,
+  setShownMemberActivity: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
   addAdmin: (email, boardID) => dispatch(addAdmin(email, boardID)),
   removeAdmin: (email, boardID) => dispatch(removeAdmin(email, boardID)),
-  demoteSelf: boardID => dispatch(demoteSelf(boardID))
+  demoteSelf: boardID => dispatch(demoteSelf(boardID)),
+  setShownMemberActivity: member => dispatch(setShownMemberActivity(member))
 });
 
 export default connect(null, mapDispatchToProps)(MemberModal);

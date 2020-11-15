@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import classes from './CardDetails.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
-import { CloseBtn } from '../../../UI/Buttons/Buttons';
+import { CloseBtnCircle } from '../../../UI/Buttons/Buttons';
 import { connect } from 'react-redux';
 import CardTitle from '../CardTitle/CardTitle';
 import CardDesc from '../CardDesc/CardDesc';
@@ -27,11 +27,13 @@ const CardDetails = props => {
   return (
     <div className={classes.Container}>
       <div ref={modalRef} className={classes.CardDetails} style={props.currentCard.isArchived ? { paddingTop: '55px'} : null}>
-        <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
+        <CloseBtnCircle close={props.close} />
         {props.currentCard.isArchived &&
           <div className={classes.DisabledOverlay}>
-            <div><span className={classes.AlertIcon}>{alertIcon}</span> This card is currently archived.
-            <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
+            <div>
+              <span className={classes.AlertIcon}>{alertIcon}</span> This card is currently archived.
+              <CloseBtnCircle close={props.close} />
+            </div>
           </div>}
         <CardTitle title={props.currentCard.title} listTitle={props.currentListTitle}
         boardID={props.boardID} listID={props.listID} cardID={props.cardID} />

@@ -3,7 +3,8 @@ import * as actionTypes from '../actions/actionTypes';
 const initialState = {
   boardActivity: [],
   cardActivity: [],
-  cardActivityLoading: false
+  cardActivityLoading: false,
+  shownMemberActivity: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -15,6 +16,7 @@ const reducer = (state = initialState, action) => {
     }
     case actionTypes.CARD_ACTIVITY_LOADING : return { ...state, cardActivityLoading: action.bool };
     case actionTypes.UPDATE_BOARD_ACTIVITY: return { ...state, boardActivity: action.activity };
+    case actionTypes.SET_SHOWN_MEMBER_ACTIVITY: return { ...state, shownMemberActivity: action.member };
     default: return state;
   }
 };
