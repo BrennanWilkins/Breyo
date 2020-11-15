@@ -6,8 +6,7 @@ import { toggleDueDateIsComplete } from '../../../../store/actions';
 import { Checkbox } from '../../../UI/Inputs/Inputs';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import DueDateModal from '../DueDateModal/DueDateModal';
-import { format } from 'date-fns';
-import isThisYear from 'date-fns/isThisYear';
+import formatDate from '../../../../utils/formatDate';
 
 const CardDueDate = props => {
   const [showModal, setShowModal] = useState(false);
@@ -16,18 +15,13 @@ const CardDueDate = props => {
     props.toggleIsComplete(props.cardID, props.listID, props.boardID);
   };
 
-  // format date & show year in date if not current year
-  const date = isThisYear(new Date(props.currentCard.dueDate.dueDate)) ?
-  format(new Date(props.currentCard.dueDate.dueDate), `MMM d 'at' h:mm aa`) :
-  format(new Date(props.currentCard.dueDate.dueDate), `MMM d, yyyy 'at' h:mm aa`);
-
   return (
     <div className={classes.Container}>
       <div className={classes.Title}>DUE DATE</div>
       <div className={classes.Input}>
         <Checkbox checked={props.currentCard.dueDate.isComplete} clicked={changeHandler} />
         <span className={classes.Btn}>
-          <ActionBtn clicked={() => setShowModal(true)}>{date}</ActionBtn>
+          <ActionBtn clicked={() => setShowModal(true)}>{formatDate(props.currentCard.dueDate.dueDate)}</ActionBtn>
         </span>
       </div>
       {showModal && <DueDateModal close={() => setShowModal(false)} fromDueDate />}

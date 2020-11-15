@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import classes from './Comment.module.css';
 import PropTypes from 'prop-types';
 import { AccountBtn } from '../../../../UI/Buttons/Buttons';
-import { format } from 'date-fns';
-import isThisYear from 'date-fns/isThisYear';
 import Commenter from '../Commenter/Commenter';
 import DeleteModal from './DeleteModal/DeleteModal';
 import { connect } from 'react-redux';
 import { deleteComment, updateComment } from '../../../../../store/actions';
 import EditComment from './EditComment/EditComment';
+import formatDate from '../../../../../utils/formatDate';
 
 const Comment = props => {
   const [showCommenter, setShowCommenter] = useState(false);
@@ -27,11 +26,6 @@ const Comment = props => {
     props.updateComment(msg, props.commentID);
   };
 
-  // show year in date if not current year
-  const date = isThisYear(new Date(props.date)) ?
-  format(new Date(props.date), `MMM d 'at' h:mm aa`) :
-  format(new Date(props.date), `MMM d, yyyy 'at' h:mm aa`);
-
   return (
     <><div className={classes.Comment}>
       <span className={classes.AccountInfo}>
@@ -41,7 +35,7 @@ const Comment = props => {
       <div className={classes.CommentDetail}>
         <div>
           <span className={classes.FullName}>{props.fullName}</span>
-          <span className={classes.Date}>{date}</span>
+          <span className={classes.Date}>{formatDate(props.date)}</span>
         </div>
         {!showEdit && <div className={classes.Msg}>{props.msg}</div>}
         {showEdit && <EditComment msg={props.msg} close={() => setShowEdit(false)} edit={msg => editHandler(msg)} />}

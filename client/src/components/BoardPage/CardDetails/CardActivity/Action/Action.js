@@ -2,19 +2,13 @@ import React, { useState, useEffect } from 'react';
 import classes from './Action.module.css';
 import PropTypes from 'prop-types';
 import { AccountBtn } from '../../../../UI/Buttons/Buttons';
-import { format } from 'date-fns';
-import isThisYear from 'date-fns/isThisYear';
 import Commenter from '../Commenter/Commenter';
 import parseActionMsg from '../../../../../utils/parseActionMsg';
+import formatDate from '../../../../../utils/formatDate';
 
 const Action = props => {
   const [showUser, setShowUser] = useState(false);
   const [msg, setMsg] = useState(props.msg);
-
-  // format date & show year in date if not current year
-  const date = isThisYear(new Date(props.date)) ?
-  format(new Date(props.date), `MMM d 'at' h:mm aa`) :
-  format(new Date(props.date), `MMM d, yyyy 'at' h:mm aa`);
 
   useEffect(() => {
     if (props.isBoard && props.cardID && props.listID && props.boardID) {
@@ -33,7 +27,7 @@ const Action = props => {
           <span className={classes.FullName}>{props.fullName} </span>
           <span className={classes.Msg}>{msg}</span>
         </div>
-        <div className={classes.Date}>{date}</div>
+        <div className={classes.Date}>{formatDate(props.date)}</div>
       </div>
     </div>
   );
