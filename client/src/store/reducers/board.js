@@ -60,6 +60,7 @@ const reducer = (state = initialState, action) => {
     }
     case actionTypes.DELETE_BOARD: return { ...initialState };
     case actionTypes.TOGGLE_IS_STARRED_ACTIVE: return { ...state, isStarred: !state.isStarred };
+    case actionTypes.LEAVE_BOARD: return { ...initialState };
     default: return state;
   }
 };

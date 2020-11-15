@@ -125,3 +125,13 @@ export const rejectInvite = boardID => async dispatch => {
     console.log(err);
   }
 };
+
+export const leaveBoard = () => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    await axios.put('/board/leave', { boardID });
+    dispatch({ type: actionTypes.LEAVE_BOARD, boardID });
+  } catch (err) {
+    dispatch(addNotif('There was an error while leaving the board.'));
+  }
+};

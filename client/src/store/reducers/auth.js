@@ -93,6 +93,10 @@ const reducer = (state = initialState, action) => {
       const invites = state.invites.filter(invite => invite.boardID !== action.boardID);
       return { ...state, invites };
     }
+    case actionTypes.LEAVE_BOARD: {
+      const boards = state.boards.filter(board => board.boardID !== action.boardID);
+      return { ...state, boards };
+    }
     default: return state;
   }
 };

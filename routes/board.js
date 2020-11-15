@@ -320,4 +320,26 @@ router.put('/refreshEnabled', auth, validate([body('boardID').not().isEmpty()]),
   }
 );
 
+router.put('/leave', auth, validate([body('boardID').not().isEmpty()]),
+  async (req, res) => {
+    try {
+      const board = await Board.findById(req.body.boardID);
+      const user = await User.findById(req.userID);
+      if (!board || !user) { throw 'err'; }
+      const member = board.members.find(member => member.email === user.email);
+      if (!member) { throw 'err'; }
+      if (member.isAdmin) {
+        const adminCount = board.members.filter(member => member.isAdmin).length;
+        if (adminCount < 2) { throw 'err'; }
+      }
+      user.boards = user.boards.filter(board => String(board.boardID) !== String(req.body.boardID));
+      board.members = board.members.filter(member => member.email !== user.email);
+      await addActivity(null, `left this board`, null, null, board._id, null, user.email, user.fullName);
+      await user.save();
+      await board.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;
