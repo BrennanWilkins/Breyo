@@ -4,6 +4,7 @@ const { param } = require('express-validator');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsMember = require('../middleware/useIsMember');
+const useIsAdmin = require('../middleware/useIsAdmin');
 const Activity = require('../models/activity');
 const User = require('../models/user');
 
@@ -65,6 +66,16 @@ router.get('/member/:email/:boardID', auth, validate([param('*').not().isEmpty()
     try {
       const activity = await Activity.find({ boardID: req.params.boardID, email: req.params.email }).sort('-date').lean();
       res.status(200).json({ activity });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: admin
+router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty()]), useIsAdmin,
+  async (req, res) => {
+    try {
+      await Activity.deleteMany({ boardID: req.params.boardID });
+      res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
 );

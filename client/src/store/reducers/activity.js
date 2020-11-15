@@ -17,6 +17,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.CARD_ACTIVITY_LOADING : return { ...state, cardActivityLoading: action.bool };
     case actionTypes.UPDATE_BOARD_ACTIVITY: return { ...state, boardActivity: action.activity };
     case actionTypes.SET_SHOWN_MEMBER_ACTIVITY: return { ...state, shownMemberActivity: action.member };
+    case actionTypes.DELETE_BOARD_ACTIVITY: return { ...state, boardActivity: [] };
     default: return state;
   }
 };

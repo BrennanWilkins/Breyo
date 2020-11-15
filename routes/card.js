@@ -392,7 +392,7 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
       card.remove();
       await list.save();
       await addActivity(null, `deleted ${card.title} from list ${list.title}`, null, null, req.body.boardID, req.userID);
-      await Archive.deleteMany({ cardID: card._id });
+      await Activity.deleteMany({ cardID: card._id });
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }

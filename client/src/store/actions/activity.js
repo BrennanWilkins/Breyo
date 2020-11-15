@@ -1,5 +1,6 @@
 import * as actionTypes from './actionTypes';
 import { instance as axios } from '../../axios';
+import { addNotif } from './notifications';
 
 export const getRecentCardActivity = () => async (dispatch, getState) => {
   try {
@@ -21,3 +22,13 @@ export const updateBoardActivity = activity => ({ type: actionTypes.UPDATE_BOARD
 export const resetCardActivity = () => ({ type: actionTypes.RESET_CARD_ACTIVITY });
 
 export const setShownMemberActivity = member => ({ type: actionTypes.SET_SHOWN_MEMBER_ACTIVITY, member });
+
+export const deleteBoardActivity = () => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    await axios.delete(`/activity/${boardID}`);
+    dispatch({ type: actionTypes.DELETE_BOARD_ACTIVITY, boardID });
+  } catch (err) {
+    dispatch(addNotif('There was an error while deleting the board\'s activity history.'));
+  }
+};
