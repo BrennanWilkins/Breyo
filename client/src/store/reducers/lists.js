@@ -523,7 +523,7 @@ const reducer = (state = initialState, action) => {
       list.cards = cards;
       lists[listIndex] = list;
       const allComments = [...state.allComments];
-      allComments.unshift({ ...action.payload });
+      allComments.unshift({ ...action.payload, cardTitle: card.title });
       return { ...state, lists, currentCard: card, allComments };
     }
     case actionTypes.UPDATE_COMMENT: {
