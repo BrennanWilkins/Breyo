@@ -34,7 +34,19 @@
   font-size: 14px;
   color: rgb(55,55,55);
 }
-.Msg a {
+.MsgContainer a {
   text-decoration: underline;
   color: black;
+}
+.Comment {
+  background: white;
+  padding: 10px;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin: 5px 11px 0 7px;
+  border-radius: 4px;
+  word-break: break-all;
+  border: 1px solid rgb(227, 227, 227);
+  box-shadow: var(--box-shadow6);
+  align-self: flex-start;
 }

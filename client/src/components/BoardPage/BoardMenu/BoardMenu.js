@@ -9,6 +9,7 @@ import Action from '../CardDetails/CardActivity/Action/Action';
 import AboutMenu from './AboutMenu/AboutMenu';
 import SettingsMenu from './SettingsMenu/SettingsMenu';
 import BackgroundMenu from './BackgroundMenu/BackgroundMenu';
+import ActivityMenu from './ActivityMenu/ActivityMenu';
 
 const BoardMenu = props => {
   const [showBoardDesc, setShowBoardDesc] = useState(false);
@@ -48,11 +49,13 @@ const BoardMenu = props => {
           <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
           msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />
         ))}
+        <div className={classes.ViewAll} onClick={() => setShowAllActivity(true)}>View all activity...</div>
       </div>
     </div>
   );
 
-  const content = showBoardDesc ? <AboutMenu /> : showChangeBackground ? <BackgroundMenu /> : showSettings ? <SettingsMenu /> : showArchive ? <Archive /> : defaultContent;
+  const content = showBoardDesc ? <AboutMenu /> : showChangeBackground ? <BackgroundMenu /> :
+  showSettings ? <SettingsMenu /> : showArchive ? <Archive /> : showAllActivity ? <ActivityMenu /> : defaultContent;
 
   return (
     <div className={props.show ? classes.Menu : `${classes.Menu} ${classes.HideMenu}`}>
@@ -70,13 +73,11 @@ BoardMenu.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
   activity: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
   color: state.board.color,
-  boardID: state.board.boardID,
   activity: state.activity.boardActivity
 });
 

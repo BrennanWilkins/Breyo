@@ -1,0 +1,26 @@
+.Btns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.Active, .Inactive {
+  width: 120px;
+  height: 40px;
+  border-radius: 3px;
+  margin: 0 5px;
+  text-align: center;
+  line-height: 40px;
+  color: white;
+}
+.Active {
+  background: rgb(var(--red));
+}
+.Inactive {
+  color: black;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.Inactive:hover {
+  background: rgb(var(--red), 0.85);
+  color: white;
+}

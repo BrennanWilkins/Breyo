@@ -24,6 +24,7 @@ const CardActivity = props => {
 
   useEffect(() => {
     if (showDetails) { setData(props.comments.concat(props.activity).sort((a, b) => new Date(b.date) - new Date(a.date))); }
+    else { setData(props.comments); }
   }, [props.activity, props.comments, showDetails]);
 
   return (

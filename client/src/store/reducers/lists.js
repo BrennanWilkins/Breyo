@@ -8,32 +8,20 @@ const initialState = {
   currentCard: null,
   currentListTitle: null,
   archivedCards: [],
-  archivedLists: []
+  archivedLists: [],
+  allComments: []
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.UPDATE_ACTIVE_BOARD: {
       let archivedCards = [];
+      let allComments = [];
       let lists = action.payload.lists.map(list => {
-        const cards = list.cards.map(card => ({
-          cardID: card._id,
-          checklists: card.checklists.map(checklist => ({
-            title: checklist.title,
-            checklistID: checklist._id,
-            items: checklist.items.map(item => ({
-              itemID: item._id,
-              title: item.title,
-              isComplete: item.isComplete
-            }))
-          })),
-          dueDate: card.dueDate,
-          labels: card.labels,
-          title: Entities.decode(card.title),
-          desc: Entities.decode(card.desc),
-          isArchived: card.isArchived,
-          members: card.members,
-          comments: card.comments.map(comment => ({
+        const cards = list.cards.map(card => {
+          const title = Entities.decode(card.title);
+
+          const comments = card.comments.map(comment => ({
             email: comment.email,
             fullName: comment.fullName,
             cardID: comment.cardID,
@@ -41,8 +29,32 @@ const reducer = (state = initialState, action) => {
             date: comment.date,
             commentID: comment._id,
             msg: Entities.decode(comment.msg)
-          })).sort((a,b) => new Date(b.date) - new Date(a.date))
-        }));
+          })).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+          if (!list.isArchived && !card.isArchived) {
+            allComments = allComments.concat(comments.map(comment => ({...comment, cardTitle: title})));
+          }
+
+          return {
+            cardID: card._id,
+            checklists: card.checklists.map(checklist => ({
+              title: checklist.title,
+              checklistID: checklist._id,
+              items: checklist.items.map(item => ({
+                itemID: item._id,
+                title: item.title,
+                isComplete: item.isComplete
+              }))
+            })),
+            dueDate: card.dueDate,
+            labels: card.labels,
+            title,
+            desc: Entities.decode(card.desc),
+            isArchived: card.isArchived,
+            members: card.members,
+            comments
+          };
+        });
         if (!list.isArchived) {
           archivedCards = archivedCards.concat(cards.filter(card => card.isArchived).map(card => ({ ...card, listID: list._id })));
         }
@@ -58,7 +70,7 @@ const reducer = (state = initialState, action) => {
       lists = lists.filter(list => !list.isArchived);
       const currentCard = state.currentCard && state.shownCardID && state.shownListID && !state.currentCard.isArchived ?
       lists.find(list => list.listID === state.shownListID).cards.find(card => card.cardID === state.shownCardID) : null;
-      return { ...state, lists, archivedCards, archivedLists, currentCard };
+      return { ...state, lists, archivedCards, archivedLists, currentCard, allComments };
     }
     case actionTypes.UPDATE_LIST_TITLE: {
       const lists = [...state.lists];
@@ -510,7 +522,9 @@ const reducer = (state = initialState, action) => {
       cards[cardIndex] = card;
       list.cards = cards;
       lists[listIndex] = list;
-      return { ...state, lists, currentCard: card };
+      const allComments = [...state.allComments];
+      allComments.unshift({ ...action.payload });
+      return { ...state, lists, currentCard: card, allComments };
     }
     case actionTypes.UPDATE_COMMENT: {
       const lists = [...state.lists];
@@ -528,7 +542,12 @@ const reducer = (state = initialState, action) => {
       cards[cardIndex] = card;
       list.cards = cards;
       lists[listIndex] = list;
-      return { ...state, lists, currentCard: card };
+      const allComments = [...state.allComments];
+      const allCommentIndex = allComments.findIndex(comment => comment.commentID === action.commentID);
+      const allComment = { ...allComments[allCommentIndex] };
+      allComment.msg = action.msg;
+      allComments[allCommentIndex] = allComment;
+      return { ...state, lists, currentCard: card, allComments };
     }
     case actionTypes.DELETE_COMMENT: {
       const lists = [...state.lists];
@@ -544,7 +563,10 @@ const reducer = (state = initialState, action) => {
       cards[cardIndex] = card;
       list.cards = cards;
       lists[listIndex] = list;
-      return { ...state, lists, currentCard: card };
+      const allComments = [...state.allComments];
+      const allCommentIndex = allComments.findIndex(comment => comment.commentID === action.commentID);
+      allComments.splice(allCommentIndex, 1);
+      return { ...state, lists, currentCard: card, allComments };
     }
     default: return state;
   }
