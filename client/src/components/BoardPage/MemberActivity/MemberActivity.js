@@ -5,8 +5,10 @@ import { CloseBtnCircle } from '../../UI/Buttons/Buttons';
 import PropTypes from 'prop-types';
 import { activityIcon } from '../../UI/icons';
 import Action from '../CardDetails/CardActivity/Action/Action';
+import CommentAction from '../CardDetails/CardActivity/Action/CommentAction';
 import AuthSpinner from '../../UI/AuthSpinner/AuthSpinner';
 import { instance as axios } from '../../../axios';
+import { connect } from 'react-redux';
 
 const MemberActivity = props => {
   const modalRef = useRef();
@@ -20,7 +22,7 @@ const MemberActivity = props => {
       try {
         const data = await axios.get(`/activity/member/${email}/${boardID}`);
         setLoading(false);
-        setUserActivity(data.data.activity);
+        setUserActivity(data.data.activity.concat(props.allComments.filter(comment => comment.email === props.email)).sort((a,b) => new Date(b.date) - new Date(a.date)));
       } catch (err) {
         setLoading(false);
         setErr(true);
@@ -45,10 +47,12 @@ const MemberActivity = props => {
         </div>
         <div className={classes.Activity}>
           {loading ? <div className={classes.Spinner}><AuthSpinner /></div> : !err ?
-            userActivity.map(action => (
-              <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
-              msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />
-            )) : <div className={classes.ErrMsg}>This user's activity could not be retrieved.</div>}
+            userActivity.map(action => {
+              if (action.commentID) { return <CommentAction key={action.commentID} {...action} boardID={props.boardID} />; }
+              return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
+              msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />;
+            }) :
+            <div className={classes.ErrMsg}>This user's activity could not be retrieved.</div>}
         </div>
       </div>
     </div>
@@ -60,7 +64,12 @@ MemberActivity.propTypes = {
   email: PropTypes.string.isRequired,
   fullName: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
-  path: PropTypes.string.isRequired
+  path: PropTypes.string.isRequired,
+  allComments: PropTypes.array.isRequired
 };
 
-export default MemberActivity;
+const mapStateToProps = state => ({
+  allComments: state.lists.allComments
+});
+
+export default connect(mapStateToProps)(MemberActivity);

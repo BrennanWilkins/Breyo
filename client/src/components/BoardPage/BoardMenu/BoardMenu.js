@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { boardIcon, activityIcon, settingsIcon, archiveFillIcon } from '../../UI/icons';
 import Archive from './Archive/Archive';
 import Action from '../CardDetails/CardActivity/Action/Action';
+import CommentAction from '../CardDetails/CardActivity/Action/CommentAction';
 import AboutMenu from './AboutMenu/AboutMenu';
 import SettingsMenu from './SettingsMenu/SettingsMenu';
 import BackgroundMenu from './BackgroundMenu/BackgroundMenu';
@@ -17,6 +18,7 @@ const BoardMenu = props => {
   const [showSettings, setShowSettings] = useState(false);
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
+  const [activity, setActivity] = useState([]);
 
   const resetState = () => {
     setShowChangeBackground(false);
@@ -27,6 +29,10 @@ const BoardMenu = props => {
   };
 
   useEffect(() => resetState(), [props.show]);
+
+  useEffect(() => {
+    setActivity(props.activity.concat(props.allComments).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 20));
+  }, [props.allComments, props.activity]);
 
   const showBackBtn = showChangeBackground || showBoardDesc || showAllActivity || showSettings || showArchive;
 
@@ -45,10 +51,11 @@ const BoardMenu = props => {
       </div>
       <div className={classes.Activities}>
         <div onClick={() => setShowAllActivity(true)} className={`${classes.Option} ${classes.ActivityTitle}`}>{activityIcon}Activity</div>
-        {props.activity.map(action => (
-          <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
-          msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />
-        ))}
+        {activity.map(action => {
+          if (action.commentID) { return <CommentAction key={action.commentID} {...action} boardID={props.boardID} />; }
+          return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
+          msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />;
+        })}
         <div className={classes.ViewAll} onClick={() => setShowAllActivity(true)}>View all activity...</div>
       </div>
     </div>
@@ -73,12 +80,16 @@ BoardMenu.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
-  activity: PropTypes.array.isRequired
+  activity: PropTypes.array.isRequired,
+  allComments: PropTypes.array.isRequired,
+  boardID: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
   color: state.board.color,
-  activity: state.activity.boardActivity
+  activity: state.activity.boardActivity,
+  allComments: state.lists.allComments,
+  boardID: state.board.boardID
 });
 
 export default connect(mapStateToProps)(BoardMenu);

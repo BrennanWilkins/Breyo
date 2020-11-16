@@ -24,3 +24,22 @@
   background: rgb(var(--red), 0.85);
   color: white;
 }
+.LoadMore {
+  text-decoration: underline;
+  font-size: 14px;
+  color: rgb(110,110,110);
+  cursor: pointer;
+  padding: 20px 0 20px 45px;
+  border-radius: 4px;
+}
+.LoadMore:hover {
+  color: rgb(40,40,40);
+  background: rgb(230,230,230);
+}
+.Err {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 20px;
+  text-align: center;
+  color: rgb(50,50,50);
+}

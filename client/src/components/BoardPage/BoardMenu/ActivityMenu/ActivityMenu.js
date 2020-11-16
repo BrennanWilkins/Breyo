@@ -10,17 +10,35 @@ const ActivityMenu = props => {
   const [activity, setActivity] = useState([]);
   const [comments, setComments] = useState([]);
   const [showAll, setShowAll] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [moreLoaded, setMoreLoaded] = useState(false);
+  const [err, setErr] = useState(false);
 
   useEffect(() => {
-    const fetchData = async (boardID, page) => {
-      const data = await axios.get(`/activity/all/${boardID}/${page}`);
-      const updatedActivity = data.data.activity.concat(props.allComments).sort((a,b) => new Date(b.date) - new Date(a.date));
-      setActivity(updatedActivity);
-      setComments(updatedActivity.filter(action => action.commentID));
+    const fetchData = async (boardID) => {
+      try {
+        setLoading(true);
+        const data = await axios.get(`/activity/all/${boardID}/0`);
+        setLoading(false);
+        const updatedActivity = data.data.activity.concat(props.allComments).sort((a,b) => new Date(b.date) - new Date(a.date));
+        setActivity(updatedActivity);
+        setComments(updatedActivity.filter(action => action.commentID));
+      } catch (err) { setLoading(false); setErr(true); }
     };
 
-    fetchData(props.boardID, 0);
+    fetchData(props.boardID);
   }, [props.boardID]);
+
+  const loadMoreHandler = async () => {
+    // right now only supporting up to 200 last actions
+    if (moreLoaded) { return; }
+    setMoreLoaded(true);
+    try {
+      const data = await axios.get(`/activity/all/${props.boardID}/1`);
+      if (data.data.activity.length === 0) { return; }
+      setActivity(activity.concat(data.data.activity).sort((a,b) => new Date(b.date) - new Date(a.date)));
+    } catch (err) { setErr(true); }
+  };
 
   const data = showAll ? activity : comments;
 
@@ -35,6 +53,8 @@ const ActivityMenu = props => {
         return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
         msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />;
       })}
+      {!loading && !moreLoaded && <div className={classes.LoadMore} onClick={loadMoreHandler}>Load more activity</div>}
+      {err && <div className={classes.Err}>There was an error while fetching the activity.</div>}
     </div>
   );
 };
