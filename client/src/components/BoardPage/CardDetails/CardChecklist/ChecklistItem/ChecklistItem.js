@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import classes from './ChecklistItem.module.css';
 import { Checkbox } from '../../../../UI/Inputs/Inputs';
 import PropTypes from 'prop-types';
@@ -6,20 +6,25 @@ import { CloseBtn } from '../../../../UI/Buttons/Buttons';
 import { editIcon } from '../../../../UI/icons';
 import SubmitBtns from '../../../../UI/SubmitBtns/SubmitBtns';
 import TextArea from 'react-textarea-autosize';
+import { useModalToggle } from '../../../../../utils/customHooks';
 
 const ChecklistItem = props => {
   const [showEdit, setShowEdit] = useState(false);
   const [itemTitle, setItemTitle] = useState(props.title);
+  const formRef = useRef();
 
-  const editHandler = () => {
+  const closeHandler = () => {
+    setShowEdit(false);
+    setItemTitle(props.title);
+  };
+
+  useModalToggle(showEdit, formRef, closeHandler);
+
+  const editHandler = e => {
+    e.preventDefault();
     if (itemTitle === '' || itemTitle.length > 200) { return setItemTitle(props.title); }
     props.editItem(itemTitle);
     setShowEdit(false);
-  };
-
-  const blurHandler = () => {
-    setShowEdit(false);
-    setItemTitle(props.title);
   };
 
   return (
@@ -32,10 +37,10 @@ const ChecklistItem = props => {
         <span className={classes.CloseBtn}><CloseBtn close={props.deleteItem} /></span>
       </div></> :
       <div className={classes.EditItem}>
-        <form onSubmit={editHandler}>
+        <form onSubmit={editHandler} ref={formRef}>
           <TextArea maxRows="5" value={itemTitle} onChange={e => setItemTitle(e.target.value)} className={classes.Input}
-          onKeyPress={e => { if (e.key === 'Enter') { e.preventDefault(); editHandler(); }}} autoFocus onBlur={blurHandler} />
-          <SubmitBtns close={() => setShowEdit(false)} text="Edit" />
+          onKeyPress={e => { if (e.key === 'Enter') { editHandler(e); }}} autoFocus />
+          <SubmitBtns close={closeHandler} text="Edit" />
         </form>
       </div>}
     </div>
