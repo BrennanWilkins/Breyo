@@ -16,12 +16,14 @@ const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
                 'rgb(0,121,191)', 'rgb(240, 85, 68)', 'rgb(56, 187, 244)',
                 'rgb(173, 80, 147)', 'rgb(74, 50, 221)', 'rgb(4, 107, 139)'];
 
+// returns all board & list data for a given board
 router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.params.boardID).lean();
-      if (!board) { throw 'err'; }
+      if (!board) { throw 'Board data not found'; }
       const listData = await List.find({ boardID: board._id }).lean();
+      if (!listData) { throw 'List data not found'; }
       const data = { ...board, lists: listData };
       res.status(200).json({ data });
     } catch (err) { res.sendStatus(500); }
@@ -30,6 +32,7 @@ router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape(
 
 router.get('/stream/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useIsMember, useSSE,
   (req, res) => {
+    // returns board & list data for each interval
     const boardQuery = Board.findById(req.params.boardID).lean();
     const listQuery = List.find({ boardID: req.params.boardID }).lean();
 
@@ -42,7 +45,7 @@ router.get('/stream/:boardID', auth, validate([param('boardID').not().isEmpty().
       } catch (err) { res.close(); }
     };
 
-    // stream board/list data to client every 10 seconds
+    // stream data to client every 10 seconds
     const dataInterval = setInterval(query, 10000);
 
     res.on('close', () => {
@@ -52,15 +55,17 @@ router.get('/stream/:boardID', auth, validate([param('boardID').not().isEmpty().
   }
 );
 
+// create a new board w given title/color
 router.post('/', auth, validate(
   [body('title').trim().isLength({ min: 1, max: 50 }).escape(),
   body('color').not().isEmpty().escape()]
   , 'Please enter a valid title.'),
   async (req, res) => {
     try {
+      // if invalid color default to red
       const color = COLORS.includes(req.body.color) ? req.body.color : COLORS[4];
       const user = await User.findById(req.userID);
-      if (!user) { throw 'err'; }
+      if (!user) { throw 'No user data found'; }
       const title = req.body.title.replace(/\n/g, ' ');
       // user is admin of new board by default
       const board = new Board({ title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
@@ -82,17 +87,20 @@ router.post('/', auth, validate(
 );
 
 // authorization: member
+// updates board color
 router.put('/color', auth, validate(
   [body('boardID').not().isEmpty().escape(), body('color').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
-      if (!COLORS.includes(String(req.body.color))) { throw 'err'; }
+      if (!COLORS.includes(String(req.body.color))) { throw 'Color not found'; }
       const board = await Board.findById(req.body.boardID);
+      if (!board) { throw 'No board data found'; }
       board.color = req.body.color;
+      // for each member of board, update the board color in their model
       for (let member of board.members) {
         const user = await User.findOne({ email: member.email });
         const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
-        if (index < 0) { throw 'err'; }
+        if (index < 0) { throw 'Board not found in user model'; }
         user.boards[index].color = req.body.color;
         user.markModified('boards');
         await user.save();
@@ -104,11 +112,13 @@ router.put('/color', auth, validate(
 );
 
 // authorization: member
+// update board description
 router.put('/desc', auth, validate(
   [body('boardID').not().isEmpty().escape(), body('desc').escape().isLength({ max: 300 })]), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
+      if (!board) { throw 'No board data found'; }
       board.desc = req.body.desc;
       await board.save();
       await addActivity(null, 'updated the board description', null, null, board._id, req.userID);
@@ -118,19 +128,22 @@ router.put('/desc', auth, validate(
 );
 
 // authorization: member
+// update board title
 router.put('/title', auth, validate(
   [body('title').trim().isLength({ min: 1, max: 50 }).escape(),
   body('boardID').not().isEmpty().escape()], 'Please enter a valid title.'), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
+      if (!board) { throw 'No board data found'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const oldTitle = board.title;
       board.title = title;
+      // for each member of board, update board title in their user model
       for (let member of board.members) {
         const user = await User.findOne({ email: member.email });
         const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
-        if (index < 0) { throw 'err'; }
+        if (index < 0) { throw 'Board not found in users model'; }
         user.boards[index].title = req.body.title;
         user.markModified('boards');
         await user.save();
@@ -142,11 +155,14 @@ router.put('/title', auth, validate(
   }
 );
 
+// toggle a board as starred/unstarred in user model
 router.put('/starred', auth, validate([body('boardID').not().isEmpty()]),
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
+      if (!user) { throw 'No user data found'; }
       const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+      if (index === -1) { throw 'Board not found in users board model'; }
       user.boards[index].isStarred = !user.boards[index].isStarred;
       user.markModified('boards');
       await user.save();
@@ -156,6 +172,7 @@ router.put('/starred', auth, validate([body('boardID').not().isEmpty()]),
 );
 
 // authorization: admin
+// add another admin to the board
 router.put('/admins/add', auth, validate(
   [body('email').not().isEmpty().trim().escape(),
   body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
@@ -163,26 +180,28 @@ router.put('/admins/add', auth, validate(
     try {
       const board = await Board.findById(req.body.boardID);
       const user = await User.findOne({ email: req.body.email });
-      if (!board || !user) { throw 'err'; }
+      if (!board || !user) { throw 'Board or user data not found'; }
       // find user in board's members and change user to admin if found
       const memberIndex = board.members.findIndex(member => member.email === user.email && !member.isAdmin);
-      if (board.members.length <= 1 || memberIndex === -1) { throw 'err'; }
+      if (memberIndex === -1) { throw 'Member not found in board members'; }
+      if (board.members.length <= 1) { throw 'Not enough board members to add new admin'; }
       board.members[memberIndex].isAdmin = true;
-      user.boards = user.boards.map(board => {
-        if (String(board.boardID) === String(req.body.boardID)) { return { ...board, isAdmin: true }; }
-        return board;
-      });
+      // update board in user's board model to isAdmin
+      const boardIndex = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+      if (boardIndex === -1) { throw 'Board not found in users boards'; }
+      user.boards[boardIndex].isAdmin = true;
       user.markModified('boards');
       board.markModified('members');
       await user.save();
       await board.save();
       await addActivity(null, `changed ${user.fullName} permissions to admin`, null, null, board._id, req.userID);
       res.sendStatus(200);
-    } catch (err) { res.sendStatus(500); }
+    } catch (err) { console.log(err); res.sendStatus(500); }
   }
 );
 
 // authorization: admin
+// change user permission from admin to member
 router.put('/admins/remove', auth, validate(
   [body('email').not().isEmpty().trim().escape(),
   body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
@@ -190,16 +209,16 @@ router.put('/admins/remove', auth, validate(
     try {
       const board = await Board.findById(req.body.boardID);
       const user = await User.findOne({ email: req.body.email });
-      if (!board || !user) { throw 'err'; }
+      if (!board || !user) { throw 'No board or user data found'; }
       // find user in board's members and change user isAdmin to false if found
       const memberIndex = board.members.findIndex(member => member.email === user.email && member.isAdmin);
+      if (memberIndex === -1) { throw 'User not found in boards members'; }
       const adminCount = board.members.filter(member => member.isAdmin).length;
-      if (adminCount <= 1 || memberIndex === -1) { throw 'err'; }
+      if (adminCount <= 1) { throw 'There must be at least 1 admin at all times'; }
       board.members[memberIndex].isAdmin = false;
-      user.boards = user.boards.map(board => {
-        if (String(board.boardID) === String(req.body.boardID)) { return { ...board, isAdmin: false }; }
-        return board;
-      });
+      const boardIndex = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+      if (boardIndex === -1) { throw 'Board not found in users boards'; }
+      user.boards[boardIndex].isAdmin = false;
       user.markModified('boards');
       board.markModified('members');
       await user.save();
@@ -211,6 +230,7 @@ router.put('/admins/remove', auth, validate(
 );
 
 // authorization: admin
+// send invite to a user to join the board
 router.post('/invites', auth, validate(
   [body('email').isEmail().normalizeEmail(),
   body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
@@ -218,10 +238,9 @@ router.post('/invites', auth, validate(
     try {
       const board = await Board.findById(req.body.boardID);
       const inviter = await User.findById(req.userID);
-      if (!board || !inviter) { throw 'err'; }
+      if (!board || !inviter) { throw 'No board or user data found'; }
       // find user based on user's email
       const invitee = await User.findOne({ email: req.body.email });
-      // no user found
       if (!invitee) { return res.status(400).json({ msg: 'No user was found for that email.' }); }
       // user already invited
       if (invitee.invites.find(invite => String(invite.boardID) === String(board._id))) {
@@ -237,15 +256,19 @@ router.post('/invites', auth, validate(
   }
 );
 
+// accept invitation to join a board
 router.put('/invites/accept', auth, validate(
   [body('boardID').not().isEmpty().trim().escape()]),
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
       const user = await User.findById(req.userID);
-      if (!board || !user) { throw 'err'; }
+      if (!board || !user) { throw 'No board or user data found'; }
+      // remove invite from user's invites
       user.invites = user.invites.filter(invite => String(invite.boardID) !== req.body.boardID);
+      // add board to user model
       user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false, color: board.color, refreshEnabled: true }];
+      // add user to board members
       board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
       await user.save();
       await board.save();
@@ -255,13 +278,15 @@ router.put('/invites/accept', auth, validate(
   }
 );
 
+// reject invitation to join a board
 router.put('/invites/reject', auth, validate(
   [body('boardID').not().isEmpty().trim().escape()]),
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
       const user = await User.findById(req.userID);
-      if (!board || !user) { throw 'err'; }
+      if (!board || !user) { throw 'No board or user data found'; }
+      // remove invite from user's model
       user.invites = user.invites.filter(invite => String(invite.boardID) !== req.body.boardID);
       await user.save();
       res.sendStatus(200);
@@ -270,14 +295,16 @@ router.put('/invites/reject', auth, validate(
 );
 
 // authorization: admin
+// remove a user from the board
 router.put('/members/remove', auth, validate(
   [body('email').not().isEmpty().trim().escape(),
   body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
+      if (!board) { throw 'No board data found'; }
       const user = await User.findOne({ email: req.body.email });
-      if (!board || !user) { throw 'err'; }
+      if (!user) { throw 'No user found for given email'; }
       // remove user from board's members and remove board from user's boards
       board.members = board.members.filter(member => member.email !== user.email);
       user.boards = user.boards.filter(board => board.boardID !== board._id);
@@ -289,12 +316,17 @@ router.put('/members/remove', auth, validate(
   }
 );
 
+// authorization: admin
+// delete a board, its lists, and all of its activity
 router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty()]), useIsAdmin,
   async (req, res) => {
     try {
       const board = await Board.findById(req.params.boardID);
+      if (!board) { throw 'No board data found'; }
+      // for each member of board remove board from its model
       for (let member of board.members) {
         const user = await User.findOne({ email: member.email });
+        if (!user) { throw 'User model for board member not found'; }
         user.boards = user.boards.filter(board => String(board.boardID) !== String(req.params.boardID));
         await user.save();
       }
@@ -306,12 +338,14 @@ router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty()]), u
   }
 );
 
+// toggle whether user wants data stream or not
 router.put('/refreshEnabled', auth, validate([body('boardID').not().isEmpty()]),
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
+      if (!user) { throw 'No user data found'; }
       const board = user.boards.find(board => String(board.boardID) === String(req.body.boardID));
-      if (!board) { throw 'err'; }
+      if (!board) { throw 'Board not found in users boards'; }
       board.refreshEnabled = !board.refreshEnabled;
       user.markModified('boards');
       await user.save();
@@ -320,17 +354,19 @@ router.put('/refreshEnabled', auth, validate([body('boardID').not().isEmpty()]),
   }
 );
 
+// leave a board
 router.put('/leave', auth, validate([body('boardID').not().isEmpty()]),
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
       const user = await User.findById(req.userID);
-      if (!board || !user) { throw 'err'; }
+      if (!board || !user) { throw 'No board or user data found'; }
       const member = board.members.find(member => member.email === user.email);
-      if (!member) { throw 'err'; }
+      if (!member) { throw 'User not found in boards members'; }
+      // check if user is able to leave board
       if (member.isAdmin) {
         const adminCount = board.members.filter(member => member.isAdmin).length;
-        if (adminCount < 2) { throw 'err'; }
+        if (adminCount < 2) { throw 'There must be at least one other admin for user to leave board'; }
       }
       user.boards = user.boards.filter(board => String(board.boardID) !== String(req.body.boardID));
       board.members = board.members.filter(member => member.email !== user.email);

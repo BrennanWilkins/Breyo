@@ -69,16 +69,19 @@ router.get('/all/card/:boardID/:cardID', auth, validate([param('*').not().isEmpt
   }
 );
 
+// returns all activity for given board member
 router.get('/member/:email/:boardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
   async (req, res) => {
     try {
       const activity = await Activity.find({ boardID: req.params.boardID, email: req.params.email }).sort('-date').lean();
+      if (!activity) { throw 'No member activity found'; }
       res.status(200).json({ activity });
     } catch (err) { res.sendStatus(500); }
   }
 );
 
 // authorization: admin
+// deletes all board activity
 router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty()]), useIsAdmin,
   async (req, res) => {
     try {

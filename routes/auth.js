@@ -8,10 +8,12 @@ const config = require('config');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 
+// returns a user's boards & invites to be used on dashboard page
 router.get('/userData', auth,
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
+      if (!user) { throw 'user data not found'; }
       res.status(200).json({ boards: user.boards, invites: user.invites });
     } catch (err) { res.sendStatus(500); }
   }
@@ -46,6 +48,7 @@ router.post('/signup', validate(
   'There was an error in one of the fields.'),
   async (req, res) => {
     try {
+      // user full name must be characters a-z or A-Z
       if (!req.body.fullName.match(/^[ a-zA-Z]+$/)) {
         return res.status(400).json({ msg: 'Please enter a valid full name.' });
       }
@@ -67,11 +70,12 @@ router.post('/signup', validate(
   }
 );
 
+// retrieve user data if userID token already present
 router.post('/autoLogin', auth,
   async (req, res) => {
     try {
-      const user = await User.findOne({ _id: req.userID });
-      if (!user) { throw 'err'; }
+      const user = await User.findById(req.userID);
+      if (!user) { throw 'User data not found'; }
       res.status(200).json({ email: user.email, fullName: user.fullName, invites: user.invites, boards: user.boards });
     } catch(err) { res.sendStatus(500); }
   }
@@ -83,10 +87,11 @@ router.post('/changePass', auth, validate(
   ,'The input fields cannot be empty.'),
   async (req, res) => {
     try {
-      const user = await User.findOne({ _id: req.userID });
+      const user = await User.findById(req.userID);
       if (req.body.newPassword !== req.body.confirmPassword) {
         return res.status(400).json({ msg: 'Confirm password must be equal to your new password.' });
       }
+      // confirm that user entered old password correct
       const same = await bcryptjs.compare(req.body.oldPassword, user.password);
       if (!same) { return res.status(400).json({ msg: 'Incorrect password.' }); }
       const hashedPass = await bcryptjs.hash(req.body.newPassword, 10);

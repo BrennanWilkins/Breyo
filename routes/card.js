@@ -14,6 +14,7 @@ const isThisYear = require('date-fns/isThisYear');
 
 const LABEL_COLORS = ['#F60000', '#FF8C00', '#FFEE00', '#4DE94C', '#3783FF', '#4815AA'];
 
+// create a new card
 router.post('/', auth, validate(
   [body('boardID').not().isEmpty().escape(),
   body('listID').not().isEmpty().escape(),
@@ -21,7 +22,7 @@ router.post('/', auth, validate(
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'List data not found'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const card = { title, desc: '', checklists: [], labels: [], dueDate: null, isArchived: false, members: [], comments: [] };
       list.cards.push(card);
@@ -33,6 +34,7 @@ router.post('/', auth, validate(
   }
 );
 
+// update card title
 router.put('/title', auth, validate(
   [body('cardID').not().isEmpty().escape(),
   body('boardID').not().isEmpty().escape(),
@@ -41,11 +43,11 @@ router.put('/title', auth, validate(
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'List data not found'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'Card data not found'; }
+      if (card.isArchived) { throw 'Cannot update title for archived card'; }
       card.title = title;
       await list.save();
       await addActivity(`renamed this card from ${card.title} to ${title}`, `renamed **(link)${card.title}** from ${card.title} to ${title}`,
@@ -55,6 +57,7 @@ router.put('/title', auth, validate(
   }
 );
 
+// update card description
 router.put('/desc', auth, validate(
   [body('cardID').not().isEmpty().escape(),
   body('boardID').not().isEmpty().escape(),
@@ -63,10 +66,10 @@ router.put('/desc', auth, validate(
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot update description for archived card'; }
       card.desc = req.body.desc;
       await list.save();
       res.sendStatus(200);
@@ -74,15 +77,16 @@ router.put('/desc', auth, validate(
   }
 );
 
+// add label to card
 router.put('/label/add', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
-      if (!LABEL_COLORS.includes(req.body.color)) { throw 'err'; }
+      if (!LABEL_COLORS.includes(req.body.color)) { throw 'Invalid label color'; }
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot add label to an archived card'; }
       card.labels = [...card.labels, req.body.color];
       await list.save();
       res.sendStatus(200);
@@ -90,30 +94,35 @@ router.put('/label/add', auth, validate([body('*').not().isEmpty().escape()]), u
   }
 );
 
+// remove label from card
 router.put('/label/remove', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
-      if (!LABEL_COLORS.includes(req.body.color)) { throw 'err'; }
+      if (!LABEL_COLORS.includes(req.body.color)) { throw 'Invalid label color'; }
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
-      card.labels.splice(card.labels.indexOf(req.body.color), 1);
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot update labels for archived card'; }
+      const labelIndex = card.labels.indexOf(req.body.color);
+      if (labelIndex === -1) { throw 'Label not found in cards labels'; }
+      card.labels.splice(labelIndex, 1);
       await list.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
 );
 
+// toggle card due date as complete/incomplete
 router.put('/dueDate/isComplete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived || !card.dueDate) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot update due date for archived card'; }
+      if (!card.dueDate) { throw 'No due date found for card'; }
       card.dueDate.isComplete = !card.dueDate.isComplete;
       list.markModified('cards');
       await list.save();
@@ -125,15 +134,16 @@ router.put('/dueDate/isComplete', auth, validate([body('*').not().isEmpty().esca
   }
 );
 
+// add due date to card
 router.post('/dueDate', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
-      if (isNaN(new Date(req.body.dueDate).getDate())) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot add due date to an archived card'; }
+      if (isNaN(new Date(req.body.dueDate).getDate())) { throw 'Invalid due date format'; }
       card.dueDate = { dueDate: req.body.dueDate, isComplete: false };
       await list.save();
 
@@ -150,14 +160,15 @@ router.post('/dueDate', auth, validate([body('*').not().isEmpty().escape()]), us
   }
 );
 
+// remove due date from card
 router.put('/dueDate/remove', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot remove due date from archived card'; }
       card.dueDate = null;
       await list.save();
       await addActivity(`removed the due date from this card`, `removed the due date from **(link)${card.title}**`,
@@ -167,14 +178,15 @@ router.put('/dueDate/remove', auth, validate([body('*').not().isEmpty().escape()
   }
 );
 
+// add checklist to card
 router.post('/checklist', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 100 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot add checklist to archived card'; }
       const title = req.body.title.replace(/\n/g, ' ');
       card.checklists.push({ title, items: [] });
       const updatedList = await list.save();
@@ -187,14 +199,15 @@ router.post('/checklist', auth, validate([body('*').not().isEmpty().escape(), bo
   }
 );
 
+// remove checklist from card
 router.put('/checklist/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot remove checklist from archived card'; }
       const checklist = card.checklists.id(req.body.checklistID);
       checklist.remove();
       await list.save();
@@ -205,14 +218,15 @@ router.put('/checklist/delete', auth, validate([body('*').not().isEmpty().escape
   }
 );
 
+// update checklist title
 router.put('/checklist/title', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 100 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot update checklist for archived card'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const checklist = card.checklists.id(req.body.checklistID);
       const oldTitle = checklist.title;
@@ -225,15 +239,17 @@ router.put('/checklist/title', auth, validate([body('*').not().isEmpty().escape(
   }
 );
 
+// add item to a checklist
 router.post('/checklist/item', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot add checklist item to archived card'; }
       const checklist = card.checklists.id(req.body.checklistID);
+      if (!checklist) { throw 'No checklist data found'; }
       const title = req.body.title.replace(/\n/g, ' ');
       checklist.items.push({ title, isComplete: false });
       const updatedList = await list.save();
@@ -244,16 +260,19 @@ router.post('/checklist/item', auth, validate([body('*').not().isEmpty().escape(
   }
 );
 
+// toggle checklist item as complete/incomplete
 router.put('/checklist/item/isComplete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot update checklist item for archived card'; }
       const checklist = card.checklists.id(req.body.checklistID);
+      if (!checklist) { throw 'Card checklist not found'; }
       const item = checklist.items.id(req.body.itemID);
+      if (!item) { throw 'Checklist item not found'; }
       item.isComplete = !item.isComplete;
       await list.save();
       await addActivity(`completed ${item.title} in checklist ${checklist.title}`, `completed ${item.title} in **(link)${card.title}**`,
@@ -263,16 +282,20 @@ router.put('/checklist/item/isComplete', auth, validate([body('*').not().isEmpty
   }
 );
 
+// update checklist item title
 router.put('/checklist/item/title', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot update checklist item for archived card'; }
       const title = req.body.title.replace(/\n/g, ' ');
-      const item = card.checklists.id(req.body.checklistID).items.id(req.body.itemID);
+      const checklist = card.checklists.id(req.body.checklistID);
+      if (!checklist) { throw 'Card checklist not found'; }
+      const item = checklist.items.id(req.body.itemID);
+      if (!item) { throw 'Checklist item not found'; }
       item.title = title;
       await list.save();
       res.sendStatus(200);
@@ -280,14 +303,15 @@ router.put('/checklist/item/title', auth, validate([body('*').not().isEmpty().es
   }
 );
 
+// delete item from checklist
 router.put('/checklist/item/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Cannot update checklist item for archived card'; }
       card.checklists.id(req.body.checklistID).items.id(req.body.itemID).remove();
       await list.save();
       res.sendStatus(200);
@@ -295,12 +319,17 @@ router.put('/checklist/item/delete', auth, validate([body('*').not().isEmpty().e
   }
 );
 
+// move card inside the same list
 router.put('/moveCard/sameList', auth, validate([body('*').not().isEmpty().escape(), body('sourceIndex').isInt(), body('destIndex').isInt()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
+      if (!list) { throw 'No list data found'; }
+      // remove card from original index
       const card = list.cards.splice(req.body.sourceIndex, 1)[0];
-      if (card.isArchived) { throw 'err'; }
+      if (!card) { throw 'Card not found in list'; }
+      if (card.isArchived) { throw 'Cannot move an archived card'; }
+      // add card back to new index
       list.cards.splice(req.body.destIndex, 0, card);
       await list.save();
       res.sendStatus(200);
@@ -308,14 +337,17 @@ router.put('/moveCard/sameList', auth, validate([body('*').not().isEmpty().escap
   }
 );
 
+// move card to a different list
 router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escape(), body('sourceIndex').isInt(), body('destIndex').isInt()]), useIsMember,
   async (req, res) => {
     try {
       const sourceList = await List.findById(req.body.sourceID);
       const destList = await List.findById(req.body.targetID);
-      if (!sourceList || !destList) { throw 'err'; }
+      if (!sourceList || !destList) { throw 'List data not found'; }
+      // remove card from source list
       const card = sourceList.cards.splice(req.body.sourceIndex, 1)[0];
-      if (card.isArchived) { throw 'err'; }
+      if (card.isArchived) { throw 'Cannot move an archived card'; }
+      // update card's listID & add to destination list
       card.listID = req.body.targetID;
       destList.cards.splice(req.body.destIndex, 0, card);
       await sourceList.save();
@@ -326,17 +358,21 @@ router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escap
   }
 );
 
+// create a copy of a card
 router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 100 }), body('destIndex').isInt()]), useIsMember,
   async (req, res) => {
     try {
       const sourceList = await List.findById(req.body.sourceListID);
       const destList = await List.findById(req.body.destListID);
-      if (!sourceList || !destList) { throw 'err'; }
+      if (!sourceList || !destList) { throw 'List data not found'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const sourceCard = sourceList.cards.id(req.body.cardID);
-      if (sourceCard.isArchived) { throw 'err'; }
+      if (!sourceCard) { throw 'Card data not found'; }
+      if (sourceCard.isArchived) { throw 'Cannot copy an archived card'; }
+      // keep card labels in the copy if requested
       const labels = req.body.keepLabels === 'true' ? sourceCard.labels : [];
       const checklists = [];
+      // create nested copy of card checklists if requested
       if (req.body.keepChecklists === 'true') {
         for (let checklist of sourceCard.checklists) {
           const items = checklist.items.map(item => ({ title: item.title, isComplete: item.isComplete }));
@@ -344,6 +380,7 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
         }
       }
       const newCard = { title, labels, checklists, desc: '', dueDate: null, isArchived: false, members: [], comments: [] };
+      // add copied card to destination list
       destList.cards.splice(req.body.destIndex, 0, newCard);
       const updatedList = await destList.save();
       const updatedCard = updatedList.cards[req.body.destIndex];
@@ -354,12 +391,15 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
   }
 );
 
+// send a card to archive
 router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card || card.isArchived) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
+      if (card.isArchived) { throw 'Card already archived'; }
       card.isArchived = true;
       await list.save();
       await addActivity(`archived this card`, `archived **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
@@ -368,13 +408,14 @@ router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), us
   }
 );
 
+// send card back to list from archive
 router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
-      if (!card) { throw 'err'; }
+      if (!card) { throw 'No card data found'; }
       card.isArchived = false;
       await list.save();
       await addActivity(`recovered this card`, `recovered **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
@@ -383,12 +424,14 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
   }
 );
 
+// permanently delete a card
 router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'No list data found'; }
       const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'Card data not found'; }
       card.remove();
       await list.save();
       await addActivity(null, `deleted ${card.title} from list ${list.title}`, null, null, req.body.boardID, req.userID);
@@ -398,18 +441,19 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
   }
 );
 
+// add card member
 router.post('/members', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
       const user = await User.findOne({ email: req.body.email });
       const board = await Board.findById(req.body.boardID);
-      if (!list || !user || !board) { throw 'err'; }
-      // if user not member of the board
-      if (!board.members.find(member => member.email === user.email)) { throw 'err'; }
+      if (!list || !user || !board) { throw 'Data not found'; }
+      if (!board.members.find(member => member.email === user.email)) { throw 'User must be member of board'; }
       const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'Card data not found'; }
       // if user already member of the card
-      if (card.members.find(member => member.email === user.email)) { throw 'err'; }
+      if (card.members.find(member => member.email === user.email)) { throw 'User already a member of the card'; }
       card.members.push({ email: user.email, fullName: user.fullName });
       await list.save();
       await addActivity(`added ${user.fullName} to this card`, `added ${user.fullName} to **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
@@ -418,16 +462,16 @@ router.post('/members', auth, validate([body('*').not().isEmpty().escape()]), us
   }
 );
 
+// remove a card member
 router.put('/members/remove', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
       const user = await User.findOne({ email: req.body.email });
       const board = await Board.findById(req.body.boardID);
-      if (!list || !user || !board) { throw 'err'; }
-      // if user not member of the board
-      if (!board.members.find(member => member.email === user.email)) { throw 'err'; }
+      if (!list || !user || !board) { throw 'Data not found'; }
       const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'Card data not found'; }
       card.members = card.members.filter(member => member.email !== user.email);
       await list.save();
       await addActivity(`removed ${user.fullName} from this card`, `removed ${user.fullName} from **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
@@ -436,13 +480,16 @@ router.put('/members/remove', auth, validate([body('*').not().isEmpty().escape()
   }
 );
 
+// add comment to card
 router.post('/comments', auth, validate([body('*').not().isEmpty().escape(), body('msg').isLength({ min: 1, max: 300 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
+      if (!list) { throw 'List data not found'; }
       const user = await User.findById(req.userID);
-      if (!list || !user) { throw 'err'; }
+      if (!user) { throw 'User data not found'; }
       const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'Card data not found'; }
       card.comments.push({ email: user.email, fullName: user.fullName, date: req.body.date, msg: req.body.msg, cardID: req.body.cardID, listID: req.body.listID });
       const updatedList = await list.save();
       const updatedComments = updatedList.cards.id(req.body.cardID).comments;
@@ -452,14 +499,16 @@ router.post('/comments', auth, validate([body('*').not().isEmpty().escape(), bod
   }
 );
 
+// edit comment msg, must be original author to edit
 router.put('/comments', auth, validate([body('*').not().isEmpty().escape(), body('msg').isLength({ min: 1, max: 300 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
       const user = await User.findById(req.userID);
-      if (!list || !user) { throw 'err'; }
+      if (!list || !user) { throw 'List or user data not found'; }
       const comment = list.cards.id(req.body.cardID).comments.id(req.body.commentID);
-      if (user.email !== comment.email) { throw 'err'; }
+      if (!comment) { throw 'Comment not found'; }
+      if (user.email !== comment.email) { throw 'User must be original author to edit'; }
       comment.msg = req.body.msg;
       await list.save();
       res.sendStatus(200);
@@ -467,14 +516,16 @@ router.put('/comments', auth, validate([body('*').not().isEmpty().escape(), body
   }
 );
 
+// delete a comment
 router.put('/comments/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
       const user = await User.findById(req.userID);
-      if (!list || !user) { throw 'err'; }
+      if (!list || !user) { throw 'No list or user data found'; }
       const comment = list.cards.id(req.body.cardID).comments.id(req.body.commentID);
-      if (user.email !== comment.email) { throw 'err'; }
+      if (!comment) { throw 'Comment not found'; }
+      if (user.email !== comment.email) { throw 'Must be original author to delete comment'; }
       comment.remove();
       await list.save();
       res.sendStatus(200);

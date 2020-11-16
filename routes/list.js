@@ -10,13 +10,14 @@ const useIsAdmin = require('../middleware/useIsAdmin');
 const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 
+// create a new list
 router.post('/', auth, validate(
   [body('boardID').not().isEmpty().escape(),
   body('title').isLength({ min: 1, max: 70 }).escape()]), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
-      if (!board) { throw 'err'; }
+      if (!board) { throw 'Board data not found'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const lists = await List.find({ boardID: req.body.boardID });
       const list = new List({ boardID: board._id, title, cards: [], indexInBoard: lists.length });
@@ -27,6 +28,7 @@ router.post('/', auth, validate(
   }
 );
 
+// update list title
 router.put('/title', auth, validate(
   [body('boardID').not().isEmpty().escape(),
   body('title').isLength({ min: 1, max: 70 }).escape(),
@@ -34,7 +36,7 @@ router.put('/title', auth, validate(
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'List data not found'; }
       const oldTitle = list.title;
       list.title = req.body.title.replace(/\n/g, ' ');
       await list.save();
@@ -44,12 +46,15 @@ router.put('/title', auth, validate(
   }
 );
 
+// move list to different index in board
 router.put('/moveList', auth, validate([body('sourceIndex').isInt(), body('destIndex').isInt(), body('boardID').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
       const list = lists.splice(req.body.sourceIndex, 1)[0];
+      if (!list) { throw 'List not found'; }
       lists.splice(req.body.destIndex, 0, list);
+      // update all lists in board to match new order
       for (let i = 0; i < lists.length; i++) {
         if (lists[i].indexInBoard !== i) { lists[i].indexInBoard = i; }
       }
@@ -61,11 +66,13 @@ router.put('/moveList', auth, validate([body('sourceIndex').isInt(), body('destI
   }
 );
 
+// create a copy of a list
 router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('title').trim().isLength({ min: 1, max: 70 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'List data not found'; }
+      // create deeply nested copy of all cards & all checklists/members/dueDate/etc of each card
       const cards = list.cards.filter(card => !card.isArchived).map(card => ({
         title: card.title,
         desc: card.desc,
@@ -95,20 +102,23 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
 );
 
 // authorization: admin
+// send list to archive
 router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), useIsAdmin,
   async (req, res) => {
     try {
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
-      if (!lists || lists.length === 0) { throw 'err'; }
+      if (!lists || lists.length === 0) { throw 'List data not found'; }
       const listIndex = lists.findIndex(list => String(list._id) === req.body.listID);
-      if (listIndex === -1) { throw 'err'; }
+      if (listIndex === -1) { throw 'List not found in board lists'; }
       lists.splice(listIndex, 1);
+      // update all lists index in board to reflect missing list
       for (let i = 0; i < lists.length; i++) {
         if (lists[i].indexInBoard !== i) { lists[i].indexInBoard = i; }
       }
       for (let list of lists) {
         await List.findByIdAndUpdate(list._id, { indexInBoard: list.indexInBoard });
       }
+      // set archived list's index to end of list & set as isArchived
       const updatedList = await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: true });
       await addActivity(null, `archived list ${updatedList.title}`, null, updatedList._id, req.body.boardID, req.userID);
       res.sendStatus(200);
@@ -116,11 +126,12 @@ router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), us
   }
 );
 
+// send list to board from archive
 router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).lean();
-      if (!lists.length) { throw 'err'; }
+      if (!lists.length) { throw 'Lists data not found'; }
       const list = await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: false });
       await addActivity(null, `recovered list ${list.title}`, null, list._id, req.body.boardID, req.userID);
       res.sendStatus(200);
@@ -129,6 +140,7 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
 );
 
 // authorization: admin
+// Permanently delete a list
 router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsAdmin,
   async (req, res) => {
     try {
@@ -141,11 +153,13 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
 );
 
 // authorization: admin
+// Send all cards in list to archive
 router.put('/archive/allCards', auth, validate([body('*').not().isEmpty().escape()]), useIsAdmin,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      if (!list) { throw 'err'; }
+      if (!list) { throw 'List data not found'; }
+      // set all cards to isArchived & add action for each card
       list.cards.forEach(async card => {
         card.isArchived = true;
         await addActivity(`archived this card`, `archived **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
@@ -156,12 +170,13 @@ router.put('/archive/allCards', auth, validate([body('*').not().isEmpty().escape
   }
 );
 
+// move all cards in a list to another list
 router.put('/moveAllCards', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const oldList = await List.findById(req.body.oldListID);
       const newList = await List.findById(req.body.newListID);
-      if (!oldList || !newList) { throw 'err'; }
+      if (!oldList || !newList) { throw 'Old list or new list data not found'; }
       newList.cards = newList.cards.concat([...oldList.cards]);
       oldList.cards = [];
       await oldList.save();
