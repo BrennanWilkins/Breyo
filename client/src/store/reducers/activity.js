@@ -18,6 +18,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.UPDATE_BOARD_ACTIVITY: return { ...state, boardActivity: action.activity };
     case actionTypes.SET_SHOWN_MEMBER_ACTIVITY: return { ...state, shownMemberActivity: action.member };
     case actionTypes.DELETE_BOARD_ACTIVITY: return { ...state, boardActivity: [] };
+    case actionTypes.SET_ALL_CARD_ACTIVITY: return { ...state, cardActivity: action.activity };
     default: return state;
   }
 };

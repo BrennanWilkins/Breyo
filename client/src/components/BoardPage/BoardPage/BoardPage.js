@@ -57,7 +57,7 @@ const BoardPage = props => {
       const id = props.match.params.boardID;
       try {
         const res = await axios.get('/board/' + id);
-        const activity = await axios.get('/activity/recent/' + id);
+        const activity = await axios.get('/activity/recent/board/' + id);
         document.title = res.data.data.title;
         document.body.style.overflow = 'hidden';
         props.updateActiveBoard(res.data.data);

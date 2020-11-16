@@ -18,7 +18,7 @@ const ActivityMenu = props => {
     const fetchData = async (boardID) => {
       try {
         setLoading(true);
-        const data = await axios.get(`/activity/all/${boardID}/0`);
+        const data = await axios.get(`/activity/all/board/${boardID}/0`);
         setLoading(false);
         const updatedActivity = data.data.activity.concat(props.allComments).sort((a,b) => new Date(b.date) - new Date(a.date));
         setActivity(updatedActivity);
@@ -34,7 +34,7 @@ const ActivityMenu = props => {
     if (moreLoaded) { return; }
     setMoreLoaded(true);
     try {
-      const data = await axios.get(`/activity/all/${props.boardID}/1`);
+      const data = await axios.get(`/activity/all/board/${props.boardID}/1`);
       if (data.data.activity.length === 0) { return; }
       setActivity(activity.concat(data.data.activity).sort((a,b) => new Date(b.date) - new Date(a.date)));
     } catch (err) { setErr(true); }

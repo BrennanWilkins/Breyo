@@ -8,6 +8,7 @@ const useIsAdmin = require('../middleware/useIsAdmin');
 const Activity = require('../models/activity');
 const User = require('../models/user');
 
+// for every action addActivity is called to create new doc in activity collection
 const addActivity = async (msg, boardMsg, cardID, listID, boardID, userID, email, fullName) => {
   try {
     // email & fullName may be provided & if not then is retrived from user model
@@ -15,7 +16,7 @@ const addActivity = async (msg, boardMsg, cardID, listID, boardID, userID, email
     if (email && fullName) { userEmail = email; userFullName = fullName; }
     else {
       const user = await User.findById(userID);
-      if (!user) { throw 'err'; }
+      if (!user) { throw 'No user found'; }
       userEmail = user.email; userFullName = user.fullName;
     }
     const activity = new Activity({ msg, boardMsg, email: userEmail, fullName: userFullName, cardID, listID, boardID, date: new Date() });
@@ -23,39 +24,46 @@ const addActivity = async (msg, boardMsg, cardID, listID, boardID, userID, email
   } catch (err) { return new Error('Error adding activity'); }
 };
 
-router.get('/recent/:boardID', auth, validate([param('boardID').not().isEmpty()]), useIsMember,
+// returns last 20 board actions
+router.get('/recent/board/:boardID', auth, validate([param('boardID').not().isEmpty()]), useIsMember,
   async (req, res) => {
     try {
       const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').limit(20).lean();
+      if (!activity) { throw 'No board activity found'; }
       res.status(200).json({ activity });
     } catch (err) { res.sendStatus(500); }
   }
 );
 
-router.get('/recent/:boardID/:cardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
+// returns last 20 actions for given card
+router.get('/recent/card/:boardID/:cardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
   async (req, res) => {
     try {
       const activity = await Activity.find({ boardID: req.params.boardID, cardID: req.params.cardID }).sort('-date').limit(20).lean();
+      if (!activity) { throw 'No card activity found'; }
       res.status(200).json({ activity });
     } catch (err) { res.sendStatus(500); }
   }
 );
 
-router.get('/all/:boardID/:page', auth, validate([param('boardID').not().isEmpty(), param('page').isInt()]), useIsMember,
+// returns a given page of board activity sorted by most recent, each page returns 100 actions
+router.get('/all/board/:boardID/:page', auth, validate([param('boardID').not().isEmpty(), param('page').isInt()]), useIsMember,
   async (req, res) => {
     try {
       const skip = req.params.page * 100;
       const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').skip(skip).limit(100).lean();
+      if (!activity) { throw 'No board activity found'; }
       res.status(200).json({ activity });
     } catch (err) { res.sendStatus(500); }
   }
 );
 
-router.get('/all/:boardID/:cardID/:page', auth, validate([param('*').not().isEmpty(), param('page').isInt()]), useIsMember,
+// returns all actions for given card
+router.get('/all/card/:boardID/:cardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
   async (req, res) => {
     try {
-      const skip = req.params.page * 100;
-      const activity = await Activity.find({ boardID: req.params.boardID, cardID: req.params.cardID }).sort('-date').skip(skip).limit(100).lean();
+      const activity = await Activity.find({ boardID: req.params.boardID, cardID: req.params.cardID }).sort('-date').lean();
+      if (!activity) { throw 'No card activity found'; }
       res.status(200).json({ activity });
     } catch (err) { res.sendStatus(500); }
   }

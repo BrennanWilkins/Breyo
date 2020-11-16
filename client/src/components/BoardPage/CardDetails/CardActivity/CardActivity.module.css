@@ -21,3 +21,14 @@
 .Spinner {
   margin-bottom: 20px;
 }
+.ViewAll {
+  text-decoration: underline;
+  margin-left: 43px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: rgb(110,110,110);
+  cursor: pointer;
+}
+.ViewAll:hover {
+  color: rgb(50,50,50);
+}

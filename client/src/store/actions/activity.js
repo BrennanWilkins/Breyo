@@ -8,8 +8,23 @@ export const getRecentCardActivity = () => async (dispatch, getState) => {
     const state = getState();
     const boardID = state.board.boardID;
     const cardID = state.lists.shownCardID;
-    const res = await axios.get(`/activity/recent/${boardID}/${cardID}`);
+    const res = await axios.get(`/activity/recent/card/${boardID}/${cardID}`);
     dispatch({ type: actionTypes.UPDATE_CARD_ACTIVITY, activity: res.data.activity });
+    dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: false });
+  } catch (err) {
+    console.log(err);
+    dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: false });
+  }
+};
+
+export const getAllCardActivity = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: true });
+    const state = getState();
+    const boardID = state.board.boardID;
+    const cardID = state.lists.shownCardID;
+    const res = await axios.get(`/activity/all/card/${boardID}/${cardID}`);
+    dispatch({ type: actionTypes.SET_ALL_CARD_ACTIVITY, activity: res.data.activity });
     dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: false });
   } catch (err) {
     console.log(err);

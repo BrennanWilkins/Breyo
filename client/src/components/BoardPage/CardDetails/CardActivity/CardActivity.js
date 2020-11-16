@@ -6,13 +6,14 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Comment from './Comment/Comment';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
-import { getRecentCardActivity, resetCardActivity } from '../../../../store/actions';
+import { getRecentCardActivity, resetCardActivity, getAllCardActivity } from '../../../../store/actions';
 import Action from './Action/Action';
 import AuthSpinner from '../../../UI/AuthSpinner/AuthSpinner';
 
 const CardActivity = props => {
   const [data, setData] = useState([]);
   const [showDetails, setShowDetails] = useState(false);
+  const [allShown, setAllShown] = useState(false);
 
   useEffect(() => {
     if (!showDetails) {
@@ -26,6 +27,11 @@ const CardActivity = props => {
     if (showDetails) { setData(props.comments.concat(props.activity).sort((a, b) => new Date(b.date) - new Date(a.date))); }
     else { setData(props.comments); }
   }, [props.activity, props.comments, showDetails]);
+
+  const showAllHandler = () => {
+    setAllShown(true);
+    props.getAllCardActivity();
+  };
 
   return (
     <div>
@@ -41,6 +47,7 @@ const CardActivity = props => {
         else { return <Action key={datum._id} email={datum.email} fullName={datum.fullName} msg={datum.msg} date={datum.date} />; }
       })}
       {props.isLoading && <div className={classes.Spinner}><AuthSpinner /></div>}
+      {!props.isLoading && showDetails && !allShown && <div className={classes.ViewAll} onClick={showAllHandler}>Show all actions...</div>}
     </div>
   );
 };
@@ -49,7 +56,10 @@ CardActivity.propTypes = {
   comments: PropTypes.array.isRequired,
   userEmail: PropTypes.string.isRequired,
   activity: PropTypes.array.isRequired,
-  isLoading: PropTypes.bool.isRequired
+  isLoading: PropTypes.bool.isRequired,
+  getRecentCardActivity: PropTypes.func.isRequired,
+  resetCardActivity: PropTypes.func.isRequired,
+  getAllCardActivity: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -61,7 +71,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getRecentCardActivity: () => dispatch(getRecentCardActivity()),
-  resetCardActivity: () => dispatch(resetCardActivity())
+  resetCardActivity: () => dispatch(resetCardActivity()),
+  getAllCardActivity: () => dispatch(getAllCardActivity())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CardActivity);
