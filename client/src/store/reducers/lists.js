@@ -76,7 +76,8 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const index = lists.findIndex(list => list.listID === action.listID);
       lists[index] = { ...lists[index], title: action.title };
-      return { ...state, lists };
+      const currentListTitle = state.currentListTitle ? action.title : null;
+      return { ...state, lists, currentListTitle };
     }
     case actionTypes.ADD_LIST: {
       const list = { listID: action.listID, title: action.title, cards: [], indexInBoard: state.lists.length };

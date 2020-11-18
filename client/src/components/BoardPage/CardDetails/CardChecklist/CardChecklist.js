@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classes from './CardChecklist.module.css';
 import { checklistIcon } from '../../../UI/icons';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
-import { Checkbox } from '../../../UI/Inputs/Inputs';
 import { connect } from 'react-redux';
 import DeleteModal from './DeleteModal/DeleteModal';
 import ProgressBar from './ProgressBar/ProgressBar';

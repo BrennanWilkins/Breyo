@@ -46,6 +46,7 @@ const reducer = (state = initialState, action) => {
       return { ...state, members };
     }
     case actionTypes.DEMOTE_SELF: return { ...state, userIsAdmin: false };
+    case actionTypes.PROMOTE_SELF: return { ...state, userIsAdmin: true };
     case actionTypes.UPDATE_COLOR: return {
       ...state,
       color: action.color

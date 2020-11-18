@@ -3,7 +3,7 @@ import classes from './ListActions.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { BackBtn, CloseBtn } from '../../../UI/Buttons/Buttons';
-import { copyList, archiveList, archiveAllCards } from '../../../../store/actions';
+import { copyList, archiveList, archiveAllCards, addNotif } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import MoveCards from './MoveCards';
 
@@ -33,10 +33,15 @@ const ListActions = props => {
     props.close();
   };
 
+  const archiveHandler = () => {
+    if (!props.userIsAdmin) { return props.addNotif('You must be an admin to archive lists.'); }
+    props.archiveList(props.listID, props.boardID);
+  };
+
   const defaultContent = (
     <>
       <div className={classes.Option} onClick={() => setShowCopyList(true)}>Copy list</div>
-      <div className={classes.Option} onClick={() => props.archiveList(props.listID, props.boardID)}>Archive list</div>
+      <div className={classes.Option} onClick={archiveHandler}>Archive list</div>
       <div className={classes.Option} onClick={archiveAllHandler}>Archive all cards in this list</div>
       <div className={classes.Option} onClick={() => setShowMoveCards(true)}>Move all cards in this list</div>
     </>
@@ -70,13 +75,19 @@ ListActions.propTypes = {
   boardID: PropTypes.string.isRequired,
   copyList: PropTypes.func.isRequired,
   archiveList: PropTypes.func.isRequired,
-  archiveAllCards: PropTypes.func.isRequired
+  archiveAllCards: PropTypes.func.isRequired,
+  userIsAdmin: PropTypes.bool.isRequired
 };
+
+const mapStateToProps = state => ({
+  userIsAdmin: state.board.userIsAdmin
+});
 
 const mapDispatchToProps = dispatch => ({
   copyList: (title, listID, boardID) => dispatch(copyList(title, listID, boardID)),
   archiveList: (listID, boardID) => dispatch(archiveList(listID, boardID)),
-  archiveAllCards: (listID, boardID) => dispatch(archiveAllCards(listID, boardID))
+  archiveAllCards: (listID, boardID) => dispatch(archiveAllCards(listID, boardID)),
+  addNotif: msg => dispatch(addNotif(msg))
 });
 
-export default connect(null, mapDispatchToProps)(ListActions);
+export default connect(mapStateToProps, mapDispatchToProps)(ListActions);

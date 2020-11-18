@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import classes from './CardMembers.module.css';
 import PropTypes from 'prop-types';
-import { ActionBtn, AccountBtn } from '../../../UI/Buttons/Buttons';
+import { AccountBtn } from '../../../UI/Buttons/Buttons';
 import { plusIcon } from '../../../UI/icons';
 import AddCardMember from '../AddCardMember/AddCardMember';
 import CardMemberModal from '../CardMemberModal/CardMemberModal';

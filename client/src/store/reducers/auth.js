@@ -72,10 +72,20 @@ const reducer = (state = initialState, action) => {
       invites: [...action.invites]
     };
     case actionTypes.DEMOTE_SELF: {
-      const updatedBoards = [...state.boards].map(board => ({ ...board }));
-      const index = updatedBoards.findIndex(board => board.boardID === action.boardID);
-      updatedBoards[index].isAdmin = false;
-      return { ...state, boards: updatedBoards };
+      const boards = [...state.boards];
+      const boardIndex = boards.findIndex(board => board.boardID === action.boardID);
+      const board = { ...boards[boardIndex] };
+      board.isAdmin = false;
+      boards[boardIndex] = board;
+      return { ...state, boards };
+    }
+    case actionTypes.PROMOTE_SELF: {
+      const boards = [...state.boards];
+      const boardIndex = boards.findIndex(board => board.boardID === action.boardID);
+      const board = { ...boards[boardIndex] };
+      board.isAdmin = true;
+      boards[boardIndex] = board;
+      return { ...state, boards };
     }
     case actionTypes.UPDATE_REFRESH_ENABLED: {
       const boards = [...state.boards];

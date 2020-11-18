@@ -22,7 +22,7 @@ const BoardNavBar = props => {
   useEffect(() => setInputTitle(props.title), [props.title]);
 
   const checkTitle = () => {
-    if (inputTitle === props.title || inputTitle.length > 50 || inputTitle === '') { return; }
+    if (inputTitle === props.title || inputTitle.length > 100 || inputTitle === '') { return; }
     props.updateTitle(inputTitle, props.boardID);
   };
 

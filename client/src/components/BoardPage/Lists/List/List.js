@@ -18,6 +18,8 @@ const List = props => {
   const [showTitleInput, setShowTitleInput] = useState(false);
   const [showListActions, setShowListActions] = useState(false);
 
+  useEffect(() => setTitleInput(props.title), [props.title]);
+
   const titleBlurHandler = () => {
     if (titleInput === props.title) { return setShowTitleInput(false); }
     if (titleInput.length === 0 || titleInput.length >= 200) { setShowTitleInput(false); return setTitleInput(props.title); }

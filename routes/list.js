@@ -19,8 +19,8 @@ router.post('/', auth, validate(
       const board = await Board.findById(req.body.boardID);
       if (!board) { throw 'Board data not found'; }
       const title = req.body.title.replace(/\n/g, ' ');
-      const lists = await List.find({ boardID: req.body.boardID });
-      const list = new List({ boardID: board._id, title, cards: [], indexInBoard: lists.length });
+      const lists = await List.find({ boardID: req.body.boardID, isArchived: false });
+      const list = new List({ boardID: board._id, title, cards: [], indexInBoard: lists.length, isArchived: false });
       const newList = await list.save();
       await addActivity(null, `added list ${title} to this board`, null, newList._id, req.body.boardID, req.userID);
       res.status(200).json({ listID: newList._id });
@@ -88,7 +88,7 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
         isArchived: false,
         members: card.members
       }));
-      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
+      const lists = await List.find({ boardID: req.body.boardID, isArchived: false });
       const newList = new List({ boardID: req.body.boardID, title: req.body.title, desc: list.desc, indexInBoard: lists.length, cards, isArchived: false });
       const updatedList = await newList.save();
       await addActivity(null, `added list ${newList.title} to this board`, null, updatedList._id, req.body.boardID, req.userID);

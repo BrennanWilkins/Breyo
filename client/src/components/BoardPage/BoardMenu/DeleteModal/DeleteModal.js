@@ -25,7 +25,7 @@ const DeleteModal = props => {
   `You must be an admin to delete this ${props.mode}.`;
 
   return (
-    <div ref={modalRef} className={classes.DeleteModal}>
+    <div ref={modalRef} className={classes.DeleteModal} style={props.mode === 'list' ? {left: 'calc(50% - 150px)'} : null}>
       <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
       {canDelete ?
         <>

@@ -345,8 +345,8 @@ router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escap
       const destList = await List.findById(req.body.targetID);
       if (!sourceList || !destList) { throw 'List data not found'; }
       // remove card from source list
-      const card = sourceList.cards.splice(req.body.sourceIndex, 1)[0];
-      if (card.isArchived) { throw 'Cannot move an archived card'; }
+      const card = sourceList.cards.filter(card => !card.isArchived).splice(req.body.sourceIndex, 1)[0];
+      if (!card) { throw 'Card not found'; }
       // update card's listID & add to destination list
       card.listID = req.body.targetID;
       destList.cards.splice(req.body.destIndex, 0, card);

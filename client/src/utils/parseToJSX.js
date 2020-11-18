@@ -1,4 +1,3 @@
-import React from 'react';
 import Parse from 'html-react-parser';
 const Entities = require('entities');
 
