@@ -37,7 +37,8 @@ const socketMap = {
   'post/card/members': actionTypes.ADD_CARD_MEMBER,
   'put/card/members/remove': actionTypes.REMOVE_CARD_MEMBER,
   'put/card/comments': actionTypes.UPDATE_COMMENT,
-  'put/card/comments/delete': actionTypes.DELETE_COMMENT
+  'put/card/comments/delete': actionTypes.DELETE_COMMENT,
+  'put/card/archive/restore': actionTypes.RESTORE_ARCHIVED_CARDS
 };
 
 export default socketMap;

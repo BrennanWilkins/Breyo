@@ -38,7 +38,8 @@ const routes = [
   'put/card/members/remove',
   'post/card/comments',
   'put/card/comments',
-  'put/card/comments/delete'
+  'put/card/comments/delete',
+  'put/card/archive/restore'
 ];
 
 module.exports = routes;

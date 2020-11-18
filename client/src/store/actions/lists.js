@@ -46,8 +46,10 @@ export const archiveList = (listID, boardID) => async dispatch => {
 export const recoverList = (listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.RECOVER_LIST, listID });
-    await axios.put('/list/archive/recover', { listID, boardID });
+    const res = await axios.put('/list/archive/recover', { listID, boardID });
+    dispatch({ type: actionTypes.RESTORE_ARCHIVED_CARDS, archivedCards: res.data.archivedCards, listID });
     sendUpdate('put/list/archive/recover', JSON.stringify({ listID }));
+    sendUpdate('put/card/archive/restore', JSON.stringify({ archivedCards: res.data.archivedCards, listID }));
   } catch (err) {
     console.log(err);
   }

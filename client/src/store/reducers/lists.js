@@ -474,7 +474,8 @@ const reducer = (state = initialState, action) => {
       archivedLists.push(archivedList);
       // remove any archived cards in the archived list since they will be archived too
       const allArchivedCards = state.allArchivedCards.filter(card => card.listID !== archivedList.listID);
-      return { ...state, lists, archivedLists, allArchivedCards };
+      const allComments = state.allComments.filter(comment => comment.listID !== archivedList.listID);
+      return { ...state, lists, archivedLists, allArchivedCards, allComments };
     }
     case actionTypes.RECOVER_LIST: {
       const lists = [...state.lists];
@@ -485,6 +486,44 @@ const reducer = (state = initialState, action) => {
       archivedList.indexInBoard = lists.length;
       lists.push(archivedList);
       return { ...state, lists, archivedLists };
+    }
+    case actionTypes.RESTORE_ARCHIVED_CARDS: {
+      let allArchivedCards = [...state.allArchivedCards];
+      let allComments = [...state.allComments];
+      const archivedCards = action.archivedCards.map(card => {
+        const title = Entities.decode(card.title);
+        const comments = card.comments.map(comment => ({
+          email: comment.email,
+          fullName: comment.fullName,
+          cardID: comment.cardID,
+          listID: comment.listID,
+          date: comment.date,
+          commentID: comment._id,
+          msg: Entities.decode(comment.msg)
+        })).sort((a,b) => new Date(b.date) - new Date(a.date));
+        allComments = allComments.concat(comments.map(comment => ({...comment, cardTitle: title})));
+        return {
+          cardID: card._id,
+          checklists: card.checklists.map(checklist => ({
+            title: checklist.title,
+            checklistID: checklist._id,
+            items: checklist.items.map(item => ({
+              itemID: item._id,
+              title: item.title,
+              isComplete: item.isComplete
+            }))
+          })),
+          dueDate: card.dueDate,
+          labels: card.labels,
+          title,
+          desc: Entities.decode(card.desc),
+          members: card.members,
+          comments,
+          listID: action.listID
+        };
+      });
+      allArchivedCards = allArchivedCards.concat(archivedCards);
+      return { ...state, allArchivedCards, allComments };
     }
     case actionTypes.DELETE_LIST: {
       const archivedLists = [...state.archivedLists];
