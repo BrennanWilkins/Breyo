@@ -326,9 +326,9 @@ router.put('/moveCard/sameList', auth, validate([body('*').not().isEmpty().escap
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
       // remove card from original index
-      const card = list.cards.splice(req.body.sourceIndex, 1)[0];
+      const card = list.cards.filter(card => !card.isArchived).splice(req.body.sourceIndex, 1)[0];
       if (!card) { throw 'Card not found in list'; }
-      if (card.isArchived) { throw 'Cannot move an archived card'; }
+      // if (card.isArchived) { throw 'Cannot move an archived card'; }
       // add card back to new index
       list.cards.splice(req.body.destIndex, 0, card);
       await list.save();
@@ -346,7 +346,7 @@ router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escap
       if (!sourceList || !destList) { throw 'List data not found'; }
       // remove card from source list
       const card = sourceList.cards.filter(card => !card.isArchived).splice(req.body.sourceIndex, 1)[0];
-      if (!card) { throw 'Card not found'; }
+      if (!card) { throw 'Card not found in list'; }
       // update card's listID & add to destination list
       card.listID = req.body.targetID;
       destList.cards.splice(req.body.destIndex, 0, card);

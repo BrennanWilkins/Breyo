@@ -8,8 +8,38 @@ const boardRouter = require('./routes/board');
 const listRouter = require('./routes/list');
 const cardRouter = require('./routes/card');
 const activityRouter = require('./routes/activity');
+const jwt = require('jsonwebtoken');
+const socketRoutes = require('./routes/socket');
 
 const app = express();
+
+const server = require('http').createServer(app);
+
+const io = require('socket.io')(server, { cors: true });
+io.use((socket, next) => {
+  if (socket.handshake.query && socket.handshake.query.token) {
+    jwt.verify(socket.handshake.query.token, config.get('AUTH_KEY'), (err, decoded) => {
+      if (err) { return next(new Error('Unauthorized')); }
+      socket.decodedUser = decoded;
+      next();
+    });
+  } else { next(new Error('Unauthorized')); }
+}).on('connection', socket => {
+  socket.on('join', room => {
+    // verify user is member of board
+    if (socket.decodedUser.user.boards.findIndex(board => String(board.boardID) === String(room)) === -1) {
+      return socket.emit('unauthorized', 'Not a member');
+    }
+    socket.join(room);
+    socket.room = room;
+    socket.emit('joined', 'User successfully joined');
+  });
+  for (let route of socketRoutes) {
+    socket.on(route, msg => {
+      socket.to(socket.room).emit(route, msg);
+    });
+  }
+});
 
 const mongoose = require('mongoose');
 mongoose.set('useFindAndModify', false);
@@ -37,6 +67,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const port = process.env.PORT || 9000;
-app.listen(port, () => console.log(`Server started on port ${port}`));
+server.listen(port, () => console.log(`Server started on port ${port}`));
 
 module.exports = app;

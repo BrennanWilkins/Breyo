@@ -6,11 +6,12 @@ const { body, param } = require('express-validator');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsAdmin = require('../middleware/useIsAdmin');
-const useSSE = require('../middleware/useSSE');
 const useIsMember = require('../middleware/useIsMember');
 const List = require('../models/list');
 const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
 const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
                 'rgb(0,121,191)', 'rgb(240, 85, 68)', 'rgb(56, 187, 244)',
@@ -30,34 +31,9 @@ router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape(
   }
 );
 
-router.get('/stream/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useIsMember, useSSE,
-  (req, res) => {
-    // returns board & list data for each interval
-    const boardQuery = Board.findById(req.params.boardID).lean();
-    const listQuery = List.find({ boardID: req.params.boardID }).lean();
-
-    const query = async () => {
-      try {
-        const board = await boardQuery;
-        const lists = await listQuery;
-        const data = { ...board, lists };
-        res.sendEventData(data);
-      } catch (err) { res.close(); }
-    };
-
-    // stream data to client every 10 seconds
-    const dataInterval = setInterval(query, 10000);
-
-    res.on('close', () => {
-      clearInterval(dataInterval);
-      res.end();
-    });
-  }
-);
-
 // create a new board w given title/color
 router.post('/', auth, validate(
-  [body('title').trim().isLength({ min: 1, max: 50 }).escape(),
+  [body('title').trim().isLength({ min: 1, max: 100 }).escape(),
   body('color').not().isEmpty().escape()]
   , 'Please enter a valid title.'),
   async (req, res) => {
@@ -81,7 +57,11 @@ router.post('/', auth, validate(
       const list3 = new List({ boardID: board._id, title: 'Done', cards: [], indexInBoard: 2, isArchived: false });
       await list1.save(); await list2.save(); await list3.save();
       await addActivity(null, 'created this board', null, null, board._id, null, user.email, user.fullName);
-      res.status(200).json({ ...newBoard });
+
+      // update client's token to show new board
+      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
+
+      res.status(200).json({ board: newBoard, token });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -130,7 +110,7 @@ router.put('/desc', auth, validate(
 // authorization: member
 // update board title
 router.put('/title', auth, validate(
-  [body('title').trim().isLength({ min: 1, max: 50 }).escape(),
+  [body('title').trim().isLength({ min: 1, max: 100 }).escape(),
   body('boardID').not().isEmpty().escape()], 'Please enter a valid title.'), useIsMember,
   async (req, res) => {
     try {
@@ -273,7 +253,11 @@ router.put('/invites/accept', auth, validate(
       await user.save();
       await board.save();
       await addActivity(null, `was added to this board`, null, null, board._id, null, user.email, user.fullName);
-      res.sendStatus(200);
+
+      // update client's token to show new board
+      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
+
+      res.status(200).json({ token });
     } catch(err) { res.sendStatus(500); }
   }
 );

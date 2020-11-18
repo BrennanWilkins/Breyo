@@ -9,7 +9,6 @@
     "axios": "^0.21.0",
     "date-fns": "^2.16.1",
     "entities": "^2.1.0",
-    "eventsource": "^1.0.7",
     "html-react-parser": "^0.14.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.0",
@@ -24,6 +23,7 @@
     "react-transition-group": "^4.4.1",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
+    "socket.io-client": "^3.0.1",
     "uuid": "^8.3.1"
   },
   "scripts": {

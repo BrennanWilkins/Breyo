@@ -1,56 +1,27 @@
-import React, { useEffect, useState, Suspense, lazy } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardPage.module.css';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import BoardNavBar from '../BoardNavBar/BoardNavBar';
-import EventSourcePolyfill from 'eventsource';
+import { initSocket, connectSocket, closeSocket }  from '../../../store/actions/socket';
 import { instance as axios } from '../../../axios';
-import { addNotif, updateActiveBoard, getBoardData, setCardDetails,
-  updateBoardActivity, setShownMemberActivity } from '../../../store/actions';
+import { addNotif, updateActiveBoard, setCardDetails, updateBoardActivity, setShownMemberActivity } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
 import ListContainer from '../Lists/ListContainer/ListContainer';
 const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'));
 const MemberActivity = lazy(() => import('../MemberActivity/MemberActivity'));
 
 const BoardPage = props => {
-  const [windowClosed, setWindowClosed] = useState(false);
-
   useEffect(() => {
-    if (!props.refreshEnabled || windowClosed) { return; }
-    console.log('stream opened');
-    const id = props.match.params.boardID;
-    const url = 'http://localhost:9000/api/board/stream/' + id;
-    const source = new EventSourcePolyfill(url, { headers: { 'x-auth-token': axios.defaults.headers.common['x-auth-token'] }});
-
-    source.onmessage = event => {
-      console.log('Received stream');
-      const data = JSON.parse(event.data);
-      props.updateActiveBoard(data);
-    };
-
-    source.onerror = errMsg => {
-      console.log('Error: connection closed', errMsg);
-      source.close();
-      props.addNotif('Connection to the server was lost.');
-    };
+    initSocket(props.match.params.boardID);
+    connectSocket();
 
     return () => {
-      console.log('Stream closed');
-      source.close();
+      console.log('connection closed');
+      closeSocket();
     };
-  }, [props.match.params.boardID, props.refreshEnabled, windowClosed]);
-
-  useEffect(() => {
-    const visibilityHandler = e => {
-      if (document.visibilityState !== 'visible') { setWindowClosed(true); }
-      else { setWindowClosed(false); }
-    };
-
-    if (props.refreshEnabled) { document.addEventListener('visibilitychange', visibilityHandler); }
-
-    return () => { document.removeEventListener('visibilitychange', visibilityHandler); }
-  }, [props.match.params.boardID, props.refreshEnabled]);
+  }, [props.match.params.boardID]);
 
   useEffect(() => {
     const fetchData = async () => {
