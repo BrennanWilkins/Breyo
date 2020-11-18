@@ -13,11 +13,8 @@ const AddCardMember = props => {
   const [boardMembers, setBoardMembers] = useState([]);
 
   useEffect(() => {
-    const members = props.cardMembers.map(member => ({ ...member, isMember: true }))
-    .concat(props.members.filter(member => !props.cardMembers.find(cardMember => cardMember.email === member.email))
-    .map(member => ({ ...member, isMember: false })));
-    setBoardMembers(members);
-  }, []);
+    setBoardMembers(props.members.map(member => ({ ...member, isMember: !!props.cardMembers.find(cardMember => cardMember.email === member.email) })));
+  }, [props.members, props.cardMembers]);
 
   useLayoutEffect(() => {
     if (!props.fromList) { return; }
@@ -29,15 +26,11 @@ const AddCardMember = props => {
   }, [props.fromList]);
 
   const memberHandler = index => {
-    const members = [...boardMembers];
     if (boardMembers[index].isMember) {
-      members[index].isMember = false;
       props.removeCardMember(boardMembers[index].email, props.cardID, props.listID, props.boardID);
     } else {
-      members[index].isMember = true;
       props.addCardMember(boardMembers[index].email, boardMembers[index].fullName, props.cardID, props.listID, props.boardID);
     }
-    setBoardMembers(members);
   };
 
   return (
