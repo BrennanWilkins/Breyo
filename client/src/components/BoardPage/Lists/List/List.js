@@ -85,13 +85,9 @@ List.propTypes = {
   setCardDetails: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => ({
-  lists: state.lists.lists
-});
-
 const mapDispatchToProps = dispatch => ({
   updateListTitle: (title, listID, boardID) => dispatch(updateListTitle(title, listID, boardID)),
   setCardDetails: (cardID, listID) => dispatch(setCardDetails(cardID, listID))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(List));
+export default connect(null, mapDispatchToProps)(withRouter(List));

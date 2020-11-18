@@ -5,6 +5,7 @@ import List from '../List/List';
 import AddList from '../AddList/AddList';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { dndHandler } from '../../../../store/actions';
+import PropTypes from 'prop-types';
 
 const ListContainer = props => {
   const onDragEndHandler = ({ source, destination }) => {
@@ -26,6 +27,12 @@ const ListContainer = props => {
       </Droppable>
     </DragDropContext>
   );
+};
+
+ListContainer.propTypes = {
+  lists: PropTypes.array.isRequired,
+  boardID: PropTypes.string.isRequired,
+  dndHandler: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({

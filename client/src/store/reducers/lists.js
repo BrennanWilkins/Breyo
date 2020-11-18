@@ -449,7 +449,9 @@ const reducer = (state = initialState, action) => {
           dueDate: card.dueDate,
           labels: card.labels,
           title: Entities.decode(card.title),
-          desc: Entities.decode(card.desc)
+          desc: Entities.decode(card.desc),
+          comments: [],
+          members: card.members
         }))
       };
       lists.push(newList);
