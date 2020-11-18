@@ -75,7 +75,6 @@ BoardPage.propTypes = {
   color: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
   hideCardDetails: PropTypes.func.isRequired,
-  refreshEnabled: PropTypes.bool.isRequired,
   shownMember: PropTypes.object,
   closeMemberActivity: PropTypes.func.isRequired
 };
@@ -85,7 +84,6 @@ const mapStateToProps = state => ({
   boardID: state.board.boardID,
   shownCardID: state.lists.shownCardID,
   shownListID: state.lists.shownListID,
-  refreshEnabled: state.board.refreshEnabled,
   shownMember: state.activity.shownMemberActivity
 });
 

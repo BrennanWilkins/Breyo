@@ -48,7 +48,7 @@ router.post('/', auth, validate(
         color, creatorEmail: user.email, desc: '' });
       await board.save();
       // add board to user's boards
-      const newBoard = { boardID: board._id, title, isStarred: false, isAdmin: true, color: board.color, refreshEnabled: true };
+      const newBoard = { boardID: board._id, title, isStarred: false, isAdmin: true, color: board.color };
       user.boards.unshift(newBoard);
       await user.save();
       // add default lists to board (to do, doing, done)
@@ -247,7 +247,7 @@ router.put('/invites/accept', auth, validate(
       // remove invite from user's invites
       user.invites = user.invites.filter(invite => String(invite.boardID) !== req.body.boardID);
       // add board to user model
-      user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false, color: board.color, refreshEnabled: true }];
+      user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false, color: board.color }];
       // add user to board members
       board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
       await user.save();
@@ -319,22 +319,6 @@ router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty()]), u
       await Activity.deleteMany({ boardID: req.params.boardID });
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
-  }
-);
-
-// toggle whether user wants data stream or not
-router.put('/refreshEnabled', auth, validate([body('boardID').not().isEmpty()]),
-  async (req, res) => {
-    try {
-      const user = await User.findById(req.userID);
-      if (!user) { throw 'No user data found'; }
-      const board = user.boards.find(board => String(board.boardID) === String(req.body.boardID));
-      if (!board) { throw 'Board not found in users boards'; }
-      board.refreshEnabled = !board.refreshEnabled;
-      user.markModified('boards');
-      await user.save();
-      res.sendStatus(200);
-    } catch (err) { res.sendStatus(500); }
   }
 );
 

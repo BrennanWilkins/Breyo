@@ -27,11 +27,10 @@ export const toggleIsStarred = (id, isActive) => async dispatch => {
 
 export const updateActiveBoard = payload => (dispatch, getState) => {
   const activeBoard = getState().auth.boards.find(board => board.boardID === payload._id);
-  const refreshEnabled = activeBoard.refreshEnabled;
   const isStarred = activeBoard.isStarred;
   const creatorFullName = payload.members.find(member => member.email === payload.creatorEmail).fullName;
   const userIsAdmin = activeBoard.isAdmin;
-  dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload, refreshEnabled, isStarred, creatorFullName, userIsAdmin });
+  dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload, isStarred, creatorFullName, userIsAdmin });
 };
 
 export const updateBoardTitle = (title, id) => async dispatch => {
@@ -93,14 +92,6 @@ export const updateBoardDesc = desc => async (dispatch, getState) => {
     dispatch({ type: actionTypes.UPDATE_BOARD_DESC, desc });
     await axios.put('/board/desc', { desc, boardID });
     sendUpdate('put/board/desc', desc);
-  } catch (err) { console.log(err); }
-};
-
-export const updateRefreshEnabled = () => async (dispatch, getState) => {
-  try {
-    const boardID = getState().board.boardID;
-    dispatch({ type: actionTypes.UPDATE_REFRESH_ENABLED, boardID });
-    await axios.put('/board/refreshEnabled', { boardID });
   } catch (err) { console.log(err); }
 };
 

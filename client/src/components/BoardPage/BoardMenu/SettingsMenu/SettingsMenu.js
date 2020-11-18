@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import DeleteModal from '../DeleteModal/DeleteModal';
 import { withRouter } from 'react-router-dom';
-import { updateRefreshEnabled, deleteBoard, deleteBoardActivity, leaveBoard } from '../../../../store/actions';
+import { deleteBoard, deleteBoardActivity, leaveBoard } from '../../../../store/actions';
 
 const SettingsMenu = props => {
   const [showDeleteBoard, setShowDeleteBoard] = useState(false);
@@ -33,10 +33,6 @@ const SettingsMenu = props => {
 
   return (
     <>
-      <div className={classes.RefreshBtn}>
-        <ActionBtn clicked={props.updateRefreshEnabled}>{props.refreshEnabled ? 'Disable' : 'Enable'} auto refresh</ActionBtn>
-        <div>Disabling auto refresh will cause your board not to automatically update when other members create changes on the board.</div>
-      </div>
       <div className={classes.ModalContainer}>
         <ActionBtn clicked={() => setShowLeaveBoard(true)}>Leave this board</ActionBtn>
         {showLeaveBoard && <DeleteModal confirmText="LEAVE BOARD" close={() => setShowLeaveBoard(false)}
@@ -57,8 +53,6 @@ const SettingsMenu = props => {
 };
 
 SettingsMenu.propTypes = {
-  refreshEnabled: PropTypes.bool.isRequired,
-  updateRefreshEnabled: PropTypes.func.isRequired,
   userIsAdmin: PropTypes.bool.isRequired,
   deleteBoard: PropTypes.func.isRequired,
   deleteBoardActivity: PropTypes.func.isRequired,
@@ -68,12 +62,10 @@ SettingsMenu.propTypes = {
 
 const mapStateToProps = state => ({
   userIsAdmin: state.board.userIsAdmin,
-  refreshEnabled: state.board.refreshEnabled,
   members: state.board.members
 });
 
 const mapDispatchToProps = dispatch => ({
-  updateRefreshEnabled: () => dispatch(updateRefreshEnabled()),
   deleteBoard: () => dispatch(deleteBoard()),
   deleteBoardActivity: () => dispatch(deleteBoardActivity()),
   leaveBoard: () => dispatch(leaveBoard())

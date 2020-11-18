@@ -87,14 +87,6 @@ const reducer = (state = initialState, action) => {
       boards[boardIndex] = board;
       return { ...state, boards };
     }
-    case actionTypes.UPDATE_REFRESH_ENABLED: {
-      const boards = [...state.boards];
-      const index = boards.findIndex(board => board.boardID === action.boardID);
-      const board = { ...boards[index] };
-      board.refreshEnabled = !board.refreshEnabled;
-      boards[index] = board;
-      return { ...state, boards };
-    }
     case actionTypes.DELETE_BOARD: {
       const boards = state.boards.filter(board => board.boardID !== action.boardID);
       return { ...state, boards };
