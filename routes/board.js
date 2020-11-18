@@ -52,9 +52,9 @@ router.post('/', auth, validate(
       user.boards.unshift(newBoard);
       await user.save();
       // add default lists to board (to do, doing, done)
-      const list1 = new List({ boardID: board._id, title: 'To Do', cards: [], indexInBoard: 0, isArchived: false });
-      const list2 = new List({ boardID: board._id, title: 'Doing', cards: [], indexInBoard: 1, isArchived: false });
-      const list3 = new List({ boardID: board._id, title: 'Done', cards: [], indexInBoard: 2, isArchived: false });
+      const list1 = new List({ boardID: board._id, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false });
+      const list2 = new List({ boardID: board._id, title: 'Doing', cards: [], archivedCards: [], indexInBoard: 1, isArchived: false });
+      const list3 = new List({ boardID: board._id, title: 'Done', cards: [], archivedCards: [], indexInBoard: 2, isArchived: false });
       await list1.save(); await list2.save(); await list3.save();
       await addActivity(null, 'created this board', null, null, board._id, null, user.email, user.fullName);
 

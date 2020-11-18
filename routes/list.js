@@ -20,7 +20,7 @@ router.post('/', auth, validate(
       if (!board) { throw 'Board data not found'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false });
-      const list = new List({ boardID: board._id, title, cards: [], indexInBoard: lists.length, isArchived: false });
+      const list = new List({ boardID: board._id, title, cards: [], archivedCards: [], indexInBoard: lists.length, isArchived: false });
       const newList = await list.save();
       await addActivity(null, `added list ${title} to this board`, null, newList._id, req.body.boardID, req.userID);
       res.status(200).json({ listID: newList._id });
@@ -73,7 +73,7 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'List data not found'; }
       // create deeply nested copy of all cards & all checklists/members/dueDate/etc of each card
-      const cards = list.cards.filter(card => !card.isArchived).map(card => ({
+      const cards = list.cards.map(card => ({
         title: card.title,
         desc: card.desc,
         checklists: card.checklists.map(checklist => ({
@@ -89,7 +89,7 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
         members: card.members
       }));
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false });
-      const newList = new List({ boardID: req.body.boardID, title: req.body.title, desc: list.desc, indexInBoard: lists.length, cards, isArchived: false });
+      const newList = new List({ boardID: req.body.boardID, title: req.body.title, desc: list.desc, indexInBoard: lists.length, cards, archivedCards: [], isArchived: false });
       const updatedList = await newList.save();
       await addActivity(null, `added list ${newList.title} to this board`, null, updatedList._id, req.body.boardID, req.userID);
       for (let card of list.cards) {
@@ -152,18 +152,18 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
   }
 );
 
-// authorization: admin
 // Send all cards in list to archive
-router.put('/archive/allCards', auth, validate([body('*').not().isEmpty().escape()]), useIsAdmin,
+router.put('/archive/allCards', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'List data not found'; }
       // set all cards to isArchived & add action for each card
       list.cards.forEach(async card => {
-        card.isArchived = true;
         await addActivity(`archived this card`, `archived **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
       });
+      list.archivedCards = list.archivedCards.concat(list.cards);
+      list.cards = [];
       await list.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
@@ -177,8 +177,10 @@ router.put('/moveAllCards', auth, validate([body('*').not().isEmpty().escape()])
       const oldList = await List.findById(req.body.oldListID);
       const newList = await List.findById(req.body.newListID);
       if (!oldList || !newList) { throw 'Old list or new list data not found'; }
-      newList.cards = newList.cards.concat([...oldList.cards]);
+      newList.cards = newList.cards.concat(oldList.cards);
+      newList.archivedCards = newList.archivedCards.concat(oldList.archivedCards);
       oldList.cards = [];
+      oldList.archivedCards = [];
       await oldList.save();
       await newList.save();
       await Activity.updateMany({ listID: req.body.oldListID }, { listID: req.body.newListID });

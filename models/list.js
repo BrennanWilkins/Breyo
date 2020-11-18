@@ -25,7 +25,6 @@ const CardSchema = new mongoose.Schema({
   checklists: [ChecklistSchema],
   labels: [],
   dueDate: {},
-  isArchived: Boolean,
   members: [],
   comments: [CommentSchema]
 });
@@ -34,6 +33,7 @@ const ListSchema = new mongoose.Schema({
   boardID: String,
   title: String,
   cards: [CardSchema],
+  archivedCards: [CardSchema],
   indexInBoard: Number,
   isArchived: Boolean
 });

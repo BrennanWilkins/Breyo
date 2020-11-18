@@ -14,13 +14,29 @@ export const addCard = (title, boardID, listID) => async dispatch => {
 };
 
 export const setCardDetails = (cardID, listID) => (dispatch, getState) => {
-  const lists = getState().lists.lists;
-  const currentCard = cardID ? lists.find(list => list.listID === listID).cards.find(card => card.cardID === cardID) : null;
-  const currentListTitle = listID ? lists.find(list => list.listID === listID).title : null;
+  const state = getState();
+  let currentCard = null;
+  if (cardID) {
+    currentCard = state.lists.lists.find(list => list.listID === listID).cards.find(card => card.cardID === cardID);
+    if (!currentCard) {
+      currentCard = state.lists.allArchivedCards.find(card => card.cardID === cardID && card.listID === listID);
+      if (!currentCard) { currentCard = null; }
+      else { currentCard.isArchived = true; }
+    }
+  }
+  const currentListTitle = listID ? state.lists.lists.find(list => list.listID === listID).title : null;
   if (!currentCard || !currentListTitle) {
     return dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID: null, listID: null, currentCard: null, currentListTitle: null });
   }
   dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID, listID, currentCard, currentListTitle });
+};
+
+export const setCardDetailsArchived = (cardID, listID, currentCard) => (dispatch, getState) => {
+  // current list may be active or archived
+  const lists = getState().lists;
+  const currentList = lists.lists.find(list => list.listID === listID) || lists.archivedLists.find(list => list.listID === listID);
+  const currentListTitle = currentList.title;
+  dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID, listID, currentCard: { ...currentCard, isArchived: true }, currentListTitle });
 };
 
 export const updateCardTitle = (title, cardID, listID, boardID) => async dispatch => {
@@ -170,9 +186,8 @@ export const deleteChecklistItem = (itemID, checklistID, cardID, listID, boardID
 export const copyCard = (title, keepChecklists, keepLabels, cardID, currentCard, sourceListID, destListID, destIndex, boardID) => async dispatch => {
   try {
     const res = await axios.post('/card/copy', { title, keepChecklists, keepLabels, cardID, sourceListID, destListID, destIndex, boardID });
-    const data = { checklists: res.data.checklists, currentCard, newCardID: res.data.cardID, keepLabels, sourceListID, destListID, destIndex };
-    dispatch({ type: actionTypes.COPY_CARD, ...data });
-    sendUpdate('post/card/copy', JSON.stringify({ ...data }));
+    dispatch({ type: actionTypes.COPY_CARD, title, checklists: res.data.checklists, currentCard, newCardID: res.data.cardID, keepLabels, sourceListID, destListID, destIndex });
+    sendUpdate('post/card/copy', JSON.stringify({ title, checklists: res.data.checklists, currentCard, newCardID: res.data.cardID, keepLabels, sourceListID, destListID, destIndex }));
   } catch (err) {
     dispatch(addNotif('There was an error while copying the card.'));
   }
@@ -186,14 +201,6 @@ export const archiveCard = (cardID, listID, boardID) => async dispatch => {
   } catch (err) {
     console.log(err);
   }
-};
-
-export const setCardDetailsArchived = (cardID, listID, currentCard) => (dispatch, getState) => {
-  // current list may be active or archived
-  const lists = getState().lists;
-  const currentList = lists.lists.find(list => list.listID === listID) || lists.archivedLists.find(list => list.listID === listID);
-  const currentListTitle = currentList.title;
-  dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID, listID, currentCard, currentListTitle });
 };
 
 export const recoverCard = (cardID, listID, boardID) => async dispatch => {

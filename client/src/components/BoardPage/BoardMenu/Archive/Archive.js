@@ -54,7 +54,7 @@ Archive.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  archivedCards: state.lists.archivedCards,
+  archivedCards: state.lists.allArchivedCards,
   archivedLists: state.lists.archivedLists,
   boardID: state.board.boardID,
   userIsAdmin: state.board.userIsAdmin

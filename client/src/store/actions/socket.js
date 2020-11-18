@@ -183,8 +183,8 @@ export const initSocket = boardID => {
   });
 
   newSocket.on('post/card/copy', data => {
-    const parsed = JSON.parse(data);
-    store.dispatch({ type: actionTypes.COPY_CARD, ...parsed });
+    const { checklists, currentCard, newCardID, keepLabels, sourceListID, destListID, destIndex } = JSON.parse(data);
+    store.dispatch({ type: actionTypes.COPY_CARD, checklists, currentCard, newCardID, keepLabels, sourceListID, destListID, destIndex });
   });
 
   newSocket.on('post/card/archive', data => {

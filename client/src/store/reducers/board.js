@@ -45,14 +45,8 @@ const reducer = (state = initialState, action) => {
     }
     case actionTypes.DEMOTE_SELF: return { ...state, userIsAdmin: false };
     case actionTypes.PROMOTE_SELF: return { ...state, userIsAdmin: true };
-    case actionTypes.UPDATE_COLOR: return {
-      ...state,
-      color: action.color
-    }
-    case actionTypes.UPDATE_BOARD_DESC: return {
-      ...state,
-      desc: action.desc
-    };
+    case actionTypes.UPDATE_COLOR: return { ...state, color: action.color };
+    case actionTypes.UPDATE_BOARD_DESC: return { ...state, desc: action.desc };
     case actionTypes.DELETE_BOARD: return { ...initialState };
     case actionTypes.TOGGLE_IS_STARRED_ACTIVE: return { ...state, isStarred: !state.isStarred };
     case actionTypes.LEAVE_BOARD: return { ...initialState };
