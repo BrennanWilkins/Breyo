@@ -27,10 +27,7 @@ const reducer = (state = initialState, action) => {
       creatorFullName: action.creatorFullName,
       userIsAdmin: action.userIsAdmin
     };
-    case actionTypes.UPDATE_BOARD_TITLE: return {
-      ...state,
-      title: action.title
-    };
+    case actionTypes.UPDATE_BOARD_TITLE: return { ...state, title: action.title };
     case actionTypes.ADD_ADMIN: {
       const members = [...state.members];
       const index = members.findIndex(member => member.email === action.email);

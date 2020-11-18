@@ -37,7 +37,7 @@ export const archiveList = (listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.ARCHIVE_LIST, listID });
     await axios.post('/list/archive', { listID, boardID });
-    sendUpdate('post/list/archive', listID);
+    sendUpdate('post/list/archive', JSON.stringify({ listID }));
   } catch(err) {
     console.log(err);
   }
@@ -47,7 +47,7 @@ export const recoverList = (listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.RECOVER_LIST, listID });
     await axios.put('/list/archive/recover', { listID, boardID });
-    sendUpdate('put/list/archive/recover', listID);
+    sendUpdate('put/list/archive/recover', JSON.stringify({ listID }));
   } catch (err) {
     console.log(err);
   }
@@ -57,7 +57,7 @@ export const deleteList = (listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.DELETE_LIST, listID });
     await axios.put('/list/archive/delete', { listID, boardID });
-    sendUpdate('put/list/archive/delete', listID);
+    sendUpdate('put/list/archive/delete', JSON.stringify({ listID }));
   } catch(err) {
     console.log(err);
   }
@@ -67,7 +67,7 @@ export const archiveAllCards = (listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.ARCHIVE_ALL_CARDS, listID });
     await axios.put('/list/archive/allCards', { listID, boardID });
-    sendUpdate('put/list/archive/allCards', listID);
+    sendUpdate('put/list/archive/allCards', JSON.stringify({ listID }));
   } catch(err) {
     console.log(err);
   }

@@ -36,7 +36,7 @@ export const updateActiveBoard = payload => (dispatch, getState) => {
 export const updateBoardTitle = (title, id) => async dispatch => {
   try {
     await axios.put('/board/title', { boardID: id, title });
-    sendUpdate('put/board/title', title);
+    sendUpdate('put/board/title', JSON.stringify({ title }));
     dispatch({ type: actionTypes.UPDATE_BOARD_TITLE, title });
   } catch (err) {
     console.log(err);
@@ -80,7 +80,7 @@ export const updateColor = (color, boardID) => async (dispatch, getState) => {
     const boardID = getState().board.boardID;
     dispatch({ type: actionTypes.UPDATE_COLOR, color });
     await axios.put('/board/color', { color, boardID });
-    sendUpdate('put/board/color', color);
+    sendUpdate('put/board/color', JSON.stringify({ color }));
   } catch (err) {
     console.log(err);
   }
@@ -91,7 +91,7 @@ export const updateBoardDesc = desc => async (dispatch, getState) => {
     const boardID = getState().board.boardID;
     dispatch({ type: actionTypes.UPDATE_BOARD_DESC, desc });
     await axios.put('/board/desc', { desc, boardID });
-    sendUpdate('put/board/desc', desc);
+    sendUpdate('put/board/desc', JSON.stringify({ desc }));
   } catch (err) { console.log(err); }
 };
 
