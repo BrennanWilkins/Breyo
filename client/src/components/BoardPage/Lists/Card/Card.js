@@ -20,6 +20,7 @@ const Card = props => {
     setTotalChecklists(props.checklists.length);
     setCompletedChecklists(props.checklists.filter(checklist => {
       let total = checklist.items.length;
+      if (total === 0) { return false; }
       let completed = checklist.items.filter(item => item.isComplete).length;
       return completed === total;
     }).length);

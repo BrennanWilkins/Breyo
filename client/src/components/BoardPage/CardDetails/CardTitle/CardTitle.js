@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classes from './CardTitle.module.css';
 import { cardIcon } from '../../../UI/icons';
@@ -8,6 +8,8 @@ import { connect } from 'react-redux';
 
 const CardTitle = props => {
   const [title, setTitle] = useState(props.title);
+
+  useEffect(() => setTitle(props.title), [props.title]);
 
   const submitHandler = e => {
     e.target.blur();
