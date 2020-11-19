@@ -392,7 +392,14 @@ const reducer = (state = initialState, action) => {
       destList.cards = destCards;
       lists[sourceIndex] = sourceList;
       lists[destIndex] = destList;
-      return { ...state, lists };
+      const allComments = [...state.allComments];
+      for (let i = 0; i < allComments.length; i++) {
+        if (allComments[i].listID === action.sourceID) {
+          const updatedComment = { ...allComments[i], listID: action.destID };
+          allComments[i] = updatedComment;
+        }
+      }
+      return { ...state, lists, allComments };
     }
     case actionTypes.COPY_CARD: {
       const lists = [...state.lists];
@@ -428,6 +435,9 @@ const reducer = (state = initialState, action) => {
       lists[listIndex] = list;
       const allArchivedCards = [...state.allArchivedCards];
       allArchivedCards.unshift({ ...card, listID: action.listID });
+      if (state.currentCard && state.currentCard.cardID === action.cardID) {
+        return { ...state, lists, allArchivedCards, currentCard: null, shownCardID: null, shownListID: null, currentListTitle: null };
+      }
       return { ...state, lists, allArchivedCards };
     }
     case actionTypes.RECOVER_CARD: {
@@ -442,13 +452,22 @@ const reducer = (state = initialState, action) => {
       cards.push(card);
       list.cards = cards;
       lists[listIndex] = list;
+      if (state.currentCard && state.currentCard.cardID === action.cardID) {
+        const currentCard = { ...state.currentCard };
+        delete currentCard.isArchived;
+        return { ...state, lists, allArchivedCards, currentCard };
+      }
       return { ...state, lists, allArchivedCards };
     }
     case actionTypes.DELETE_CARD: {
       const allArchivedCards = [...state.allArchivedCards];
       const cardIndex = allArchivedCards.findIndex(card => card.cardID === action.cardID);
       allArchivedCards.splice(cardIndex, 1);
-      return { ...state, allArchivedCards };
+      const allComments = state.allComments.filter(comment => comment.cardID !== action.cardID);
+      if (state.currentCard && state.currentCard.cardID === action.cardID) {
+        return { ...state, allArchivedCards, currentCard: null, shownCardID: null, shownListID: null, currentListTitle: null, allComments };
+      }
+      return { ...state, allArchivedCards, allComments };
     }
     case actionTypes.COPY_LIST: {
       const lists = [...state.lists];
@@ -496,8 +515,10 @@ const reducer = (state = initialState, action) => {
       archivedLists.push(archivedList);
       // remove any archived cards in the archived list since they will be archived too
       const allArchivedCards = state.allArchivedCards.filter(card => card.listID !== archivedList.listID);
-      const allComments = state.allComments.filter(comment => comment.listID !== archivedList.listID);
-      return { ...state, lists, archivedLists, allArchivedCards, allComments };
+      if (state.currentCard && state.shownListID === action.listID) {
+        return { ...state, lists, archivedLists, allArchivedCards, currentCard: null, shownCardID: null, shownListID: null, currentListTitle: null };
+      }
+      return { ...state, lists, archivedLists, allArchivedCards };
     }
     case actionTypes.RECOVER_LIST: {
       const lists = [...state.lists];
@@ -551,7 +572,8 @@ const reducer = (state = initialState, action) => {
       const archivedLists = [...state.archivedLists];
       const listIndex = archivedLists.findIndex(list => list.listID === action.listID);
       archivedLists.splice(listIndex, 1);
-      return { ...state, archivedLists };
+      const allComments = state.allComments.filter(comment => comment.listID !== action.listID);
+      return { ...state, archivedLists, allComments };
     }
     case actionTypes.ARCHIVE_ALL_CARDS: {
       const lists = [...state.lists];

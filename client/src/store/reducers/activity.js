@@ -25,6 +25,25 @@ const reducer = (state = initialState, action) => {
       if (boardActivity.length > 20) { boardActivity.pop(); }
       return { ...state, boardActivity };
     }
+    case actionTypes.MOVE_CARD_DIFF_LIST: {
+      // update listID for card's activities in boardActivity
+      const boardActivity = [...state.boardActivity];
+      for (let i = 0; i < boardActivity.length; i++) {
+        if (boardActivity[i].listID === action.sourceID) {
+          const updatedActivity = { ...boardActivity[i], listID: action.destID };
+          boardActivity[i] = updatedActivity;
+        }
+      }
+      return { ...state, boardActivity };
+    }
+    case actionTypes.DELETE_CARD: {
+      const boardActivity = state.boardActivity.filter(activity => activity.cardID !== action.cardID);
+      return { ...state, boardActivity };
+    }
+    case actionTypes.DELETE_LIST: {
+      const boardActivity = state.boardActivity.filter(activity => activity.listID !== action.listID);
+      return { ...state, boardActivity };
+    }
     default: return state;
   }
 };

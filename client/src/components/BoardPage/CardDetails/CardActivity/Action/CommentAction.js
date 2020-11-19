@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import classes from './Action.module.css';
 import PropTypes from 'prop-types';
 import { AccountBtn } from '../../../../UI/Buttons/Buttons';

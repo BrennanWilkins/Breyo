@@ -364,7 +364,7 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
           checklists.push({ title: checklist.title, items });
         }
       }
-      const newCard = { title, labels, checklists, desc: '', dueDate: null, isArchived: false, members: [], comments: [] };
+      const newCard = { title, labels, checklists, desc: '', dueDate: null, members: [], comments: [] };
       // add copied card to destination list
       destList.cards.splice(req.body.destIndex, 0, newCard);
       const updatedList = await destList.save();
