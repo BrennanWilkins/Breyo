@@ -18,6 +18,7 @@ const socketMap = {
   'put/list/moveAllCards': actionTypes.MOVE_ALL_CARDS,
   'post/card': actionTypes.ADD_CARD,
   'put/card/title': actionTypes.UPDATE_CARD_TITLE,
+  'put/card/desc': actionTypes.UPDATE_CARD_DESC,
   'put/card/label/add': actionTypes.ADD_CARD_LABEL,
   'put/card/label/remove': actionTypes.REMOVE_CARD_LABEL,
   'put/card/dueDate/isComplete': actionTypes.TOGGLE_DUE_DATE,
@@ -38,7 +39,8 @@ const socketMap = {
   'put/card/members/remove': actionTypes.REMOVE_CARD_MEMBER,
   'put/card/comments': actionTypes.UPDATE_COMMENT,
   'put/card/comments/delete': actionTypes.DELETE_COMMENT,
-  'put/card/archive/restore': actionTypes.RESTORE_ARCHIVED_CARDS
+  'put/card/archive/restore': actionTypes.RESTORE_ARCHIVED_CARDS,
+  'post/activity': actionTypes.ADD_RECENT_ACTIVITY
 };
 
 export default socketMap;

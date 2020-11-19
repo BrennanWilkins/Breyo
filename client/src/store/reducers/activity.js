@@ -19,6 +19,12 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SET_SHOWN_MEMBER_ACTIVITY: return { ...state, shownMemberActivity: action.member };
     case actionTypes.DELETE_BOARD_ACTIVITY: return { ...state, boardActivity: [] };
     case actionTypes.SET_ALL_CARD_ACTIVITY: return { ...state, cardActivity: action.activity };
+    case actionTypes.ADD_RECENT_ACTIVITY: {
+      const boardActivity = [...state.boardActivity];
+      boardActivity.unshift(action.newActivity);
+      if (boardActivity.length > 20) { boardActivity.pop(); }
+      return { ...state, boardActivity };
+    }
     default: return state;
   }
 };

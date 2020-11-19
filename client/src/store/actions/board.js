@@ -2,6 +2,7 @@ import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
 import { addNotif } from './notifications';
 import { sendUpdate } from './socket';
+import { addRecentActivity } from './activity';
 
 export const createBoard = (title, color) => async dispatch => {
   try {
@@ -35,9 +36,10 @@ export const updateActiveBoard = payload => (dispatch, getState) => {
 
 export const updateBoardTitle = (title, id) => async dispatch => {
   try {
-    await axios.put('/board/title', { boardID: id, title });
+    const res = await axios.put('/board/title', { boardID: id, title });
     sendUpdate('put/board/title', JSON.stringify({ title }));
     dispatch({ type: actionTypes.UPDATE_BOARD_TITLE, title });
+    addRecentActivity(res.data.newActivity);
   } catch (err) {
     console.log(err);
   }
@@ -54,9 +56,10 @@ export const sendInvite = (email, boardID) => async dispatch => {
 
 export const addAdmin = (email, boardID) => async dispatch => {
   try {
-    await axios.put('/board/admins/add', { email, boardID });
+    const res = await axios.put('/board/admins/add', { email, boardID });
     dispatch({ type: actionTypes.ADD_ADMIN, email, boardID });
     sendUpdate('put/board/admins/add', email);
+    addRecentActivity(res.data.newActivity);
   } catch (err) {
     console.log(err);
     dispatch(addNotif('There was an error while changing user permissions.'));
@@ -65,9 +68,10 @@ export const addAdmin = (email, boardID) => async dispatch => {
 
 export const removeAdmin = (email, boardID) => async dispatch => {
   try {
-    await axios.put('/board/admins/remove', { email, boardID });
+    const res = await axios.put('/board/admins/remove', { email, boardID });
     dispatch({ type: actionTypes.REMOVE_ADMIN, email, boardID });
     sendUpdate('put/board/admins/remove', email);
+    addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(addNotif('There was an error while changing user permissions.'));
   }
@@ -90,8 +94,9 @@ export const updateBoardDesc = desc => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
     dispatch({ type: actionTypes.UPDATE_BOARD_DESC, desc });
-    await axios.put('/board/desc', { desc, boardID });
+    const res = await axios.put('/board/desc', { desc, boardID });
     sendUpdate('put/board/desc', JSON.stringify({ desc }));
+    addRecentActivity(res.data.newActivity);
   } catch (err) { console.log(err); }
 };
 
@@ -110,6 +115,7 @@ export const acceptInvite = boardID => async dispatch => {
     const tokenRes = await axios.put('/board/invites/accept', { boardID });
     axios.defaults.headers.common['x-auth-token'] = tokenRes.data.token;
     localStorage['token'] = tokenRes.data.token;
+    addRecentActivity(tokenRes.data.newActivity);
 
     const res = await axios.get('/auth/userData');
 
@@ -132,8 +138,9 @@ export const rejectInvite = boardID => async dispatch => {
 export const leaveBoard = () => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
-    await axios.put('/board/leave', { boardID });
+    const res = await axios.put('/board/leave', { boardID });
     dispatch({ type: actionTypes.LEAVE_BOARD, boardID });
+    addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(addNotif('There was an error while leaving the board.'));
   }

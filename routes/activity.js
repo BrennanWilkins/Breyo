@@ -20,7 +20,11 @@ const addActivity = async (msg, boardMsg, cardID, listID, boardID, userID, email
       userEmail = user.email; userFullName = user.fullName;
     }
     const activity = new Activity({ msg, boardMsg, email: userEmail, fullName: userFullName, cardID, listID, boardID, date: new Date() });
-    await activity.save();
+    const newActivity = await activity.save();
+    // board stores max past 200 actions
+    const allActivity = await Activity.find({ boardID }).sort('-date').skip(200);
+    for (let oldAction of allActivity) { oldAction.remove(); }
+    return newActivity;
   } catch (err) { return new Error('Error adding activity'); }
 };
 

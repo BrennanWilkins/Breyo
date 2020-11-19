@@ -101,8 +101,8 @@ router.put('/desc', auth, validate(
       if (!board) { throw 'No board data found'; }
       board.desc = req.body.desc;
       await board.save();
-      await addActivity(null, 'updated the board description', null, null, board._id, req.userID);
-      res.sendStatus(200);
+      const newActivity = await addActivity(null, 'updated the board description', null, null, board._id, req.userID);
+      res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -129,8 +129,8 @@ router.put('/title', auth, validate(
         await user.save();
       }
       await board.save();
-      await addActivity(null, `renamed this board from ${oldTitle} to ${title}`, null, null, board._id, req.userID);
-      res.sendStatus(200);
+      const newActivity = await addActivity(null, `renamed this board from ${oldTitle} to ${title}`, null, null, board._id, req.userID);
+      res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -174,9 +174,9 @@ router.put('/admins/add', auth, validate(
       board.markModified('members');
       await user.save();
       await board.save();
-      await addActivity(null, `changed ${user.fullName} permissions to admin`, null, null, board._id, req.userID);
-      res.sendStatus(200);
-    } catch (err) { console.log(err); res.sendStatus(500); }
+      const newActivity = await addActivity(null, `changed ${user.fullName} permissions to admin`, null, null, board._id, req.userID);
+      res.status(200).json({ newActivity });
+    } catch (err) { res.sendStatus(500); }
   }
 );
 
@@ -203,8 +203,8 @@ router.put('/admins/remove', auth, validate(
       board.markModified('members');
       await user.save();
       await board.save();
-      await addActivity(null, `changed ${user.fullName} permissions to member`, null, null, board._id, req.userID);
-      res.sendStatus(200);
+      const newActivity = await addActivity(null, `changed ${user.fullName} permissions to member`, null, null, board._id, req.userID);
+      res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -252,12 +252,12 @@ router.put('/invites/accept', auth, validate(
       board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
       await user.save();
       await board.save();
-      await addActivity(null, `was added to this board`, null, null, board._id, null, user.email, user.fullName);
+      const newActivity = await addActivity(null, `was added to this board`, null, null, board._id, null, user.email, user.fullName);
 
       // update client's token to show new board
       const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
 
-      res.status(200).json({ token });
+      res.status(200).json({ token, newActivity });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -294,8 +294,8 @@ router.put('/members/remove', auth, validate(
       user.boards = user.boards.filter(board => board.boardID !== board._id);
       await board.save();
       await user.save();
-      await addActivity(null, `removed ${user.fullName} from this board`, null, null, board._id, req.userID);
-      res.sendStatus(200);
+      const newActivity = await addActivity(null, `removed ${user.fullName} from this board`, null, null, board._id, req.userID);
+      res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -338,10 +338,10 @@ router.put('/leave', auth, validate([body('boardID').not().isEmpty()]),
       }
       user.boards = user.boards.filter(board => String(board.boardID) !== String(req.body.boardID));
       board.members = board.members.filter(member => member.email !== user.email);
-      await addActivity(null, `left this board`, null, null, board._id, null, user.email, user.fullName);
+      const newActivity = await addActivity(null, `left this board`, null, null, board._id, null, user.email, user.fullName);
       await user.save();
       await board.save();
-      res.sendStatus(200);
+      res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );

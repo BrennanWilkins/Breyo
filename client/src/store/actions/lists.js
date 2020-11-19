@@ -2,12 +2,14 @@ import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
 import { addNotif } from './notifications';
 import { sendUpdate } from './socket';
+import { addRecentActivity } from './activity';
 
 export const updateListTitle = (title, listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.UPDATE_LIST_TITLE, title, listID });
-    await axios.put('/list/title', { title, listID, boardID });
+    const res = await axios.put('/list/title', { title, listID, boardID });
     sendUpdate('put/list/title', JSON.stringify({ title, listID }));
+    addRecentActivity(res.data.newActivity);
   } catch (err) {
     console.log(err);
   }
@@ -18,6 +20,7 @@ export const addList = (title, boardID) => async dispatch => {
     const res = await axios.post('/list', { title, boardID });
     dispatch({ type: actionTypes.ADD_LIST, title, listID: res.data.listID });
     sendUpdate('post/list', JSON.stringify({ title, listID: res.data.listID }));
+    addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(addNotif('Your list could not be created.'));
   }
@@ -36,8 +39,9 @@ export const copyList = (title, listID, boardID) => async dispatch => {
 export const archiveList = (listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.ARCHIVE_LIST, listID });
-    await axios.post('/list/archive', { listID, boardID });
+    const res = await axios.post('/list/archive', { listID, boardID });
     sendUpdate('post/list/archive', JSON.stringify({ listID }));
+    addRecentActivity(res.data.newActivity);
   } catch(err) {
     console.log(err);
   }
@@ -50,6 +54,7 @@ export const recoverList = (listID, boardID) => async dispatch => {
     dispatch({ type: actionTypes.RESTORE_ARCHIVED_CARDS, archivedCards: res.data.archivedCards, listID });
     sendUpdate('put/list/archive/recover', JSON.stringify({ listID }));
     sendUpdate('put/card/archive/restore', JSON.stringify({ archivedCards: res.data.archivedCards, listID }));
+    addRecentActivity(res.data.newActivity);
   } catch (err) {
     console.log(err);
   }
@@ -58,8 +63,9 @@ export const recoverList = (listID, boardID) => async dispatch => {
 export const deleteList = (listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.DELETE_LIST, listID });
-    await axios.put('/list/archive/delete', { listID, boardID });
+    const res = await axios.put('/list/archive/delete', { listID, boardID });
     sendUpdate('put/list/archive/delete', JSON.stringify({ listID }));
+    addRecentActivity(res.data.newActivity);
   } catch(err) {
     console.log(err);
   }

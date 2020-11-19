@@ -22,8 +22,8 @@ router.post('/', auth, validate(
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false });
       const list = new List({ boardID: board._id, title, cards: [], archivedCards: [], indexInBoard: lists.length, isArchived: false });
       const newList = await list.save();
-      await addActivity(null, `added list ${title} to this board`, null, newList._id, req.body.boardID, req.userID);
-      res.status(200).json({ listID: newList._id });
+      const newActivity = await addActivity(null, `added list ${title} to this board`, null, newList._id, req.body.boardID, req.userID);
+      res.status(200).json({ listID: newList._id, newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -40,8 +40,8 @@ router.put('/title', auth, validate(
       const oldTitle = list.title;
       list.title = req.body.title.replace(/\n/g, ' ');
       await list.save();
-      await addActivity(null, `renamed list ${oldTitle} to ${list.title}`, null, list._id, req.body.boardID, req.userID);
-      res.sendStatus(200);
+      const newActivity = await addActivity(null, `renamed list ${oldTitle} to ${list.title}`, null, list._id, req.body.boardID, req.userID);
+      res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -121,8 +121,8 @@ router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), us
       }
       // set archived list's index to end of list & set as isArchived
       const updatedList = await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: true });
-      await addActivity(null, `archived list ${updatedList.title}`, null, updatedList._id, req.body.boardID, req.userID);
-      res.sendStatus(200);
+      const newActivity = await addActivity(null, `archived list ${updatedList.title}`, null, updatedList._id, req.body.boardID, req.userID);
+      res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -134,8 +134,8 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).lean();
       if (!lists.length) { throw 'Lists data not found'; }
       const list = await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: false });
-      await addActivity(null, `recovered list ${list.title}`, null, list._id, req.body.boardID, req.userID);
-      res.status(200).json({ archivedCards: list.archivedCards });
+      const newActivity = await addActivity(null, `recovered list ${list.title}`, null, list._id, req.body.boardID, req.userID);
+      res.status(200).json({ archivedCards: list.archivedCards, newActivity });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -146,9 +146,9 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
   async (req, res) => {
     try {
       const list = await List.findByIdAndDelete(req.body.listID);
-      await addActivity(null, `deleted list ${list.title}`, null, null, req.body.boardID, req.userID);
+      const newActivity = await addActivity(null, `deleted list ${list.title}`, null, null, req.body.boardID, req.userID);
       await Activity.deleteMany({ listID: list._id });
-      res.sendStatus(200);
+      res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
 );

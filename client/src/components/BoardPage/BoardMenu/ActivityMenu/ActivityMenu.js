@@ -53,7 +53,7 @@ const ActivityMenu = props => {
         return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
         msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />;
       })}
-      {!loading && !moreLoaded && <div className={classes.LoadMore} onClick={loadMoreHandler}>Load more activity</div>}
+      {!loading && !moreLoaded && showAll && <div className={classes.LoadMore} onClick={loadMoreHandler}>Load more activity</div>}
       {err && <div className={classes.Err}>There was an error while fetching the activity.</div>}
     </div>
   );

@@ -1,6 +1,13 @@
 import * as actionTypes from './actionTypes';
 import { instance as axios } from '../../axios';
 import { addNotif } from './notifications';
+import { sendUpdate } from './socket';
+import store from '../../store';
+
+export const addRecentActivity = newActivity => {
+  store.dispatch({ type: actionTypes.ADD_RECENT_ACTIVITY, newActivity });
+  sendUpdate('post/activity', JSON.stringify({ newActivity }));
+};
 
 export const getRecentCardActivity = () => async (dispatch, getState) => {
   try {
