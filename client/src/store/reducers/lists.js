@@ -134,9 +134,11 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex], title: action.title };
-      list.cards[cardIndex] = card;
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex], title: action.title };
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
@@ -154,11 +156,13 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
       const labels = [...card.labels, action.color];
       card.labels = labels;
-      list.cards[cardIndex] = card;
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
@@ -166,12 +170,14 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
       const labels = [...card.labels];
       labels.splice(labels.indexOf(action.color), 1);
       card.labels = labels;
-      list.cards[cardIndex] = card;
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
@@ -179,12 +185,14 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
       const dueDate = {...card.dueDate};
       dueDate.isComplete = !dueDate.isComplete;
       card.dueDate = dueDate;
-      list.cards[cardIndex] = card;
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
@@ -192,11 +200,13 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
       const dueDate = { dueDate: action.dueDate, isComplete: false };
       card.dueDate = dueDate;
-      list.cards[cardIndex] = card;
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
@@ -204,10 +214,12 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
       card.dueDate = null;
-      list.cards[cardIndex] = card;
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
@@ -215,12 +227,14 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
       const checklists = [...card.checklists];
       checklists.push({ title: action.title, items: [], checklistID: action.checklistID });
       card.checklists = checklists;
-      list.cards[cardIndex] = card;
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
@@ -228,13 +242,15 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
       const checklists = [...card.checklists];
       const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
       checklists.splice(checklistIndex, 1);
       card.checklists = checklists;
-      list.cards[cardIndex] = card;
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
@@ -258,8 +274,9 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
       const checklists = [...card.checklists];
       const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
       const checklist = {...checklists[checklistIndex]};
@@ -268,7 +285,8 @@ const reducer = (state = initialState, action) => {
       checklist.items = items;
       checklists[checklistIndex] = checklist;
       card.checklists = checklists;
-      list.cards[cardIndex] = card;
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
@@ -276,8 +294,9 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
       const checklists = [...card.checklists];
       const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
       const checklist = {...checklists[checklistIndex]};
@@ -287,7 +306,8 @@ const reducer = (state = initialState, action) => {
       checklist.items = items;
       checklists[checklistIndex] = checklist;
       card.checklists = checklists;
-      list.cards[cardIndex] = card;
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
@@ -314,8 +334,9 @@ const reducer = (state = initialState, action) => {
       const lists = [...state.lists];
       const listIndex = lists.findIndex(list => list.listID === action.listID);
       const list = { ...lists[listIndex] };
-      const cardIndex = list.cards.findIndex(card => card.cardID === action.cardID);
-      const card = { ...list.cards[cardIndex] };
+      const cards = [...list.cards];
+      const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
+      const card = { ...cards[cardIndex] };
       const checklists = [...card.checklists];
       const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
       const checklist = {...checklists[checklistIndex]};
@@ -325,7 +346,8 @@ const reducer = (state = initialState, action) => {
       checklist.items = items;
       checklists[checklistIndex] = checklist;
       card.checklists = checklists;
-      list.cards[cardIndex] = card;
+      cards[cardIndex] = card;
+      list.cards = cards;
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
