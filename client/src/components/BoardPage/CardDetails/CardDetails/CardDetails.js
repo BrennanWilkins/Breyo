@@ -29,12 +29,13 @@ const CardDetails = props => {
 
   return (
     <div className={classes.Container}>
-      <div ref={modalRef} className={classes.CardDetails} style={props.currentCard.isArchived ? { paddingTop: '55px'} : null}>
+      <div ref={modalRef} className={classes.CardDetails} style={props.currentCard.isArchived || props.currentCard.listIsArchived ? { paddingTop: '55px'} : null}>
         <CloseBtnCircle close={props.close} />
-        {props.currentCard.isArchived &&
+        {props.currentCard.isArchived || props.currentCard.listIsArchived &&
           <div className={classes.DisabledOverlay}>
             <div>
-              <span className={classes.AlertIcon}>{alertIcon}</span> This card is currently archived.
+              <span className={classes.AlertIcon}>{alertIcon}</span>
+              {props.currentCard.isArchived ? ' This card is currently archived.' : ' This card\'s list is currently archived.'}
               <CloseBtnCircle close={props.close} />
             </div>
           </div>}

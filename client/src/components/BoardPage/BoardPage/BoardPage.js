@@ -46,8 +46,16 @@ const BoardPage = props => {
 
   const closeDetailsHandler = () => {
     props.history.push(`/board/${props.boardID}`);
-    props.hideCardDetails();
+    props.setCardDetails(null, null);
   };
+
+  useEffect(() => {
+    const path = props.location.pathname;
+    if (!path.includes('/c/') || !path.includes('/l/')) { return; }
+    const listID = path.slice(path.indexOf('/l/') + 3, path.indexOf('/c/'));
+    const cardID = path.slice(path.indexOf('/c/') + 3);
+    props.setCardDetails(cardID, listID);
+  }, [props.location.pathname]);
 
   const fallback = <div className={classes.Fallback}><Spinner /></div>;
 
@@ -74,7 +82,7 @@ BoardPage.propTypes = {
   updateActiveBoard: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
-  hideCardDetails: PropTypes.func.isRequired,
+  setCardDetails: PropTypes.func.isRequired,
   shownMember: PropTypes.object,
   closeMemberActivity: PropTypes.func.isRequired
 };
@@ -90,7 +98,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   addNotif: msg => dispatch(addNotif(msg)),
   updateActiveBoard: data => dispatch(updateActiveBoard(data)),
-  hideCardDetails: () => dispatch(setCardDetails(null, null)),
+  setCardDetails: (cardID, listID) => dispatch(setCardDetails(cardID, listID)),
   updateBoardActivity: activity => dispatch(updateBoardActivity(activity)),
   closeMemberActivity: () => dispatch(setShownMemberActivity(null))
 });

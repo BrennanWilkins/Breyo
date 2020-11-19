@@ -35,15 +35,6 @@ const List = props => {
     props.history.push(`/board/${props.boardID}/l/${props.listID}/c/${cardID}`);
   };
 
-  useEffect(() => {
-    const listPath = `/l/${props.listID}/`;
-    const path = props.location.pathname;
-    if (path.includes(listPath)) {
-      const cardID = path.slice(path.indexOf('/c/') + 3);
-      props.setCardDetails(cardID, props.listID);
-    }
-  }, [props.location.pathname]);
-
   return (
     <Draggable draggableId={props.listID} index={props.indexInBoard}>
       {(provided, snapshot) => (

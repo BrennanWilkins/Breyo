@@ -15,20 +15,27 @@ export const addCard = (title, boardID, listID) => async dispatch => {
   }
 };
 
+const setCardDetailsNull = dispatch => dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID: null, listID: null, currentCard: null, currentListTitle: null });
+
 export const setCardDetails = (cardID, listID) => (dispatch, getState) => {
+  // if card being closed then IDs will be null
+  if (!cardID || !listID) { return setCardDetailsNull(dispatch); }
   const state = getState();
+  // card's listID could be in lists or archived lists
+  let list = state.lists.lists.find(list => list.listID === listID) || state.lists.archivedLists.find(list => list.listID === listID);
+  if (!list) { return setCardDetailsNull(dispatch); }
+  let currentListTitle = list.title;
   let currentCard = null;
-  if (cardID) {
-    currentCard = state.lists.lists.find(list => list.listID === listID).cards.find(card => card.cardID === cardID);
-    if (!currentCard) {
-      currentCard = state.lists.allArchivedCards.find(card => card.cardID === cardID && card.listID === listID);
-      if (!currentCard) { currentCard = null; }
-      else { currentCard.isArchived = true; }
-    }
-  }
-  const currentListTitle = listID ? state.lists.lists.find(list => list.listID === listID).title : null;
-  if (!currentCard || !currentListTitle) {
-    return dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID: null, listID: null, currentCard: null, currentListTitle: null });
+  currentCard = list.cards.find(card => card.cardID === cardID);
+  if (!currentCard) {
+    // card not found in lists or archived lists, check in archivedCards
+    currentCard = state.lists.allArchivedCards.find(card => card.cardID === cardID && card.listID === listID);
+    // card not found anywhere
+    if (!currentCard) { return setCardDetailsNull(dispatch); }
+    currentCard.isArchived = true;
+  } else {
+    // if card found in archivedLists then set list is archived
+    if (list.isArchived) { currentCard.listIsArchived = true; }
   }
   dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID, listID, currentCard, currentListTitle });
 };
