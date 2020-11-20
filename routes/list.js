@@ -145,13 +145,13 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
 
 // authorization: admin
 // Permanently delete a list
-router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsAdmin,
+router.delete('/archive/:listID/:boardID', auth, validate([param('*').not().isEmpty()]), useIsAdmin,
   async (req, res) => {
     try {
-      const list = await List.findByIdAndDelete(req.body.listID);
-      await addActivity(null, `deleted list ${list.title}`, null, null, req.body.boardID, req.userID);
+      const list = await List.findByIdAndDelete(req.params.listID);
+      await addActivity(null, `deleted list ${list.title}`, null, null, req.params.boardID, req.userID);
       await Activity.deleteMany({ listID: list._id });
-      const activity = await Activity.find({ boardID: req.body.boardID }).sort('-date').limit(20).lean();
+      const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').limit(20).lean();
       if (!activity) { throw 'No board activity found'; }
       res.status(200).json({ activity });
     } catch(err) { res.sendStatus(500); }

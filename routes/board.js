@@ -153,7 +153,7 @@ router.put('/starred', auth, validate([body('boardID').not().isEmpty()]),
 
 // authorization: admin
 // add another admin to the board
-router.put('/admins/add', auth, validate(
+router.post('/admins', auth, validate(
   [body('email').not().isEmpty().trim().escape(),
   body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
   async (req, res) => {
@@ -182,13 +182,13 @@ router.put('/admins/add', auth, validate(
 
 // authorization: admin
 // change user permission from admin to member
-router.put('/admins/remove', auth, validate(
-  [body('email').not().isEmpty().trim().escape(),
-  body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
+router.delete('/admins/:email/:boardID', auth, validate(
+  [param('email').not().isEmpty().trim().escape(),
+  param('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.body.boardID);
-      const user = await User.findOne({ email: req.body.email });
+      const board = await Board.findById(req.params.boardID);
+      const user = await User.findOne({ email: req.params.email });
       if (!board || !user) { throw 'No board or user data found'; }
       // find user in board's members and change user isAdmin to false if found
       const memberIndex = board.members.findIndex(member => member.email === user.email && member.isAdmin);
@@ -196,7 +196,7 @@ router.put('/admins/remove', auth, validate(
       const adminCount = board.members.filter(member => member.isAdmin).length;
       if (adminCount <= 1) { throw 'There must be at least 1 admin at all times'; }
       board.members[memberIndex].isAdmin = false;
-      const boardIndex = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+      const boardIndex = user.boards.findIndex(board => String(board.boardID) === String(req.params.boardID));
       if (boardIndex === -1) { throw 'Board not found in users boards'; }
       user.boards[boardIndex].isAdmin = false;
       user.markModified('boards');

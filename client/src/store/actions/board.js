@@ -56,9 +56,9 @@ export const sendInvite = (email, boardID) => async dispatch => {
 
 export const addAdmin = (email, boardID) => async dispatch => {
   try {
-    const res = await axios.put('/board/admins/add', { email, boardID });
+    const res = await axios.post('/board/admins', { email, boardID });
     dispatch({ type: actionTypes.ADD_ADMIN, email, boardID });
-    sendUpdate('put/board/admins/add', email);
+    sendUpdate('post/board/admins', email);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     console.log(err);
@@ -68,9 +68,9 @@ export const addAdmin = (email, boardID) => async dispatch => {
 
 export const removeAdmin = (email, boardID) => async dispatch => {
   try {
-    const res = await axios.put('/board/admins/remove', { email, boardID });
+    const res = await axios.delete(`/board/admins/${email}/${boardID}`);
     dispatch({ type: actionTypes.REMOVE_ADMIN, email, boardID });
-    sendUpdate('put/board/admins/remove', email);
+    sendUpdate('delete/board/admins', email);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(addNotif('There was an error while changing user permissions.'));

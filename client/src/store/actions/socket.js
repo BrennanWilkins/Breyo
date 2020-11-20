@@ -38,13 +38,13 @@ export const initSocket = boardID => {
     }
   });
 
-  newSocket.on('put/board/admins/add', email => {
+  newSocket.on('post/board/admins', email => {
     store.dispatch({ type: actionTypes.ADD_ADMIN, email });
     const userEmail = store.getState().auth.email;
     if (email === userEmail) { store.dispatch({ type: actionTypes.PROMOTE_SELF, boardID }); }
   });
 
-  newSocket.on('put/board/admins/remove', email => {
+  newSocket.on('delete/board/admins', email => {
     store.dispatch({ type: actionTypes.REMOVE_ADMIN, email });
     const userEmail = store.getState().auth.email;
     if (email === userEmail) { store.dispatch({ type: actionTypes.DEMOTE_SELF, boardID }); }

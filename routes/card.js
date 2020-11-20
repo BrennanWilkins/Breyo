@@ -3,7 +3,7 @@ const router = express.Router();
 const List = require('../models/list');
 const User = require('../models/user');
 const Board = require('../models/board');
-const { body } = require('express-validator');
+const { body, param } = require('express-validator');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsMember = require('../middleware/useIsMember');
@@ -80,7 +80,7 @@ router.put('/desc', auth, validate(
 );
 
 // add label to card
-router.put('/label/add', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.post('/label', auth, validate([body('*').not().isEmpty()]), useIsMember,
   async (req, res) => {
     try {
       if (!LABEL_COLORS.includes(req.body.color)) { throw 'Invalid label color'; }
@@ -163,18 +163,18 @@ router.post('/dueDate', auth, validate([body('*').not().isEmpty().escape()]), us
 );
 
 // remove due date from card
-router.put('/dueDate/remove', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.delete('/dueDate/:cardID/:listID/:boardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
   async (req, res) => {
     try {
-      const list = await List.findById(req.body.listID);
+      const list = await List.findById(req.params.listID);
       if (!list) { throw 'No list data found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
-      const card = list.cards.id(req.body.cardID);
+      const card = list.cards.id(req.params.cardID);
       if (!card) { throw 'No card data found'; }
       card.dueDate = null;
       await list.save();
       const newActivity = await addActivity(`removed the due date from this card`, `removed the due date from **(link)${card.title}**`,
-        card._id, list._id, req.body.boardID, req.userID);
+        card._id, list._id, req.params.boardID, req.userID);
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -202,19 +202,19 @@ router.post('/checklist', auth, validate([body('*').not().isEmpty().escape(), bo
 );
 
 // remove checklist from card
-router.put('/checklist/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.delete('/checklist/:checklistID/:cardID/:listID/:boardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
   async (req, res) => {
     try {
-      const list = await List.findById(req.body.listID);
+      const list = await List.findById(req.params.listID);
       if (!list) { throw 'No list data found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
-      const card = list.cards.id(req.body.cardID);
+      const card = list.cards.id(req.params.cardID);
       if (!card) { throw 'No card data found'; }
-      const checklist = card.checklists.id(req.body.checklistID);
+      const checklist = card.checklists.id(req.params.checklistID);
       checklist.remove();
       await list.save();
       const newActivity = await addActivity(`removed checklist ${checklist.title} from this card`, `removed checklist ${checklist.title} from **(link)${card.title}**`,
-        card._id, list._id, req.body.boardID, req.userID);
+        card._id, list._id, req.params.boardID, req.userID);
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -432,18 +432,18 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
 );
 
 // permanently delete a card
-router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.delete('/archive/:cardID/:listID/:boardID', auth, validate([param('*').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
-      const list = await List.findById(req.body.listID);
+      const list = await List.findById(req.params.listID);
       if (!list) { throw 'No list data found'; }
-      const card = list.archivedCards.id(req.body.cardID);
+      const card = list.archivedCards.id(req.params.cardID);
       if (!card) { throw 'Card data not found'; }
       card.remove();
       await list.save();
-      await addActivity(null, `deleted ${card.title} from list ${list.title}`, null, null, req.body.boardID, req.userID);
+      await addActivity(null, `deleted ${card.title} from list ${list.title}`, null, null, req.params.boardID, req.userID);
       await Activity.deleteMany({ cardID: card._id });
-      const activity = await Activity.find({ boardID: req.body.boardID }).sort('-date').limit(20).lean();
+      const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').limit(20).lean();
       if (!activity) { throw 'No board activity found'; }
       res.status(200).json({ activity });
     } catch (err) { res.sendStatus(500); }
@@ -451,7 +451,7 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
 );
 
 // add card member
-router.post('/members', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.post('/members', auth, validate([body('*').not().isEmpty().escape(), body('email').isEmail()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -474,20 +474,20 @@ router.post('/members', auth, validate([body('*').not().isEmpty().escape()]), us
 );
 
 // remove a card member
-router.put('/members/remove', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.delete('/members/:email/:cardID/:listID/:boardID', auth, validate([param('*').not().isEmpty().escape(), param('email').isEmail()]), useIsMember,
   async (req, res) => {
     try {
-      const list = await List.findById(req.body.listID);
-      const user = await User.findOne({ email: req.body.email });
-      const board = await Board.findById(req.body.boardID);
+      const list = await List.findById(req.params.listID);
+      const user = await User.findOne({ email: req.params.email });
+      const board = await Board.findById(req.params.boardID);
       if (!list || !user || !board) { throw 'Data not found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
-      const card = list.cards.id(req.body.cardID);
+      const card = list.cards.id(req.params.cardID);
       if (!card) { throw 'Card data not found'; }
       card.members = card.members.filter(member => member.email !== user.email);
       await list.save();
       const newActivity = await addActivity(`removed ${user.fullName} from this card`, `removed ${user.fullName} from **(link)${card.title}**`,
-      card._id, list._id, req.body.boardID, req.userID);
+      card._id, list._id, req.params.boardID, req.userID);
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -531,14 +531,14 @@ router.put('/comments', auth, validate([body('*').not().isEmpty().escape(), body
 );
 
 // delete a comment
-router.put('/comments/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.delete('/comments/:commentID/:cardID/:listID/:boardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
   async (req, res) => {
     try {
-      const list = await List.findById(req.body.listID);
+      const list = await List.findById(req.params.listID);
       const user = await User.findById(req.userID);
       if (!list || !user) { throw 'No list or user data found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
-      const comment = list.cards.id(req.body.cardID).comments.id(req.body.commentID);
+      const comment = list.cards.id(req.params.cardID).comments.id(req.params.commentID);
       if (!comment) { throw 'Comment not found'; }
       if (user.email !== comment.email) { throw 'Must be original author to delete comment'; }
       comment.remove();
