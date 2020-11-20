@@ -23,6 +23,7 @@ router.post('/', auth, validate(
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'List data not found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [], comments: [] };
       list.cards.push(card);
@@ -44,6 +45,7 @@ router.put('/title', auth, validate(
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'List data not found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'Card data not found'; }
@@ -67,6 +69,7 @@ router.put('/desc', auth, validate(
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       card.desc = req.body.desc;
@@ -83,6 +86,7 @@ router.put('/label/add', auth, validate([body('*').not().isEmpty().escape()]), u
       if (!LABEL_COLORS.includes(req.body.color)) { throw 'Invalid label color'; }
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       card.labels = [...card.labels, req.body.color];
@@ -99,6 +103,7 @@ router.put('/label/remove', auth, validate([body('*').not().isEmpty().escape()])
       if (!LABEL_COLORS.includes(req.body.color)) { throw 'Invalid label color'; }
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       const labelIndex = card.labels.indexOf(req.body.color);
@@ -116,6 +121,7 @@ router.put('/dueDate/isComplete', auth, validate([body('*').not().isEmpty().esca
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       if (!card.dueDate) { throw 'No due date found for card'; }
@@ -136,6 +142,7 @@ router.post('/dueDate', auth, validate([body('*').not().isEmpty().escape()]), us
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       if (isNaN(new Date(req.body.dueDate).getDate())) { throw 'Invalid due date format'; }
@@ -161,6 +168,7 @@ router.put('/dueDate/remove', auth, validate([body('*').not().isEmpty().escape()
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       card.dueDate = null;
@@ -178,6 +186,7 @@ router.post('/checklist', auth, validate([body('*').not().isEmpty().escape(), bo
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       const title = req.body.title.replace(/\n/g, ' ');
@@ -198,6 +207,7 @@ router.put('/checklist/delete', auth, validate([body('*').not().isEmpty().escape
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       const checklist = card.checklists.id(req.body.checklistID);
@@ -216,6 +226,7 @@ router.put('/checklist/title', auth, validate([body('*').not().isEmpty().escape(
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       const title = req.body.title.replace(/\n/g, ' ');
@@ -236,6 +247,7 @@ router.post('/checklist/item', auth, validate([body('*').not().isEmpty().escape(
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       const checklist = card.checklists.id(req.body.checklistID);
@@ -256,6 +268,7 @@ router.put('/checklist/item/isComplete', auth, validate([body('*').not().isEmpty
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       const checklist = card.checklists.id(req.body.checklistID);
@@ -277,6 +290,7 @@ router.put('/checklist/item/title', auth, validate([body('*').not().isEmpty().es
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       const title = req.body.title.replace(/\n/g, ' ');
@@ -297,6 +311,7 @@ router.put('/checklist/item/delete', auth, validate([body('*').not().isEmpty().e
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       card.checklists.id(req.body.checklistID).items.id(req.body.itemID).remove();
@@ -312,6 +327,7 @@ router.put('/moveCard/sameList', auth, validate([body('*').not().isEmpty().escap
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       // remove card from original index
       const card = list.cards.splice(req.body.sourceIndex, 1)[0];
       if (!card) { throw 'Card not found in list'; }
@@ -330,6 +346,7 @@ router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escap
       const sourceList = await List.findById(req.body.sourceID);
       const destList = await List.findById(req.body.targetID);
       if (!sourceList || !destList) { throw 'List data not found'; }
+      if (sourceList.isArchived || destList.isArchived) { throw 'Cannot move a card to an archived list.'; }
       // remove card from source list
       const card = sourceList.cards.splice(req.body.sourceIndex, 1)[0];
       if (!card) { throw 'Card not found in list'; }
@@ -351,6 +368,7 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
       const sourceList = await List.findById(req.body.sourceListID);
       const destList = await List.findById(req.body.destListID);
       if (!sourceList || !destList) { throw 'List data not found'; }
+      if (sourceList.isArchived || destList.isArchived) { throw 'Cannot copy a card a card to or from an archived list.'; }
       const title = req.body.title.replace(/\n/g, ' ');
       const sourceCard = sourceList.cards.id(req.body.cardID);
       if (!sourceCard) { throw 'Card data not found'; }
@@ -382,6 +400,7 @@ router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), us
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       const checkIfArchived = list.archivedCards.id(req.body.cardID);
@@ -401,7 +420,6 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'No list data found'; }
-      if (list.isArchived) { throw 'Cannot recover a card to an archived list'; }
       const card = list.archivedCards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       list.cards.push(card);
@@ -438,6 +456,7 @@ router.post('/members', auth, validate([body('*').not().isEmpty().escape()]), us
       const user = await User.findOne({ email: req.body.email });
       const board = await Board.findById(req.body.boardID);
       if (!list || !user || !board) { throw 'Data not found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       if (!board.members.find(member => member.email === user.email)) { throw 'User must be member of board'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'Card data not found'; }
@@ -460,6 +479,7 @@ router.put('/members/remove', auth, validate([body('*').not().isEmpty().escape()
       const user = await User.findOne({ email: req.body.email });
       const board = await Board.findById(req.body.boardID);
       if (!list || !user || !board) { throw 'Data not found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'Card data not found'; }
       card.members = card.members.filter(member => member.email !== user.email);
@@ -478,6 +498,7 @@ router.post('/comments', auth, validate([body('*').not().isEmpty().escape(), bod
       const list = await List.findById(req.body.listID);
       const user = await User.findById(req.userID);
       if (!list || !user) { throw 'List or user data not found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'Card data not found'; }
       card.comments.push({ email: user.email, fullName: user.fullName, date: req.body.date, msg: req.body.msg, cardID: req.body.cardID, listID: req.body.listID });
@@ -496,6 +517,7 @@ router.put('/comments', auth, validate([body('*').not().isEmpty().escape(), body
       const list = await List.findById(req.body.listID);
       const user = await User.findById(req.userID);
       if (!list || !user) { throw 'List or user data not found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const comment = list.cards.id(req.body.cardID).comments.id(req.body.commentID);
       if (!comment) { throw 'Comment not found'; }
       if (user.email !== comment.email) { throw 'User must be original author to edit'; }
@@ -513,6 +535,7 @@ router.put('/comments/delete', auth, validate([body('*').not().isEmpty().escape(
       const list = await List.findById(req.body.listID);
       const user = await User.findById(req.userID);
       if (!list || !user) { throw 'No list or user data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const comment = list.cards.id(req.body.cardID).comments.id(req.body.commentID);
       if (!comment) { throw 'Comment not found'; }
       if (user.email !== comment.email) { throw 'Must be original author to delete comment'; }
