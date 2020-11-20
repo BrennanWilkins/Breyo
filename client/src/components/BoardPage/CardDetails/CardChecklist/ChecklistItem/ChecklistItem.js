@@ -22,7 +22,7 @@ const ChecklistItem = props => {
 
   const editHandler = e => {
     e.preventDefault();
-    if (itemTitle === '' || itemTitle.length > 200) { return setItemTitle(props.title); }
+    if (itemTitle === '' || itemTitle.length > 300) { return setItemTitle(props.title); }
     props.editItem(itemTitle);
     setShowEdit(false);
   };

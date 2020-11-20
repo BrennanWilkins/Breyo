@@ -18,7 +18,7 @@ const LABEL_COLORS = ['#F60000', '#FF8C00', '#FFEE00', '#4DE94C', '#3783FF', '#4
 router.post('/', auth, validate(
   [body('boardID').not().isEmpty().escape(),
   body('listID').not().isEmpty().escape(),
-  body('title').isLength({ min: 1, max: 100 }).escape()]), useIsMember,
+  body('title').isLength({ min: 1, max: 200 }).escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -40,7 +40,7 @@ router.put('/title', auth, validate(
   [body('cardID').not().isEmpty().escape(),
   body('boardID').not().isEmpty().escape(),
   body('listID').not().isEmpty().escape(),
-  body('title').isLength({ min: 1, max: 100 }).escape()]), useIsMember,
+  body('title').isLength({ min: 1, max: 200 }).escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -64,7 +64,7 @@ router.put('/desc', auth, validate(
   [body('cardID').not().isEmpty().escape(),
   body('boardID').not().isEmpty().escape(),
   body('listID').not().isEmpty().escape(),
-  body('desc').isLength({ max: 300 }).escape()]), useIsMember,
+  body('desc').isLength({ max: 600 }).escape()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -181,7 +181,7 @@ router.delete('/dueDate/:cardID/:listID/:boardID', auth, validate([param('*').no
 );
 
 // add checklist to card
-router.post('/checklist', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 100 })]), useIsMember,
+router.post('/checklist', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -221,7 +221,7 @@ router.delete('/checklist/:checklistID/:cardID/:listID/:boardID', auth, validate
 );
 
 // update checklist title
-router.put('/checklist/title', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 100 })]), useIsMember,
+router.put('/checklist/title', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -242,7 +242,7 @@ router.put('/checklist/title', auth, validate([body('*').not().isEmpty().escape(
 );
 
 // add item to a checklist
-router.post('/checklist/item', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 })]), useIsMember,
+router.post('/checklist/item', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 300 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -285,7 +285,7 @@ router.put('/checklist/item/isComplete', auth, validate([body('*').not().isEmpty
 );
 
 // update checklist item title
-router.put('/checklist/item/title', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 })]), useIsMember,
+router.put('/checklist/item/title', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 300 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -362,7 +362,7 @@ router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escap
 );
 
 // create a copy of a card
-router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 100 }), body('destIndex').isInt()]), useIsMember,
+router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 }), body('destIndex').isInt()]), useIsMember,
   async (req, res) => {
     try {
       const sourceList = await List.findById(req.body.sourceListID);
@@ -494,7 +494,7 @@ router.delete('/members/:email/:cardID/:listID/:boardID', auth, validate([param(
 );
 
 // add comment to card
-router.post('/comments', auth, validate([body('*').not().isEmpty().escape(), body('msg').isLength({ min: 1, max: 300 })]), useIsMember,
+router.post('/comments', auth, validate([body('*').not().isEmpty().escape(), body('msg').isLength({ min: 1, max: 400 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -513,7 +513,7 @@ router.post('/comments', auth, validate([body('*').not().isEmpty().escape(), bod
 );
 
 // edit comment msg, must be original author to edit
-router.put('/comments', auth, validate([body('*').not().isEmpty().escape(), body('msg').isLength({ min: 1, max: 300 })]), useIsMember,
+router.put('/comments', auth, validate([body('*').not().isEmpty().escape(), body('msg').isLength({ min: 1, max: 400 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);

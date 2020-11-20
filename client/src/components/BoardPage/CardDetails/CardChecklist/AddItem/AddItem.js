@@ -14,7 +14,7 @@ const AddItem = props => {
 
   const addHandler = e => {
     e.preventDefault();
-    if (itemTitle === '' || itemTitle.length > 200) { return; }
+    if (itemTitle === '' || itemTitle.length > 300) { return; }
     setItemTitle('');
     props.addItem(itemTitle, props.checklistID, props.cardID, props.listID, props.boardID);
   };

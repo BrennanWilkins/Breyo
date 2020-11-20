@@ -35,6 +35,7 @@ const CopyCardModal = props => {
   useEffect(() => setShowPositionSelect(false), [cardPosition]);
 
   const copyHandler = () => {
+    if (cardTitle.length > 200) { return; }
     props.copyCard(cardTitle, keepChecklists, keepLabels, props.currentCardID, props.currentCard, props.currentListID, selectedListID, cardPosition, props.boardID);
     props.close();
   };

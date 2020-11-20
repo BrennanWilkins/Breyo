@@ -18,6 +18,10 @@ const AboutMenu = props => {
   const formattedDesc = useMemo(() => parseToJSX(props.desc), [props.desc]);
 
   const saveDescHandler = () => {
+    if (descInput.length > 600) {
+      setShowEditDesc(false);
+      return setDescInput(props.desc);
+    }
     props.updateDesc(descInput);
     setShowEditDesc(false);
   };

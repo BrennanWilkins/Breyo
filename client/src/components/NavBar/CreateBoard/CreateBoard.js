@@ -24,7 +24,7 @@ const CreateBoard = props => {
   useModalToggle(props.show, modalRef, closeHandler);
 
   const submitHandler = () => {
-    if (boardTitle === '' || boardTitle.length > 50) { return; }
+    if (boardTitle === '' || boardTitle.length > 100) { return; }
     closeHandler();
     props.createBoard(boardTitle, boardColor);
   };

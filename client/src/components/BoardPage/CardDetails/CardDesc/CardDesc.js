@@ -24,7 +24,7 @@ const CardDesc = props => {
   }, [showEdit]);
 
   const saveDescHandler = () => {
-    if (descInput.length > 300) { setShowEdit(false); return setDescInput(props.currentCard.desc); }
+    if (descInput.length > 600) { setShowEdit(false); return setDescInput(props.currentCard.desc); }
     props.updateCardDesc(descInput, props.cardID, props.listID, props.boardID);
     setShowEdit(false);
   };

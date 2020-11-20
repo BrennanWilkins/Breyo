@@ -20,7 +20,7 @@ const Comment = props => {
   };
 
   const editHandler = msg => {
-    if (msg === '' || msg.length > 300) { return; }
+    if (msg === '' || msg.length > 400) { return; }
     setShowEdit(false);
     if (msg === props.msg) { return; }
     props.updateComment(msg, props.commentID);

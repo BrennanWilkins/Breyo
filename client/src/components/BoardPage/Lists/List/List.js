@@ -22,7 +22,7 @@ const List = props => {
 
   const titleBlurHandler = () => {
     if (titleInput === props.title) { return setShowTitleInput(false); }
-    if (titleInput.length === 0 || titleInput.length >= 200) { setShowTitleInput(false); return setTitleInput(props.title); }
+    if (titleInput.length === 0 || titleInput.length > 200) { setShowTitleInput(false); return setTitleInput(props.title); }
     props.updateListTitle(titleInput, props.listID, props.boardID);
     setShowTitleInput(false);
   };

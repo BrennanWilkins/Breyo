@@ -24,6 +24,7 @@ const ListActions = props => {
   };
 
   const copyHandler = () => {
+    if (copyListTitle.length > 200) { return; }
     props.copyList(copyListTitle, props.listID, props.boardID);
     props.close();
   };

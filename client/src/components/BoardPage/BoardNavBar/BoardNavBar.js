@@ -27,7 +27,7 @@ const BoardNavBar = props => {
   };
 
   const inputTitleHandler = e => {
-    if (e.target.value.length > 50) { return; }
+    if (e.target.value.length > 100) { return; }
     setInputTitle(e.target.value);
   };
 

@@ -94,7 +94,7 @@ router.put('/color', auth, validate(
 // authorization: member
 // update board description
 router.put('/desc', auth, validate(
-  [body('boardID').not().isEmpty().escape(), body('desc').escape().isLength({ max: 300 })]), useIsMember,
+  [body('boardID').not().isEmpty().escape(), body('desc').escape().isLength({ max: 600 })]), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);

@@ -13,7 +13,7 @@ const Activity = require('../models/activity');
 // create a new list
 router.post('/', auth, validate(
   [body('boardID').not().isEmpty().escape(),
-  body('title').isLength({ min: 1, max: 70 }).escape()]), useIsMember,
+  body('title').isLength({ min: 1, max: 200 }).escape()]), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
@@ -31,7 +31,7 @@ router.post('/', auth, validate(
 // update list title
 router.put('/title', auth, validate(
   [body('boardID').not().isEmpty().escape(),
-  body('title').isLength({ min: 1, max: 70 }).escape(),
+  body('title').isLength({ min: 1, max: 200 }).escape(),
   body('listID').not().isEmpty().escape()]), useIsMember,
   async (req, res) => {
     try {
@@ -67,7 +67,7 @@ router.put('/moveList', auth, validate([body('sourceIndex').isInt(), body('destI
 );
 
 // create a copy of a list
-router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('title').trim().isLength({ min: 1, max: 70 })]), useIsMember,
+router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('title').trim().isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);

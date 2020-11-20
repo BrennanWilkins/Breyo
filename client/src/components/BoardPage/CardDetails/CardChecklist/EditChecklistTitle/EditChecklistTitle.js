@@ -16,7 +16,7 @@ const EditChecklistTitle = props => {
   const submitHandler = e => {
     e.preventDefault();
     props.close();
-    if (titleInput === '' || titleInput.length > 100) { return; }
+    if (titleInput === '' || titleInput.length > 200) { return; }
     props.edit(titleInput, props.checklistID);
   };
 

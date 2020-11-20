@@ -12,7 +12,7 @@ const ChecklistModal = props => {
   const [title, setTitle] = useState('');
 
   const addHandler = () => {
-    if (title === '' || title.length > 100) { return; }
+    if (title === '' || title.length > 200) { return; }
     props.close();
     props.addChecklist(title, props.cardID, props.listID, props.boardID);
   };
