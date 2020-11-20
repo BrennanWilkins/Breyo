@@ -32,9 +32,10 @@ export const setCardDetails = (cardID, listID) => (dispatch, getState) => {
     currentCard = state.lists.allArchivedCards.find(card => card.cardID === cardID && card.listID === listID);
     // card not found anywhere
     if (!currentCard) { return setCardDetailsNull(dispatch); }
-    currentCard.isArchived = true;
+    currentCard = { ...currentCard, isArchived: true };
   } else {
     // if card found in archivedLists then set list is archived
+    currentCard = { ...currentCard };
     if (list.isArchived) { currentCard.listIsArchived = true; }
   }
   dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID, listID, currentCard, currentListTitle });

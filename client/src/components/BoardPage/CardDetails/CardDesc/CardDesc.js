@@ -15,6 +15,8 @@ const CardDesc = props => {
   const [showFormattingHelp, setShowFormattingHelp] = useState(false);
   const descRef = useRef();
 
+  useEffect(() => setDescInput(props.currentCard.desc), [props.currentCard.desc]);
+
   const formattedDesc = useMemo(() => parseToJSX(props.currentCard.desc), [props.currentCard.desc]);
 
   useEffect(() => {

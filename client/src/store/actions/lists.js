@@ -51,9 +51,7 @@ export const recoverList = (listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.RECOVER_LIST, listID });
     const res = await axios.put('/list/archive/recover', { listID, boardID });
-    dispatch({ type: actionTypes.RESTORE_ARCHIVED_CARDS, archivedCards: res.data.archivedCards, listID });
     sendUpdate('put/list/archive/recover', JSON.stringify({ listID }));
-    sendUpdate('put/card/archive/restore', JSON.stringify({ archivedCards: res.data.archivedCards, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     console.log(err);

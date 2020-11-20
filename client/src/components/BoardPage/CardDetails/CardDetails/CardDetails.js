@@ -21,6 +21,7 @@ const CardDetails = props => {
 
   const archiveCardHandler = () => {
     props.archiveCard(props.cardID, props.listID, props.boardID);
+    props.close();
   };
 
   useEffect(() => {
@@ -29,9 +30,9 @@ const CardDetails = props => {
 
   return (
     <div className={classes.Container}>
-      <div ref={modalRef} className={classes.CardDetails} style={props.currentCard.isArchived || props.currentCard.listIsArchived ? { paddingTop: '55px'} : null}>
+      <div ref={modalRef} className={classes.CardDetails} style={(props.currentCard.isArchived || props.currentCard.listIsArchived) ? { paddingTop: '55px'} : null}>
         <CloseBtnCircle close={props.close} />
-        {props.currentCard.isArchived || props.currentCard.listIsArchived &&
+        {(props.currentCard.isArchived || props.currentCard.listIsArchived) &&
           <div className={classes.DisabledOverlay}>
             <div>
               <span className={classes.AlertIcon}>{alertIcon}</span>

@@ -135,7 +135,7 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
       if (!lists.length) { throw 'Lists data not found'; }
       const list = await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: false });
       const newActivity = await addActivity(null, `recovered list ${list.title}`, null, list._id, req.body.boardID, req.userID);
-      res.status(200).json({ archivedCards: list.archivedCards, newActivity });
+      res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
 );
