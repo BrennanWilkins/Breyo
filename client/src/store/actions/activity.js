@@ -9,6 +9,13 @@ export const addRecentActivity = newActivity => {
   sendUpdate('post/activity', JSON.stringify({ newActivity }));
 };
 
+export const addRecentActivities = activities => {
+  for (let newActivity of activities) {
+    store.dispatch({ type: actionTypes.ADD_RECENT_ACTIVITY, newActivity });
+    sendUpdate('post/activity', JSON.stringify({ newActivity }));
+  }
+};
+
 export const getRecentCardActivity = () => async (dispatch, getState) => {
   try {
     dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: true });

@@ -2,7 +2,7 @@ import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
 import { addNotif } from './notifications';
 import { sendUpdate } from './socket';
-import { addRecentActivity } from './activity';
+import { addRecentActivity, addRecentActivities } from './activity';
 
 export const updateListTitle = (title, listID, boardID) => async dispatch => {
   try {
@@ -31,6 +31,7 @@ export const copyList = (title, listID, boardID) => async dispatch => {
     const res = await axios.post('/list/copy', { title, listID, boardID });
     dispatch({ type: actionTypes.COPY_LIST, newList: res.data.newList });
     sendUpdate('post/list/copy', JSON.stringify({ newList: res.data.newList }));
+    addRecentActivities(res.data.activities);
   } catch (err) {
     dispatch(addNotif('There was an error while copying the list.'));
   }
@@ -72,8 +73,9 @@ export const deleteList = (listID, boardID) => async dispatch => {
 export const archiveAllCards = (listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.ARCHIVE_ALL_CARDS, listID });
-    await axios.put('/list/archive/allCards', { listID, boardID });
+    const res = await axios.put('/list/archive/allCards', { listID, boardID });
     sendUpdate('put/list/archive/allCards', JSON.stringify({ listID }));
+    addRecentActivities(res.data.activities);
   } catch(err) {
     console.log(err);
   }
