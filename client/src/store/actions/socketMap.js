@@ -40,7 +40,8 @@ const socketMap = {
   'put/card/comments': actionTypes.UPDATE_COMMENT,
   'put/card/comments/delete': actionTypes.DELETE_COMMENT,
   'put/card/archive/restore': actionTypes.RESTORE_ARCHIVED_CARDS,
-  'post/activity': actionTypes.ADD_RECENT_ACTIVITY
+  'post/activity': actionTypes.ADD_RECENT_ACTIVITY,
+  'put/activity/board': actionTypes.UPDATE_BOARD_ACTIVITY
 };
 
 export default socketMap;

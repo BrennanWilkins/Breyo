@@ -238,8 +238,9 @@ export const deleteCard = (cardID, listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.DELETE_CARD, cardID, listID });
     const res = await axios.put('/card/archive/delete', { cardID, listID, boardID });
+    dispatch({ type: actionTypes.UPDATE_BOARD_ACTIVITY, activity: res.data.activity });
+    sendUpdate('put/activity/board', JSON.stringify({ activity: res.data.activity }));
     sendUpdate('put/card/archive/delete', JSON.stringify({ cardID, listID }));
-    addRecentActivity(res.data.newActivity);
   } catch (err) {
     console.log(err);
   }

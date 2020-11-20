@@ -36,14 +36,6 @@ const reducer = (state = initialState, action) => {
       }
       return { ...state, boardActivity };
     }
-    case actionTypes.DELETE_CARD: {
-      const boardActivity = state.boardActivity.filter(activity => activity.cardID !== action.cardID);
-      return { ...state, boardActivity };
-    }
-    case actionTypes.DELETE_LIST: {
-      const boardActivity = state.boardActivity.filter(activity => activity.listID !== action.listID);
-      return { ...state, boardActivity };
-    }
     default: return state;
   }
 };

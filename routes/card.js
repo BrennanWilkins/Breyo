@@ -441,9 +441,11 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
       if (!card) { throw 'Card data not found'; }
       card.remove();
       await list.save();
-      const newActivity = await addActivity(null, `deleted ${card.title} from list ${list.title}`, null, null, req.body.boardID, req.userID);
+      await addActivity(null, `deleted ${card.title} from list ${list.title}`, null, null, req.body.boardID, req.userID);
       await Activity.deleteMany({ cardID: card._id });
-      res.status(200).json({ newActivity });
+      const activity = await Activity.find({ boardID: req.body.boardID }).sort('-date').limit(20).lean();
+      if (!activity) { throw 'No board activity found'; }
+      res.status(200).json({ activity });
     } catch (err) { res.sendStatus(500); }
   }
 );

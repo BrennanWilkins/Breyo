@@ -149,9 +149,11 @@ router.put('/archive/delete', auth, validate([body('*').not().isEmpty().escape()
   async (req, res) => {
     try {
       const list = await List.findByIdAndDelete(req.body.listID);
-      const newActivity = await addActivity(null, `deleted list ${list.title}`, null, null, req.body.boardID, req.userID);
+      await addActivity(null, `deleted list ${list.title}`, null, null, req.body.boardID, req.userID);
       await Activity.deleteMany({ listID: list._id });
-      res.status(200).json({ newActivity });
+      const activity = await Activity.find({ boardID: req.body.boardID }).sort('-date').limit(20).lean();
+      if (!activity) { throw 'No board activity found'; }
+      res.status(200).json({ activity });
     } catch(err) { res.sendStatus(500); }
   }
 );

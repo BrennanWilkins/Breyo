@@ -63,8 +63,9 @@ export const deleteList = (listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.DELETE_LIST, listID });
     const res = await axios.put('/list/archive/delete', { listID, boardID });
+    dispatch({ type: actionTypes.UPDATE_BOARD_ACTIVITY, activity: res.data.activity });
     sendUpdate('put/list/archive/delete', JSON.stringify({ listID }));
-    addRecentActivity(res.data.newActivity);
+    sendUpdate('put/activity/board', JSON.stringify({ activity: res.data.activity }));
   } catch(err) {
     console.log(err);
   }
