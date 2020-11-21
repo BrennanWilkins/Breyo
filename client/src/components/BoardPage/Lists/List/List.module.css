@@ -65,9 +65,6 @@
 .AddCardBtn:active, .CardOptionBtn:active {
   background: rgb(210, 210, 210);
 }
-.ListActionsContainer {
-  position: relative;
-}
 .CardOptionBtn {
   border-radius: 3px;
   cursor: pointer;

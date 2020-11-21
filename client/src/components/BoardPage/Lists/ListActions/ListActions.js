@@ -6,6 +6,7 @@ import { BackBtn, CloseBtn } from '../../../UI/Buttons/Buttons';
 import { copyList, archiveList, archiveAllCards, addNotif } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import MoveCards from './MoveCards';
+import TextArea from 'react-textarea-autosize';
 
 const ListActions = props => {
   const modalRef = useRef();
@@ -15,7 +16,7 @@ const ListActions = props => {
   const [copyListTitle, setCopyListTitle] = useState(props.title);
   const [showMoveCards, setShowMoveCards] = useState(false);
 
-  useEffect(() => { if (showCopyList) { setTimeout(() => inputRef.current.focus(), 200); }}, [showCopyList]);
+  useEffect(() => { if (showCopyList) { setTimeout(() => inputRef.current.select(), 200); }}, [showCopyList]);
 
   const resetState = () => {
     setShowCopyList(false);
@@ -23,8 +24,9 @@ const ListActions = props => {
     setShowMoveCards(false);
   };
 
-  const copyHandler = () => {
-    if (copyListTitle.length > 200) { return; }
+  const copyHandler = e => {
+    e.preventDefault();
+    if (copyListTitle === '' || copyListTitle.length > 200) { return; }
     props.copyList(copyListTitle, props.listID, props.boardID);
     props.close();
   };
@@ -51,19 +53,20 @@ const ListActions = props => {
   const copyListContent = (
     <div className={classes.CopyContainer}>
       <form onSubmit={copyHandler}>
-        <input className={classes.Input} value={copyListTitle} onChange={e => setCopyListTitle(e.target.value)}
-        placeholder="Enter list title" ref={inputRef} />
+        <TextArea className={classes.Input} value={copyListTitle} onChange={e => setCopyListTitle(e.target.value)}
+        placeholder="Enter list title" ref={inputRef} minRows="2" maxRows="4" />
         <button type="submit" disabled={copyListTitle === ''} className={classes.SubmitBtn}>Create List</button>
       </form>
     </div>
   );
 
   return (
-    <div ref={modalRef} className={classes.Container}>
+    <div ref={modalRef} className={classes.Container} style={{ left: `${props.left}px`, top: `${props.top}px` }}>
       <div className={classes.Title}>
         <span className={showCopyList || showMoveCards ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
         {showCopyList ? 'Copy List' : showMoveCards ? 'Move all cards in this list' : 'List Actions'}
-        <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
+        <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
+      </div>
       {showCopyList ? copyListContent : showMoveCards ? <MoveCards listID={props.listID} boardID={props.boardID} close={props.close} /> : defaultContent}
     </div>
   );

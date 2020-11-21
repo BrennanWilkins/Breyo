@@ -14,9 +14,18 @@ import { withRouter } from 'react-router-dom';
 const List = props => {
   const [titleInput, setTitleInput] = useState(props.title);
   const [showAddCard, setShowAddCard] = useState(false);
-  const inputRef = useRef();
   const [showTitleInput, setShowTitleInput] = useState(false);
   const [showListActions, setShowListActions] = useState(false);
+  const inputRef = useRef();
+  const actionsRef = useRef();
+  const [actionsTop, setActionsTop] = useState(0);
+  const [actionsLeft, setActionsLeft] = useState(0);
+
+  useEffect(() => {
+    const rect = actionsRef.current.getBoundingClientRect();
+    setActionsTop(rect.top);
+    setActionsLeft(rect.left);
+  }, [showListActions]);
 
   useEffect(() => setTitleInput(props.title), [props.title]);
 
@@ -27,26 +36,24 @@ const List = props => {
     setShowTitleInput(false);
   };
 
-  useEffect(() => {
-    if (showTitleInput) { inputRef.current.focus(); }
-  }, [showTitleInput]);
-
   const setCardDetailsHandler = cardID => {
     props.history.push(`/board/${props.boardID}/l/${props.listID}/c/${cardID}`);
   };
 
+  const blurInputHandler = e => {
+    if (inputRef.current && !inputRef.current.contains(e.target)) { inputRef.current.blur(); }
+  };
+
   return (
+    <>
     <Draggable draggableId={props.listID} index={props.indexInBoard}>
       {(provided, snapshot) => (
-        <div className={classes.List} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+        <div className={classes.List} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} onMouseDown={blurInputHandler}>
           <div className={classes.ListTop}>
             {!showTitleInput ? <div className={classes.ListTitle} onClick={() => setShowTitleInput(true)}>{titleInput}</div> :
-            <TextArea ref={inputRef} maxRows="20" value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.TitleInput}
-            onFocus={e => e.target.select()} onBlur={editTitleHandler} onKeyPress={e => { if (e.key === 'Enter') { e.preventDefault(); editTitleHandler(); }}} />}
-            <div className={classes.ListActionsContainer}>
-              <div className={classes.CardOptionBtn} onClick={() => setShowListActions(true)}>{dotsIcon}</div>
-              {showListActions && <ListActions close={() => setShowListActions(false)} title={props.title} listID={props.listID} boardID={props.boardID} />}
-            </div>
+            <TextArea maxRows="10" ref={inputRef} value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.TitleInput}
+            onFocus={e => e.target.select()} autoFocus onBlur={editTitleHandler} onKeyPress={e => { if (e.key === 'Enter') { e.preventDefault(); editTitleHandler(); }}} />}
+            <div ref={actionsRef} className={classes.CardOptionBtn} onClick={() => setShowListActions(true)}>{dotsIcon}</div>
           </div>
           <Droppable droppableId={props.listID}>
             {(provided, snapshot) => (
@@ -63,6 +70,8 @@ const List = props => {
         </div>
       )}
     </Draggable>
+    {showListActions && <ListActions left={actionsLeft} top={actionsTop} close={() => setShowListActions(false)} title={props.title} listID={props.listID} boardID={props.boardID} />}
+    </>
   );
 };
 
