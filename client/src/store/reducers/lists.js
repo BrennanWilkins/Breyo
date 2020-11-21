@@ -37,7 +37,7 @@ const reducer = (state = initialState, action) => {
               checklistID: checklist._id,
               items: checklist.items.map(item => ({
                 itemID: item._id,
-                title: item.title,
+                title: Entities.decode(item.title),
                 isComplete: item.isComplete
               }))
             })),

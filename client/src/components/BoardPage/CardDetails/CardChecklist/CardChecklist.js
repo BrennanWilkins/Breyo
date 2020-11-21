@@ -54,7 +54,7 @@ const CardChecklist = props => {
         <div className={classes.TitleLeft} style={showEditTitle ? { width: '100%'} : null}>
           <span className={classes.Icon}>{checklistIcon}</span>
           {showEditTitle ? <EditChecklistTitle title={props.title} close={() => setShowEditTitle(false)} checklistID={props.checklistID} /> :
-          <span onClick={() => setShowEditTitle(true)}>{props.title}</span>}
+          <span className={classes.Title} onClick={() => setShowEditTitle(true)}>{props.title}</span>}
         </div>
         {!showEditTitle &&
         <div className={classes.TitleRight}>

@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   font-weight: 500;
+  max-width: 100%;
 }
 .TitleLeft span {
   cursor: pointer;
@@ -22,7 +23,6 @@
   display: flex;
   align-items: center;
   margin: 20px 15px 10px 0;
-  overflow: hidden;
   flex-wrap: wrap;
 }
 .AddBtn {
@@ -31,4 +31,9 @@
 }
 .TitleRight {
   margin-left: auto;
+}
+.Title {
+  word-wrap: break-word;
+  max-width: 100%;
+  overflow: hidden;
 }

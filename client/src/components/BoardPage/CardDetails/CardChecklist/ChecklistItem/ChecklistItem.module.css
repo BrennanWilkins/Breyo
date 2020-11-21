@@ -12,6 +12,8 @@
 .Title, .TitleCompleted {
   margin-left: 20px;
   font-size: 14px;
+  max-width: calc(100% - 100px);
+  word-wrap: break-word;
 }
 .TitleCompleted {
   text-decoration: line-through;
