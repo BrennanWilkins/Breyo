@@ -16,7 +16,7 @@
 .Detail {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: calc(100% - 37px);
 }
 .MsgContainer {
   margin-left: 7px;
@@ -33,6 +33,7 @@
 }
 .Msg {
   color: rgb(55,55,55);
+  word-wrap: break-word;
 }
 .MsgContainer a {
   text-decoration: underline;

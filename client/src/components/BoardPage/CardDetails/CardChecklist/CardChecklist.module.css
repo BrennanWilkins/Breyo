@@ -18,13 +18,17 @@
   position: relative;
   margin-left: 10px;
 }
-.Title {
+.TitleContainer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin: 20px 15px 10px 0;
+  overflow: hidden;
+  flex-wrap: wrap;
 }
 .AddBtn {
   margin-top: 10px;
   margin-left: 45px;
+}
+.TitleRight {
+  margin-left: auto;
 }

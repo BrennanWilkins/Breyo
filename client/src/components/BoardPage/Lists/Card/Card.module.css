@@ -79,3 +79,6 @@
 .AccountBtn button:hover {
   background: rgb(220,220,220);
 }
+.Title {
+  word-wrap: break-word;
+}

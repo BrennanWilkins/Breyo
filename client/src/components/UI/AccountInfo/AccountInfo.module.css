@@ -22,6 +22,15 @@
   color: rgb(122, 122, 122);
   margin-top: 3px;
 }
+.Name, .Email {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 .NameIcon:hover {
   background: #c7c7c7;
+}
+.Details {
+  width: 210px;
+  overflow: hidden;
 }

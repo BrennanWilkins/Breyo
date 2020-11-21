@@ -44,7 +44,7 @@ const CopyCardModal = props => {
     <div ref={modalRef} className={classes.Container}>
       <div className={classes.Title}>Copy Card<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
       <TextArea className={classes.Input} value={cardTitle} onChange={e => setCardTitle(e.target.value)}
-      minRows="3" maxRows="10" placeholder="Enter a title for this card" onKeyPress={e => e.key === 'Enter' ? e.target.blur() : null} />
+      minRows="3" maxRows="3" placeholder="Enter a title for this card" onKeyPress={e => e.key === 'Enter' ? e.target.blur() : null} />
       <div className={classes.Keeps}>
         <div className={classes.Checkbox}><Checkbox checked={keepChecklists} clicked={() => setKeepChecklists(prev => !prev)} />Keep checklists</div>
         <Checkbox checked={keepLabels} clicked={() => setKeepLabels(prev => !prev)} />Keep labels

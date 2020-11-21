@@ -23,12 +23,17 @@
   cursor: pointer;
   border-radius: 3px;
   border: 2px solid transparent;
-  transition: 100ms;
   width: 240px;
   box-sizing: border-box;
   font-family: 'Roboto', -apple-system, sans-serif;
-  resize: none;
   overflow: hidden;
+}
+.ListTitle {
+  word-wrap: break-word;
+}
+.TitleInput {
+  resize: none;
+  transition: background 100ms, border 100ms;
 }
 .TitleInput:focus {
   background: white;

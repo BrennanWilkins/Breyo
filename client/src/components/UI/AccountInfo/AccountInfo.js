@@ -6,8 +6,8 @@ const AccountInfo = props => (
   <div className={classes.AccountInfo}
   style={{ padding: props.givePadding ? '15px 0' : '0 0 15px 0', borderBottom: props.noBorder ? '0' : '1px solid #ddd'}}>
     <div className={classes.NameIcon}>{props.fullName.slice(0, 1)}</div>
-    <div>
-      <div>{props.fullName}</div>
+    <div className={classes.Details}>
+      <div className={classes.Name}>{props.fullName}</div>
       <div className={classes.Email}>{props.email}</div>
     </div>
   </div>

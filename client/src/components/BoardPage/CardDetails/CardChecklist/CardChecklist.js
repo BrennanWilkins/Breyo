@@ -50,14 +50,14 @@ const CardChecklist = props => {
 
   return (
     <div>
-      <div className={classes.Title}>
+      <div className={classes.TitleContainer}>
         <div className={classes.TitleLeft} style={showEditTitle ? { width: '100%'} : null}>
           <span className={classes.Icon}>{checklistIcon}</span>
           {showEditTitle ? <EditChecklistTitle title={props.title} close={() => setShowEditTitle(false)} checklistID={props.checklistID} /> :
           <span onClick={() => setShowEditTitle(true)}>{props.title}</span>}
         </div>
         {!showEditTitle &&
-        <div>
+        <div className={classes.TitleRight}>
           {progress !== 0 && <ActionBtn clicked={() => setHideCompleted(prev => !prev)}>{hideCompleted ? 'Show' : 'Hide'} completed items</ActionBtn>}
           <span className={classes.BtnContainer}>
             <ActionBtn clicked={() => setShowDeleteModal(true)}>Delete</ActionBtn>

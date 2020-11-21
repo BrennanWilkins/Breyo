@@ -20,7 +20,7 @@ const List = props => {
 
   useEffect(() => setTitleInput(props.title), [props.title]);
 
-  const titleBlurHandler = () => {
+  const editTitleHandler = () => {
     if (titleInput === props.title) { return setShowTitleInput(false); }
     if (titleInput.length === 0 || titleInput.length > 200) { setShowTitleInput(false); return setTitleInput(props.title); }
     props.updateListTitle(titleInput, props.listID, props.boardID);
@@ -42,7 +42,7 @@ const List = props => {
           <div className={classes.ListTop}>
             {!showTitleInput ? <div className={classes.ListTitle} onClick={() => setShowTitleInput(true)}>{titleInput}</div> :
             <TextArea ref={inputRef} maxRows="20" value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.TitleInput}
-            onFocus={e => e.target.select()} onBlur={titleBlurHandler} />}
+            onFocus={e => e.target.select()} onBlur={editTitleHandler} onKeyPress={e => { if (e.key === 'Enter') { e.preventDefault(); editTitleHandler(); }}} />}
             <div className={classes.ListActionsContainer}>
               <div className={classes.CardOptionBtn} onClick={() => setShowListActions(true)}>{dotsIcon}</div>
               {showListActions && <ListActions close={() => setShowListActions(false)} title={props.title} listID={props.listID} boardID={props.boardID} />}

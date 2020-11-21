@@ -34,6 +34,9 @@
   font-weight: 300;
   font-size: 14px;
   margin: 5px 0 0 47px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .ListTitle span {
   font-weight: 400;

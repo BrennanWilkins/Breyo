@@ -13,6 +13,7 @@ const CardTitle = props => {
 
   const submitHandler = e => {
     e.target.blur();
+    if (title === props.title) { return; }
     if (title === '' || title.length > 200) { return setTitle(props.title); }
     props.updateTitle(title, props.cardID, props.listID, props.boardID);
   };

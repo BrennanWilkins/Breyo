@@ -5,14 +5,15 @@ import { AccountBtn } from '../../../../UI/Buttons/Buttons';
 import Commenter from '../Commenter/Commenter';
 import parseActionMsg from '../../../../../utils/parseActionMsg';
 import formatDate from '../../../../../utils/formatDate';
+const Entities = require('entities');
 
 const Action = props => {
   const [showUser, setShowUser] = useState(false);
-  const [msg, setMsg] = useState(props.msg);
+  const [msg, setMsg] = useState(Entities.decode(props.msg));
 
   useEffect(() => {
     if (props.isBoard && props.cardID && props.listID && props.boardID) {
-      setMsg(parseActionMsg(props.msg, props.cardID, props.listID, props.boardID));
+      setMsg(parseActionMsg(msg, props.cardID, props.listID, props.boardID));
     }
   }, [props.isBoard, props.cardID, props.listID, props.boardID]);
 
