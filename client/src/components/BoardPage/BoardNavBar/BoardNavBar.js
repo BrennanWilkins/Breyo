@@ -22,7 +22,7 @@ const BoardNavBar = props => {
   useEffect(() => setInputTitle(props.title), [props.title]);
 
   const checkTitle = () => {
-    if (inputTitle === props.title || inputTitle.length > 100 || inputTitle === '') { return; }
+    if (inputTitle === props.title || inputTitle.length > 100 || inputTitle === '') { return setInputTitle(props.title); }
     props.updateTitle(inputTitle, props.boardID);
   };
 
@@ -33,28 +33,24 @@ const BoardNavBar = props => {
 
   return (
     <div className={classes.NavBar}>
-      <div className={classes.Section}>
-        <span className={classes.Input}><AutosizeInput value={inputTitle} onChange={inputTitleHandler} onBlur={checkTitle} /></span>
-        <span className={props.isStarred ? `${classes.StarBtn} ${classes.Highlight}` : classes.StarBtn}>
-          <Button clicked={() => props.toggleIsStarred(props.boardID)}>{starIcon}</Button>
+      <span className={classes.Input}><AutosizeInput value={inputTitle} onChange={inputTitleHandler} onBlur={checkTitle} /></span>
+      <span className={props.isStarred ? `${classes.StarBtn} ${classes.Highlight}` : classes.StarBtn}>
+        <Button clicked={() => props.toggleIsStarred(props.boardID)}>{starIcon}</Button>
+      </span>
+      <span className={classes.Separator}></span>
+      {props.members.map(member => (
+        <span key={member.email} className={classes.Container}>
+          <span className={classes.AccountBtn}><AccountBtn clicked={() => setShowMember(member.email)}>{member.fullName.slice(0,1)}</AccountBtn></span>
+          {showMember === member.email &&
+            <MemberModal close={() => setShowMember('')} fullName={member.fullName} email={member.email} userEmail={props.userEmail}
+            isAdmin={member.isAdmin} adminCount={adminCount} userIsAdmin={props.userIsAdmin} boardID={props.boardID} />}
         </span>
-        <div className={classes.Separator}></div>
-        {props.members.map(member => (
-          <span key={member.email} className={classes.Container}>
-            <span className={classes.AccountBtn}><AccountBtn clicked={() => setShowMember(member.email)}>{member.fullName.slice(0,1)}</AccountBtn></span>
-            {showMember === member.email &&
-              <MemberModal close={() => setShowMember('')} fullName={member.fullName} email={member.email} userEmail={props.userEmail}
-              isAdmin={member.isAdmin} adminCount={adminCount} userIsAdmin={props.userIsAdmin} boardID={props.boardID} />}
-          </span>
-        ))}
-        <span className={classes.Container}>
-          <span className={classes.Btn}><Button clicked={() => setShowInviteModal(true)}>Invite</Button></span>
-          {showInviteModal && <InviteModal boardID={props.boardID} close={() => setShowInviteModal(false)} />}
-        </span>
-      </div>
-      <div className={classes.Section}>
-        <span className={`${classes.Btn} ${classes.MenuBtn}`}><Button clicked={() => setShowBoardMenu(true)}>{dotsIcon}Menu</Button></span>
-      </div>
+      ))}
+      <span className={classes.Container}>
+        <span className={classes.Btn}><Button clicked={() => setShowInviteModal(true)}>Invite</Button></span>
+        {showInviteModal && <InviteModal boardID={props.boardID} close={() => setShowInviteModal(false)} />}
+      </span>
+      <span className={`${classes.Btn} ${classes.MenuBtn}`}><Button clicked={() => setShowBoardMenu(true)}>{dotsIcon}Menu</Button></span>
       <BoardMenu show={showBoardMenu} close={() => setShowBoardMenu(false)} />
     </div>
   );
