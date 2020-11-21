@@ -13,7 +13,6 @@ import MemberModal from '../MemberModal/MemberModal';
 const BoardNavBar = props => {
   const [inputTitle, setInputTitle] = useState(props.title);
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [showBoardMenu, setShowBoardMenu] = useState(false);
   const [showMember, setShowMember] = useState('');
   const [adminCount, setAdminCount] = useState(props.members.filter(member => member.isAdmin).length);
 
@@ -32,8 +31,11 @@ const BoardNavBar = props => {
   };
 
   return (
-    <div className={classes.NavBar}>
-      <span className={classes.Input}><AutosizeInput value={inputTitle} onChange={inputTitleHandler} onBlur={checkTitle} /></span>
+    <div className={classes.NavBar} style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
+      <BoardMenu show={props.showMenu} close={props.closeMenu} />
+      <span className={props.showMenu ? `${classes.Input} ${classes.InputContracted}` : classes.Input}>
+        <AutosizeInput value={inputTitle} onChange={inputTitleHandler} onBlur={checkTitle} />
+      </span>
       <span className={props.isStarred ? `${classes.StarBtn} ${classes.Highlight}` : classes.StarBtn}>
         <Button clicked={() => props.toggleIsStarred(props.boardID)}>{starIcon}</Button>
       </span>
@@ -50,8 +52,7 @@ const BoardNavBar = props => {
         <span className={classes.Btn}><Button clicked={() => setShowInviteModal(true)}>Invite</Button></span>
         {showInviteModal && <InviteModal boardID={props.boardID} close={() => setShowInviteModal(false)} />}
       </span>
-      <span className={`${classes.Btn} ${classes.MenuBtn}`}><Button clicked={() => setShowBoardMenu(true)}>{dotsIcon}Menu</Button></span>
-      <BoardMenu show={showBoardMenu} close={() => setShowBoardMenu(false)} />
+      {!props.showMenu && <span className={`${classes.Btn} ${classes.MenuBtn}`}><Button clicked={props.openMenu}>{dotsIcon}Menu</Button></span>}
     </div>
   );
 };
@@ -63,7 +64,10 @@ BoardNavBar.propTypes = {
   isStarred: PropTypes.bool.isRequired,
   updateTitle: PropTypes.func.isRequired,
   toggleIsStarred: PropTypes.func.isRequired,
-  userEmail: PropTypes.string.isRequired
+  userEmail: PropTypes.string.isRequired,
+  showMenu: PropTypes.bool.isRequired,
+  openMenu: PropTypes.func.isRequired,
+  closeMenu: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({

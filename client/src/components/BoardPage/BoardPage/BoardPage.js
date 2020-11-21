@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardPage.module.css';
 import { withRouter } from 'react-router-dom';
@@ -13,6 +13,8 @@ const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'))
 const MemberActivity = lazy(() => import('../MemberActivity/MemberActivity'));
 
 const BoardPage = props => {
+  const [showMenu, setShowMenu] = useState(false);
+
   useEffect(() => {
     initSocket(props.match.params.boardID);
     connectSocket();
@@ -63,8 +65,8 @@ const BoardPage = props => {
     props.boardID !== props.match.params.boardID ? <Spinner /> :
     <>
     <div className={classes.Container} style={{ background: props.color }}>
-      <BoardNavBar />
-      <ListContainer />
+      <BoardNavBar showMenu={showMenu} closeMenu={() => setShowMenu(false)} openMenu={() => setShowMenu(true)} />
+      <ListContainer showMenu={showMenu} />
     </div>
     {props.shownCardID !== null && props.shownListID !== null &&
       <Suspense fallback={fallback}><CardDetails close={closeDetailsHandler} cardID={props.shownCardID} listID={props.shownListID} /></Suspense>}

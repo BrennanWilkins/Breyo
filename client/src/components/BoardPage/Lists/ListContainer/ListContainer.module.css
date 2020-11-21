@@ -6,6 +6,7 @@
   overflow-x: auto;
   display: flex;
   flex-grow: 1;
+  transition: width 250ms;
 }
 .Container::-webkit-scrollbar {
   height: 22px;
