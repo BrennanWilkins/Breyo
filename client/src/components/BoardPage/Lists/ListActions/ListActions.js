@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import classes from './ListActions.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
@@ -15,6 +15,13 @@ const ListActions = props => {
   const [showCopyList, setShowCopyList] = useState(false);
   const [copyListTitle, setCopyListTitle] = useState(props.title);
   const [showMoveCards, setShowMoveCards] = useState(false);
+  const [top, setTop] = useState(0);
+  const [left, setLeft] = useState(0);
+
+  useLayoutEffect(() => {
+    setTop(props.top);
+    setLeft(props.left);
+  }, [props.top, props.left]);
 
   useEffect(() => { if (showCopyList) { setTimeout(() => inputRef.current.select(), 200); }}, [showCopyList]);
 
@@ -61,7 +68,7 @@ const ListActions = props => {
   );
 
   return (
-    <div ref={modalRef} className={classes.Container} style={{ left: `${props.left}px`, top: `${props.top}px` }}>
+    <div ref={modalRef} className={classes.Container} style={{ left: `${left}px`, top: `${top}px` }}>
       <div className={classes.Title}>
         <span className={showCopyList || showMoveCards ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
         {showCopyList ? 'Copy List' : showMoveCards ? 'Move all cards in this list' : 'List Actions'}
