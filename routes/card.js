@@ -16,20 +16,20 @@ const LABEL_COLORS = ['#F60000', '#FF8C00', '#FFEE00', '#4DE94C', '#3783FF', '#4
 
 // create a new card
 router.post('/', auth, validate(
-  [body('boardID').not().isEmpty().escape(),
-  body('listID').not().isEmpty().escape(),
-  body('title').isLength({ min: 1, max: 200 }).escape()]), useIsMember,
+  [body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'List data not found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
-      const title = req.body.title.replace(/\n/g, ' ');
+      const title = req.body.title;
       const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [], comments: [] };
       list.cards.push(card);
       const updatedList = await list.save();
       const cardID = updatedList.cards[updatedList.cards.length - 1]._id;
-      const newActivity = await addActivity(`created this card`, `added **(link)${card.title}** to ${list.title}`, cardID, list._id, req.body.boardID, req.userID);
+      const newActivity = await addActivity(`created this card`, `added **(link)${title}** to ${list.title}`, cardID, list._id, req.body.boardID, req.userID);
       res.status(200).json({ cardID, newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -37,18 +37,18 @@ router.post('/', auth, validate(
 
 // update card title
 router.put('/title', auth, validate(
-  [body('cardID').not().isEmpty().escape(),
-  body('boardID').not().isEmpty().escape(),
-  body('listID').not().isEmpty().escape(),
-  body('title').isLength({ min: 1, max: 200 }).escape()]), useIsMember,
+  [body('cardID').isMongoId(),
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'List data not found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
-      const title = req.body.title.replace(/\n/g, ' ');
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'Card data not found'; }
+      const title = req.body.title;
       const oldTitle = card.title;
       card.title = title;
       await list.save();
@@ -61,10 +61,10 @@ router.put('/title', auth, validate(
 
 // update card description
 router.put('/desc', auth, validate(
-  [body('cardID').not().isEmpty().escape(),
-  body('boardID').not().isEmpty().escape(),
-  body('listID').not().isEmpty().escape(),
-  body('desc').isLength({ max: 600 }).escape()]), useIsMember,
+  [body('cardID').isMongoId(),
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('desc').isLength({ max: 600 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -80,7 +80,10 @@ router.put('/desc', auth, validate(
 );
 
 // add label to card
-router.post('/label', auth, validate([body('*').not().isEmpty()]), useIsMember,
+router.post('/label', auth, validate(
+  [body('listID').isMongoId(),
+  body('boardID').isMongoId(),
+  body('cardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       if (!LABEL_COLORS.includes(req.body.color)) { throw 'Invalid label color'; }
@@ -97,7 +100,10 @@ router.post('/label', auth, validate([body('*').not().isEmpty()]), useIsMember,
 );
 
 // remove label from card
-router.put('/label/remove', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.put('/label/remove', auth, validate([
+  body('listID').isMongoId(),
+  body('boardID').isMongoId(),
+  body('cardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       if (!LABEL_COLORS.includes(req.body.color)) { throw 'Invalid label color'; }
@@ -116,7 +122,10 @@ router.put('/label/remove', auth, validate([body('*').not().isEmpty().escape()])
 );
 
 // toggle card due date as complete/incomplete
-router.put('/dueDate/isComplete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.put('/dueDate/isComplete', auth, validate([
+  body('listID').isMongoId(),
+  body('boardID').isMongoId(),
+  body('cardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -137,7 +146,10 @@ router.put('/dueDate/isComplete', auth, validate([body('*').not().isEmpty().esca
 );
 
 // add due date to card
-router.post('/dueDate', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.post('/dueDate', auth, validate([
+  body('listID').isMongoId(),
+  body('boardID').isMongoId(),
+  body('cardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -163,7 +175,10 @@ router.post('/dueDate', auth, validate([body('*').not().isEmpty().escape()]), us
 );
 
 // remove due date from card
-router.delete('/dueDate/:cardID/:listID/:boardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
+router.delete('/dueDate/:cardID/:listID/:boardID', auth, validate([
+  param('listID').isMongoId(),
+  param('boardID').isMongoId(),
+  param('cardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.params.listID);
@@ -181,7 +196,11 @@ router.delete('/dueDate/:cardID/:listID/:boardID', auth, validate([param('*').no
 );
 
 // add checklist to card
-router.post('/checklist', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 })]), useIsMember,
+router.post('/checklist', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -189,7 +208,7 @@ router.post('/checklist', auth, validate([body('*').not().isEmpty().escape(), bo
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
-      const title = req.body.title.replace(/\n/g, ' ');
+      const title = req.body.title;
       card.checklists.push({ title, items: [] });
       const updatedList = await list.save();
       const checklists = updatedList.cards.id(req.body.cardID).checklists;
@@ -202,7 +221,11 @@ router.post('/checklist', auth, validate([body('*').not().isEmpty().escape(), bo
 );
 
 // remove checklist from card
-router.delete('/checklist/:checklistID/:cardID/:listID/:boardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
+router.delete('/checklist/:checklistID/:cardID/:listID/:boardID', auth, validate([
+  param('listID').isMongoId(),
+  param('boardID').isMongoId(),
+  param('cardID').isMongoId(),
+  param('checklistID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.params.listID);
@@ -221,7 +244,12 @@ router.delete('/checklist/:checklistID/:cardID/:listID/:boardID', auth, validate
 );
 
 // update checklist title
-router.put('/checklist/title', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 })]), useIsMember,
+router.put('/checklist/title', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('checklistID').isMongoId(),
+  body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -229,7 +257,7 @@ router.put('/checklist/title', auth, validate([body('*').not().isEmpty().escape(
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
-      const title = req.body.title.replace(/\n/g, ' ');
+      const title = req.body.title;
       const checklist = card.checklists.id(req.body.checklistID);
       const oldTitle = checklist.title;
       checklist.title = title;
@@ -242,7 +270,12 @@ router.put('/checklist/title', auth, validate([body('*').not().isEmpty().escape(
 );
 
 // add item to a checklist
-router.post('/checklist/item', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 300 })]), useIsMember,
+router.post('/checklist/item', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('checklistID').isMongoId(),
+  body('title').isLength({ min: 1, max: 300 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -252,8 +285,7 @@ router.post('/checklist/item', auth, validate([body('*').not().isEmpty().escape(
       if (!card) { throw 'No card data found'; }
       const checklist = card.checklists.id(req.body.checklistID);
       if (!checklist) { throw 'No checklist data found'; }
-      const title = req.body.title.replace(/\n/g, ' ');
-      checklist.items.push({ title, isComplete: false });
+      checklist.items.push({ title: req.body.title, isComplete: false });
       const updatedList = await list.save();
       const updatedChecklist = updatedList.cards.id(req.body.cardID).checklists.id(req.body.checklistID);
       const itemID = checklist.items[checklist.items.length - 1]._id;
@@ -263,7 +295,13 @@ router.post('/checklist/item', auth, validate([body('*').not().isEmpty().escape(
 );
 
 // toggle checklist item as complete/incomplete
-router.put('/checklist/item/isComplete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.put('/checklist/item/isComplete', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('checklistID').isMongoId(),
+  body('itemID').isMongoId()
+  ]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -285,7 +323,13 @@ router.put('/checklist/item/isComplete', auth, validate([body('*').not().isEmpty
 );
 
 // update checklist item title
-router.put('/checklist/item/title', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 300 })]), useIsMember,
+router.put('/checklist/item/title', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('checklistID').isMongoId(),
+  body('itemID').isMongoId(),
+  body('title').isLength({ min: 1, max: 300 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -293,12 +337,11 @@ router.put('/checklist/item/title', auth, validate([body('*').not().isEmpty().es
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
-      const title = req.body.title.replace(/\n/g, ' ');
       const checklist = card.checklists.id(req.body.checklistID);
       if (!checklist) { throw 'Card checklist not found'; }
       const item = checklist.items.id(req.body.itemID);
       if (!item) { throw 'Checklist item not found'; }
-      item.title = title;
+      item.title = req.body.title;
       await list.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
@@ -306,7 +349,12 @@ router.put('/checklist/item/title', auth, validate([body('*').not().isEmpty().es
 );
 
 // delete item from checklist
-router.put('/checklist/item/delete', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.put('/checklist/item/delete', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('checklistID').isMongoId(),
+  body('itemID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -322,7 +370,11 @@ router.put('/checklist/item/delete', auth, validate([body('*').not().isEmpty().e
 );
 
 // move card inside the same list
-router.put('/moveCard/sameList', auth, validate([body('*').not().isEmpty().escape(), body('sourceIndex').isInt(), body('destIndex').isInt()]), useIsMember,
+router.put('/moveCard/sameList', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('sourceIndex').isInt(),
+  body('destIndex').isInt()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -340,7 +392,12 @@ router.put('/moveCard/sameList', auth, validate([body('*').not().isEmpty().escap
 );
 
 // move card to a different list
-router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escape(), body('sourceIndex').isInt(), body('destIndex').isInt()]), useIsMember,
+router.put('/moveCard/diffList', auth, validate([
+  body('boardID').isMongoId(),
+  body('sourceID').isMongoId(),
+  body('targetID').isMongoId(),
+  body('sourceIndex').isInt(),
+  body('destIndex').isInt()]), useIsMember,
   async (req, res) => {
     try {
       const sourceList = await List.findById(req.body.sourceID);
@@ -362,14 +419,20 @@ router.put('/moveCard/diffList', auth, validate([body('*').not().isEmpty().escap
 );
 
 // create a copy of a card
-router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('title').isLength({ min: 1, max: 200 }), body('destIndex').isInt()]), useIsMember,
+router.post('/copy', auth, validate([
+  body('boardID').isMongoId(),
+  body('sourceListID').isMongoId(),
+  body('destListID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('title').isLength({ min: 1, max: 200 }),
+  body('destIndex').isInt()]), useIsMember,
   async (req, res) => {
     try {
       const sourceList = await List.findById(req.body.sourceListID);
       const destList = await List.findById(req.body.destListID);
       if (!sourceList || !destList) { throw 'List data not found'; }
       if (sourceList.isArchived || destList.isArchived) { throw 'Cannot copy a card a card to or from an archived list.'; }
-      const title = req.body.title.replace(/\n/g, ' ');
+      const title = req.body.title;
       const sourceCard = sourceList.cards.id(req.body.cardID);
       if (!sourceCard) { throw 'Card data not found'; }
       // keep card labels in the copy if requested
@@ -395,7 +458,10 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
 );
 
 // send a card to archive
-router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.post('/archive', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -415,7 +481,10 @@ router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), us
 );
 
 // send card back to list from archive
-router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.put('/archive/recover', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -432,7 +501,10 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
 );
 
 // permanently delete a card
-router.delete('/archive/:cardID/:listID/:boardID', auth, validate([param('*').not().isEmpty().escape()]), useIsMember,
+router.delete('/archive/:cardID/:listID/:boardID', auth, validate([
+  param('boardID').isMongoId(),
+  param('listID').isMongoId(),
+  param('cardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.params.listID);
@@ -451,7 +523,11 @@ router.delete('/archive/:cardID/:listID/:boardID', auth, validate([param('*').no
 );
 
 // add card member
-router.post('/members', auth, validate([body('*').not().isEmpty().escape(), body('email').isEmail()]), useIsMember,
+router.post('/members', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('email').isEmail()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -474,7 +550,11 @@ router.post('/members', auth, validate([body('*').not().isEmpty().escape(), body
 );
 
 // remove a card member
-router.delete('/members/:email/:cardID/:listID/:boardID', auth, validate([param('*').not().isEmpty().escape(), param('email').isEmail()]), useIsMember,
+router.delete('/members/:email/:cardID/:listID/:boardID', auth, validate([
+  param('boardID').isMongoId(),
+  param('listID').isMongoId(),
+  param('cardID').isMongoId(),
+  param('email').isEmail()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.params.listID);
@@ -494,7 +574,11 @@ router.delete('/members/:email/:cardID/:listID/:boardID', auth, validate([param(
 );
 
 // add comment to card
-router.post('/comments', auth, validate([body('*').not().isEmpty().escape(), body('msg').isLength({ min: 1, max: 400 })]), useIsMember,
+router.post('/comments', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('msg').isLength({ min: 1, max: 400 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -513,7 +597,12 @@ router.post('/comments', auth, validate([body('*').not().isEmpty().escape(), bod
 );
 
 // edit comment msg, must be original author to edit
-router.put('/comments', auth, validate([body('*').not().isEmpty().escape(), body('msg').isLength({ min: 1, max: 400 })]), useIsMember,
+router.put('/comments', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('commentID').isMongoId(),
+  body('msg').isLength({ min: 1, max: 400 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -531,7 +620,11 @@ router.put('/comments', auth, validate([body('*').not().isEmpty().escape(), body
 );
 
 // delete a comment
-router.delete('/comments/:commentID/:cardID/:listID/:boardID', auth, validate([param('*').not().isEmpty()]), useIsMember,
+router.delete('/comments/:commentID/:cardID/:listID/:boardID', auth, validate([
+  param('boardID').isMongoId(),
+  param('listID').isMongoId(),
+  param('cardID').isMongoId(),
+  param('commentID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.params.listID);

@@ -11,14 +11,14 @@ const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 
 // create a new list
-router.post('/', auth, validate(
-  [body('boardID').not().isEmpty().escape(),
-  body('title').isLength({ min: 1, max: 200 }).escape()]), useIsMember,
+router.post('/', auth, validate([
+  body('boardID').isMongoId(),
+  body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
       if (!board) { throw 'Board data not found'; }
-      const title = req.body.title.replace(/\n/g, ' ');
+      const title = req.body.title;
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false });
       const list = new List({ boardID: board._id, title, cards: [], archivedCards: [], indexInBoard: lists.length, isArchived: false });
       const newList = await list.save();
@@ -29,16 +29,16 @@ router.post('/', auth, validate(
 );
 
 // update list title
-router.put('/title', auth, validate(
-  [body('boardID').not().isEmpty().escape(),
-  body('title').isLength({ min: 1, max: 200 }).escape(),
-  body('listID').not().isEmpty().escape()]), useIsMember,
+router.put('/title', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'List data not found'; }
       const oldTitle = list.title;
-      list.title = req.body.title.replace(/\n/g, ' ');
+      list.title = req.body.title;
       await list.save();
       const newActivity = await addActivity(null, `renamed list ${oldTitle} to ${list.title}`, null, list._id, req.body.boardID, req.userID);
       res.status(200).json({ newActivity });
@@ -47,7 +47,10 @@ router.put('/title', auth, validate(
 );
 
 // move list to different index in board
-router.put('/moveList', auth, validate([body('sourceIndex').isInt(), body('destIndex').isInt(), body('boardID').not().isEmpty().escape()]), useIsMember,
+router.put('/moveList', auth, validate([
+  body('sourceIndex').isInt(),
+  body('destIndex').isInt(),
+  body('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
@@ -67,7 +70,10 @@ router.put('/moveList', auth, validate([body('sourceIndex').isInt(), body('destI
 );
 
 // create a copy of a list
-router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('title').trim().isLength({ min: 1, max: 200 })]), useIsMember,
+router.post('/copy', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -107,7 +113,9 @@ router.post('/copy', auth, validate([body('*').not().isEmpty().escape(), body('t
 
 // authorization: admin
 // send list to archive
-router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), useIsAdmin,
+router.post('/archive', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
@@ -131,7 +139,9 @@ router.post('/archive', auth, validate([body('*').not().isEmpty().escape()]), us
 );
 
 // send list to board from archive
-router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.put('/archive/recover', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).lean();
@@ -145,7 +155,9 @@ router.put('/archive/recover', auth, validate([body('*').not().isEmpty().escape(
 
 // authorization: admin
 // Permanently delete a list
-router.delete('/archive/:listID/:boardID', auth, validate([param('*').not().isEmpty()]), useIsAdmin,
+router.delete('/archive/:listID/:boardID', auth, validate([
+  param('boardID').isMongoId(),
+  param('listID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
       const list = await List.findByIdAndDelete(req.params.listID);
@@ -159,7 +171,9 @@ router.delete('/archive/:listID/:boardID', auth, validate([param('*').not().isEm
 );
 
 // Send all cards in list to archive
-router.put('/archive/allCards', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.put('/archive/allCards', auth, validate([
+  body('boardID').isMongoId(),
+  body('listID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
@@ -173,14 +187,16 @@ router.put('/archive/allCards', auth, validate([body('*').not().isEmpty().escape
       list.archivedCards = list.archivedCards.concat(list.cards);
       list.cards = [];
       await list.save();
-      console.log(activities);
       res.status(200).json({ activities });
     } catch(err) { res.sendStatus(500); }
   }
 );
 
 // move all cards in a list to another list
-router.put('/moveAllCards', auth, validate([body('*').not().isEmpty().escape()]), useIsMember,
+router.put('/moveAllCards', auth, validate([
+  body('boardID').isMongoId(),
+  body('oldListID').isMongoId(),
+  body('newListID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const oldList = await List.findById(req.body.oldListID);

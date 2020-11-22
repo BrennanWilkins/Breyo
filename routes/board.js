@@ -18,7 +18,7 @@ const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
                 'rgb(173, 80, 147)', 'rgb(74, 50, 221)', 'rgb(4, 107, 139)'];
 
 // returns all board & list data for a given board
-router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape()]), useIsMember,
+router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.params.boardID).lean();
@@ -32,17 +32,14 @@ router.get('/:boardID', auth, validate([param('boardID').not().isEmpty().escape(
 );
 
 // create a new board w given title/color
-router.post('/', auth, validate(
-  [body('title').trim().isLength({ min: 1, max: 100 }).escape(),
-  body('color').not().isEmpty().escape()]
-  , 'Please enter a valid title.'),
+router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 100 })], 'Please enter a valid title.'),
   async (req, res) => {
     try {
       // if invalid color default to red
       const color = COLORS.includes(req.body.color) ? req.body.color : COLORS[4];
       const user = await User.findById(req.userID);
       if (!user) { throw 'No user data found'; }
-      const title = req.body.title.replace(/\n/g, ' ');
+      const title = req.body.title;
       // user is admin of new board by default
       const board = new Board({ title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
         color, creatorEmail: user.email, desc: '' });
@@ -68,8 +65,7 @@ router.post('/', auth, validate(
 
 // authorization: member
 // updates board color
-router.put('/color', auth, validate(
-  [body('boardID').not().isEmpty().escape(), body('color').not().isEmpty().escape()]), useIsMember,
+router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
       if (!COLORS.includes(String(req.body.color))) { throw 'Color not found'; }
@@ -93,8 +89,7 @@ router.put('/color', auth, validate(
 
 // authorization: member
 // update board description
-router.put('/desc', auth, validate(
-  [body('boardID').not().isEmpty().escape(), body('desc').escape().isLength({ max: 600 })]), useIsMember,
+router.put('/desc', auth, validate([body('boardID').isMongoId(), body('desc').isLength({ max: 600 })]), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
@@ -110,13 +105,13 @@ router.put('/desc', auth, validate(
 // authorization: member
 // update board title
 router.put('/title', auth, validate(
-  [body('title').trim().isLength({ min: 1, max: 100 }).escape(),
-  body('boardID').not().isEmpty().escape()], 'Please enter a valid title.'), useIsMember,
+  [body('title').trim().isLength({ min: 1, max: 100 }),
+  body('boardID').isMongoId()], 'Please enter a valid title.'), useIsMember,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
       if (!board) { throw 'No board data found'; }
-      const title = req.body.title.replace(/\n/g, ' ');
+      const title = req.body.title;
       const oldTitle = board.title;
       board.title = title;
       // for each member of board, update board title in their user model
@@ -124,7 +119,7 @@ router.put('/title', auth, validate(
         const user = await User.findOne({ email: member.email });
         const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
         if (index < 0) { throw 'Board not found in users model'; }
-        user.boards[index].title = req.body.title;
+        user.boards[index].title = title;
         user.markModified('boards');
         await user.save();
       }
@@ -136,7 +131,7 @@ router.put('/title', auth, validate(
 );
 
 // toggle a board as starred/unstarred in user model
-router.put('/starred', auth, validate([body('boardID').not().isEmpty()]),
+router.put('/starred', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
@@ -153,9 +148,7 @@ router.put('/starred', auth, validate([body('boardID').not().isEmpty()]),
 
 // authorization: admin
 // add another admin to the board
-router.post('/admins', auth, validate(
-  [body('email').not().isEmpty().trim().escape(),
-  body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
+router.post('/admins', auth, validate([body('email').isEmail(), body('boardID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
@@ -182,9 +175,7 @@ router.post('/admins', auth, validate(
 
 // authorization: admin
 // change user permission from admin to member
-router.delete('/admins/:email/:boardID', auth, validate(
-  [param('email').not().isEmpty().trim().escape(),
-  param('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
+router.delete('/admins/:email/:boardID', auth, validate([param('email').isEmail(), param('boardID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
       const board = await Board.findById(req.params.boardID);
@@ -211,9 +202,7 @@ router.delete('/admins/:email/:boardID', auth, validate(
 
 // authorization: admin
 // send invite to a user to join the board
-router.post('/invites', auth, validate(
-  [body('email').isEmail().normalizeEmail(),
-  body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
+router.post('/invites', auth, validate([body('email').isEmail(), body('boardID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
@@ -237,8 +226,7 @@ router.post('/invites', auth, validate(
 );
 
 // accept invitation to join a board
-router.put('/invites/accept', auth, validate(
-  [body('boardID').not().isEmpty().trim().escape()]),
+router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
@@ -263,8 +251,7 @@ router.put('/invites/accept', auth, validate(
 );
 
 // reject invitation to join a board
-router.put('/invites/reject', auth, validate(
-  [body('boardID').not().isEmpty().trim().escape()]),
+router.put('/invites/reject', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
@@ -280,9 +267,7 @@ router.put('/invites/reject', auth, validate(
 
 // authorization: admin
 // remove a user from the board
-router.put('/members/remove', auth, validate(
-  [body('email').not().isEmpty().trim().escape(),
-  body('boardID').not().isEmpty().trim().escape()]), useIsAdmin,
+router.put('/members/remove', auth, validate([body('email').isEmail(), body('boardID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);
@@ -302,7 +287,7 @@ router.put('/members/remove', auth, validate(
 
 // authorization: admin
 // delete a board, its lists, and all of its activity
-router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty()]), useIsAdmin,
+router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
       const board = await Board.findById(req.params.boardID);
@@ -323,7 +308,7 @@ router.delete('/:boardID', auth, validate([param('boardID').not().isEmpty()]), u
 );
 
 // leave a board
-router.put('/leave', auth, validate([body('boardID').not().isEmpty()]),
+router.put('/leave', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const board = await Board.findById(req.body.boardID);

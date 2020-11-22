@@ -20,7 +20,7 @@ router.get('/userData', auth,
 );
 
 router.post('/login', validate(
-  [body('email').not().isEmpty().trim().escape(),
+  [body('email').not().isEmpty().isEmail(),
   body('password').not().isEmpty().trim().escape()],
   'Email and password cannot be empty.'),
   async (req, res) => {
@@ -40,8 +40,7 @@ router.post('/login', validate(
 );
 
 router.post('/signup', validate(
-  [body('*').trim().escape(),
-  body('email').isEmail().normalizeEmail(),
+  [body('email').isEmail(),
   body('fullName').isLength({ min: 1, max: 100 }),
   body('password').isLength({ min: 8, max: 100 }),
   body('confirmPassword').isLength({ min: 8, max: 100 })],
@@ -81,10 +80,7 @@ router.post('/autoLogin', auth,
   }
 );
 
-router.post('/changePass', auth, validate(
-  [body('*').not().isEmpty().trim().escape(),
-  body('newPassword').isLength({ min: 8, max: 100 })]
-  ,'The input fields cannot be empty.'),
+router.post('/changePass', auth, validate([body('newPassword').isLength({ min: 8, max: 100 })],'There is an error in one of the fields.'),
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
