@@ -99,6 +99,22 @@ const reducer = (state = initialState, action) => {
       const boards = state.boards.filter(board => board.boardID !== action.boardID);
       return { ...state, boards };
     }
+    case actionTypes.UPDATE_BOARD_TITLE: {
+      const boards = [...state.boards];
+      const boardIndex = boards.findIndex(board => board.boardID === action.boardID);
+      const board = { ...boards[boardIndex] };
+      board.title = action.title;
+      boards[boardIndex] = board;
+      return { ...state, boards };
+    }
+    case actionTypes.UPDATE_COLOR: {
+      const boards = [...state.boards];
+      const boardIndex = boards.findIndex(board => board.boardID === action.boardID);
+      const board = { ...boards[boardIndex] };
+      board.color = action.color;
+      boards[boardIndex] = board;
+      return { ...state, boards };
+    }
     default: return state;
   }
 };

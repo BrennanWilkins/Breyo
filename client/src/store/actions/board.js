@@ -34,11 +34,11 @@ export const updateActiveBoard = payload => (dispatch, getState) => {
   dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload, isStarred, creatorFullName, userIsAdmin });
 };
 
-export const updateBoardTitle = (title, id) => async dispatch => {
+export const updateBoardTitle = (title, boardID) => async dispatch => {
   try {
-    const res = await axios.put('/board/title', { boardID: id, title });
-    sendUpdate('put/board/title', JSON.stringify({ title }));
-    dispatch({ type: actionTypes.UPDATE_BOARD_TITLE, title });
+    const res = await axios.put('/board/title', { boardID, title });
+    sendUpdate('put/board/title', JSON.stringify({ title, boardID }));
+    dispatch({ type: actionTypes.UPDATE_BOARD_TITLE, title, boardID });
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     console.log(err);
@@ -79,12 +79,12 @@ export const removeAdmin = (email, boardID) => async dispatch => {
 
 export const demoteSelf = boardID => ({ type: actionTypes.DEMOTE_SELF, boardID });
 
-export const updateColor = (color, boardID) => async (dispatch, getState) => {
+export const updateColor = color => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
-    dispatch({ type: actionTypes.UPDATE_COLOR, color });
+    dispatch({ type: actionTypes.UPDATE_COLOR, color, boardID });
     await axios.put('/board/color', { color, boardID });
-    sendUpdate('put/board/color', JSON.stringify({ color }));
+    sendUpdate('put/board/color', JSON.stringify({ color, boardID }));
   } catch (err) {
     console.log(err);
   }
