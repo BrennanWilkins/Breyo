@@ -1,5 +1,4 @@
 import Parse from 'html-react-parser';
-const Entities = require('entities');
 
 const convertSymbol = (text, symbol, start, end) => {
   let count = 0;
@@ -45,8 +44,6 @@ const convertLinks = text => {
 
 // takes text string as input & returns JSX
 const parseToJSX = text => {
-  // decode HTML entities back to symbols
-  text = Entities.decodeHTML(text);
   // replace line breaks with <br />
   while (text.includes('\n')) { text = text.replace('\n', '<br />'); }
   // convert ** -> <b></b>

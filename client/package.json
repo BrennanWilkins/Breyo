@@ -8,7 +8,6 @@
     "@testing-library/user-event": "^7.2.1",
     "axios": "^0.21.0",
     "date-fns": "^2.16.1",
-    "entities": "^2.1.0",
     "html-react-parser": "^0.14.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.0",

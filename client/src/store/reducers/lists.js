@@ -1,5 +1,4 @@
 import * as actionTypes from '../actions/actionTypes';
-const Entities = require('entities');
 
 const initialState = {
   lists: [],
@@ -19,7 +18,6 @@ const reducer = (state = initialState, action) => {
       let allComments = [];
       let lists = action.payload.lists.map(list => {
         const cards = list.cards.map(card => {
-          const title = Entities.decode(card.title);
           const comments = card.comments.map(comment => ({
             email: comment.email,
             fullName: comment.fullName,
@@ -27,41 +25,9 @@ const reducer = (state = initialState, action) => {
             listID: comment.listID,
             date: comment.date,
             commentID: comment._id,
-            msg: Entities.decode(comment.msg)
+            msg: comment.msg
           })).sort((a,b) => new Date(b.date) - new Date(a.date));
-          allComments = allComments.concat(comments.map(comment => ({...comment, cardTitle: title})));
-          return {
-            cardID: card._id,
-            checklists: card.checklists.map(checklist => ({
-              title: checklist.title,
-              checklistID: checklist._id,
-              items: checklist.items.map(item => ({
-                itemID: item._id,
-                title: Entities.decode(item.title),
-                isComplete: item.isComplete
-              }))
-            })),
-            dueDate: card.dueDate,
-            labels: card.labels,
-            title,
-            desc: Entities.decode(card.desc),
-            members: card.members,
-            comments
-          };
-        });
-
-        const archivedCards = list.archivedCards.map(card => {
-          const title = Entities.decode(card.title);
-          const comments = card.comments.map(comment => ({
-            email: comment.email,
-            fullName: comment.fullName,
-            cardID: comment.cardID,
-            listID: comment.listID,
-            date: comment.date,
-            commentID: comment._id,
-            msg: Entities.decode(comment.msg)
-          })).sort((a,b) => new Date(b.date) - new Date(a.date));
-          allComments = allComments.concat(comments.map(comment => ({...comment, cardTitle: title})));
+          allComments = allComments.concat(comments.map(comment => ({...comment, cardTitle: card.title})));
           return {
             cardID: card._id,
             checklists: card.checklists.map(checklist => ({
@@ -75,8 +41,39 @@ const reducer = (state = initialState, action) => {
             })),
             dueDate: card.dueDate,
             labels: card.labels,
-            title,
-            desc: Entities.decode(card.desc),
+            title: card.title,
+            desc: card.desc,
+            members: card.members,
+            comments
+          };
+        });
+
+        const archivedCards = list.archivedCards.map(card => {
+          const comments = card.comments.map(comment => ({
+            email: comment.email,
+            fullName: comment.fullName,
+            cardID: comment.cardID,
+            listID: comment.listID,
+            date: comment.date,
+            commentID: comment._id,
+            msg: comment.msg
+          })).sort((a,b) => new Date(b.date) - new Date(a.date));
+          allComments = allComments.concat(comments.map(comment => ({ ...comment, cardTitle: card.title })));
+          return {
+            cardID: card._id,
+            checklists: card.checklists.map(checklist => ({
+              title: checklist.title,
+              checklistID: checklist._id,
+              items: checklist.items.map(item => ({
+                itemID: item._id,
+                title: item.title,
+                isComplete: item.isComplete
+              }))
+            })),
+            dueDate: card.dueDate,
+            labels: card.labels,
+            title: card.title,
+            desc: card.desc,
             members: card.members,
             comments
           };
@@ -86,7 +83,7 @@ const reducer = (state = initialState, action) => {
         return {
           indexInBoard: list.indexInBoard,
           listID: list._id,
-          title: Entities.decode(list.title),
+          title: list.title,
           isArchived: list.isArchived,
           cards
         };
@@ -498,7 +495,7 @@ const reducer = (state = initialState, action) => {
       const newList = {
         indexInBoard: action.newList.indexInBoard,
         listID: action.newList._id,
-        title: Entities.decode(action.newList.title),
+        title: action.newList.title,
         isArchived: false,
         cards: action.newList.cards.map(card => ({
           cardID: card._id,
@@ -513,8 +510,8 @@ const reducer = (state = initialState, action) => {
           })),
           dueDate: card.dueDate,
           labels: card.labels,
-          title: Entities.decode(card.title),
-          desc: Entities.decode(card.desc),
+          title: card.title,
+          desc: card.desc,
           comments: [],
           members: card.members
         }))

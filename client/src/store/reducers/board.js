@@ -1,5 +1,4 @@
 import * as actionTypes from '../actions/actionTypes';
-const Entities = require('entities');
 
 const initialState = {
   title: '',
@@ -17,12 +16,12 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.UPDATE_ACTIVE_BOARD: return {
       ...state,
-      title: Entities.decode(action.payload.title),
+      title: action.payload.title,
       members: [...action.payload.members],
       color: action.payload.color,
       boardID: action.payload._id,
       creatorEmail: action.payload.creatorEmail,
-      desc: Entities.decode(action.payload.desc),
+      desc: action.payload.desc,
       isStarred: action.isStarred,
       creatorFullName: action.creatorFullName,
       userIsAdmin: action.userIsAdmin
