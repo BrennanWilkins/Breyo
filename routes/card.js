@@ -315,8 +315,9 @@ router.put('/checklist/item/isComplete', auth, validate([
       if (!item) { throw 'Checklist item not found'; }
       item.isComplete = !item.isComplete;
       await list.save();
-      const newActivity = await addActivity(`completed ${item.title} in checklist ${checklist.title}`, `completed ${item.title} in **(link)${card.title}**`,
-        card._id, list._id, req.body.boardID, req.userID);
+      const cardMsg = item.isComplete ? `completed ${item.title} in checklist ${checklist.title}` : `marked ${item.title} incomplete in checklist ${checklist.title}`;
+      const boardMsg = item.isComplete ? `completed ${item.title} in **(link)${card.title}**` : `marked ${item.title} incomplete in **(link)${card.title}**`;
+      const newActivity = await addActivity(cardMsg, boardMsg, card._id, list._id, req.body.boardID, req.userID);
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
