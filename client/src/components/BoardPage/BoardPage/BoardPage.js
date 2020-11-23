@@ -4,7 +4,7 @@ import classes from './BoardPage.module.css';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import BoardNavBar from '../BoardNavBar/BoardNavBar';
-import { initSocket, connectSocket, closeSocket }  from '../../../store/actions/socket';
+import { initSocket, connectSocket, closeSocket, isConnected }  from '../../../store/actions/socket';
 import { instance as axios } from '../../../axios';
 import { addNotif, updateActiveBoard, setCardDetails, setShownMemberActivity } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
@@ -16,8 +16,10 @@ const BoardPage = props => {
   const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
-    initSocket(props.match.params.boardID);
-    connectSocket();
+    if (!isConnected()) {
+      initSocket(props.match.params.boardID);
+      connectSocket();
+    }
 
     return () => {
       console.log('connection closed');

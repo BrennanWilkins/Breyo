@@ -249,7 +249,7 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
       // update client's token to show new board, new token expires at same time
       const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
 
-      res.status(200).json({ token, newActivity });
+      res.status(200).json({ token, newActivity, boards: user.boards, invites: user.invites });
     } catch(err) { res.sendStatus(500); }
   }
 );

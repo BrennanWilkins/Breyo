@@ -97,7 +97,7 @@ router.get('/all/card/:boardID/:cardID', auth, validate([param('*').isMongoId()]
 );
 
 // returns all activity for given board member
-router.get('/member/:email/:boardID', auth, validate([param('board').isMongoId(), param('email').isEmail()]), useIsMember,
+router.get('/member/:email/:boardID', auth, validate([param('boardID').isMongoId(), param('email').isEmail()]), useIsMember,
   async (req, res) => {
     try {
       const activity = await Activity.find({ boardID: req.params.boardID, email: req.params.email }).sort('-date').lean();

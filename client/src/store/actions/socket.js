@@ -74,3 +74,7 @@ export const closeSocket = () => {
   if (!socket) { return; }
   socket.close();
 };
+
+export const isConnected = () => {
+  return socket && socket.isConnected;
+};

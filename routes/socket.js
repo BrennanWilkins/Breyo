@@ -42,7 +42,8 @@ const routes = [
   'post/activity',
   'put/activity/board/deleteCard',
   'put/activity/board/deleteList',
-  'delete/activity'
+  'delete/activity',
+  'post/board/newMember'
 ];
 
 module.exports = routes;

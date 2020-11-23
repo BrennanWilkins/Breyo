@@ -46,6 +46,11 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DELETE_BOARD: return { ...initialState };
     case actionTypes.TOGGLE_IS_STARRED_ACTIVE: return { ...state, isStarred: !state.isStarred };
     case actionTypes.LEAVE_BOARD: return { ...initialState };
+    case actionTypes.ADD_BOARD_MEMBER: {
+      const members = [...state.members];
+      members.push({ email: action.email, fullName: action.fullName, isAdmin: false });
+      return { ...state, members };
+    }
     default: return state;
   }
 };

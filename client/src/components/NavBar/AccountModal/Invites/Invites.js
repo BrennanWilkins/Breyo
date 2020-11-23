@@ -4,8 +4,14 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Button from '../../../UI/Buttons/Buttons';
 import { acceptInvite, rejectInvite } from '../../../../store/actions';
+import { withRouter } from 'react-router-dom';
 
 const Invites = props => {
+  const acceptHandler = boardID => {
+    props.acceptInvite(boardID, props.email, props.fullName, props.history.push);
+    props.close();
+  };
+
   return (
     <div className={classes.Invites}>
       {props.invites.length === 0 ?
@@ -15,7 +21,7 @@ const Invites = props => {
           <div>{invite.inviterName}<span className={classes.Email}> ({invite.inviterEmail}) </span>
           invited you to the board <span className={classes.Title}>{invite.title}</span>.</div>
           <div className={classes.Btns}>
-            <span className={classes.AcceptBtn}><Button clicked={() => props.acceptInvite(invite.boardID)}>Accept</Button></span>
+            <span className={classes.AcceptBtn}><Button clicked={() => acceptHandler(invite.boardID)}>Accept</Button></span>
             <span className={classes.RejectBtn}><Button clicked={() => props.rejectInvite(invite.boardID)}>Reject</Button></span>
           </div>
         </div>
@@ -27,7 +33,10 @@ const Invites = props => {
 Invites.propTypes = {
   invites: PropTypes.array.isRequired,
   acceptInvite: PropTypes.func.isRequired,
-  rejectInvite: PropTypes.func.isRequired
+  rejectInvite: PropTypes.func.isRequired,
+  email: PropTypes.string.isRequired,
+  fullName: PropTypes.string.isRequired,
+  close: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -35,8 +44,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  acceptInvite: boardID => dispatch(acceptInvite(boardID)),
+  acceptInvite: (boardID, email, fullName, push) => dispatch(acceptInvite(boardID, email, fullName, push)),
   rejectInvite: boardID => dispatch(rejectInvite(boardID))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Invites);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Invites));

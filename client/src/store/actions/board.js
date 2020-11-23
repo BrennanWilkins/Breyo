@@ -1,7 +1,7 @@
 import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
 import { addNotif } from './notifications';
-import { sendUpdate } from './socket';
+import { sendUpdate, initSocket, connectSocket } from './socket';
 import { addRecentActivity } from './activity';
 
 export const createBoard = (title, color) => async dispatch => {
@@ -196,17 +196,19 @@ export const deleteBoard = () => async (dispatch, getState) => {
   }
 };
 
-export const acceptInvite = boardID => async dispatch => {
+export const acceptInvite = (boardID, email, fullName, push) => async (dispatch, getState) => {
   try {
-    const tokenRes = await axios.put('/board/invites/accept', { boardID });
-    axios.defaults.headers.common['x-auth-token'] = tokenRes.data.token;
-    localStorage['token'] = tokenRes.data.token;
-    addRecentActivity(tokenRes.data.newActivity);
-
-    const res = await axios.get('/auth/userData');
-
+    const res = await axios.put('/board/invites/accept', { boardID });
+    axios.defaults.headers.common['x-auth-token'] = res.data.token;
+    localStorage['token'] = res.data.token;
+    // automatically send user to the board
+    push(`/board/${boardID}`);
+    // manually connect socket
+    initSocket(boardID);
+    connectSocket();
+    addRecentActivity(res.data.newActivity);
     dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards });
-    dispatch({ type: actionTypes.REMOVE_INVITE, boardID });
+    sendUpdate('post/board/newMember', JSON.stringify({ email, fullName }));
   } catch (err) {
     dispatch(addNotif('There was an error while joining the board.'));
   }
@@ -227,6 +229,7 @@ export const leaveBoard = () => async (dispatch, getState) => {
     const res = await axios.put('/board/leave', { boardID });
     dispatch({ type: actionTypes.LEAVE_BOARD, boardID });
     addRecentActivity(res.data.newActivity);
+    // sendUpdate('put/board/memberLeft', JSON.stringify({ }));
   } catch (err) {
     dispatch(addNotif('There was an error while leaving the board.'));
   }

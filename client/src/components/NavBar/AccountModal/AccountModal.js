@@ -20,7 +20,7 @@ const AccountModal = props => {
         {showInvites ? 'Invites' : 'Account'}
         <CloseBtn close={props.close} color="rgb(112, 112, 112)" />
       </div>
-      {showInvites ? <Invites /> :
+      {showInvites ? <Invites close={props.close} email={props.email} fullName={props.fullName} /> :
       <><AccountInfo fullName={props.fullName} email={props.email} givePadding />
       <div className={classes.Options}>
         <div onClick={() => setShowInvites(true)}>Invites</div>
