@@ -28,7 +28,18 @@ const reducer = (state = initialState, action) => {
     }
     case actionTypes.CARD_ACTIVITY_LOADING : return { ...state, cardActivityLoading: action.bool };
     case actionTypes.SET_SHOWN_MEMBER_ACTIVITY: return { ...state, shownMemberActivity: action.member };
-    case actionTypes.DELETE_BOARD_ACTIVITY: return { ...state, boardActivity: [] };
+    case actionTypes.DELETE_BOARD_ACTIVITY: {
+      const boardActivity = state.boardActivity.filter(activity => activity.commentID);
+      let cardActivity = state.cardActivity;
+      let allBoardActivity = state.allBoardActivity;
+      if (state.shownCardActivityID !== '') {
+        cardActivity = cardActivity.filter(activity => activity.commentID);
+      }
+      if (state.allBoardActivityShown) {
+        allBoardActivity = allBoardActivity.filter(activity => activity.commentID);
+      }
+      return { ...state, boardActivity, allBoardActivity, cardActivity };
+    }
     case actionTypes.ADD_RECENT_ACTIVITY: {
       const boardActivity = [...state.boardActivity];
       boardActivity.unshift(action.newActivity);

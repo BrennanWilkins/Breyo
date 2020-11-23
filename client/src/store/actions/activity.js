@@ -54,7 +54,8 @@ export const deleteBoardActivity = () => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
     await axios.delete(`/activity/${boardID}`);
-    dispatch({ type: actionTypes.DELETE_BOARD_ACTIVITY, boardID });
+    dispatch({ type: actionTypes.DELETE_BOARD_ACTIVITY });
+    sendUpdate('delete/activity');
   } catch (err) {
     dispatch(addNotif('There was an error while deleting the board\'s activity history.'));
   }
