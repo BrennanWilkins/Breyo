@@ -171,6 +171,7 @@ const reducer = (state = initialState, action) => {
       allBoardActivityErr: false,
       allBoardActivityShown: false
     };
+    case actionTypes.LEAVE_BOARD: return { ...initialState };
     default: return state;
   }
 };

@@ -201,11 +201,11 @@ export const acceptInvite = (boardID, email, fullName, push) => async (dispatch,
     const res = await axios.put('/board/invites/accept', { boardID });
     axios.defaults.headers.common['x-auth-token'] = res.data.token;
     localStorage['token'] = res.data.token;
-    // automatically send user to the board
-    push(`/board/${boardID}`);
     // manually connect socket
     initSocket(boardID);
     connectSocket();
+    // automatically send user to the board
+    push(`/board/${boardID}`);
     addRecentActivity(res.data.newActivity);
     dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards });
     sendUpdate('post/board/newMember', JSON.stringify({ email, fullName }));
@@ -223,13 +223,16 @@ export const rejectInvite = boardID => async dispatch => {
   }
 };
 
-export const leaveBoard = () => async (dispatch, getState) => {
+export const leaveBoard = push => async (dispatch, getState) => {
   try {
-    const boardID = getState().board.boardID;
+    const state = getState();
+    const boardID = state.board.boardID;
+    const email = state.auth.email;
     const res = await axios.put('/board/leave', { boardID });
-    dispatch({ type: actionTypes.LEAVE_BOARD, boardID });
     addRecentActivity(res.data.newActivity);
-    // sendUpdate('put/board/memberLeft', JSON.stringify({ }));
+    sendUpdate('put/board/memberLeft', JSON.stringify({ email }));
+    dispatch({ type: actionTypes.LEAVE_BOARD, boardID });
+    push('/');
   } catch (err) {
     dispatch(addNotif('There was an error while leaving the board.'));
   }

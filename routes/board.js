@@ -333,7 +333,7 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
         let shouldUpdate = false;
         for (let card of list.cards) {
           for (let i = card.members.length - 1; i >= 0; i--) {
-            if (member.email === user.email) { card.members.splice(i, 1); }
+            if (card.members[i].email === user.email) { card.members.splice(i, 1); }
             shouldUpdate = true;
           }
         }

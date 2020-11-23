@@ -51,6 +51,10 @@ const reducer = (state = initialState, action) => {
       members.push({ email: action.email, fullName: action.fullName, isAdmin: false });
       return { ...state, members };
     }
+    case actionTypes.DELETE_BOARD_MEMBER: {
+      const members = state.members.filter(member => member.email !== action.email);
+      return { ...state, members };
+    }
     default: return state;
   }
 };

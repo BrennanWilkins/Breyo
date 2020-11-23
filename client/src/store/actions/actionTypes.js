@@ -25,6 +25,7 @@ export const DELETE_BOARD = 'DELETE_BOARD';
 export const REMOVE_INVITE = 'REMOVE_INVITE';
 export const LEAVE_BOARD = 'LEAVE_BOARD';
 export const ADD_BOARD_MEMBER = 'ADD_BOARD_MEMBER';
+export const DELETE_BOARD_MEMBER = 'DELETE_BOARD_MEMBER';
 
 export const UPDATE_LIST_TITLE = 'UPDATE_LIST_TITLE';
 export const ADD_LIST = 'ADD_LIST';

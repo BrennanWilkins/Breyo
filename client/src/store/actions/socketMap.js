@@ -44,7 +44,8 @@ const socketMap = {
   'put/activity/board/deleteCard': actionTypes.UPDATE_BOARD_ACTIVITY_DELETE_CARD,
   'put/activity/board/deleteList': actionTypes.UPDATE_BOARD_ACTIVITY_DELETE_LIST,
   'delete/activity': actionTypes.DELETE_BOARD_ACTIVITY,
-  'post/board/newMember': actionTypes.ADD_BOARD_MEMBER
+  'post/board/newMember': actionTypes.ADD_BOARD_MEMBER,
+  'put/board/memberLeft': actionTypes.DELETE_BOARD_MEMBER
 };
 
 export default socketMap;

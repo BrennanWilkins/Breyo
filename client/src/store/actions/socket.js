@@ -8,6 +8,7 @@ import socketMap from './socketMap';
 let socket = null;
 
 export const initSocket = boardID => {
+  if (socket) { return; }
   const newSocket = io('http://localhost:9000/', {
     query: { token: axios.defaults.headers.common['x-auth-token'] }
   });
@@ -32,6 +33,7 @@ export const initSocket = boardID => {
   });
 
   newSocket.on('disconnect', reason => {
+    console.log('disconnected:', reason);
     if (reason === 'io server disconnect') {
       store.dispatch(addNotif('Connection to server lost, attempting to re-establish...'));
       newSocket.connect();
@@ -73,8 +75,4 @@ export const connectSocket = () => {
 export const closeSocket = () => {
   if (!socket) { return; }
   socket.close();
-};
-
-export const isConnected = () => {
-  return socket && socket.isConnected;
 };

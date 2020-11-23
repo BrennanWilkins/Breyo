@@ -517,7 +517,11 @@ const reducer = (state = initialState, action) => {
       const cards = [...list.cards];
       const cardIndex = cards.findIndex(card => card.cardID === action.cardID);
       const card = { ...cards[cardIndex] };
-      card.members = [...card.members, { email: action.email, fullName: action.fullName }];
+      const members = [...card.members];
+      // check if user already member
+      if (members.find(member => member.email === action.email)) { return state; }
+      members.push({ email: action.email, fullName: action.fullName });
+      card.members = members;
       cards[cardIndex] = card;
       list.cards = cards;
       lists[listIndex] = list;
@@ -585,6 +589,30 @@ const reducer = (state = initialState, action) => {
       lists[listIndex] = list;
       return { ...state, lists, currentCard: card };
     }
+    case actionTypes.DELETE_BOARD_MEMBER: {
+      // remove member from any cards they are a member of
+      const lists = [...state.lists];
+      for (let listIdx = 0; listIdx < lists.length; listIdx++) {
+        const list = { ...lists[listIdx] };
+        const cards = [...list.cards];
+        let shouldUpdate = false;
+        for (let cardIdx = 0; cardIdx < cards.length; cardIdx++) {
+          const card = { ...cards[cardIdx] };
+          const members = card.members.filter(member => member.email !== action.email);
+          if (members.length !== card.members.length) {
+            card.members = members;
+            cards[cardIdx] = card;
+            shouldUpdate = true;
+          }
+        }
+        if (shouldUpdate) {
+          list.cards = cards;
+          lists[listIdx] = list;
+        }
+      }
+      return { ...state, lists };
+    }
+    case actionTypes.LEAVE_BOARD: return { ...initialState };
     default: return state;
   }
 };

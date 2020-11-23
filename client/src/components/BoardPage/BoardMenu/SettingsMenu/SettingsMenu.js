@@ -27,8 +27,7 @@ const SettingsMenu = props => {
 
   const leaveBoardHandler = () => {
     setShowLeaveBoard(false);
-    props.leaveBoard();
-    props.history.push('/');
+    props.leaveBoard(props.history.push);
   };
 
   return (
@@ -68,7 +67,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   deleteBoard: () => dispatch(deleteBoard()),
   deleteBoardActivity: () => dispatch(deleteBoardActivity()),
-  leaveBoard: () => dispatch(leaveBoard())
+  leaveBoard: push => dispatch(leaveBoard(push))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(SettingsMenu));
