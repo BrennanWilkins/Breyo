@@ -20,16 +20,17 @@ io.use((socket, next) => {
   if (socket.handshake.query && socket.handshake.query.token) {
     jwt.verify(socket.handshake.query.token, config.get('AUTH_KEY'), (err, decoded) => {
       if (err) { return next(new Error('Unauthorized')); }
-      socket.decodedUser = decoded;
+      socket.userBoards = {};
+      for (let board of decoded.user.boards) {
+        socket.userBoards[board.boardID] = true;
+      }
       next();
     });
   } else { next(new Error('Unauthorized')); }
 }).on('connection', socket => {
   socket.on('join', room => {
     // verify user is member of board
-    if (socket.decodedUser.user.boards.findIndex(board => String(board.boardID) === String(room)) === -1) {
-      return socket.emit('unauthorized', 'Not a member');
-    }
+    if (!socket.userBoards[room]) { return socket.emit('unauthorized', 'Not a member'); }
     socket.join(room);
     socket.room = room;
     socket.emit('joined', 'User successfully joined');

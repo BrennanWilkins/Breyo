@@ -57,8 +57,9 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
       await list1.save(); await list2.save(); await list3.save();
       await addActivity(null, 'created this board', null, null, board._id, null, user.email, user.fullName);
 
-      // update client's token to show new board
-      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
+      const decoded = jwt.decode(req.header('x-auth-token'));
+      // update client's token to show new board, new token expires at same time
+      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
 
       res.status(200).json({ board: newBoard, token });
     } catch(err) { res.sendStatus(500); }
@@ -244,8 +245,9 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
       await board.save();
       const newActivity = await addActivity(null, `was added to this board`, null, null, board._id, null, user.email, user.fullName);
 
-      // update client's token to show new board
-      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
+      const decoded = jwt.decode(req.header('x-auth-token'));
+      // update client's token to show new board, new token expires at same time
+      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
 
       res.status(200).json({ token, newActivity });
     } catch(err) { res.sendStatus(500); }

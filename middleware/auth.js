@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
-// verify jwt token from user & set as req.userId for all requests
+// verify jwt token from user, sets user._id as req.userID
+// req.userMembers set as all boards user is member of
+// req.userAdmins set as all boards user is admin of
 module.exports = (req, res, next) => {
   const token = req.header('x-auth-token');
   if (token) {
@@ -9,11 +11,12 @@ module.exports = (req, res, next) => {
       if (err) {
         return res.status(401).json({ msg: 'TOKEN NOT VALID' });
       }
-      if (decoded.newUser) {
-        // for signup
-        req.userID = decoded.newUser._id;
-      } else {
-        req.userID = decoded.user._id;
+      req.userID = decoded.user._id;
+      req.userMembers = {};
+      req.userAdmins = {};
+      for (let board of decoded.user.boards) {
+        req.userMembers[board.boardID] = true;
+        if (board.isAdmin) { req.userAdmins[board.boardID] = true; }
       }
       next();
     });

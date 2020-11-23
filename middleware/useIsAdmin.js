@@ -1,14 +1,12 @@
-const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
-// middleware for validating if user is admin of a board
-const useIsAdmin = async (req, res, next) => {
-  try {
-    const user = await User.findOne({ _id: req.userID });
-    // boardID may be sent in body or in params
-    const isAdmin = user.boards.find(board => (board._id === req.body.boardID || board._id === req.params.boardID) && board.isAdmin);
-    if (!isAdmin) { res.status(401).json({ msg: 'MUST BE ADMIN' }); }
-    else { next(); }
-  } catch(err) { res.sendStatus(500); }
+// verify that the user is an admin of the board
+const useIsAdmin = (req, res, next) => {
+  // boardID may be sent in body or in params
+  const isAdmin = req.userAdmins[req.body.boardID] || req.userAdmins[req.params.boardID];
+  if (!isAdmin) { res.status(401).json({ msg: 'MUST BE ADMIN' }); }
+  else { next(); }
 };
 
 module.exports = useIsAdmin;
