@@ -327,6 +327,19 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
       }
       user.boards = user.boards.filter(board => String(board.boardID) !== String(req.body.boardID));
       board.members = board.members.filter(member => member.email !== user.email);
+      // remove user from cards they are a member of
+      const lists = await List.find({ boardID: board._id });
+      for (let list of lists) {
+        let shouldUpdate = false;
+        for (let card of list.cards) {
+          for (let i = card.members.length - 1; i >= 0; i--) {
+            if (member.email === user.email) { card.members.splice(i, 1); }
+            shouldUpdate = true;
+          }
+        }
+        // only need to update list if member changed
+        if (shouldUpdate) { await list.save(); }
+      }
       const newActivity = await addActivity(null, `left this board`, null, null, board._id, null, user.email, user.fullName);
       await user.save();
       await board.save();
