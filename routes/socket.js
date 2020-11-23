@@ -40,7 +40,8 @@ const routes = [
   'put/card/comments',
   'delete/card/comments',
   'post/activity',
-  'put/activity/board'
+  'put/activity/board/deleteCard',
+  'put/activity/board/deleteList'
 ];
 
 module.exports = routes;

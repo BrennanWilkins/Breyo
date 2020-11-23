@@ -7,92 +7,17 @@ const initialState = {
   currentCard: null,
   currentListTitle: null,
   allArchivedCards: [],
-  archivedLists: [],
-  allComments: []
+  archivedLists: []
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.UPDATE_ACTIVE_BOARD: {
-      let allArchivedCards = [];
-      let allComments = [];
-      let lists = action.payload.lists.map(list => {
-        const cards = list.cards.map(card => {
-          const comments = card.comments.map(comment => ({
-            email: comment.email,
-            fullName: comment.fullName,
-            cardID: comment.cardID,
-            listID: comment.listID,
-            date: comment.date,
-            commentID: comment._id,
-            msg: comment.msg
-          })).sort((a,b) => new Date(b.date) - new Date(a.date));
-          allComments = allComments.concat(comments.map(comment => ({...comment, cardTitle: card.title})));
-          return {
-            cardID: card._id,
-            checklists: card.checklists.map(checklist => ({
-              title: checklist.title,
-              checklistID: checklist._id,
-              items: checklist.items.map(item => ({
-                itemID: item._id,
-                title: item.title,
-                isComplete: item.isComplete
-              }))
-            })),
-            dueDate: card.dueDate,
-            labels: card.labels,
-            title: card.title,
-            desc: card.desc,
-            members: card.members,
-            comments
-          };
-        });
-
-        const archivedCards = list.archivedCards.map(card => {
-          const comments = card.comments.map(comment => ({
-            email: comment.email,
-            fullName: comment.fullName,
-            cardID: comment.cardID,
-            listID: comment.listID,
-            date: comment.date,
-            commentID: comment._id,
-            msg: comment.msg
-          })).sort((a,b) => new Date(b.date) - new Date(a.date));
-          allComments = allComments.concat(comments.map(comment => ({ ...comment, cardTitle: card.title })));
-          return {
-            cardID: card._id,
-            checklists: card.checklists.map(checklist => ({
-              title: checklist.title,
-              checklistID: checklist._id,
-              items: checklist.items.map(item => ({
-                itemID: item._id,
-                title: item.title,
-                isComplete: item.isComplete
-              }))
-            })),
-            dueDate: card.dueDate,
-            labels: card.labels,
-            title: card.title,
-            desc: card.desc,
-            members: card.members,
-            comments
-          };
-        });
-
-        allArchivedCards = allArchivedCards.concat(archivedCards.map(card => ({ ...card, listID: list._id })));
-        return {
-          indexInBoard: list.indexInBoard,
-          listID: list._id,
-          title: list.title,
-          isArchived: list.isArchived,
-          cards
-        };
-      }).sort((a,b) => a.indexInBoard - b.indexInBoard);
-
-      const archivedLists = lists.filter(list => list.isArchived);
-      lists = lists.filter(list => !list.isArchived);
-      return { ...state, lists, allArchivedCards, archivedLists, allComments };
-    }
+    case actionTypes.SET_LIST_DATA: return {
+      ...state,
+      lists: action.payload.lists,
+      allArchivedCards: action.payload.allArchivedCards,
+      archivedLists: action.payload.archivedLists
+    };
     case actionTypes.UPDATE_LIST_TITLE: {
       const lists = [...state.lists];
       const index = lists.findIndex(list => list.listID === action.listID);
@@ -386,17 +311,10 @@ const reducer = (state = initialState, action) => {
       destList.cards = destCards;
       lists[sourceIndex] = sourceList;
       lists[destIndex] = destList;
-      const allComments = [...state.allComments];
-      for (let i = 0; i < allComments.length; i++) {
-        if (allComments[i].listID === action.sourceID) {
-          const updatedComment = { ...allComments[i], listID: action.destID };
-          allComments[i] = updatedComment;
-        }
-      }
       if (state.currentCard && state.currentCard.cardID === card.cardID) {
-        return { ...state, lists, allComments, shownListID: action.destID, currentListTitle: destList.title };
+        return { ...state, lists, shownListID: action.destID, currentListTitle: destList.title }
       }
-      return { ...state, lists, allComments };
+      return { ...state, lists };
     }
     case actionTypes.COPY_CARD: {
       const lists = [...state.lists];
@@ -484,11 +402,10 @@ const reducer = (state = initialState, action) => {
       const allArchivedCards = [...state.allArchivedCards];
       const cardIndex = allArchivedCards.findIndex(card => card.cardID === action.cardID);
       allArchivedCards.splice(cardIndex, 1);
-      const allComments = state.allComments.filter(comment => comment.cardID !== action.cardID);
       if (state.currentCard && state.currentCard.cardID === action.cardID) {
-        return { ...state, allArchivedCards, currentCard: null, shownCardID: null, shownListID: null, currentListTitle: null, allComments };
+        return { ...state, allArchivedCards, currentCard: null, shownCardID: null, shownListID: null, currentListTitle: null };
       }
-      return { ...state, allArchivedCards, allComments };
+      return { ...state, allArchivedCards };
     }
     case actionTypes.COPY_LIST: {
       const lists = [...state.lists];
@@ -558,12 +475,11 @@ const reducer = (state = initialState, action) => {
       const archivedLists = [...state.archivedLists];
       const listIndex = archivedLists.findIndex(list => list.listID === action.listID);
       archivedLists.splice(listIndex, 1);
-      const allComments = state.allComments.filter(comment => comment.listID !== action.listID);
       const allArchivedCards = state.allArchivedCards.filter(card => card.listID !== action.listID);
       if (state.currentCard && state.shownListID === action.listID) {
-        return { ...state, archivedLists, allComments, allArchivedCards, currentCard: null, shownCardID: null, shownListID: null, currentListTitle: null };
+        return { ...state, archivedLists, allArchivedCards, currentCard: null, shownCardID: null, shownListID: null, currentListTitle: null };
       }
-      return { ...state, archivedLists, allComments, allArchivedCards };
+      return { ...state, archivedLists, allArchivedCards };
     }
     case actionTypes.ARCHIVE_ALL_CARDS: {
       const lists = [...state.lists];
@@ -633,9 +549,7 @@ const reducer = (state = initialState, action) => {
       cards[cardIndex] = card;
       list.cards = cards;
       lists[listIndex] = list;
-      const allComments = [...state.allComments];
-      allComments.unshift({ ...action.payload, cardTitle: card.title });
-      return { ...state, lists, currentCard: card, allComments };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.UPDATE_COMMENT: {
       const lists = [...state.lists];
@@ -653,12 +567,7 @@ const reducer = (state = initialState, action) => {
       cards[cardIndex] = card;
       list.cards = cards;
       lists[listIndex] = list;
-      const allComments = [...state.allComments];
-      const allCommentIndex = allComments.findIndex(comment => comment.commentID === action.commentID);
-      const allComment = { ...allComments[allCommentIndex] };
-      allComment.msg = action.msg;
-      allComments[allCommentIndex] = allComment;
-      return { ...state, lists, currentCard: card, allComments };
+      return { ...state, lists, currentCard: card };
     }
     case actionTypes.DELETE_COMMENT: {
       const lists = [...state.lists];
@@ -674,10 +583,7 @@ const reducer = (state = initialState, action) => {
       cards[cardIndex] = card;
       list.cards = cards;
       lists[listIndex] = list;
-      const allComments = [...state.allComments];
-      const allCommentIndex = allComments.findIndex(comment => comment.commentID === action.commentID);
-      allComments.splice(allCommentIndex, 1);
-      return { ...state, lists, currentCard: card, allComments };
+      return { ...state, lists, currentCard: card };
     }
     default: return state;
   }

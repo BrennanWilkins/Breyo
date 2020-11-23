@@ -238,8 +238,8 @@ export const deleteCard = (cardID, listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.DELETE_CARD, cardID, listID });
     const res = await axios.delete(`/card/archive/${cardID}/${listID}/${boardID}`);
-    dispatch({ type: actionTypes.UPDATE_BOARD_ACTIVITY, activity: res.data.activity });
-    sendUpdate('put/activity/board', JSON.stringify({ activity: res.data.activity }));
+    dispatch({ type: actionTypes.UPDATE_BOARD_ACTIVITY_DELETE_CARD, activity: res.data.activity });
+    sendUpdate('put/activity/board/deleteCard', JSON.stringify({ activity: res.data.activity, cardID }));
     sendUpdate('delete/card/archive', JSON.stringify({ cardID, listID }));
   } catch (err) {
     console.log(err);
@@ -276,8 +276,8 @@ export const addComment = msg => async (dispatch, getState) => {
     const date = String(new Date());
     const res = await axios.post('/card/comments', { msg, cardID, listID, date, boardID: state.board.boardID });
     const payload = { msg, commentID: res.data.commentID, cardID, date, listID, email: state.auth.email, fullName: state.auth.fullName };
-    dispatch({ type: actionTypes.ADD_COMMENT, payload });
-    sendUpdate('post/card/comments', JSON.stringify(payload));
+    dispatch({ type: actionTypes.ADD_COMMENT, payload, cardTitle: res.data.cardTitle });
+    sendUpdate('post/card/comments', JSON.stringify({ payload, cardTitle: res.data.cardTitle }));
   } catch (err) {
     console.log(err);
   }

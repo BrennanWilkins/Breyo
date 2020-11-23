@@ -25,7 +25,9 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
       if (!board) { throw 'Board data not found'; }
       const listData = await List.find({ boardID: board._id }).lean();
       if (!listData) { throw 'List data not found'; }
-      const data = { ...board, lists: listData };
+      const activity = await Activity.find({ boardID: board._id }).sort('-date').limit(20).lean();
+      if (!activity) { throw 'Activity data not found'; }
+      const data = { ...board, lists: listData, activity };
       res.status(200).json({ data });
     } catch (err) { res.sendStatus(500); }
   }

@@ -23,7 +23,7 @@ export const getRecentCardActivity = () => async (dispatch, getState) => {
     const boardID = state.board.boardID;
     const cardID = state.lists.shownCardID;
     const res = await axios.get(`/activity/recent/card/${boardID}/${cardID}`);
-    dispatch({ type: actionTypes.UPDATE_CARD_ACTIVITY, activity: res.data.activity });
+    dispatch({ type: actionTypes.SET_CARD_ACTIVITY, activity: res.data.activity, cardID });
     dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: false });
   } catch (err) {
     console.log(err);
@@ -38,15 +38,13 @@ export const getAllCardActivity = () => async (dispatch, getState) => {
     const boardID = state.board.boardID;
     const cardID = state.lists.shownCardID;
     const res = await axios.get(`/activity/all/card/${boardID}/${cardID}`);
-    dispatch({ type: actionTypes.SET_ALL_CARD_ACTIVITY, activity: res.data.activity });
+    dispatch({ type: actionTypes.SET_CARD_ACTIVITY, activity: res.data.activity, cardID });
     dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: false });
   } catch (err) {
     console.log(err);
     dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: false });
   }
 };
-
-export const updateBoardActivity = activity => ({ type: actionTypes.UPDATE_BOARD_ACTIVITY, activity });
 
 export const resetCardActivity = () => ({ type: actionTypes.RESET_CARD_ACTIVITY });
 
@@ -61,3 +59,30 @@ export const deleteBoardActivity = () => async (dispatch, getState) => {
     dispatch(addNotif('There was an error while deleting the board\'s activity history.'));
   }
 };
+
+export const fetchFirstPageBoardActivity = () => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    dispatch({ type: actionTypes.SET_LOADING_ALL_BOARD_ACTIVITY, bool: true });
+    const res = await axios.get(`/activity/all/board/${boardID}/firstPage`);
+    dispatch({ type: actionTypes.SET_LOADING_ALL_BOARD_ACTIVITY, bool: false });
+    dispatch({ type: actionTypes.SET_ALL_BOARD_ACTIVITY_FIRST_PAGE, activity: res.data.activity });
+  } catch (err) {
+    dispatch({ type: actionTypes.SET_LOADING_ALL_BOARD_ACTIVITY, bool: false });
+    dispatch({ type: actionTypes.SET_ERR_ALL_BOARD_ACTIVITY, bool: true });
+  }
+};
+
+export const fetchAllBoardActivity = () => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    const res = await axios.get(`/activity/all/board/${boardID}/allActions`);
+    dispatch({ type: actionTypes.SET_ALL_BOARD_ACTIVITY, activity: res.data.activity });
+  } catch (err) {
+    dispatch({ type: actionTypes.SET_ERR_ALL_BOARD_ACTIVITY, bool: true });
+  }
+};
+
+export const resetAllBoardActivity = () => ({ type: actionTypes.RESET_ALL_BOARD_ACTIVITY });
+
+export const setAllBoardActivityShown = () => ({ type: actionTypes.SET_ALL_BOARD_ACTIVITY_SHOWN });

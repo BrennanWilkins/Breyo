@@ -51,11 +51,34 @@ router.get('/recent/card/:boardID/:cardID', auth, validate([param('*').isMongoId
 );
 
 // returns a given page of board activity sorted by most recent, each page returns 100 actions
-router.get('/all/board/:boardID/:page', auth, validate([param('boardID').isMongoId(), param('page').isInt()]), useIsMember,
+// use if want to support activity pagination/more than 200 activities
+// router.get('/all/board/:boardID/:page', auth, validate([param('boardID').isMongoId(), param('page').isInt()]), useIsMember,
+//   async (req, res) => {
+//     try {
+//       const skip = req.params.page * 100;
+//       const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').skip(skip).limit(100).lean();
+//       if (!activity) { throw 'No board activity found'; }
+//       res.status(200).json({ activity });
+//     } catch (err) { res.sendStatus(500); }
+//   }
+// );
+
+// returns first 100 activities for a board sorted by most recent
+router.get('/all/board/:boardID/firstPage', auth, validate([param('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
-      const skip = req.params.page * 100;
-      const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').skip(skip).limit(100).lean();
+      const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').limit(100).lean();
+      if (!activity) { throw 'No board activity found'; }
+      res.status(200).json({ activity });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// returns all activities for a board sorted by most recent
+router.get('/all/board/:boardID/allActions', auth, validate([param('boardID').isMongoId()]), useIsMember,
+  async (req, res) => {
+    try {
+      const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').lean();
       if (!activity) { throw 'No board activity found'; }
       res.status(200).json({ activity });
     } catch (err) { res.sendStatus(500); }

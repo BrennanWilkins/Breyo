@@ -11,22 +11,18 @@ import Action from './Action/Action';
 import AuthSpinner from '../../../UI/AuthSpinner/AuthSpinner';
 
 const CardActivity = props => {
-  const [data, setData] = useState([]);
   const [showDetails, setShowDetails] = useState(false);
   const [allShown, setAllShown] = useState(false);
 
   useEffect(() => {
-    if (!showDetails) {
-      props.resetCardActivity();
-      return setData(props.comments);
-    }
-    props.getRecentCardActivity();
-  }, [showDetails]);
+    return () => props.resetCardActivity();
+  }, []);
 
-  useEffect(() => {
-    if (showDetails) { setData(props.comments.concat(props.activity).sort((a, b) => new Date(b.date) - new Date(a.date))); }
-    else { setData(props.comments); }
-  }, [props.activity, props.comments, showDetails]);
+  const showDetailsHandler = () => {
+    if (!showDetails) { props.getRecentCardActivity(); }
+    else { props.resetCardActivity(); }
+    setShowDetails(prev => !prev);
+  };
 
   const showAllHandler = () => {
     setAllShown(true);
@@ -38,14 +34,16 @@ const CardActivity = props => {
       <div className={classes.Title}>
         <div>{activityIcon}Activity</div>
         <span className={classes.ShowDetailBtn}>
-          <ActionBtn clicked={() => setShowDetails(prev => !prev)}>{showDetails ? 'Hide Details' : 'Show Details'}</ActionBtn>
+          <ActionBtn clicked={showDetailsHandler}>{showDetails ? 'Hide Details' : 'Show Details'}</ActionBtn>
         </span>
       </div>
       <AddComment />
-      {data.map(datum => {
-        if (datum.commentID) { return <Comment key={datum.commentID} {...datum} userComment={props.userEmail === datum.email} />; }
-        else { return <Action key={datum._id} email={datum.email} fullName={datum.fullName} msg={datum.msg} date={datum.date} />; }
-      })}
+      {showDetails ?
+        props.activity.map(action => {
+          if (action.commentID) { return <Comment key={action.commentID} {...action} userComment={props.userEmail === action.email} />; }
+          else { return <Action key={action._id} email={action.email} fullName={action.fullName} msg={action.msg} date={action.date} />; }
+        }) :
+        props.comments.map(comment => <Comment key={comment.commentID} {...comment} userComment={props.userEmail === comment.email} />)}
       {props.isLoading && <div className={classes.Spinner}><AuthSpinner /></div>}
       {!props.isLoading && showDetails && !allShown && <div className={classes.ViewAll} onClick={showAllHandler}>Show all actions...</div>}
     </div>

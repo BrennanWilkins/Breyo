@@ -26,12 +26,98 @@ export const toggleIsStarred = (id, isActive) => async dispatch => {
   }
 };
 
-export const updateActiveBoard = payload => (dispatch, getState) => {
-  const activeBoard = getState().auth.boards.find(board => board.boardID === payload._id);
+export const updateActiveBoard = data => (dispatch, getState) => {
+  const activeBoard = getState().auth.boards.find(board => board.boardID === data._id);
   const isStarred = activeBoard.isStarred;
-  const creatorFullName = payload.members.find(member => member.email === payload.creatorEmail).fullName;
+  const creatorFullName = data.members.find(member => member.email === data.creatorEmail).fullName;
   const userIsAdmin = activeBoard.isAdmin;
-  dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload, isStarred, creatorFullName, userIsAdmin });
+
+  const boardPayload = { isStarred, creatorFullName, userIsAdmin, title: data.title, members: data.members,
+    color: data.color, boardID: data._id, desc: data.desc, creatorEmail: data.creatorEmail };
+  dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload: boardPayload });
+
+  let allArchivedCards = [];
+  let allComments = [];
+  let lists = data.lists.map(list => {
+    const cards = list.cards.map(card => {
+      const comments = card.comments.map(comment => ({
+        email: comment.email,
+        fullName: comment.fullName,
+        cardID: comment.cardID,
+        listID: comment.listID,
+        date: comment.date,
+        commentID: comment._id,
+        msg: comment.msg
+      })).sort((a,b) => new Date(b.date) - new Date(a.date));
+      allComments = allComments.concat(comments.map(comment => ({...comment, cardTitle: card.title})));
+      return {
+        cardID: card._id,
+        checklists: card.checklists.map(checklist => ({
+          title: checklist.title,
+          checklistID: checklist._id,
+          items: checklist.items.map(item => ({
+            itemID: item._id,
+            title: item.title,
+            isComplete: item.isComplete
+          }))
+        })),
+        dueDate: card.dueDate,
+        labels: card.labels,
+        title: card.title,
+        desc: card.desc,
+        members: card.members,
+        comments
+      };
+    });
+    const archivedCards = list.archivedCards.map(card => {
+      const comments = card.comments.map(comment => ({
+        email: comment.email,
+        fullName: comment.fullName,
+        cardID: comment.cardID,
+        listID: comment.listID,
+        date: comment.date,
+        commentID: comment._id,
+        msg: comment.msg
+      })).sort((a,b) => new Date(b.date) - new Date(a.date));
+      allComments = allComments.concat(comments.map(comment => ({ ...comment, cardTitle: card.title })));
+      return {
+        cardID: card._id,
+        checklists: card.checklists.map(checklist => ({
+          title: checklist.title,
+          checklistID: checklist._id,
+          items: checklist.items.map(item => ({
+            itemID: item._id,
+            title: item.title,
+            isComplete: item.isComplete
+          }))
+        })),
+        dueDate: card.dueDate,
+        labels: card.labels,
+        title: card.title,
+        desc: card.desc,
+        members: card.members,
+        comments
+      };
+    });
+    allArchivedCards = allArchivedCards.concat(archivedCards.map(card => ({ ...card, listID: list._id })));
+    return {
+      indexInBoard: list.indexInBoard,
+      listID: list._id,
+      title: list.title,
+      isArchived: list.isArchived,
+      cards
+    };
+  }).sort((a,b) => a.indexInBoard - b.indexInBoard);
+  const archivedLists = lists.filter(list => list.isArchived);
+  lists = lists.filter(list => !list.isArchived);
+
+  const listPayload = { lists, allArchivedCards, archivedLists };
+  dispatch({ type: actionTypes.SET_LIST_DATA, payload: listPayload });
+
+  allComments.sort((a, b) => new Date(b.date) - new Date(a.date));
+  const combinedActivity = data.activity.concat(allComments).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
+  const activityPayload = { activity: combinedActivity, allComments };
+  dispatch({ type: actionTypes.SET_BOARD_ACTIVITY, payload: activityPayload });
 };
 
 export const updateBoardTitle = (title, boardID) => async dispatch => {

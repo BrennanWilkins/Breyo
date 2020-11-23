@@ -37,10 +37,12 @@ const socketMap = {
   'delete/card/archive': actionTypes.DELETE_CARD,
   'post/card/members': actionTypes.ADD_CARD_MEMBER,
   'delete/card/members': actionTypes.REMOVE_CARD_MEMBER,
+  'post/card/comments': actionTypes.ADD_COMMENT,
   'put/card/comments': actionTypes.UPDATE_COMMENT,
   'delete/card/comments': actionTypes.DELETE_COMMENT,
   'post/activity': actionTypes.ADD_RECENT_ACTIVITY,
-  'put/activity/board': actionTypes.UPDATE_BOARD_ACTIVITY
+  'put/activity/board/deleteCard': actionTypes.UPDATE_BOARD_ACTIVITY_DELETE_CARD,
+  'put/activity/board/deleteList': actionTypes.UPDATE_BOARD_ACTIVITY_DELETE_LIST
 };
 
 export default socketMap;

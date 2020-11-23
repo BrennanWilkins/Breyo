@@ -50,11 +50,6 @@ export const initSocket = boardID => {
     if (email === userEmail) { store.dispatch({ type: actionTypes.DEMOTE_SELF, boardID }); }
   });
 
-  newSocket.on('post/card/comments', data => {
-    const payload = JSON.parse(data);
-    store.dispatch({ type: actionTypes.ADD_COMMENT, payload });
-  });
-
   for (let route in socketMap) {
     newSocket.on(route, data => {
       const payload = JSON.parse(data);

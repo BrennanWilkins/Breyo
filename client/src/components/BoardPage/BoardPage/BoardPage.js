@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import BoardNavBar from '../BoardNavBar/BoardNavBar';
 import { initSocket, connectSocket, closeSocket }  from '../../../store/actions/socket';
 import { instance as axios } from '../../../axios';
-import { addNotif, updateActiveBoard, setCardDetails, updateBoardActivity, setShownMemberActivity } from '../../../store/actions';
+import { addNotif, updateActiveBoard, setCardDetails, setShownMemberActivity } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
 import ListContainer from '../Lists/ListContainer/ListContainer';
 const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'));
@@ -30,11 +30,9 @@ const BoardPage = props => {
       const id = props.match.params.boardID;
       try {
         const res = await axios.get('/board/' + id);
-        const activity = await axios.get('/activity/recent/board/' + id);
         document.title = res.data.data.title;
         document.body.style.overflow = 'hidden';
         props.updateActiveBoard(res.data.data);
-        props.updateBoardActivity(activity.data.activity);
       } catch (err) {
         document.title = 'Brello';
         document.body.style.overflow = 'auto';
@@ -101,7 +99,6 @@ const mapDispatchToProps = dispatch => ({
   addNotif: msg => dispatch(addNotif(msg)),
   updateActiveBoard: data => dispatch(updateActiveBoard(data)),
   setCardDetails: (cardID, listID) => dispatch(setCardDetails(cardID, listID)),
-  updateBoardActivity: activity => dispatch(updateBoardActivity(activity)),
   closeMemberActivity: () => dispatch(setShownMemberActivity(null))
 });
 

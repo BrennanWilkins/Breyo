@@ -591,7 +591,7 @@ router.post('/comments', auth, validate([
       const updatedList = await list.save();
       const updatedComments = updatedList.cards.id(req.body.cardID).comments;
       const commentID = updatedComments[updatedComments.length - 1]._id;
-      res.status(200).json({ commentID });
+      res.status(200).json({ commentID, cardTitle: card.title });
     } catch (err) { res.sendStatus(500); }
   }
 );

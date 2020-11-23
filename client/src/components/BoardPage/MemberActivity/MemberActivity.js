@@ -69,7 +69,7 @@ MemberActivity.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  allComments: state.lists.allComments
+  allComments: state.activity.allComments
 });
 
 export default connect(mapStateToProps)(MemberActivity);

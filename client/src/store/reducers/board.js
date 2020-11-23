@@ -17,14 +17,14 @@ const reducer = (state = initialState, action) => {
     case actionTypes.UPDATE_ACTIVE_BOARD: return {
       ...state,
       title: action.payload.title,
-      members: [...action.payload.members],
+      members: action.payload.members,
       color: action.payload.color,
-      boardID: action.payload._id,
+      boardID: action.payload.boardID,
       creatorEmail: action.payload.creatorEmail,
       desc: action.payload.desc,
-      isStarred: action.isStarred,
-      creatorFullName: action.creatorFullName,
-      userIsAdmin: action.userIsAdmin
+      isStarred: action.payload.isStarred,
+      creatorFullName: action.payload.creatorFullName,
+      userIsAdmin: action.payload.userIsAdmin
     };
     case actionTypes.UPDATE_BOARD_TITLE: return { ...state, title: action.title };
     case actionTypes.ADD_ADMIN: {
