@@ -2,19 +2,11 @@ import React from 'react';
 import classes from './HomePage.module.css';
 import { Link } from 'react-router-dom';
 import { teamGoals, sharedGoals } from '../../UI/illustrations';
+import HomeNav from '../HomeNav/HomeNav';
 
 const HomePage = () => (
   <div>
-    <div className={classes.NavBar}>
-      <div className={classes.NavBarContent}>
-        <h1>Brello</h1>
-        <div className={classes.NavBtns}>
-          <Link to="/tech"><button>Tech</button></Link>
-          <Link to="/help"><button>Help</button></Link>
-          <Link to="/login"><button className={classes.LoginBtn}>Login</button></Link>
-        </div>
-      </div>
-    </div>
+    <HomeNav />
     <div className={classes.Main}>
       <h1>Organize, delegate, and plan your team's projects with Brello.</h1>
       <div className={classes.SignupBtn}><Link to="/signup"><button>SIGN UP FOR FREE</button></Link></div>

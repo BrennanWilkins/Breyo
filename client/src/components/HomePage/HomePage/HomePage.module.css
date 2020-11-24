@@ -1,51 +1,3 @@
-.NavBar {
-  width: 100%;
-  height: 70px;
-  box-shadow: 0 2px 8px 0px rgba(0,0,0,0.15);
-  background: white;
-}
-.NavBarContent {
-  width: 100%;
-  height: 100%;
-  max-width: 1000px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  margin: auto;
-  box-sizing: border-box;
-}
-.NavBar h1 {
-  color: rgb(var(--red));
-}
-.NavBtns button, .SignupBtn button {
-  outline: none;
-  border: 0;
-  font-family: 'Roboto', -apple-system, sans-serif;
-  padding: 0;
-  border-radius: 4px;
-  font-weight: 500;
-  font-size: 15px;
-  transition: all 250ms;
-  cursor: pointer;
-}
-.NavBtns button {
-  height: 40px;
-  width: 85px;
-  margin-right: 10px;
-  color: rgb(var(--red));
-  background: transparent;
-}
-.NavBtns button:hover {
-  background: rgb(var(--red), 0.2);
-}
-.LoginBtn {
-  background: rgb(var(--red), 0.2) !important;
-}
-.LoginBtn:hover {
-  background: rgb(var(--red)) !important;
-  color: white;
-}
 .SignupBtn {
   display: flex;
   justify-content: center;
@@ -56,6 +8,14 @@
   color: white;
   background: rgb(var(--red));
   padding: 10px 14px;
+  outline: none;
+  border: 0;
+  font-family: 'Roboto', -apple-system, sans-serif;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 250ms;
+  cursor: pointer;
 }
 .SignupBtn button:hover {
   background: rgb(var(--darkRed));
@@ -73,6 +33,9 @@
   box-sizing: border-box;
   max-height: 220px;
   max-width: 428px;
+}
+.Main {
+  margin-top: 115px;
 }
 .Main h1 {
   text-align: center;
@@ -120,7 +83,7 @@
   margin: 0 10px;
   box-sizing: border-box;
   border-radius: 2px;
-  transition: 250ms;
+  transition: all 300ms;
 }
 .InfoBtns a:hover {
   background: rgb(var(--red));

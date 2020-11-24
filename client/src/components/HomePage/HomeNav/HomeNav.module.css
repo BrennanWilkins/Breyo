@@ -1,0 +1,141 @@
+.NavBar {
+  position: fixed;
+  width: 100%;
+  height: 70px;
+  box-shadow: 0 2px 8px 0px rgba(0,0,0,0.15);
+  background: white;
+  top: 0;
+}
+.NavBarContent {
+  width: 100%;
+  height: 70px;
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  margin: auto;
+  box-sizing: border-box;
+}
+.NavBar h1 {
+  color: rgb(var(--red));
+}
+.NavBtn, .DropdownBtn {
+  outline: none;
+  border: 0;
+  font-family: 'Roboto', -apple-system, sans-serif;
+  padding: 0;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 250ms;
+  cursor: pointer;
+}
+.DropdownBtn {
+  margin: 5px 0;
+  height: 40px;
+  width: 100%;
+  color: rgb(var(--red));
+  background: white;
+  font-size: 16px;
+}
+.NavBtn {
+  height: 40px;
+  width: 85px;
+  margin-right: 10px;
+  color: rgb(var(--red));
+  background: white;
+}
+.NavBtn:hover, .DropdownBtn:hover {
+  background: rgb(var(--red), 0.2);
+}
+.LoginBtn {
+  background: rgb(var(--red), 0.2);
+}
+.LoginBtn:hover {
+  background: rgb(var(--red));
+  color: white;
+}
+.Dropdown .LoginBtn {
+  display: none;
+}
+.SignupBtn {
+  margin-top: 20px;
+  background: rgb(var(--red));
+  color: white;
+}
+.SignupBtn:hover {
+  background: rgb(var(--darkRed));
+}
+.DropdownToggle {
+  display: none;
+  cursor: pointer;
+  margin-left: 15px;
+  width: 35px;
+  height: 100%;
+}
+.DropdownToggle:after,
+.DropdownToggle:before,
+.DropdownToggle div {
+  background: rgb(27, 27, 27);
+  border-radius: 4px;
+  content: '';
+  display: block;
+  height: 4px;
+  margin: 6px 0;
+  transition: all 200ms ease-in-out;
+}
+.Open:before {
+  transform: translateY(10px) rotate(135deg);
+}
+.Open:after {
+  transform: translateY(-10px) rotate(-135deg);
+}
+.Open div {
+  transform: scale(0);
+}
+.Dropdown {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  background: white;
+  padding: 0 0 10px;
+}
+.Dropdown a {
+  width: 70%;
+}
+.Backdrop {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(0,0,0,0.4);
+}
+@media (max-width: 450px) {
+  .DropdownToggle {
+    display: block;
+  }
+  .Backdrop {
+    display: block;
+  }
+  .NavBtns, .Dropdown {
+    display: flex;
+    align-items: center;
+  }
+  .NavBtn {
+    display: none;
+  }
+  .LoginBtn {
+    display: block;
+  }
+}
+@media (max-width: 310px) {
+  .NavBtns .LoginBtn {
+    display: none;
+  }
+  .Dropdown .LoginBtn {
+    display: block;
+  }
+}
