@@ -4,46 +4,125 @@
   box-shadow: 0 2px 8px 0px rgba(0,0,0,0.15);
   background: white;
 }
-.Content {
+.NavBarContent {
   width: 100%;
   height: 100%;
-  max-width: 700px;
+  max-width: 1000px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 20px;
   margin: auto;
-  padding: 0 15px;
+  box-sizing: border-box;
 }
-.Title {
+.NavBar h1 {
   color: rgb(var(--red));
 }
-.Btns a {
-  text-decoration: none;
-}
-.SignupBtn, .LoginBtn {
+.NavBtns button, .SignupBtn button {
+  outline: none;
+  border: 0;
+  font-family: 'Roboto', -apple-system, sans-serif;
+  padding: 0;
   border-radius: 4px;
   font-weight: 500;
   font-size: 15px;
-  padding: 10px 14px;
   transition: all 250ms;
-  box-sizing: border-box;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
 }
-.SignupBtn {
-  box-shadow: var(--box-shadow2);
-  color: white;
-  background: rgb(var(--red));
-}
-.SignupBtn:hover {
-  box-shadow: var(--box-shadow3);
-  background: rgb(var(--darkRed));
-}
-.LoginBtn {
+.NavBtns button {
+  height: 40px;
+  width: 85px;
   margin-right: 10px;
   color: rgb(var(--red));
   background: transparent;
 }
-.LoginBtn:hover {
+.NavBtns button:hover {
   background: rgb(var(--red), 0.2);
+}
+.LoginBtn {
+  background: rgb(var(--red), 0.2) !important;
+}
+.LoginBtn:hover {
+  background: rgb(var(--red)) !important;
+  color: white;
+}
+.SignupBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 35px 0;
+}
+.SignupBtn button {
+  color: white;
+  background: rgb(var(--red));
+  padding: 10px 14px;
+}
+.SignupBtn button:hover {
+  background: rgb(var(--darkRed));
+}
+.Illustrations {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 850px;
+  margin: auto;
+}
+.Illustration svg {
+  padding: 0 20px;
+  box-sizing: border-box;
+  max-height: 220px;
+  max-width: 428px;
+}
+.Main h1 {
+  text-align: center;
+  max-width: 850px;
+  font-size: 40px;
+  margin: 50px auto 0;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+@media (max-width: 600px) {
+  .Main h1 {
+    font-size: 35px;
+  }
+}
+@media (max-width: 450px) {
+  .Main h1 {
+    font-size: 30px;
+  }
+}
+.InfoContainer {
+  max-width: 800px;
+  margin: 80px auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+.Info {
+  text-align: center;
+  width: 100%;
+  padding: 0 20px 30px;
+  box-sizing: border-box;
+  background: white;
+  border-radius: 4px;
+  box-shadow: var(--box-shadow4);
+}
+.Info h1 {
+  margin: 0;
+  padding: 25px 0 10px;
+  color: rgb(var(--red));
+}
+.InfoBtns a {
+  display: inline-block;
+  color: rgb(var(--red));
+  padding: 5px;
+  width: 150px;
+  margin: 0 10px;
+  box-sizing: border-box;
+  border-radius: 2px;
+  transition: 250ms;
+}
+.InfoBtns a:hover {
+  background: rgb(var(--red));
+  color: white;
 }

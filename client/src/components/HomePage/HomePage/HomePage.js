@@ -1,21 +1,40 @@
 import React from 'react';
 import classes from './HomePage.module.css';
 import { Link } from 'react-router-dom';
+import { teamGoals, sharedGoals } from '../../UI/illustrations';
 
-const HomePage = () => {
-  return (
-    <div>
-      <div className={classes.NavBar}>
-        <div className={classes.Content}>
-          <h1 className={classes.Title}>Brello</h1>
-          <div className={classes.Btns}>
-            <Link to="/login"><span className={classes.LoginBtn}>LOG IN</span></Link>
-            <Link to="/signup"><span className={classes.SignupBtn}>SIGN UP</span></Link>
-          </div>
+const HomePage = () => (
+  <div>
+    <div className={classes.NavBar}>
+      <div className={classes.NavBarContent}>
+        <h1>Brello</h1>
+        <div className={classes.NavBtns}>
+          <Link to="/tech"><button>Tech</button></Link>
+          <Link to="/help"><button>Help</button></Link>
+          <Link to="/login"><button className={classes.LoginBtn}>Login</button></Link>
         </div>
       </div>
     </div>
-  );
-};
+    <div className={classes.Main}>
+      <h1>Organize, delegate, and plan your team's projects with Brello.</h1>
+      <div className={classes.SignupBtn}><Link to="/signup"><button>SIGN UP FOR FREE</button></Link></div>
+      <div className={classes.Illustrations}>
+        <div className={classes.Illustration}>{teamGoals}</div>
+        <div className={classes.Illustration}>{sharedGoals}</div>
+      </div>
+    </div>
+    <div className={classes.InfoContainer}>
+      <div className={classes.Info}>
+        <h1>What is Brello?</h1>
+        <p>Brello provides kanban-style boards, lists, and cards to manage your workflow and tasks.</p>
+        <p>It is heavily inspired by the UI/UX and functionality of the popular application Trello, while utilizing a different tech stack and all original source code.</p>
+        <div className={classes.InfoBtns}>
+          <a href="https://trello.com" rel="noopener noreferrer" target="_blank">Visit Trello</a>
+          <Link to="/tech">Brello's tech stack</Link>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 export default HomePage;
