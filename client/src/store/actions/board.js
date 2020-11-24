@@ -29,8 +29,15 @@ export const toggleIsStarred = (id, isActive) => async dispatch => {
 export const updateActiveBoard = data => (dispatch, getState) => {
   const activeBoard = getState().auth.boards.find(board => board.boardID === data._id);
   const isStarred = activeBoard.isStarred;
-  const creatorFullName = data.members.find(member => member.email === data.creatorEmail).fullName;
-  const userIsAdmin = activeBoard.isAdmin;
+  const userMember = data.members.find(member => member.email === data.creatorEmail);
+  const creatorFullName = userMember.fullName;
+  const userIsAdmin = userMember.isAdmin;
+
+  if (data.invites && data.boards) {
+    dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: data.invites, boards: data.boards });
+  }
+
+  if (data.token) { axios.defaults.headers.common['x-auth-token'] = data.token; }
 
   const boardPayload = { isStarred, creatorFullName, userIsAdmin, title: data.title, members: data.members,
     color: data.color, boardID: data._id, desc: data.desc, creatorEmail: data.creatorEmail };

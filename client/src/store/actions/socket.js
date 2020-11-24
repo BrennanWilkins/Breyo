@@ -40,16 +40,32 @@ export const initSocket = boardID => {
     }
   });
 
-  newSocket.on('post/board/admins', email => {
-    store.dispatch({ type: actionTypes.ADD_ADMIN, email });
-    const userEmail = store.getState().auth.email;
-    if (email === userEmail) { store.dispatch({ type: actionTypes.PROMOTE_SELF, boardID }); }
+  newSocket.on('post/board/admins', async email => {
+    try {
+      store.dispatch({ type: actionTypes.ADD_ADMIN, email });
+      const state = store.getState();
+      const userEmail = state.auth.email;
+      if (email === userEmail) {
+        // user was added as admin, fetch new token
+        const res = await axios.put('/board/admins/promoteUser', { boardID: state.board.boardID });
+        axios.defaults.headers.common['x-auth-token'] = res.data.token;
+        store.dispatch({ type: actionTypes.PROMOTE_SELF, boardID });
+      }
+    } catch (err) { console.log(err); }
   });
 
-  newSocket.on('delete/board/admins', email => {
-    store.dispatch({ type: actionTypes.REMOVE_ADMIN, email });
-    const userEmail = store.getState().auth.email;
-    if (email === userEmail) { store.dispatch({ type: actionTypes.DEMOTE_SELF, boardID }); }
+  newSocket.on('delete/board/admins', async email => {
+    try {
+      store.dispatch({ type: actionTypes.REMOVE_ADMIN, email });
+      const state = store.getState();
+      const userEmail = state.auth.email;
+      if (email === userEmail) {
+        // user was demoted as admin, fetch new token
+        const res = await axios.put('/board/admins/demoteUser', { boardID: state.board.boardID });
+        axios.defaults.headers.common['x-auth-token'] = res.data.token;
+        store.dispatch({ type: actionTypes.DEMOTE_SELF, boardID });
+      }
+    } catch (err) { console.log(err); }
   });
 
   for (let route in socketMap) {

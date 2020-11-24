@@ -28,6 +28,19 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
       const activity = await Activity.find({ boardID: board._id }).sort('-date').limit(20).lean();
       if (!activity) { throw 'Activity data not found'; }
       const data = { ...board, lists: listData, activity };
+
+      const decoded = jwt.decode(req.header('x-auth-token'));
+      const isAdminInToken = req.userAdmins[req.params.boardID];
+      const isAdminInBoard = board.members.find(member => member.email === decoded.user.email);
+      // user's token is not up to date, send new token
+      if (isAdminInBoard !== isAdminInToken) {
+        const user = await User.findById(req.userID);
+        const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+        data.invites = user.invites;
+        data.boards = user.boards;
+        data.token = token;
+      }
+
       res.status(200).json({ data });
     } catch (err) { res.sendStatus(500); }
   }
@@ -172,6 +185,35 @@ router.post('/admins', auth, validate([body('email').isEmail(), body('boardID').
       await board.save();
       const newActivity = await addActivity(null, `changed ${user.fullName} permissions to admin`, null, null, board._id, req.userID);
       res.status(200).json({ newActivity });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// user receives new token on permission change to admin
+router.put('/admins/promoteUser', auth,
+  async (req, res) => {
+    try {
+      const isAlreadyAdmin = req.userAdmins[req.body.boardID];
+      if (isAlreadyAdmin) { throw 'User already an admin'; }
+      const user = await User.findById(req.userID);
+      const decoded = jwt.decode(req.header('x-auth-token'));
+      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+      res.status(200).json({ token });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// user receives new token on permission change from admin to member
+router.put('/admins/demoteUser', auth,
+  async (req, res) => {
+    try {
+      const isAdmin = req.userAdmins[req.body.boardID];
+      const isMember = req.userMembers[req.body.boardID];
+      if (!isAdmin && isMember) { throw 'User already demoted'; }
+      const user = await User.findById(req.userID);
+      const decoded = jwt.decode(req.header('x-auth-token'));
+      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+      res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }
   }
 );
