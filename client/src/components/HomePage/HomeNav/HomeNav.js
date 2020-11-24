@@ -21,6 +21,10 @@ const HomeNav = () => {
     return () => window.removeEventListener('resize', resizeHandler);
   }, [showDropdown]);
 
+  useEffect(() => {
+    return () => document.body.style.overflow = 'auto';
+  }, []);
+
   return (
     <>
       {showDropdown && <div className={classes.Backdrop} onClick={() => setShowDropdown(false)}></div>}
