@@ -6,38 +6,43 @@ import AuthSpinner from '../UI/AuthSpinner/AuthSpinner';
 import { loginValidation } from '../../utils/authValidation';
 import { connect } from 'react-redux';
 import { login, loginErr, authReset } from '../../store/actions';
+import AuthContainer from './AuthContainer';
 
 const LoginPage = props => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showErr, setShowErr] = useState(true);
+
+  useEffect(() => setShowErr(false), [email, password]);
 
   useEffect(() => props.authReset(), []);
 
   const submitHandler = e => {
     e.preventDefault();
+    setShowErr(true);
     let msg = loginValidation(email, password);
     if (msg !== '') { return props.loginErr(msg); }
     props.login(email, password);
   };
 
   return (
-    <div className={classes.Container}>
+    <AuthContainer>
       <h1 className={classes.Title}><Link to="/">Brello</Link></h1>
-      <div className={classes.Panel}>
-        <h3>Log in to Brello</h3>
+      <div className={classes.LoginPanel}>
+        <h3 className={classes.Title3}>Log in to Brello</h3>
         <form onSubmit={submitHandler} className={classes.Form}>
-          <input placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} />
-          <input placeholder="Enter your password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+          <input disabled={props.loading} placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} />
+          <input disabled={props.loading} placeholder="Enter your password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
           <button type="submit" disabled={props.loading}>Log in</button>
         </form>
         {props.loading && <AuthSpinner />}
-        <div className={props.err ? classes.ShowErr : classes.HideErr}>{props.errMsg}</div>
+        <div className={(props.err && showErr) ? classes.ShowErr : classes.HideErr}>{props.errMsg}</div>
         <div className={classes.Links}>
           <div className={classes.Link}><Link to="/forgot-password">Forgot my password</Link></div>
           <div className={classes.Link}>Don't have an account? <Link to="/signup">Sign up</Link></div>
         </div>
       </div>
-    </div>
+    </AuthContainer>
   );
 };
 
