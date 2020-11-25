@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
 import { plusIcon } from '../../../UI/icons';
 import AddCardMember from '../AddCardMember/AddCardMember';
-import CardMemberModal from '../CardMemberModal/CardMemberModal';
+import CardMemberModal from '../../../UI/CardMemberModal/CardMemberModal';
 
 const CardMembers = props => {
   const [showAddMember, setShowAddMember] = useState(false);

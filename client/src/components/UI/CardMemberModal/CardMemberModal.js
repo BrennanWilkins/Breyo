@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
 import classes from './CardMemberModal.module.css';
 import PropTypes from 'prop-types';
-import { useModalToggle } from '../../../../utils/customHooks';
-import { CloseBtn } from '../../../UI/Buttons/Buttons';
-import AccountInfo from '../../../UI/AccountInfo/AccountInfo';
+import { useModalToggle } from '../../../utils/customHooks';
+import { CloseBtn } from '../Buttons/Buttons';
+import AccountInfo from '../AccountInfo/AccountInfo';
 import { connect } from 'react-redux';
-import { removeCardMember } from '../../../../store/actions';
+import { removeCardMember } from '../../../store/actions';
 
 const CardMemberModal = props => {
   const modalRef = useRef();

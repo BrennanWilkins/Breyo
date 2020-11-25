@@ -10,6 +10,7 @@ import Card from '../Card/Card';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import ListActions from '../ListActions/ListActions';
 import { withRouter } from 'react-router-dom';
+import CardMemberModal from '../../../UI/CardMemberModal/CardMemberModal';
 
 const List = props => {
   const [titleInput, setTitleInput] = useState(props.title);
@@ -20,6 +21,11 @@ const List = props => {
   const actionsRef = useRef();
   const [actionsTop, setActionsTop] = useState(0);
   const [actionsLeft, setActionsLeft] = useState(0);
+  const [shownMemberEmail, setShownMemberEmail] = useState('');
+  const [shownMemberFullName, setShownMemberFullName] = useState('');
+  const [memberModalTop, setMemberModalTop] = useState(0);
+  const [memberModalLeft, setMemberModalLeft] = useState(0);
+  const [shownModalCardID, setShownModalCardID] = useState('');
 
   useEffect(() => {
     // set list actions based on list button position
@@ -59,7 +65,11 @@ const List = props => {
           <Droppable droppableId={props.listID}>
             {(provided, snapshot) => (
               <div className={classes.CardContainer} ref={provided.innerRef}>
-                {props.cards.map((card, i) => <Card key={card.cardID} index={i} {...card} listID={props.listID} showDetails={() => setCardDetailsHandler(card.cardID)} />)}
+                {props.cards.map((card, i) => (
+                  <Card key={card.cardID} index={i} {...card} listID={props.listID} showDetails={() => setCardDetailsHandler(card.cardID)}
+                  setEmail={email => { setShownMemberEmail(email); setShownModalCardID(card.cardID); }} setFullName={fullName => setShownMemberFullName(fullName)}
+                  setTop={top => setMemberModalTop(top)} setLeft={left => setMemberModalLeft(left)} />
+                ))}
                 {showAddCard && <AddCard close={() => setShowAddCard(false)} boardID={props.boardID} listID={props.listID} />}
                 {provided.placeholder}
               </div>
@@ -71,7 +81,12 @@ const List = props => {
         </div>
       )}
     </Draggable>
-    {showListActions && <ListActions left={actionsLeft} top={actionsTop} close={() => setShowListActions(false)} title={props.title} listID={props.listID} boardID={props.boardID} />}
+    {showListActions && <ListActions left={actionsLeft} top={actionsTop} close={() => setShowListActions(false)}
+    title={props.title} listID={props.listID} boardID={props.boardID} />}
+    {shownMemberEmail !== '' &&
+    <CardMemberModal top={memberModalTop} left={memberModalLeft} listID={props.listID}
+    cardID={shownModalCardID} inCard email={shownMemberEmail} fullName={shownMemberFullName}
+    close={() => { setShownMemberEmail(''); setShownMemberFullName(''); }} />}
     </>
   );
 };

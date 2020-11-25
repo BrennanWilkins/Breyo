@@ -1,20 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classes from './Card.module.css';
 import { editIcon, clockIcon, checklistIcon, commentIcon } from '../../../UI/icons';
 import { format } from 'date-fns';
 import { Draggable } from 'react-beautiful-dnd';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
-import CardMemberModal from '../../CardDetails/CardMemberModal/CardMemberModal';
 
 const Card = props => {
   const [completedChecklists, setCompletedChecklists] = useState(0);
   const [totalChecklists, setTotalChecklists] = useState(0);
-  const [shownMemberEmail, setShownMemberEmail] = useState('');
-  const [shownMemberFullName, setShownMemberFullName] = useState('');
-  const [memberModalTop, setMemberModalTop] = useState(0);
-  const [memberModalLeft, setMemberModalLeft] = useState(0);
-  const cardMemberRef = useRef();
 
   useEffect(() => {
     // calculate completed checklists based on whether all items are completed
@@ -31,23 +25,17 @@ const Card = props => {
     const rect = e.target.getBoundingClientRect();
     // stop event propagation to card so card details not opened
     e.stopPropagation();
-    setShownMemberEmail(email);
-    setShownMemberFullName(fullName);
+    props.setEmail(email);
+    props.setFullName(fullName);
     // set modal pos based on AccountBtn position
-    setMemberModalTop(rect.top + 30);
-    setMemberModalLeft(rect.left);
-  };
-
-  const showDetailsHandler = e => {
-    // dont show card details if clicked on card member modal
-    if (cardMemberRef.current && cardMemberRef.current.contains(e.target)) { return; }
-    props.showDetails();
+    props.setTop(rect.top + 30);
+    props.setLeft(rect.left);
   };
 
   return (
     <Draggable draggableId={props.cardID} index={props.index}>
       {(provided, snapshot) => (
-        <div className={classes.Card} onClick={showDetailsHandler} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+        <div className={classes.Card} onClick={props.showDetails} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
           {props.labels.length > 0 && <div className={classes.Labels}>{props.labels.map(color => <div key={color} style={{background: color}}></div>)}</div>}
           <div className={classes.EditIcon}>{editIcon}</div>
           <div className={classes.Title}>{props.title}</div>
@@ -71,10 +59,6 @@ const Card = props => {
                 </span>
               </div>
             ))}
-            {shownMemberEmail !== '' &&
-            <div ref={cardMemberRef}><CardMemberModal top={memberModalTop} left={memberModalLeft} listID={props.listID}
-            cardID={props.cardID} inCard email={shownMemberEmail} fullName={shownMemberFullName}
-            close={() => { setShownMemberEmail(''); setShownMemberFullName(''); }} /></div>}
           </div>}
         </div>
       )}
@@ -92,7 +76,11 @@ Card.propTypes = {
   index: PropTypes.number.isRequired,
   members: PropTypes.array.isRequired,
   listID: PropTypes.string.isRequired,
-  comments: PropTypes.array.isRequired
+  comments: PropTypes.array.isRequired,
+  setEmail: PropTypes.func.isRequired,
+  setFullName: PropTypes.func.isRequired,
+  setTop: PropTypes.func.isRequired,
+  setLeft: PropTypes.func.isRequired
 };
 
 export default Card;
