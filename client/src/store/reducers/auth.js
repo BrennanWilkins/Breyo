@@ -11,7 +11,8 @@ const initialState = {
   loginErrMsg: '',
   signupLoading: false,
   signupErr: false,
-  signupErrMsg: ''
+  signupErrMsg: '',
+  autoLoginLoading: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -115,6 +116,7 @@ const reducer = (state = initialState, action) => {
       boards[boardIndex] = board;
       return { ...state, boards };
     }
+    case actionTypes.AUTO_LOGIN_LOADING: return { ...state, autoLoginLoading: action.bool };
     default: return state;
   }
 };

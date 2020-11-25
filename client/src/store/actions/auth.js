@@ -68,8 +68,10 @@ export const logout = () => dispatch => {
 export const autoLogin = () => async dispatch => {
   if (!localStorage['token']) { return; }
   try {
+    dispatch({ type: actionTypes.AUTO_LOGIN_LOADING, bool: true });
     axios.defaults.headers.common['x-auth-token'] = localStorage['token'];
     const res = await axios.post('/auth/autoLogin');
+    dispatch({ type: actionTypes.AUTO_LOGIN_LOADING, bool: false });
     dispatch(loginDispatch(res.data));
   } catch (err) { dispatch(logout()); }
 }

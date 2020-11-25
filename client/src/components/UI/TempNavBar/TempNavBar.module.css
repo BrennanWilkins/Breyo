@@ -1,0 +1,39 @@
+.TempNavBar {
+  background: rgb(185, 185, 185);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 3px;
+  z-index: 10;
+}
+.Title {
+  position: absolute;
+  width: 100px;
+  text-align: center;
+  left: calc(50% - 50px);
+  font-weight: 500;
+  color: white;
+  font-size: 20px;
+}
+@media (max-width: 330px) {
+  .Title {
+    position: static;
+  }
+}
+.Section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.PersonIcon {
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgb(96, 96, 96);
+}
