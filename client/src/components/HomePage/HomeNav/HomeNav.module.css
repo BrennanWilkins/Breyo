@@ -60,7 +60,6 @@
   display: none;
 }
 .SignupBtn {
-  margin-top: 20px;
   background: rgb(var(--red));
   color: white;
 }
@@ -100,6 +99,12 @@
   width: 100%;
   background: white;
   padding: 0 0 10px;
+  animation: slideOut 600ms forwards;
+  overflow: hidden;
+}
+@keyframes slideOut {
+  from { max-height: 0; }
+  to { max-height: 300px; }
 }
 .Dropdown a {
   width: 70%;
@@ -112,6 +117,12 @@
   width: 100%;
   height: 100%;
   background: rgb(0,0,0,0.4);
+  animation: opacityIn 400ms forwards 100ms;
+  opacity: 0;
+}
+@keyframes opacityIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 @media (max-width: 450px) {
   .DropdownToggle {
