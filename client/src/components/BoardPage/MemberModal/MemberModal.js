@@ -18,7 +18,9 @@ const MemberModal = props => {
   const memberDisabled = !props.userIsAdmin || (props.isAdmin && props.adminCount === 1);
 
   const changeHandler = mode => {
+    // cant change permissions if not admin
     if (!props.userIsAdmin) { return; }
+    // cant change permissions if user already admin or not enough admins to change to member
     if ((mode === 'admin' && (adminDisabled || props.isAdmin)) ||
     (mode === 'member' && memberDisabled)) { return; }
 

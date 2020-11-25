@@ -16,10 +16,12 @@ const BoardPage = props => {
   const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
+    // initalize new socket connection on new board load
     initSocket(props.match.params.boardID);
     connectSocket();
 
     return () => {
+      // close socket connection on navigation away
       console.log('connection closed');
       closeSocket();
     };
@@ -30,10 +32,12 @@ const BoardPage = props => {
       const id = props.match.params.boardID;
       try {
         const res = await axios.get('/board/' + id);
+        // update document style on success
         document.title = res.data.data.title;
         document.body.style.overflow = 'hidden';
         props.updateActiveBoard(res.data.data);
       } catch (err) {
+        // if error return document style to default & navigate to dashboard
         document.title = 'Brello';
         document.body.style.overflow = 'auto';
         props.addNotif('There was an error while retrieving the board data.');
@@ -50,6 +54,7 @@ const BoardPage = props => {
   };
 
   useEffect(() => {
+    // set card details based on listID & cardID in query params
     const path = props.location.pathname;
     if (!path.includes('/c/') || !path.includes('/l/')) { return; }
     const listID = path.slice(path.indexOf('/l/') + 3, path.indexOf('/c/'));

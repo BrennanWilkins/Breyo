@@ -15,10 +15,12 @@ const CardActivity = props => {
   const [allShown, setAllShown] = useState(false);
 
   useEffect(() => {
+    // reset card activity on closing card details
     return () => props.resetCardActivity();
   }, []);
 
   const showDetailsHandler = () => {
+    // fetch recent card activity on show details else clear card activity
     if (!showDetails) { props.getRecentCardActivity(); }
     else { props.resetCardActivity(); }
     setShowDetails(prev => !prev);

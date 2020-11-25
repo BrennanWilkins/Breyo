@@ -14,6 +14,8 @@ const DeleteModal = props => {
     props.delete();
   };
 
+  // cannot leave board if user is only admin
+  // cannot delete board if user is not admin
   const canDelete = props.mode === 'leave' ? (!props.userIsAdmin || props.adminCount >= 2) : props.userIsAdmin;
 
   const text = props.mode === 'leave' ? 'Are you sure you want to leave this board?' :

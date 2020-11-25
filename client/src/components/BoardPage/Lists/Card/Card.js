@@ -17,6 +17,7 @@ const Card = props => {
   const cardMemberRef = useRef();
 
   useEffect(() => {
+    // calculate completed checklists based on whether all items are completed
     setTotalChecklists(props.checklists.length);
     setCompletedChecklists(props.checklists.filter(checklist => {
       let total = checklist.items.length;
@@ -28,14 +29,17 @@ const Card = props => {
 
   const accountBtnClickHandler = (e, email, fullName) => {
     const rect = e.target.getBoundingClientRect();
+    // stop event propagation to card so card details not opened
     e.stopPropagation();
     setShownMemberEmail(email);
     setShownMemberFullName(fullName);
+    // set modal pos based on AccountBtn position
     setMemberModalTop(rect.top + 30);
     setMemberModalLeft(rect.left);
   };
 
   const showDetailsHandler = e => {
+    // dont show card details if clicked on card member modal
     if (cardMemberRef.current && cardMemberRef.current.contains(e.target)) { return; }
     props.showDetails();
   };

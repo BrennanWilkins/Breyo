@@ -13,11 +13,13 @@ const AddCardMember = props => {
   const [boardMembers, setBoardMembers] = useState([]);
 
   useEffect(() => {
+    // add isMember property to props.members before syncing state
     setBoardMembers(props.members.map(member => ({ ...member, isMember: !!props.cardMembers.find(cardMember => cardMember.email === member.email) })));
   }, [props.members, props.cardMembers]);
 
   useLayoutEffect(() => {
     if (!props.fromList) { return; }
+    // if modal is toggled from the card members list then make sure it doesn't overflow screen
     if (modalRef.current.getBoundingClientRect().right + 5 >= window.innerWidth) {
       modalRef.current.style.right = '0';
     } else {

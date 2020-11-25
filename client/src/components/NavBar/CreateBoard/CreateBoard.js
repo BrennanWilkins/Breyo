@@ -15,6 +15,7 @@ const CreateBoard = props => {
 
   const closeHandler = () => {
     props.close();
+    // change default settings back only after close animation finished
     setTimeout(() => {
       setBoardTitle('');
       setBoardColor(COLORS[4]);

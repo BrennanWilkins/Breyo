@@ -20,6 +20,7 @@ const LoginPage = props => {
   const submitHandler = e => {
     e.preventDefault();
     setShowErr(true);
+    // message will be empty if no errors
     let msg = loginValidation(email, password);
     if (msg !== '') { return props.loginErr(msg); }
     props.login(email, password);

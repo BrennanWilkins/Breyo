@@ -9,7 +9,9 @@ import PropTypes from 'prop-types';
 
 const ListContainer = props => {
   const onDragEndHandler = ({ source, destination }) => {
+    // list/card dropped in invalid place
     if (!destination) { return; }
+    // list/card dropped in original place
     if (source.index === destination.index && source.droppableId === destination.droppableId) { return; }
     props.dndHandler(source, destination, props.boardID);
   };

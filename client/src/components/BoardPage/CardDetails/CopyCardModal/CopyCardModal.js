@@ -28,6 +28,7 @@ const CopyCardModal = props => {
   useEffect(() => {
     const cards = props.lists.find(list => list.listID === selectedListID).cards;
     setCardPosition(cards.length);
+    // create array of size cards.length + 1 to show all possible card positions
     setPositionArr([...Array(cards.length + 1)]);
     setShowListSelect(false);
   }, [selectedListID]);

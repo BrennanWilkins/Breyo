@@ -22,6 +22,7 @@ const List = props => {
   const [actionsLeft, setActionsLeft] = useState(0);
 
   useEffect(() => {
+    // set list actions based on list button position
     const rect = actionsRef.current.getBoundingClientRect();
     setActionsTop(rect.top);
     setActionsLeft(rect.left);

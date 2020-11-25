@@ -22,6 +22,7 @@ const SignupPage = props => {
   const submitHandler = e => {
     e.preventDefault();
     setShowErr(true);
+    // message will be empty if no errors
     let msg = signupValidation(email, fullName, password, confirmPassword);
     if (msg !== '') { return props.signupErr(msg); }
     props.signup({ email, fullName, password, confirmPassword });

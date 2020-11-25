@@ -7,6 +7,7 @@ const HomeNav = () => {
 
   useEffect(() => {
     const resizeHandler = () => {
+      // if dropdown not shown make sure document overflow is correct
       if (window.innerWidth > 450) { setShowDropdown(false); }
     };
 

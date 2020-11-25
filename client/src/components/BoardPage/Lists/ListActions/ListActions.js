@@ -19,6 +19,7 @@ const ListActions = props => {
   const [left, setLeft] = useState(0);
 
   useLayoutEffect(() => {
+    // set position before mounting to screen to prevent flickering
     setTop(props.top);
     setLeft(props.left);
   }, [props.top, props.left]);
