@@ -1,4 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
+import { findAndReplace } from './reducerUtils';
 
 const initialState = {
   title: '',
@@ -28,15 +29,11 @@ const reducer = (state = initialState, action) => {
     };
     case actionTypes.UPDATE_BOARD_TITLE: return { ...state, title: action.title };
     case actionTypes.ADD_ADMIN: {
-      const members = [...state.members];
-      const index = members.findIndex(member => member.email === action.email);
-      members[index].isAdmin = true;
+      const members = findAndReplace(state.members, 'email', action.email, 'isAdmin', true);
       return { ...state, members };
     }
     case actionTypes.REMOVE_ADMIN: {
-      const members = [...state.members];
-      const index = members.findIndex(member => member.email === action.email);
-      members[index].isAdmin = false;
+      const members = findAndReplace(state.members, 'email', action.email, 'isAdmin', false);
       return { ...state, members };
     }
     case actionTypes.DEMOTE_SELF: return { ...state, userIsAdmin: false };

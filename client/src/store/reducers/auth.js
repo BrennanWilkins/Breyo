@@ -1,4 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
+import { findAndReplace, findAndToggle } from './reducerUtils';
 
 const initialState = {
   isAuth: false,
@@ -62,10 +63,8 @@ const reducer = (state = initialState, action) => {
       boards: [...state.boards, {...action.payload}]
     };
     case actionTypes.TOGGLE_IS_STARRED: {
-      const updatedBoards = [...state.boards].map(board => ({ ...board }));
-      const index = updatedBoards.findIndex(board => board.boardID === action.id);
-      updatedBoards[index].isStarred = !updatedBoards[index].isStarred;
-      return { ...state, boards: updatedBoards };
+      const boards = findAndToggle(state.boards, 'boardID', action.boardID, 'isStarred');
+      return { ...state, boards };
     }
     case actionTypes.UPDATE_USER_DATA: return {
       ...state,
@@ -73,19 +72,11 @@ const reducer = (state = initialState, action) => {
       invites: [...action.invites]
     };
     case actionTypes.DEMOTE_SELF: {
-      const boards = [...state.boards];
-      const boardIndex = boards.findIndex(board => board.boardID === action.boardID);
-      const board = { ...boards[boardIndex] };
-      board.isAdmin = false;
-      boards[boardIndex] = board;
+      const boards = findAndReplace(state.boards, 'boardID', action.boardID, 'isAdmin', false);
       return { ...state, boards };
     }
     case actionTypes.PROMOTE_SELF: {
-      const boards = [...state.boards];
-      const boardIndex = boards.findIndex(board => board.boardID === action.boardID);
-      const board = { ...boards[boardIndex] };
-      board.isAdmin = true;
-      boards[boardIndex] = board;
+      const boards = findAndReplace(state.boards, 'boardID', action.boardID, 'isAdmin', true);
       return { ...state, boards };
     }
     case actionTypes.DELETE_BOARD: {
@@ -101,19 +92,11 @@ const reducer = (state = initialState, action) => {
       return { ...state, boards };
     }
     case actionTypes.UPDATE_BOARD_TITLE: {
-      const boards = [...state.boards];
-      const boardIndex = boards.findIndex(board => board.boardID === action.boardID);
-      const board = { ...boards[boardIndex] };
-      board.title = action.title;
-      boards[boardIndex] = board;
+      const boards = findAndReplace(state.boards, 'boardID', action.boardID, 'title', action.title);
       return { ...state, boards };
     }
     case actionTypes.UPDATE_COLOR: {
-      const boards = [...state.boards];
-      const boardIndex = boards.findIndex(board => board.boardID === action.boardID);
-      const board = { ...boards[boardIndex] };
-      board.color = action.color;
-      boards[boardIndex] = board;
+      const boards = findAndReplace(state.boards, 'boardID', action.boardID, 'color', action.color);
       return { ...state, boards };
     }
     case actionTypes.AUTO_LOGIN_LOADING: return { ...state, autoLoginLoading: action.bool };

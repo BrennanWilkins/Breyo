@@ -1,4 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
+import { concatSort, checkBoardActivity, updateActivityListID } from './reducerUtils';
 
 const initialState = {
   boardActivity: [],
@@ -23,7 +24,7 @@ const reducer = (state = initialState, action) => {
     };
     case actionTypes.SET_CARD_ACTIVITY: {
       const allComments = state.allComments.filter(comment => comment.cardID === action.cardID);
-      const cardActivity = action.activity.concat(allComments).sort((a,b) => new Date(b.date) - new Date(a.date));
+      const cardActivity = concatSort(action.activity, allComments);
       return { ...state, cardActivity, shownCardActivityID: action.cardID };
     }
     case actionTypes.CARD_ACTIVITY_LOADING : return { ...state, cardActivityLoading: action.bool };
@@ -45,7 +46,7 @@ const reducer = (state = initialState, action) => {
       boardActivity.unshift(action.newActivity);
       if (boardActivity.length > 20) { boardActivity.pop(); }
       let allBoardActivity = state.allBoardActivity;
-      if (state.allBoardActivityShown && !state.allBoardActivityLoading && !state.allBoardActivityErr) {
+      if (checkBoardActivity(state)) {
         allBoardActivity = [...allBoardActivity];
         allBoardActivity.unshift(action.newActivity);
       }
@@ -58,28 +59,10 @@ const reducer = (state = initialState, action) => {
     }
     case actionTypes.MOVE_CARD_DIFF_LIST: {
       // update listID for card's activities in boardActivity
-      const boardActivity = [...state.boardActivity];
-      for (let i = 0; i < boardActivity.length; i++) {
-        if (boardActivity[i].listID === action.sourceID) {
-          const updatedActivity = { ...boardActivity[i], listID: action.destID };
-          boardActivity[i] = updatedActivity;
-        }
-      }
-      const allComments = [...state.allComments];
-      for (let i = 0; i < allComments.length; i++) {
-        if (allComments[i].listID === action.sourceID) {
-          const updatedComment = { ...allComments[i], listID: action.destID };
-          allComments[i] = updatedComment;
-        }
-      }
-      if (state.allBoardActivityShown && !state.allBoardActivityLoading && !state.allBoardActivityErr) {
-        const allBoardActivity = [...state.allBoardActivity];
-        for (let i = 0; i < allBoardActivity.length; i++) {
-          if (allBoardActivity[i].listID === action.sourceID) {
-            const updatedActivity = { ...allBoardActivity[i], listID: action.destID };
-            allBoardActivity[i] = updatedActivity;
-          }
-        }
+      const boardActivity = updateActivityListID([...state.boardActivity], action.sourceID, action.destID);
+      const allComments = updateActivityListID([...state.allComments], action.sourceID, action.destID);
+      if (checkBoardActivity(state)) {
+        const allBoardActivity = updateActivityListID([...state.allBoardActivity], action.sourceID, action.destID);
         return { ...state, boardActivity, allComments, allBoardActivity };
       }
       return { ...state, boardActivity, allComments };
@@ -87,17 +70,17 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SET_BOARD_ACTIVITY: return { ...state, boardActivity: action.payload.activity, allComments: action.payload.allComments };
     case actionTypes.UPDATE_BOARD_ACTIVITY_DELETE_CARD: {
       const allComments = state.allComments.filter(comment => comment.cardID !== action.cardID);
-      const combinedActivity = action.activity.concat(allComments).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
+      const combinedActivity = concatSort(action.activity, allComments).slice(0, 20);
       let allBoardActivity = state.allBoardActivity;
-      if (state.allBoardActivityShown && !state.allBoardActivityLoading && !state.allBoardActivityErr) {
+      if (checkBoardActivity(state)) {
         allBoardActivity = state.allBoardActivity.filter(activity => activity.cardID !== action.cardID);
       }
       return { ...state, boardActivity: combinedActivity, allComments, allBoardActivity };
     }
     case actionTypes.UPDATE_BOARD_ACTIVITY_DELETE_LIST: {
       const allComments = state.allComments.filter(comment => comment.listID !== action.listID);
-      const combinedActivity = action.activity.concat(allComments).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
-      if (state.allBoardActivityShown && !state.allBoardActivityLoading && !state.allBoardActivityErr) {
+      const combinedActivity = concatSort(action.activity, allComments).slice(0, 20);
+      if (checkBoardActivity(state)) {
         const allBoardActivity = state.allBoardActivity.filter(activity => activity.listID !== action.listID);
         return { ...state, boardActivity: combinedActivity, allComments, allBoardActivity };
       }
@@ -110,7 +93,7 @@ const reducer = (state = initialState, action) => {
       const boardActivity = [...state.boardActivity];
       boardActivity.unshift(comment);
       let allBoardActivity = state.allBoardActivity;
-      if (state.allBoardActivityShown && !state.allBoardActivityLoading && !state.allBoardActivityErr) {
+      if (checkBoardActivity(state)) {
         allBoardActivity = [...allBoardActivity];
         allBoardActivity.unshift(comment);
       }
@@ -157,11 +140,11 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SET_LOADING_ALL_BOARD_ACTIVITY: return { ...state, allBoardActivityLoading: action.bool };
     case actionTypes.SET_ERR_ALL_BOARD_ACTIVITY: return { ...state, allBoardActivityErr: action.bool };
     case actionTypes.SET_ALL_BOARD_ACTIVITY_FIRST_PAGE: {
-      const allBoardActivity = action.activity.concat(state.allComments).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 100);
+      const allBoardActivity = concatSort(action.activity, state.allComments).slice(0, 100);
       return { ...state, allBoardActivity };
     }
     case actionTypes.SET_ALL_BOARD_ACTIVITY: {
-      const allBoardActivity = action.activity.concat(state.allComments).sort((a,b) => new Date(b.date) - new Date(a.date));
+      const allBoardActivity = concatSort(action.activity, state.allComments);
       return { ...state, allBoardActivity };
     }
     case actionTypes.SET_ALL_BOARD_ACTIVITY_SHOWN: return { ...state, allBoardActivityShown: true };
