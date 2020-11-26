@@ -81,7 +81,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   updateTitle: (title, id) => dispatch(updateBoardTitle(title, id)),
-  toggleIsStarred: id => dispatch(toggleIsStarred(id, true))
+  toggleIsStarred: boardID => dispatch(toggleIsStarred(boardID))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BoardNavBar);

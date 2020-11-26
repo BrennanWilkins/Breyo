@@ -76,7 +76,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  toggleIsStarred: id => dispatch(toggleIsStarred(id))
+  toggleIsStarred: boardID => dispatch(toggleIsStarred(boardID))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(BoardMenu));

@@ -27,7 +27,7 @@ const BoardList = props => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  toggleIsStarred: id => dispatch(toggleIsStarred(id, false))
+  toggleIsStarred: boardID => dispatch(toggleIsStarred(boardID))
 });
 
 export default connect(null, mapDispatchToProps)(withRouter(BoardList));

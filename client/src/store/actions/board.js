@@ -16,11 +16,12 @@ export const createBoard = (title, color) => async dispatch => {
   }
 };
 
-export const toggleIsStarred = (id, isActive) => async dispatch => {
+export const toggleIsStarred = boardID => async (dispatch, getState) => {
   try {
-    dispatch({ type: actionTypes.TOGGLE_IS_STARRED, id });
+    dispatch({ type: actionTypes.TOGGLE_IS_STARRED, boardID });
+    const isActive = getState().board.boardID === boardID;
     if (isActive) { dispatch({ type: actionTypes.TOGGLE_IS_STARRED_ACTIVE }); }
-    await axios.put('/board/starred', { boardID: id });
+    await axios.put('/board/starred', { boardID });
   } catch (err) {
     console.log(err);
   }
