@@ -27,11 +27,12 @@ export const toggleIsStarred = (id, isActive) => async dispatch => {
 };
 
 export const updateActiveBoard = data => (dispatch, getState) => {
-  const activeBoard = getState().auth.boards.find(board => board.boardID === data._id);
+  const state = getState();
+  const activeBoard = state.auth.boards.find(board => board.boardID === data._id);
   const isStarred = activeBoard.isStarred;
-  const userMember = data.members.find(member => member.email === data.creatorEmail);
-  const creatorFullName = userMember.fullName;
-  const userIsAdmin = userMember.isAdmin;
+  const creator = data.members.find(member => member.email === data.creatorEmail);
+  const creatorFullName = creator.fullName;
+  const userIsAdmin = activeBoard.isAdmin;
 
   if (data.invites && data.boards) {
     dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: data.invites, boards: data.boards });
