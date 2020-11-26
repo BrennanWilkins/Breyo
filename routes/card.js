@@ -410,6 +410,8 @@ router.put('/moveCard/diffList', auth, validate([
       if (!card) { throw 'Card not found in list'; }
       // update card's listID & add to destination list
       card.listID = req.body.targetID;
+      // update listID for all of card's comments
+      for (let comment of card.comments) { comment.listID = req.body.targetID; }
       destList.cards.splice(req.body.destIndex, 0, card);
       await sourceList.save();
       await destList.save();
