@@ -28,7 +28,6 @@ const LoginPage = props => {
 
   return (
     <AuthContainer>
-      <h1 className={classes.Title}><Link to="/">Brello</Link></h1>
       <div className={classes.LoginPanel}>
         <h3 className={classes.Title3}>Log in to Brello</h3>
         <form onSubmit={submitHandler} className={classes.Form}>

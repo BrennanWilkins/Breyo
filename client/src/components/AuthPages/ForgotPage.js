@@ -12,7 +12,6 @@ const ForgotPage = () => {
 
   return (
     <AuthContainer>
-      <h1 className={classes.Title}><Link to="/">Brello</Link></h1>
       <div className={classes.LoginPanel} style={{ height: '350px'}}>
         <h3 className={classes.Title3}>Forgot your password?</h3>
         <p className={classes.SubTitle}>Please enter your email and check your inbox for a link to reset your password.</p>

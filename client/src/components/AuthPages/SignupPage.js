@@ -30,7 +30,6 @@ const SignupPage = props => {
 
   return (
     <AuthContainer>
-      <h1 className={classes.Title}><Link to="/">Brello</Link></h1>
       <div className={classes.SignupPanel}>
         <h3 className={classes.Title3}>Sign up for Brello</h3>
         <form onSubmit={submitHandler} className={classes.Form}>

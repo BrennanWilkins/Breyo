@@ -1,16 +1,12 @@
 .Title {
-  text-align: center;
-  margin: 20px auto 40px;
-}
-.Title a {
-  color: rgb(var(--red));
+  margin: 20px auto;
 }
 .LoginPanel, .SignupPanel {
   box-shadow: var(--box-shadow1);
   max-width: 450px;
   height: 400px;
   border-radius: 2px;
-  margin: auto;
+  margin: 0 auto 20px;
   text-align: center;
   background: white;
   position: relative;
