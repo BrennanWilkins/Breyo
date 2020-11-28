@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-// if action msg contains **(link)cardTitle(link)** then replace with link to open the card detail modal
+// if action msg contains **(link)cardTitle** then replace with link to open the card detail modal
 const parseActionMsg = (msg, cardID, listID, boardID) => {
   let start = msg.indexOf('**(link)');
   if (start === -1) { return msg; }
