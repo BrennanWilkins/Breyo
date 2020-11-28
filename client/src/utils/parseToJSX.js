@@ -33,7 +33,13 @@ const convertLinks = text => {
       if (text.slice(linkStart, linkEnd + linkStart + 2).includes('<')) { continue; }
       // replace unformatted with formatted a tag in text
       let unformatted = text.slice(start, linkStart + linkEnd + 2);
-      let formatted = `<a href="${text.slice(linkStart + 1, linkEnd + linkStart + 1)}" target="_blank" rel="noopener noreferrer">${text.slice(start + 1, end + start + 1)}</a>`;
+      let link = text.slice(start + 1, end + start + 1);
+      let href = text.slice(linkStart + 1, linkEnd + linkStart + 1);
+      // make sure href is preceded by http:// or https:// else add https:// to beginning
+      if (href.slice(0, 7) !== 'http://' || href.slice(0, 8) !== 'https://') {
+        href = 'https://' + href;
+      }
+      let formatted = `<a href="${href}" target="_blank" rel="noopener noreferrer">${link}</a>`;
       text = text.replace(unformatted, formatted);
       i += formatted.length;
     }
