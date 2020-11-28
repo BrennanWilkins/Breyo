@@ -70,3 +70,19 @@
     transform: scale(1.2);
   }
 }
+.HomeContainer a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgb(var(--red));
+  margin-left: 5px;
+}
+.HomeContainer h1 {
+  margin-left: 8px;
+}
+.HomeContainer .Logo {
+  transform: scale(1.4);
+}
+.HomeContainer .Block {
+  border-color: rgb(var(--red));
+}

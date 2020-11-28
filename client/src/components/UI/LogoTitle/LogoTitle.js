@@ -4,7 +4,7 @@ import { checkIcon2 as checkIcon } from '../icons';
 import { Link } from 'react-router-dom';
 
 const TitleLogo = props => (
-  <div className={props.loading ? `${classes.Container} ${classes.Loading}` : classes.Container}>
+  <div className={props.home ? classes.HomeContainer : props.loading ? `${classes.Container} ${classes.Loading}` : classes.Container}>
     <Link to="/">
       <div className={classes.Logo}>
         <div className={`${classes.Section} ${classes.Sec1}`}>
@@ -20,7 +20,7 @@ const TitleLogo = props => (
           <div className={classes.Block}></div>
         </div>
       </div>
-      <div className={classes.Title}>Brello</div>
+      {props.home ? <h1>Brello</h1> : <div className={classes.Title}>Brello</div>}
     </Link>
   </div>
 );

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import classes from './HomeNav.module.css';
 import { Link } from 'react-router-dom';
+import LogoTitle from '../../UI/LogoTitle/LogoTitle';
 
 const HomeNav = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -8,7 +9,7 @@ const HomeNav = () => {
   useEffect(() => {
     const resizeHandler = () => {
       // if dropdown not shown make sure document overflow is correct
-      if (window.innerWidth > 450) { setShowDropdown(false); }
+      if (window.innerWidth > 480) { setShowDropdown(false); }
     };
 
     if (showDropdown) {
@@ -31,7 +32,7 @@ const HomeNav = () => {
       {showDropdown && <div className={classes.Backdrop} onClick={() => setShowDropdown(false)}></div>}
       <div className={classes.NavBar}>
         <div className={classes.NavBarContent}>
-          <h1>Brello</h1>
+          <LogoTitle home />
           <div className={classes.NavBtns}>
             <Link to="/tech"><button className={classes.NavBtn}>Tech</button></Link>
             <Link to="/help"><button className={classes.NavBtn}>Help</button></Link>

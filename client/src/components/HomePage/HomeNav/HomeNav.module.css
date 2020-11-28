@@ -17,9 +17,6 @@
   margin: auto;
   box-sizing: border-box;
 }
-.NavBar h1 {
-  color: rgb(var(--red));
-}
 .NavBtn, .DropdownBtn {
   outline: none;
   border: 0;
@@ -124,7 +121,7 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
-@media (max-width: 450px) {
+@media (max-width: 480px) {
   .DropdownToggle {
     display: block;
   }
@@ -142,7 +139,7 @@
     display: block;
   }
 }
-@media (max-width: 310px) {
+@media (max-width: 350px) {
   .NavBtns .LoginBtn {
     display: none;
   }
