@@ -49,3 +49,9 @@ test('renders links correctly', () => {
   const expected = Parse('To visit this link, <a href="http://www.example.com" target="_blank" rel="noopener noreferrer"><b>click here</b></a>');
   expect(tested).toMatchObject(expected);
 });
+
+test('renders links that are missing http', () => {
+  const tested = parseToJSX('To visit this link, _~click here~_[example.com]');
+  const expected = Parse('To visit this link, <a href="https://example.com" target="_blank" rel="noopener noreferrer"><i>click here</i></a>');
+  expect(tested).toMatchObject(expected);
+});

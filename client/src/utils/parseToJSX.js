@@ -36,7 +36,7 @@ const convertLinks = text => {
       let link = text.slice(start + 1, end + start + 1);
       let href = text.slice(linkStart + 1, linkEnd + linkStart + 1);
       // make sure href is preceded by http:// or https:// else add https:// to beginning
-      if (href.slice(0, 7) !== 'http://' || href.slice(0, 8) !== 'https://') {
+      if (href.slice(0, 7) !== 'http://' && href.slice(0, 8) !== 'https://') {
         href = 'https://' + href;
       }
       let formatted = `<a href="${href}" target="_blank" rel="noopener noreferrer">${link}</a>`;
