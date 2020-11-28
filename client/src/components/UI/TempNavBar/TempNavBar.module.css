@@ -11,20 +11,6 @@
   padding: 0 3px;
   z-index: 10;
 }
-.Title {
-  position: absolute;
-  width: 100px;
-  text-align: center;
-  left: calc(50% - 50px);
-  font-weight: 500;
-  color: white;
-  font-size: 20px;
-}
-@media (max-width: 330px) {
-  .Title {
-    position: static;
-  }
-}
 .Section {
   display: flex;
   justify-content: center;
