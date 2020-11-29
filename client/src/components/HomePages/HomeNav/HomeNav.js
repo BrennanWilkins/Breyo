@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import classes from './HomeNav.module.css';
 import { Link } from 'react-router-dom';
 import LogoTitle from '../../UI/LogoTitle/LogoTitle';
+import DropdownToggle from '../../UI/DropdownToggle/DropdownToggle';
 
 const HomeNav = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -37,7 +38,7 @@ const HomeNav = () => {
             <Link to="/tech"><button className={classes.NavBtn}>Tech</button></Link>
             <Link to="/help"><button className={classes.NavBtn}>Help</button></Link>
             <Link to="/login"><button className={`${classes.NavBtn} ${classes.LoginBtn}`}>Login</button></Link>
-            <div className={`${classes.DropdownToggle} ${showDropdown ? classes.Open : classes.Closed}`} onClick={() => setShowDropdown(shown => !shown)}><div></div></div>
+            <DropdownToggle open={showDropdown} clicked={() => setShowDropdown(shown => !shown)} />
           </div>
         </div>
         {showDropdown && <div className={classes.Dropdown}>

@@ -63,33 +63,6 @@
 .SignupBtn:hover {
   background: rgb(var(--darkRed));
 }
-.DropdownToggle {
-  display: none;
-  cursor: pointer;
-  margin-left: 15px;
-  width: 35px;
-  height: 100%;
-}
-.DropdownToggle:after,
-.DropdownToggle:before,
-.DropdownToggle div {
-  background: rgb(27, 27, 27);
-  border-radius: 4px;
-  content: '';
-  display: block;
-  height: 4px;
-  margin: 6px 0;
-  transition: all 200ms ease-in-out;
-}
-.Open:before {
-  transform: translateY(10px) rotate(135deg);
-}
-.Open:after {
-  transform: translateY(-10px) rotate(-135deg);
-}
-.Open div {
-  transform: scale(0);
-}
 .Dropdown {
   display: none;
   flex-direction: column;
@@ -122,9 +95,6 @@
   to { opacity: 1; }
 }
 @media (max-width: 480px) {
-  .DropdownToggle {
-    display: block;
-  }
   .Backdrop {
     display: block;
   }

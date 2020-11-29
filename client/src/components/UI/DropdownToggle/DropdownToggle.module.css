@@ -1,0 +1,31 @@
+.DropdownToggle {
+  display: none;
+  cursor: pointer;
+  margin-left: 15px;
+  width: 35px;
+}
+.DropdownToggle:after,
+.DropdownToggle:before,
+.DropdownToggle div {
+  background: rgb(27, 27, 27);
+  border-radius: 4px;
+  content: '';
+  display: block;
+  height: 4px;
+  margin: 6px 0;
+  transition: all 200ms ease-in-out;
+}
+.Open:before {
+  transform: translateY(10px) rotate(135deg);
+}
+.Open:after {
+  transform: translateY(-10px) rotate(-135deg);
+}
+.Open div {
+  transform: scale(0);
+}
+@media (max-width: 480px) {
+  .DropdownToggle {
+    display: block;
+  }
+}
