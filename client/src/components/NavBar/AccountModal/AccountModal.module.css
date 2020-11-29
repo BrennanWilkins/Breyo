@@ -41,7 +41,12 @@
   padding: 8px 10px;
   cursor: pointer;
 }
-.Options div:hover {
+.Options a {
+  display: block;
+  padding: 8px 10px;
+  color: inherit;
+}
+.Options div:hover, .Options a:hover {
   background: rgb(241, 241, 241);
 }
 .ShowBackBtn button, .HideBackBtn button {

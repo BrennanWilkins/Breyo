@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classes from './NavBar.module.css';
 import Button, { AccountBtn } from '../../UI/Buttons/Buttons';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { houseIcon, boardIcon, plusIcon } from '../../UI/icons';
 import { connect } from 'react-redux';
 import CreateBoard from '../CreateBoard/CreateBoard';
@@ -15,7 +15,7 @@ const NavBar = props => {
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showBoardMenu, setShowBoardMenu] = useState(false);
 
-  return (
+  return props.location.pathname === '/help' ? null : (
     <div className={classes.NavBar}>
       <div className={classes.Section}>
         <Button><Link to="/">{houseIcon}</Link></Button>
@@ -42,4 +42,4 @@ const mapStateToProps = state => ({
   fullName: state.auth.fullName
 });
 
-export default connect(mapStateToProps)(NavBar);
+export default connect(mapStateToProps)(withRouter(NavBar));

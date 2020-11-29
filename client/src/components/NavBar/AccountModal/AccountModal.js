@@ -7,6 +7,7 @@ import { useModalToggle } from '../../../utils/customHooks';
 import { CloseBtn, BackBtn } from '../../UI/Buttons/Buttons';
 import AccountInfo from '../../UI/AccountInfo/AccountInfo';
 import Invites from './Invites/Invites';
+import { Link } from 'react-router-dom';
 
 const AccountModal = props => {
   const modalRef = useRef();
@@ -24,7 +25,7 @@ const AccountModal = props => {
       <><AccountInfo fullName={props.fullName} email={props.email} givePadding />
       <div className={classes.Options}>
         <div onClick={() => setShowInvites(true)}>Invites</div>
-        <div>Help</div>
+        <Link to="/help">Help</Link>
         <div onClick={props.logout}>Log Out</div>
       </div></>}
     </div>
