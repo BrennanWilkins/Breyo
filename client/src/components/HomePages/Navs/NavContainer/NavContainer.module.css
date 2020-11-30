@@ -1,0 +1,33 @@
+.Backdrop {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  animation: opacityIn 400ms forwards 100ms;
+  opacity: 0;
+}
+@keyframes opacityIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.NavBar {
+  position: fixed;
+  width: 100%;
+  height: 70px;
+  box-shadow: 0 2px 8px 0px rgba(0,0,0,0.15);
+  background: white;
+  top: 0;
+}
+.NavBar button {
+  outline: none;
+  border: 0;
+  font-family: 'Roboto', -apple-system, sans-serif;
+  padding: 0;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 250ms;
+  cursor: pointer;
+}
