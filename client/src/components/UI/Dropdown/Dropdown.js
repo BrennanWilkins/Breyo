@@ -6,7 +6,7 @@ const Dropdown = props => {
   useEffect(() => {
     const resizeHandler = () => {
       // if dropdown not shown make sure document overflow is correct
-      if (window.innerWidth > 480) { props.close(); }
+      if (window.innerWidth > props.max) { props.close(); }
     };
 
     if (props.show) {
@@ -17,7 +17,7 @@ const Dropdown = props => {
     }
 
     return () => window.removeEventListener('resize', resizeHandler);
-  }, [props.show]);
+  }, [props.show, props.max]);
 
   useEffect(() => {
     return () => document.body.style.overflow = 'auto';
@@ -32,7 +32,8 @@ const Dropdown = props => {
 
 Dropdown.propTypes = {
   show: PropTypes.bool.isRequired,
-  close: PropTypes.func.isRequired
+  close: PropTypes.func.isRequired,
+  max: PropTypes.number.isRequired
 };
 
 export default Dropdown;

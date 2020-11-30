@@ -26,7 +26,7 @@ const HomeNav = () => {
           <DropdownToggle open={showDropdown} clicked={() => setShowDropdown(shown => !shown)} />
         </div>
       </div>
-      <Dropdown show={showDropdown} close={() => setShowDropdown(false)}>
+      <Dropdown show={showDropdown} close={() => setShowDropdown(false)} max={480}>
         <div className={classes.DropdownBtns}>
           {links}
           <Link to="/signup"><button className={classes.SignupBtn}>Sign up</button></Link>

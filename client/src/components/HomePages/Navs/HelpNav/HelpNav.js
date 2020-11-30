@@ -6,18 +6,19 @@ import DropdownToggle from '../../../UI/DropdownToggle/DropdownToggle';
 import Dropdown from '../../../UI/Dropdown/Dropdown';
 import { connect } from 'react-redux';
 import NavContainer from '../NavContainer/NavContainer';
+import PropTypes from 'prop-types';
 
 const HelpNav = props => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const links = (
     <>
-      <div>Creating a board</div>
-      <div>Inviting a user to a board</div>
-      <div>Creating a list</div>
-      <div>Creating a card</div>
-      <div>Adding members to a card</div>
-      <div>Checklists</div>
+      <div onClick={() => props.navigate(1)}>Creating a board</div>
+      <div onClick={() => props.navigate(2)}>Inviting a user to a board</div>
+      <div onClick={() => props.navigate(3)}>Creating a list</div>
+      <div onClick={() => props.navigate(4)}>Creating a card</div>
+      <div onClick={() => props.navigate(5)}>Deleting a list or card</div>
+      <div onClick={() => props.navigate(6)}>Card features</div>
     </>
   );
 
@@ -38,7 +39,7 @@ const HelpNav = props => {
           <div className={classes.Btns}>{navLinks}</div>
           <DropdownToggle open={showDropdown} clicked={() => setShowDropdown(shown => !shown)} />
         </div>
-        <Dropdown show={showDropdown} close={() => setShowDropdown(false)}>
+        <Dropdown show={showDropdown} close={() => setShowDropdown(false)} max={640}>
           <div className={classes.Dropdown}>
             {navLinks}
             <div className={classes.Sep}></div>
@@ -49,6 +50,11 @@ const HelpNav = props => {
       <div className={classes.NavLinks}>{links}</div>
     </>
   );
+};
+
+HelpNav.propTypes = {
+  isAuth: PropTypes.bool.isRequired,
+  navigate: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
