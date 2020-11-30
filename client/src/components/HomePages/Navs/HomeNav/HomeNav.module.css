@@ -1,0 +1,78 @@
+.NavBarContent {
+  width: 100%;
+  height: 70px;
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  margin: auto;
+  box-sizing: border-box;
+}
+.NavBtns {
+  display: flex;
+  align-items: center;
+}
+.DropdownBtns button {
+  margin: 5px 0;
+  height: 40px;
+  width: 100%;
+  color: rgb(var(--red));
+  background: white;
+  font-size: 16px;
+}
+.NavBtns button {
+  height: 40px;
+  width: 85px;
+  margin-right: 10px;
+  color: rgb(var(--red));
+  background: white;
+}
+.NavBtns button:hover, .DropdownBtns button:hover {
+  background: rgba(var(--red), 0.2);
+}
+.LoginBtn {
+  background: rgba(var(--red), 0.2) !important;
+}
+.LoginBtn:hover {
+  background: rgb(var(--red)) !important;
+  color: white !important;
+}
+.DropdownBtns .LoginBtn {
+  display: none !important;
+}
+.SignupBtn {
+  background: rgb(var(--red)) !important;
+  color: white !important;
+  border-bottom: 2px solid rgb(var(--darkRed)) !important;
+}
+.SignupBtn:hover {
+  background: rgb(var(--darkRed)) !important;
+}
+.DropdownBtns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  background: white;
+  padding: 0 0 10px;
+}
+.DropdownBtns a {
+  width: 70%;
+}
+@media (max-width: 480px) {
+  .NavBtns button {
+    display: none;
+  }
+  .LoginBtn {
+    display: block !important;
+  }
+}
+@media (max-width: 350px) {
+  .NavBtns .LoginBtn {
+    display: none !important;
+  }
+  .DropdownBtns .LoginBtn {
+    display: block !important;
+  }
+}

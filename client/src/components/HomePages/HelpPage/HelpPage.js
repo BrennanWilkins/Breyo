@@ -1,24 +1,30 @@
 import React from 'react';
 import classes from './HelpPage.module.css';
-import { Link } from 'react-router-dom';
-import LogoTitle from '../../UI/LogoTitle/LogoTitle';
+import HelpNav from '../Navs/HelpNav/HelpNav';
 
-const HelpPage = props => {
+const HelpPage = () => {
   return (
     <div>
-      <div className={classes.NavBar}>
-        <div className={classes.NavBarContent}>
-          <LogoTitle help />
-          {props.isAuth ?
-            <Link to="/"><button className={classes.BackBtn}>Back to my boards</button></Link> :
-            <div className={classes.Btns}>
-              <Link to="/login"><button className={classes.LoginBtn}>Login</button></Link>
-              <Link to="/signup"><button className={classes.SignupBtn}>Sign up</button></Link>
-            </div>
-          }
-        </div>
-      </div>
+      <HelpNav />
       <div className={classes.Content}>
+        <div>
+          <h2>Creating a board</h2>
+        </div>
+        <div>
+          <h2>Inviting a user to a board</h2>
+        </div>
+        <div>
+          <h2>Creating a list</h2>
+        </div>
+        <div>
+          <h2>Creating a card</h2>
+        </div>
+        <div>
+          <h2>Adding members to a card</h2>
+        </div>
+        <div>
+          <h2>Checklists</h2>
+        </div>
       </div>
     </div>
   );

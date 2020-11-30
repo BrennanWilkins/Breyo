@@ -27,7 +27,7 @@ const App = props => {
           <Switch>
             <Route exact path="/" render={() => <Suspense fallback={<Spinner />}><DashboardPage /></Suspense>} />
             <Route path="/board/:boardID" render={() => <Suspense fallback={<Spinner />}><BoardPage /></Suspense>} />
-            <Route exact path="/help" render={() => <Suspense fallback={<Spinner />}><HelpPage isAuth /></Suspense>} />
+            <Route exact path="/help" render={() => <Suspense fallback={<Spinner />}><HelpPage /></Suspense>} />
             <Redirect to="/" />
           </Switch>
         </>

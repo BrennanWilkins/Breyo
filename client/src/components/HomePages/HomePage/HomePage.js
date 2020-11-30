@@ -2,7 +2,7 @@ import React from 'react';
 import classes from './HomePage.module.css';
 import { Link } from 'react-router-dom';
 import { teamGoals, sharedGoals } from '../../UI/illustrations';
-import HomeNav from '../HomeNav/HomeNav';
+import HomeNav from '../Navs/HomeNav/HomeNav';
 
 const HomePage = () => (
   <div>
