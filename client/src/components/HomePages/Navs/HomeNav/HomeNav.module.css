@@ -15,21 +15,8 @@
 }
 .DropdownBtns button {
   margin: 5px 0;
-  height: 40px;
   width: 100%;
-  color: rgb(var(--red));
-  background: white;
   font-size: 16px;
-}
-.NavBtns button {
-  height: 40px;
-  width: 85px;
-  margin-right: 10px;
-  color: rgb(var(--red));
-  background: white;
-}
-.NavBtns button:hover, .DropdownBtns button:hover {
-  background: rgba(var(--red), 0.2);
 }
 .DropdownBtns .LoginBtn button {
   display: none !important;
@@ -47,6 +34,9 @@
 .DropdownBtns a {
   width: 70%;
 }
+.LoginBtn {
+  width: 70%;
+}
 @media (max-width: 480px) {
   .NavBtns button {
     display: none;
@@ -58,6 +48,9 @@
 @media (max-width: 350px) {
   .NavBtns .LoginBtn button {
     display: none !important;
+  }
+  .NavBtns {
+    display: block;
   }
   .DropdownBtns .LoginBtn button {
     display: block !important;

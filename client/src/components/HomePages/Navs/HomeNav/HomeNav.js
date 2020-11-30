@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
 import classes from './HomeNav.module.css';
-import { Link } from 'react-router-dom';
 import LogoTitle from '../../../UI/LogoTitle/LogoTitle';
 import DropdownToggle from '../../../UI/DropdownToggle/DropdownToggle';
 import Dropdown from '../../../UI/Dropdown/Dropdown';
 import NavContainer from '../NavContainer/NavContainer';
-import { LoginBtn, SignupBtn } from '../NavBtns/NavBtns';
+import { LoginBtn, SignupBtn, NavBtn } from '../NavBtns/NavBtns';
 
 const HomeNav = () => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const links = (
     <>
-      <Link to="/tech"><button>Tech</button></Link>
-      <Link to="/help"><button>Help</button></Link>
-      <Link to="/login"><span className={classes.LoginBtn}><LoginBtn /></span></Link>
+      <NavBtn link="/tech" title="Tech" />
+      <NavBtn link="/help" title="Help" />
+      <span className={classes.LoginBtn}><LoginBtn /></span>
     </>
   );
 
@@ -30,7 +29,7 @@ const HomeNav = () => {
       <Dropdown show={showDropdown} close={() => setShowDropdown(false)} max={480}>
         <div className={classes.DropdownBtns}>
           {links}
-          <Link to="/signup"><SignupBtn /></Link>
+          <SignupBtn />
         </div>
       </Dropdown>
     </NavContainer>

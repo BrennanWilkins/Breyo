@@ -24,3 +24,13 @@
 .SignupBtn:hover {
   background: rgb(var(--darkRed)) !important;
 }
+.NavBtn {
+  height: 40px;
+  width: 85px;
+  margin-right: 10px;
+  color: rgb(var(--red));
+  background: white;
+}
+.NavBtn:hover {
+  background: rgba(var(--red), 0.2);
+}

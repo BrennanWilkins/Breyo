@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import classes from './HelpNav.module.css';
-import { Link } from 'react-router-dom';
 import LogoTitle from '../../../UI/LogoTitle/LogoTitle';
 import DropdownToggle from '../../../UI/DropdownToggle/DropdownToggle';
 import Dropdown from '../../../UI/Dropdown/Dropdown';
@@ -28,13 +27,7 @@ const HelpNav = props => {
     </>
   );
 
-  const navLinks = (
-    props.isAuth ? <Link to="/"><BackBtn /></Link> :
-    <>
-      <Link to="/login"><LoginBtn /></Link>
-      <Link to="/signup"><SignupBtn /></Link>
-    </>
-  );
+  const navLinks = props.isAuth ? <BackBtn /> : <><LoginBtn /><SignupBtn /></>;
 
   return (
     <>
