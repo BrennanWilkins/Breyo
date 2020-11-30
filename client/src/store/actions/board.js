@@ -1,6 +1,6 @@
 import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
-import { addNotif } from './notifications';
+import { addNotif, serverErr } from './notifications';
 import { sendUpdate, initSocket, connectSocket } from './socket';
 import { addRecentActivity } from './activity';
 
@@ -23,7 +23,7 @@ export const toggleIsStarred = boardID => async (dispatch, getState) => {
     if (isActive) { dispatch({ type: actionTypes.TOGGLE_IS_STARRED_ACTIVE }); }
     await axios.put('/board/starred', { boardID });
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -136,7 +136,7 @@ export const updateBoardTitle = (title, boardID) => async dispatch => {
     dispatch({ type: actionTypes.UPDATE_BOARD_TITLE, title, boardID });
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -156,7 +156,6 @@ export const addAdmin = (email, boardID) => async dispatch => {
     sendUpdate('post/board/admins', email);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
     dispatch(addNotif('There was an error while changing user permissions.'));
   }
 };
@@ -181,7 +180,7 @@ export const updateColor = color => async (dispatch, getState) => {
     await axios.put('/board/color', { color, boardID });
     sendUpdate('put/board/color', JSON.stringify({ color, boardID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -192,7 +191,9 @@ export const updateBoardDesc = desc => async (dispatch, getState) => {
     const res = await axios.put('/board/desc', { desc, boardID });
     sendUpdate('put/board/desc', JSON.stringify({ desc }));
     addRecentActivity(res.data.newActivity);
-  } catch (err) { console.log(err); }
+  } catch (err) {
+    dispatch(serverErr());
+  }
 };
 
 export const deleteBoard = () => async (dispatch, getState) => {
@@ -228,7 +229,7 @@ export const rejectInvite = boardID => async dispatch => {
     dispatch({ type: actionTypes.REMOVE_INVITE, boardID });
     await axios.put('/board/invites/reject', { boardID });
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 

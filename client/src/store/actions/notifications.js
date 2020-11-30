@@ -19,3 +19,7 @@ export const addNotif = notif => (dispatch, getState) => {
   dispatch(setNotifs(notifs));
   dispatch(removeNotif(newNotif.id));
 };
+
+export const serverErr = () => dispatch => {
+  dispatch(addNotif('There was an error while connecting to the server. Your changes may not be saved.'));
+};

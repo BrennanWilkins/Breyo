@@ -1,6 +1,6 @@
 import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
-import { addNotif } from './notifications';
+import { addNotif, serverErr } from './notifications';
 import { sendUpdate } from './socket';
 import { addRecentActivity } from './activity';
 
@@ -11,7 +11,7 @@ export const addCard = (title, boardID, listID) => async dispatch => {
     sendUpdate('post/card', JSON.stringify({ title, listID, cardID: res.data.cardID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -56,7 +56,7 @@ export const updateCardTitle = (title, cardID, listID, boardID) => async dispatc
     sendUpdate('put/card/title', JSON.stringify({ title, cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -66,7 +66,7 @@ export const updateCardDesc = (desc, cardID, listID, boardID) => async dispatch 
     await axios.put('/card/desc', { desc, cardID, listID, boardID });
     sendUpdate('put/card/desc', JSON.stringify({ desc, cardID, listID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -76,7 +76,7 @@ export const addCardLabel = (color, cardID, listID, boardID) => async dispatch =
     await axios.post('/card/label', { color, cardID, listID, boardID });
     sendUpdate('post/card/label', JSON.stringify({ color, cardID, listID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -86,7 +86,7 @@ export const removeCardLabel = (color, cardID, listID, boardID) => async dispatc
     await axios.put('/card/label/remove', { color, cardID, listID, boardID });
     sendUpdate('put/card/label/remove', JSON.stringify({ color, cardID, listID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -97,7 +97,7 @@ export const toggleDueDateIsComplete = (cardID, listID, boardID) => async dispat
     sendUpdate('put/card/dueDate/isComplete', JSON.stringify({ cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -108,7 +108,7 @@ export const addDueDate = (dueDate, cardID, listID, boardID) => async dispatch =
     sendUpdate('post/card/dueDate', JSON.stringify({ dueDate, cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -119,7 +119,7 @@ export const removeDueDate = (cardID, listID, boardID) => async dispatch => {
     sendUpdate('delete/card/dueDate', JSON.stringify({ cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -141,7 +141,7 @@ export const deleteChecklist = (checklistID, cardID, listID, boardID) => async d
     sendUpdate('delete/card/checklist', JSON.stringify({ checklistID, cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -156,7 +156,7 @@ export const editChecklistTitle = (title, checklistID) => async (dispatch, getSt
     sendUpdate('put/card/checklist/title', JSON.stringify({ title, checklistID, cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -166,7 +166,7 @@ export const addChecklistItem = (title, checklistID, cardID, listID, boardID) =>
     dispatch({ type: actionTypes.ADD_CHECKLIST_ITEM, title, itemID: res.data.itemID, checklistID, cardID, listID });
     sendUpdate('post/card/checklist/item', JSON.stringify({ title, itemID: res.data.itemID, checklistID, cardID, listID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -177,7 +177,7 @@ export const toggleChecklistItemIsComplete = (itemID, checklistID, cardID, listI
     sendUpdate('put/card/checklist/item/isComplete', JSON.stringify({ itemID, checklistID, cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -187,7 +187,7 @@ export const editChecklistItem = (title, itemID, checklistID, cardID, listID, bo
     await axios.put('/card/checklist/item/title', { title, itemID, checklistID, cardID, listID, boardID });
     sendUpdate('put/card/checklist/item/title', JSON.stringify({ title, itemID, checklistID, cardID, listID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -197,7 +197,7 @@ export const deleteChecklistItem = (itemID, checklistID, cardID, listID, boardID
     await axios.put('/card/checklist/item/delete', { itemID, checklistID, cardID, listID, boardID });
     sendUpdate('put/card/checklist/item/delete', JSON.stringify({ itemID, checklistID, cardID, listID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -219,7 +219,7 @@ export const archiveCard = (cardID, listID, boardID) => async dispatch => {
     sendUpdate('post/card/archive', JSON.stringify({ cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -230,7 +230,7 @@ export const recoverCard = (cardID, listID, boardID) => async dispatch => {
     sendUpdate('put/card/archive/recover', JSON.stringify({ cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -242,7 +242,7 @@ export const deleteCard = (cardID, listID, boardID) => async dispatch => {
     sendUpdate('put/activity/board/deleteCard', JSON.stringify({ activity: res.data.activity, cardID }));
     sendUpdate('delete/card/archive', JSON.stringify({ cardID, listID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -253,7 +253,7 @@ export const addCardMember = (email, fullName, cardID, listID, boardID) => async
     sendUpdate('post/card/members', JSON.stringify({ email, fullName, cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -264,7 +264,7 @@ export const removeCardMember = (email, cardID, listID, boardID) => async dispat
     sendUpdate('delete/card/members', JSON.stringify({ email, cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -279,7 +279,7 @@ export const addComment = msg => async (dispatch, getState) => {
     dispatch({ type: actionTypes.ADD_COMMENT, payload, cardTitle: res.data.cardTitle });
     sendUpdate('post/card/comments', JSON.stringify({ payload, cardTitle: res.data.cardTitle }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -292,7 +292,7 @@ export const updateComment = (msg, commentID) => async (dispatch, getState) => {
     await axios.put('/card/comments', { msg, commentID, cardID, listID, boardID: state.board.boardID });
     sendUpdate('put/card/comments', JSON.stringify({ msg, commentID, cardID, listID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -306,6 +306,6 @@ export const deleteComment = commentID => async (dispatch, getState) => {
     await axios.delete(`/card/comments/${commentID}/${cardID}/${listID}/${boardID}`);
     sendUpdate('delete/card/comments', JSON.stringify({ commentID, cardID, listID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };

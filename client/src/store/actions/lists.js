@@ -1,6 +1,6 @@
 import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
-import { addNotif } from './notifications';
+import { addNotif, serverErr } from './notifications';
 import { sendUpdate } from './socket';
 import { addRecentActivity, addRecentActivities } from './activity';
 
@@ -11,7 +11,7 @@ export const updateListTitle = (title, listID, boardID) => async dispatch => {
     sendUpdate('put/list/title', JSON.stringify({ title, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -44,7 +44,7 @@ export const archiveList = (listID, boardID) => async dispatch => {
     sendUpdate('post/list/archive', JSON.stringify({ listID }));
     addRecentActivity(res.data.newActivity);
   } catch(err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -55,7 +55,7 @@ export const recoverList = (listID, boardID) => async dispatch => {
     sendUpdate('put/list/archive/recover', JSON.stringify({ listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -67,7 +67,7 @@ export const deleteList = (listID, boardID) => async dispatch => {
     sendUpdate('delete/list/archive', JSON.stringify({ listID }));
     sendUpdate('put/activity/board/deleteList', JSON.stringify({ activity: res.data.activity, listID }));
   } catch(err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -78,7 +78,7 @@ export const archiveAllCards = (listID, boardID) => async dispatch => {
     sendUpdate('put/list/archive/allCards', JSON.stringify({ listID }));
     addRecentActivities(res.data.activities);
   } catch(err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };
 
@@ -88,6 +88,6 @@ export const moveAllCards = (oldListID, newListID, boardID) => async dispatch =>
     await axios.put('/list/moveAllCards', { oldListID, newListID, boardID });
     sendUpdate('put/list/moveAllCards', JSON.stringify({ oldListID, newListID }));
   } catch (err) {
-    console.log(err);
+    dispatch(serverErr());
   }
 };

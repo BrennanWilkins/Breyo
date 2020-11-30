@@ -26,7 +26,6 @@ export const getRecentCardActivity = () => async (dispatch, getState) => {
     dispatch({ type: actionTypes.SET_CARD_ACTIVITY, activity: res.data.activity, cardID });
     dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: false });
   } catch (err) {
-    console.log(err);
     dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: false });
   }
 };
@@ -41,7 +40,6 @@ export const getAllCardActivity = () => async (dispatch, getState) => {
     dispatch({ type: actionTypes.SET_CARD_ACTIVITY, activity: res.data.activity, cardID });
     dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: false });
   } catch (err) {
-    console.log(err);
     dispatch({ type: actionTypes.CARD_ACTIVITY_LOADING, bool: false });
   }
 };
