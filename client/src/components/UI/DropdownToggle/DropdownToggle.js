@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 const DropdownToggle = props => {
   return (
-    <div className={`${classes.DropdownToggle} ${props.open ? classes.Open : ''}`} onClick={props.clicked}>
+    <div className={`${classes.DropdownToggle} ${props.open ? classes.Open : ''} ${props.widthToShow === 480 ? classes.OpenSmall : classes.OpenBig}`} onClick={props.clicked}>
       <div></div>
     </div>
   );
@@ -12,7 +12,8 @@ const DropdownToggle = props => {
 
 DropdownToggle.propTypes = {
   clicked: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired
+  open: PropTypes.bool.isRequired,
+  widthToShow: PropTypes.number.isRequired
 };
 
 export default DropdownToggle;

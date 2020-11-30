@@ -24,8 +24,13 @@
 .Open div {
   transform: scale(0);
 }
+@media (max-width: 640px) {
+  .OpenBig {
+    display: block;
+  }
+}
 @media (max-width: 480px) {
-  .DropdownToggle {
+  .OpenSmall {
     display: block;
   }
 }

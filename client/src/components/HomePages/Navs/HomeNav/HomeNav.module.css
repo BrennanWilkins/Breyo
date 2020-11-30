@@ -56,6 +56,8 @@
   width: 100%;
   background: white;
   padding: 0 0 10px;
+  overflow: auto;
+  max-height: calc(100vh - 70px);
 }
 .DropdownBtns a {
   width: 70%;

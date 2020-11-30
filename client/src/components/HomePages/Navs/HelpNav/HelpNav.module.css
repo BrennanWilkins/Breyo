@@ -62,7 +62,7 @@
   width: 100%;
   background: white;
   overflow: auto;
-  height: 315px;
+  padding: 0 0 10px;
   max-height: calc(100vh - 70px);
 }
 .Dropdown a {

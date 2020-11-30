@@ -23,7 +23,7 @@ const HomeNav = () => {
         <LogoTitle home />
         <div className={classes.NavBtns}>
           {links}
-          <DropdownToggle open={showDropdown} clicked={() => setShowDropdown(shown => !shown)} />
+          <DropdownToggle widthToShow={480} open={showDropdown} clicked={() => setShowDropdown(shown => !shown)} />
         </div>
       </div>
       <Dropdown show={showDropdown} close={() => setShowDropdown(false)} max={480}>

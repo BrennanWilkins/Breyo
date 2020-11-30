@@ -11,14 +11,19 @@ import PropTypes from 'prop-types';
 const HelpNav = props => {
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const navHandler = num => {
+    props.navigate(num);
+    setShowDropdown(false);
+  };
+
   const links = (
     <>
-      <div onClick={() => props.navigate(1)}>Creating a board</div>
-      <div onClick={() => props.navigate(2)}>Inviting a user to a board</div>
-      <div onClick={() => props.navigate(3)}>Creating a list</div>
-      <div onClick={() => props.navigate(4)}>Creating a card</div>
-      <div onClick={() => props.navigate(5)}>Deleting a list or card</div>
-      <div onClick={() => props.navigate(6)}>Card features</div>
+      <div onClick={() => navHandler(1)}>Creating a board</div>
+      <div onClick={() => navHandler(2)}>Inviting a user to a board</div>
+      <div onClick={() => navHandler(3)}>Creating a list</div>
+      <div onClick={() => navHandler(4)}>Creating a card</div>
+      <div onClick={() => navHandler(5)}>Deleting a list or card</div>
+      <div onClick={() => navHandler(6)}>Card features</div>
     </>
   );
 
@@ -37,7 +42,7 @@ const HelpNav = props => {
         <div className={classes.NavBarContent}>
           <LogoTitle help />
           <div className={classes.Btns}>{navLinks}</div>
-          <DropdownToggle open={showDropdown} clicked={() => setShowDropdown(shown => !shown)} />
+          <DropdownToggle widthToShow={640} open={showDropdown} clicked={() => setShowDropdown(shown => !shown)} />
         </div>
         <Dropdown show={showDropdown} close={() => setShowDropdown(false)} max={640}>
           <div className={classes.Dropdown}>
