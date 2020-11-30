@@ -17,23 +17,23 @@ export const initSocket = boardID => {
     newSocket.emit('join', boardID);
   });
 
-  newSocket.on('joined', () => {
-    console.log('connected');
-  });
+  // newSocket.on('joined', () => {
+  //   console.log('connected');
+  // });
 
-  newSocket.on('unauthorized', () => {
-    console.log('Not a member');
-  });
+  // newSocket.on('unauthorized', () => {
+  //   console.log('Not a member');
+  // });
 
   newSocket.on('connect_error', error => {
     if (error.message === 'Unauthorized') {
-      console.log('Unauthorized');
+      // console.log('Unauthorized');
       newSocket.close();
     }
   });
 
   newSocket.on('disconnect', reason => {
-    console.log('disconnected:', reason);
+    // console.log('disconnected:', reason);
     if (reason === 'io server disconnect') {
       store.dispatch(addNotif('Connection to server lost, attempting to re-establish...'));
       newSocket.connect();
