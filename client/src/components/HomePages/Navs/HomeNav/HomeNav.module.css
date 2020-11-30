@@ -37,11 +37,30 @@
 .LoginBtn {
   width: 70%;
 }
+@media (max-width: 540px) {
+  .NavBtnsTech button {
+    display: none;
+  }
+  .LoginBtn button {
+    display: block !important;
+  }
+}
 @media (max-width: 480px) {
   .NavBtns button {
     display: none;
   }
   .LoginBtn button {
+    display: block !important;
+  }
+}
+@media (max-width: 420px) {
+  .NavBtnsTech .LoginBtn button {
+    display: none !important;
+  }
+  .NavBtnsTech {
+    display: block;
+  }
+  .DropdownBtnsTech .LoginBtn button {
     display: block !important;
   }
 }

@@ -29,6 +29,11 @@
     display: block;
   }
 }
+@media (max-width: 540px) {
+  .OpenMid {
+    display: block;
+  }
+}
 @media (max-width: 480px) {
   .OpenSmall {
     display: block;
