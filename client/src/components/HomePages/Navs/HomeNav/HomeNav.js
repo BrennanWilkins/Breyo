@@ -5,6 +5,7 @@ import LogoTitle from '../../../UI/LogoTitle/LogoTitle';
 import DropdownToggle from '../../../UI/DropdownToggle/DropdownToggle';
 import Dropdown from '../../../UI/Dropdown/Dropdown';
 import NavContainer from '../NavContainer/NavContainer';
+import { LoginBtn, SignupBtn } from '../NavBtns/NavBtns';
 
 const HomeNav = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -13,7 +14,7 @@ const HomeNav = () => {
     <>
       <Link to="/tech"><button>Tech</button></Link>
       <Link to="/help"><button>Help</button></Link>
-      <Link to="/login"><button className={classes.LoginBtn}>Login</button></Link>
+      <Link to="/login"><span className={classes.LoginBtn}><LoginBtn /></span></Link>
     </>
   );
 
@@ -29,7 +30,7 @@ const HomeNav = () => {
       <Dropdown show={showDropdown} close={() => setShowDropdown(false)} max={480}>
         <div className={classes.DropdownBtns}>
           {links}
-          <Link to="/signup"><button className={classes.SignupBtn}>Sign up</button></Link>
+          <Link to="/signup"><SignupBtn /></Link>
         </div>
       </Dropdown>
     </NavContainer>

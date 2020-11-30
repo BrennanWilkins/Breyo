@@ -1,0 +1,26 @@
+.LoginBtn {
+  height: 40px;
+  width: 85px;
+  color: rgb(var(--red)) !important;
+  margin-right: 10px;
+  background: rgba(var(--red), 0.2) !important;
+}
+.BackBtn {
+  padding: 10px !important;
+  color: rgb(var(--red));
+  background: rgba(var(--red), 0.2) !important;
+}
+.LoginBtn:hover, .BackBtn:hover {
+  background: rgb(var(--red)) !important;
+  color: white !important;
+}
+.SignupBtn {
+  height: 40px;
+  width: 85px;
+  background: rgb(var(--red)) !important;
+  color: white !important;
+  border-bottom: 2px solid rgb(var(--darkRed)) !important;
+}
+.SignupBtn:hover {
+  background: rgb(var(--darkRed)) !important;
+}

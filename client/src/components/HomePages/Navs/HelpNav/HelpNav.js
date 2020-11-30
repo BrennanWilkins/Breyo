@@ -7,6 +7,7 @@ import Dropdown from '../../../UI/Dropdown/Dropdown';
 import { connect } from 'react-redux';
 import NavContainer from '../NavContainer/NavContainer';
 import PropTypes from 'prop-types';
+import { LoginBtn, BackBtn, SignupBtn } from '../NavBtns/NavBtns';
 
 const HelpNav = props => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -28,11 +29,10 @@ const HelpNav = props => {
   );
 
   const navLinks = (
-    props.isAuth ?
-    <Link to="/"><button className={classes.BackBtn}>Back to my boards</button></Link> :
+    props.isAuth ? <Link to="/"><BackBtn /></Link> :
     <>
-      <Link to="/login"><button className={classes.LoginBtn}>Login</button></Link>
-      <Link to="/signup"><button className={classes.SignupBtn}>Sign up</button></Link>
+      <Link to="/login"><LoginBtn /></Link>
+      <Link to="/signup"><SignupBtn /></Link>
     </>
   );
 

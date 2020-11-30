@@ -31,23 +31,8 @@
 .NavBtns button:hover, .DropdownBtns button:hover {
   background: rgba(var(--red), 0.2);
 }
-.LoginBtn {
-  background: rgba(var(--red), 0.2) !important;
-}
-.LoginBtn:hover {
-  background: rgb(var(--red)) !important;
-  color: white !important;
-}
-.DropdownBtns .LoginBtn {
+.DropdownBtns .LoginBtn button {
   display: none !important;
-}
-.SignupBtn {
-  background: rgb(var(--red)) !important;
-  color: white !important;
-  border-bottom: 2px solid rgb(var(--darkRed)) !important;
-}
-.SignupBtn:hover {
-  background: rgb(var(--darkRed)) !important;
 }
 .DropdownBtns {
   display: flex;
@@ -66,15 +51,15 @@
   .NavBtns button {
     display: none;
   }
-  .LoginBtn {
+  .LoginBtn button {
     display: block !important;
   }
 }
 @media (max-width: 350px) {
-  .NavBtns .LoginBtn {
+  .NavBtns .LoginBtn button {
     display: none !important;
   }
-  .DropdownBtns .LoginBtn {
+  .DropdownBtns .LoginBtn button {
     display: block !important;
   }
 }
