@@ -38,14 +38,14 @@ const BoardPage = props => {
         props.updateActiveBoard(res.data.data);
       } catch (err) {
         // if error return document style to default & navigate to dashboard
-        document.title = 'Brello';
+        document.title = 'Breyo';
         document.body.style.overflow = 'auto';
         props.addNotif('There was an error while retrieving the board data.');
         props.history.push('/');
       }
     };
     fetchData();
-    return () => { document.title = 'Brello'; document.body.style.overflow = 'auto'; }
+    return () => { document.title = 'Breyo'; document.body.style.overflow = 'auto'; }
   }, []);
 
   const closeDetailsHandler = () => {

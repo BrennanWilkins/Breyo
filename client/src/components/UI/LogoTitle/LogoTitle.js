@@ -21,7 +21,7 @@ const TitleLogo = props => (
           <div className={classes.Block}></div>
         </div>
       </div>
-      {props.home ? <h1>Brello</h1> : props.help ? <h1>Brello Help</h1> : <div className={classes.Title}>Brello</div>}
+      {props.home ? <h1>Breyo</h1> : props.help ? <h1>Breyo Help</h1> : <div className={classes.Title}>Breyo</div>}
     </Link>
   </div>
 );

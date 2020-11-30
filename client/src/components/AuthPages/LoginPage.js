@@ -29,7 +29,7 @@ const LoginPage = props => {
   return (
     <AuthContainer>
       <div className={classes.LoginPanel}>
-        <h3 className={classes.Title3}>Log in to Brello</h3>
+        <h3 className={classes.Title3}>Log in to Breyo</h3>
         <form onSubmit={submitHandler} className={classes.Form}>
           <input disabled={props.loading} placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} />
           <input disabled={props.loading} placeholder="Enter your password" type="password" value={password} onChange={e => setPassword(e.target.value)} />

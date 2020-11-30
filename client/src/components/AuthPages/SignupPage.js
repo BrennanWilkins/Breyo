@@ -31,7 +31,7 @@ const SignupPage = props => {
   return (
     <AuthContainer>
       <div className={classes.SignupPanel}>
-        <h3 className={classes.Title3}>Sign up for Brello</h3>
+        <h3 className={classes.Title3}>Sign up for Breyo</h3>
         <form onSubmit={submitHandler} className={classes.Form}>
           <input disabled={props.loading} placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} />
           <input disabled={props.loading} placeholder="Enter your full name" value={fullName} onChange={e => setFullName(e.target.value)} />
