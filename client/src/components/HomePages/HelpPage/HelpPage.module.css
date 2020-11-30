@@ -10,3 +10,6 @@
     margin: 80px 0 0 0;
   }
 }
+.Content div {
+  border-bottom: 1.2px solid #eee;
+}
