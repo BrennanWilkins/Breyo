@@ -22,7 +22,6 @@ const BoardPage = props => {
 
     return () => {
       // close socket connection on navigation away
-      // console.log('connection closed');
       closeSocket();
     };
   }, [props.match.params.boardID]);
@@ -50,13 +49,15 @@ const BoardPage = props => {
 
   const closeDetailsHandler = () => {
     props.history.push(`/board/${props.boardID}`);
-    props.setCardDetails(null, null);
   };
 
   useEffect(() => {
     // set card details based on listID & cardID in query params
     const path = props.location.pathname;
-    if (!path.includes('/c/') || !path.includes('/l/')) { return; }
+    if (!path.includes('/c/') || !path.includes('/l/')) {
+      if (!props.shownCardID || !props.shownListID) { return; }
+      return props.setCardDetails(null, null);
+    }
     const listID = path.slice(path.indexOf('/l/') + 3, path.indexOf('/c/'));
     const cardID = path.slice(path.indexOf('/c/') + 3);
     props.setCardDetails(cardID, listID);
