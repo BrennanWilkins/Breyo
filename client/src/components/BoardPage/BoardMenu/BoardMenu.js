@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardMenu.module.css';
 import { CloseBtn, BackBtn } from '../../UI/Buttons/Buttons';

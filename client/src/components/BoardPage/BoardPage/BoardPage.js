@@ -22,7 +22,7 @@ const BoardPage = props => {
 
     return () => {
       // close socket connection on navigation away
-      console.log('connection closed');
+      // console.log('connection closed');
       closeSocket();
     };
   }, [props.match.params.boardID]);

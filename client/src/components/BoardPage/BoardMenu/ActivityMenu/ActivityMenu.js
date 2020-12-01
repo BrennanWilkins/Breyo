@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import classes from './ActivityMenu.module.css';
 import Action from '../../CardDetails/CardActivity/Action/Action';
 import CommentAction from '../../CardDetails/CardActivity/Action/CommentAction';
-import { instance as axios } from '../../../../axios';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { fetchFirstPageBoardActivity, fetchAllBoardActivity,
