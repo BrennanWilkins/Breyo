@@ -13,7 +13,7 @@ const CopyCardModal = props => {
   const listRef = useRef();
   const positionRef = useRef();
   useModalToggle(true, modalRef, props.close);
-  const [cardTitle, setCardTitle] = useState(props.currentCard.title);
+  const [cardTitle, setCardTitle] = useState(props.currentCardTitle);
   const [keepChecklists, setKeepChecklists] = useState(true);
   const [keepLabels, setKeepLabels] = useState(true);
   const [listTitle, setListTitle] = useState(props.currentListTitle);
@@ -37,7 +37,7 @@ const CopyCardModal = props => {
 
   const copyHandler = () => {
     if (cardTitle.length > 200) { return; }
-    props.copyCard(cardTitle, keepChecklists, keepLabels, props.currentCardID, props.currentCard, props.currentListID, selectedListID, cardPosition, props.boardID);
+    props.copyCard(cardTitle, keepChecklists, keepLabels, selectedListID, cardPosition);
     props.close();
   };
 
@@ -80,27 +80,22 @@ const CopyCardModal = props => {
 
 CopyCardModal.propTypes = {
   close: PropTypes.func.isRequired,
-  currentCard: PropTypes.object.isRequired,
   lists: PropTypes.array.isRequired,
   currentListID: PropTypes.string.isRequired,
-  currentCardID: PropTypes.string.isRequired,
   currentListTitle: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
-  copyCard: PropTypes.func.isRequired
+  copyCard: PropTypes.func.isRequired,
+  currentCardTitle: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
-  currentCard: state.lists.currentCard,
   lists: state.lists.lists,
   currentListID: state.lists.shownListID,
-  currentCardID: state.lists.shownCardID,
   currentListTitle: state.lists.currentListTitle,
-  boardID: state.board.boardID
+  currentCardTitle: state.lists.currentCard.title
 });
 
 const mapDispatchToProps = dispatch => ({
-  copyCard: (title, keepChecklists, keepLabels, cardID, currentCard, sourceListID, destListID, destIndex, boardID) => (
-    dispatch(copyCard(title, keepChecklists, keepLabels, cardID, currentCard, sourceListID, destListID, destIndex, boardID)))
+  copyCard: (title, keepChecklists, keepLabels, destListID, destIndex) => dispatch(copyCard(title, keepChecklists, keepLabels, destListID, destIndex))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CopyCardModal);

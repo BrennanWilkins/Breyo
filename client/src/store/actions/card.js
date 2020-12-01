@@ -217,11 +217,17 @@ export const deleteChecklistItem = (itemID, checklistID) => async (dispatch, get
   }
 };
 
-export const copyCard = (title, keepChecklists, keepLabels, cardID, currentCard, sourceListID, destListID, destIndex, boardID) => async dispatch => {
+export const copyCard = (title, keepChecklists, keepLabels, destListID, destIndex) => async (dispatch, getState) => {
   try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    const sourceListID = state.lists.shownListID;
+    const cardID = state.lists.shownCardID;
+    const currentCard = state.lists.currentCard;
     const res = await axios.post('/card/copy', { title, keepChecklists, keepLabels, cardID, sourceListID, destListID, destIndex, boardID });
-    dispatch({ type: actionTypes.COPY_CARD, title, checklists: res.data.checklists, currentCard, newCardID: res.data.cardID, keepLabels, sourceListID, destListID, destIndex });
-    sendUpdate('post/card/copy', JSON.stringify({ title, checklists: res.data.checklists, currentCard, newCardID: res.data.cardID, keepLabels, sourceListID, destListID, destIndex }));
+    const data = { title, checklists: res.data.checklists, currentCard, newCardID: res.data.cardID, keepLabels, sourceListID, destListID, destIndex };
+    dispatch({ type: actionTypes.COPY_CARD, ...data });
+    sendUpdate('post/card/copy', JSON.stringify({ ...data }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(addNotif('There was an error while copying the card.'));
