@@ -14,7 +14,7 @@ const ChecklistModal = props => {
   const addHandler = () => {
     if (title === '' || title.length > 200) { return; }
     props.close();
-    props.addChecklist(title, props.cardID, props.listID, props.boardID);
+    props.addChecklist(title);
   };
 
   return (
@@ -29,20 +29,11 @@ const ChecklistModal = props => {
 
 ChecklistModal.propTypes = {
   close: PropTypes.func.isRequired,
-  addChecklist: PropTypes.func.isRequired,
-  listID: PropTypes.string.isRequired,
-  cardID: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired
+  addChecklist: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => ({
-  listID: state.lists.shownListID,
-  cardID: state.lists.shownCardID,
-  boardID: state.board.boardID
-});
-
 const mapDispatchToProps = dispatch => ({
-  addChecklist: (title, cardID, listID, boardID) => dispatch(addChecklist(title, cardID, listID, boardID))
+  addChecklist: title => dispatch(addChecklist(title))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ChecklistModal);
+export default connect(null, mapDispatchToProps)(ChecklistModal);

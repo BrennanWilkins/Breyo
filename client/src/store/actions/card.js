@@ -4,6 +4,12 @@ import { addNotif, serverErr } from './notifications';
 import { sendUpdate } from './socket';
 import { addRecentActivity } from './activity';
 
+const getCardState = getState => {
+  // helper func for retrieving cardID/listID/boardID for card details actions
+  const state = getState();
+  return { boardID: state.board.boardID, listID: state.lists.shownListID, cardID: state.lists.shownCardID };
+};
+
 export const addCard = (title, boardID, listID) => async dispatch => {
   try {
     const res = await axios.post('/card', { title, boardID, listID });
@@ -49,8 +55,9 @@ export const setCardDetailsArchived = (cardID, listID, currentCard) => (dispatch
   dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID, listID, currentCard: { ...currentCard, isArchived: true }, currentListTitle });
 };
 
-export const updateCardTitle = (title, cardID, listID, boardID) => async dispatch => {
+export const updateCardTitle = title => async (dispatch, getState) => {
   try {
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.UPDATE_CARD_TITLE, title, cardID, listID });
     const res = await axios.put('/card/title', { title, cardID, listID, boardID });
     sendUpdate('put/card/title', JSON.stringify({ title, cardID, listID }));
@@ -62,10 +69,7 @@ export const updateCardTitle = (title, cardID, listID, boardID) => async dispatc
 
 export const updateCardDesc = desc => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const boardID = state.board.boardID;
-    const listID = state.lists.shownListID;
-    const cardID = state.lists.shownCardID;
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.UPDATE_CARD_DESC, desc, cardID, listID });
     await axios.put('/card/desc', { desc, cardID, listID, boardID });
     sendUpdate('put/card/desc', JSON.stringify({ desc, cardID, listID }));
@@ -74,8 +78,9 @@ export const updateCardDesc = desc => async (dispatch, getState) => {
   }
 };
 
-export const addCardLabel = (color, cardID, listID, boardID) => async dispatch => {
+export const addCardLabel = color => async (dispatch, getState) => {
   try {
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.ADD_CARD_LABEL, color, cardID, listID });
     await axios.post('/card/label', { color, cardID, listID, boardID });
     sendUpdate('post/card/label', JSON.stringify({ color, cardID, listID }));
@@ -84,8 +89,9 @@ export const addCardLabel = (color, cardID, listID, boardID) => async dispatch =
   }
 };
 
-export const removeCardLabel = (color, cardID, listID, boardID) => async dispatch => {
+export const removeCardLabel = color => async (dispatch, getState) => {
   try {
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.REMOVE_CARD_LABEL, color, cardID, listID });
     await axios.put('/card/label/remove', { color, cardID, listID, boardID });
     sendUpdate('put/card/label/remove', JSON.stringify({ color, cardID, listID }));
@@ -94,8 +100,9 @@ export const removeCardLabel = (color, cardID, listID, boardID) => async dispatc
   }
 };
 
-export const toggleDueDateIsComplete = (cardID, listID, boardID) => async dispatch => {
+export const toggleDueDateIsComplete = () => async (dispatch, getState) => {
   try {
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.TOGGLE_DUE_DATE, cardID, listID });
     const res = await axios.put('/card/dueDate/isComplete', { cardID, listID, boardID });
     sendUpdate('put/card/dueDate/isComplete', JSON.stringify({ cardID, listID }));
@@ -105,8 +112,9 @@ export const toggleDueDateIsComplete = (cardID, listID, boardID) => async dispat
   }
 };
 
-export const addDueDate = (dueDate, cardID, listID, boardID) => async dispatch => {
+export const addDueDate = dueDate => async (dispatch, getState) => {
   try {
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.ADD_DUE_DATE, dueDate, cardID, listID });
     const res = await axios.post('/card/dueDate', { dueDate, cardID, listID, boardID });
     sendUpdate('post/card/dueDate', JSON.stringify({ dueDate, cardID, listID }));
@@ -116,8 +124,9 @@ export const addDueDate = (dueDate, cardID, listID, boardID) => async dispatch =
   }
 };
 
-export const removeDueDate = (cardID, listID, boardID) => async dispatch => {
+export const removeDueDate = () => async (dispatch, getState) => {
   try {
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.REMOVE_DUE_DATE, cardID, listID });
     const res = await axios.delete(`/card/dueDate/${cardID}/${listID}/${boardID}`);
     sendUpdate('delete/card/dueDate', JSON.stringify({ cardID, listID }));
@@ -127,8 +136,9 @@ export const removeDueDate = (cardID, listID, boardID) => async dispatch => {
   }
 };
 
-export const addChecklist = (title, cardID, listID, boardID) => async dispatch => {
+export const addChecklist = title => async (dispatch, getState) => {
   try {
+    const { boardID, listID, cardID } = getCardState(getState);
     const res = await axios.post('/card/checklist', { title, cardID, listID, boardID });
     dispatch({ type: actionTypes.ADD_CHECKLIST, title, checklistID: res.data.checklistID, cardID, listID });
     sendUpdate('post/card/checklist', JSON.stringify({ title, checklistID: res.data.checklistID, cardID, listID }));
@@ -140,10 +150,7 @@ export const addChecklist = (title, cardID, listID, boardID) => async dispatch =
 
 export const deleteChecklist = checklistID => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const boardID = state.board.boardID;
-    const listID = state.lists.shownListID;
-    const cardID = state.lists.shownCardID;
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.DELETE_CHECKLIST, checklistID, cardID, listID });
     const res = await axios.delete(`/card/checklist/${checklistID}/${cardID}/${listID}/${boardID}`);
     sendUpdate('delete/card/checklist', JSON.stringify({ checklistID, cardID, listID }));
@@ -155,10 +162,7 @@ export const deleteChecklist = checklistID => async (dispatch, getState) => {
 
 export const editChecklistTitle = (title, checklistID) => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const cardID = state.lists.shownCardID;
-    const listID = state.lists.shownListID;
-    const boardID = state.board.boardID;
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.EDIT_CHECKLIST_TITLE, title, checklistID, cardID, listID });
     const res = await axios.put('/card/checklist/title', { title, checklistID, cardID, listID, boardID });
     sendUpdate('put/card/checklist/title', JSON.stringify({ title, checklistID, cardID, listID }));
@@ -170,10 +174,7 @@ export const editChecklistTitle = (title, checklistID) => async (dispatch, getSt
 
 export const addChecklistItem = (title, checklistID) => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const boardID = state.board.boardID;
-    const listID = state.lists.shownListID;
-    const cardID = state.lists.shownCardID;
+    const { boardID, listID, cardID } = getCardState(getState);
     const res = await axios.post('/card/checklist/item', { title, checklistID, cardID, listID, boardID });
     dispatch({ type: actionTypes.ADD_CHECKLIST_ITEM, title, itemID: res.data.itemID, checklistID, cardID, listID });
     sendUpdate('post/card/checklist/item', JSON.stringify({ title, itemID: res.data.itemID, checklistID, cardID, listID }));
@@ -184,10 +185,7 @@ export const addChecklistItem = (title, checklistID) => async (dispatch, getStat
 
 export const toggleChecklistItemIsComplete = (itemID, checklistID) => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const boardID = state.board.boardID;
-    const listID = state.lists.shownListID;
-    const cardID = state.lists.shownCardID;
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.TOGGLE_CHECKLIST_ITEM, itemID, checklistID, cardID, listID });
     const res = await axios.put('/card/checklist/item/isComplete', { itemID, checklistID, cardID, listID, boardID });
     sendUpdate('put/card/checklist/item/isComplete', JSON.stringify({ itemID, checklistID, cardID, listID }));
@@ -199,10 +197,7 @@ export const toggleChecklistItemIsComplete = (itemID, checklistID) => async (dis
 
 export const editChecklistItem = (title, itemID, checklistID) => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const boardID = state.board.boardID;
-    const listID = state.lists.shownListID;
-    const cardID = state.lists.shownCardID;
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.EDIT_CHECKLIST_ITEM, title, itemID, checklistID, cardID, listID });
     await axios.put('/card/checklist/item/title', { title, itemID, checklistID, cardID, listID, boardID });
     sendUpdate('put/card/checklist/item/title', JSON.stringify({ title, itemID, checklistID, cardID, listID }));
@@ -213,10 +208,7 @@ export const editChecklistItem = (title, itemID, checklistID) => async (dispatch
 
 export const deleteChecklistItem = (itemID, checklistID) => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const boardID = state.board.boardID;
-    const listID = state.lists.shownListID;
-    const cardID = state.lists.shownCardID;
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.DELETE_CHECKLIST_ITEM, itemID, checklistID, cardID, listID });
     await axios.put('/card/checklist/item/delete', { itemID, checklistID, cardID, listID, boardID });
     sendUpdate('put/card/checklist/item/delete', JSON.stringify({ itemID, checklistID, cardID, listID }));
@@ -236,8 +228,9 @@ export const copyCard = (title, keepChecklists, keepLabels, cardID, currentCard,
   }
 };
 
-export const archiveCard = (cardID, listID, boardID) => async dispatch => {
+export const archiveCard = () => async (dispatch, getState) => {
   try {
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.ARCHIVE_CARD, cardID, listID });
     const res = await axios.post('/card/archive', { cardID, listID, boardID });
     sendUpdate('post/card/archive', JSON.stringify({ cardID, listID }));
@@ -295,10 +288,11 @@ export const removeCardMember = (email, cardID, listID, boardID) => async dispat
 export const addComment = msg => async (dispatch, getState) => {
   try {
     const state = getState();
-    const cardID = state.lists.shownCardID;
+    const boardID = state.board.boardID;
     const listID = state.lists.shownListID;
+    const cardID = state.lists.shownCardID;
     const date = String(new Date());
-    const res = await axios.post('/card/comments', { msg, cardID, listID, date, boardID: state.board.boardID });
+    const res = await axios.post('/card/comments', { msg, cardID, listID, date, boardID });
     const payload = { msg, commentID: res.data.commentID, cardID, date, listID, email: state.auth.email, fullName: state.auth.fullName };
     dispatch({ type: actionTypes.ADD_COMMENT, payload, cardTitle: res.data.cardTitle });
     sendUpdate('post/card/comments', JSON.stringify({ payload, cardTitle: res.data.cardTitle }));
@@ -309,11 +303,9 @@ export const addComment = msg => async (dispatch, getState) => {
 
 export const updateComment = (msg, commentID) => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const cardID = state.lists.shownCardID;
-    const listID = state.lists.shownListID;
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.UPDATE_COMMENT, msg, commentID, cardID, listID });
-    await axios.put('/card/comments', { msg, commentID, cardID, listID, boardID: state.board.boardID });
+    await axios.put('/card/comments', { msg, commentID, cardID, listID, boardID });
     sendUpdate('put/card/comments', JSON.stringify({ msg, commentID, cardID, listID }));
   } catch (err) {
     dispatch(serverErr());
@@ -322,10 +314,7 @@ export const updateComment = (msg, commentID) => async (dispatch, getState) => {
 
 export const deleteComment = commentID => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const cardID = state.lists.shownCardID;
-    const listID = state.lists.shownListID;
-    const boardID = state.board.boardID;
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.DELETE_COMMENT, commentID, cardID, listID });
     await axios.delete(`/card/comments/${commentID}/${cardID}/${listID}/${boardID}`);
     sendUpdate('delete/card/comments', JSON.stringify({ commentID, cardID, listID }));

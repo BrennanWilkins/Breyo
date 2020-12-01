@@ -15,7 +15,7 @@ const CardTitle = props => {
     e.target.blur();
     if (title === props.title) { return; }
     if (title === '' || title.length > 200) { return setTitle(props.title); }
-    props.updateTitle(title, props.cardID, props.listID, props.boardID);
+    props.updateTitle(title);
   };
 
   const keyPressHandler = e => {
@@ -37,14 +37,11 @@ const CardTitle = props => {
 CardTitle.propTypes = {
   title: PropTypes.string.isRequired,
   listTitle: PropTypes.string.isRequired,
-  updateTitle: PropTypes.func.isRequired,
-  boardID: PropTypes.string.isRequired,
-  listID: PropTypes.string.isRequired,
-  cardID: PropTypes.string.isRequired
+  updateTitle: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
-  updateTitle: (title, cardID, listID, boardID) => dispatch(updateCardTitle(title, cardID, listID, boardID))
+  updateTitle: title => dispatch(updateCardTitle(title))
 });
 
 export default connect(null, mapDispatchToProps)(CardTitle);

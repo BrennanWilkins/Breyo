@@ -14,9 +14,9 @@ const LabelModal = props => {
 
   const colorHandler = color => {
     if (props.labels.includes(color)) {
-      props.removeCardLabel(color, props.cardID, props.listID, props.boardID);
+      props.removeCardLabel(color);
     } else {
-      props.addCardLabel(color, props.cardID, props.listID, props.boardID);
+      props.addCardLabel(color);
     }
   };
 
@@ -44,24 +44,18 @@ const LabelModal = props => {
 LabelModal.propTypes = {
   close: PropTypes.func.isRequired,
   labels: PropTypes.array.isRequired,
-  listID: PropTypes.string.isRequired,
-  cardID: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
   addCardLabel: PropTypes.func.isRequired,
   removeCardLabel: PropTypes.func.isRequired,
   openFromMiddle: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
-  labels: state.lists.currentCard.labels,
-  listID: state.lists.shownListID,
-  cardID: state.lists.shownCardID,
-  boardID: state.board.boardID
+  labels: state.lists.currentCard.labels
 });
 
 const mapDispatchToProps = dispatch => ({
-  addCardLabel: (color, cardID, listID, boardID) => dispatch(addCardLabel(color, cardID, listID, boardID)),
-  removeCardLabel: (color, cardID, listID, boardID) => dispatch(removeCardLabel(color, cardID, listID, boardID))
+  addCardLabel: color => dispatch(addCardLabel(color)),
+  removeCardLabel: color => dispatch(removeCardLabel(color))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LabelModal);

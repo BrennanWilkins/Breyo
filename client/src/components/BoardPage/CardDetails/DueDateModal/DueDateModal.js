@@ -15,14 +15,14 @@ const DueDateModal = props => {
   const [selectedDate, setSelectedDate] = useState(props.dueDate ? new Date(props.dueDate.dueDate) : new Date());
 
   const saveHandler = () => {
-    props.addDueDate(String(selectedDate), props.cardID, props.listID, props.boardID);
+    props.addDueDate(String(selectedDate));
     props.close();
   };
 
   const removeHandler = () => {
     props.close();
     if (!props.dueDate) { return; }
-    props.removeDueDate(props.cardID, props.listID, props.boardID);
+    props.removeDueDate();
   };
 
   return (
@@ -44,24 +44,18 @@ const DueDateModal = props => {
 DueDateModal.propTypes = {
   close: PropTypes.func.isRequired,
   dueDate: PropTypes.object,
-  listID: PropTypes.string.isRequired,
-  cardID: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
   addDueDate: PropTypes.func.isRequired,
   removeDueDate: PropTypes.func.isRequired,
   fromDueDate: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
-  dueDate: state.lists.currentCard.dueDate,
-  listID: state.lists.shownListID,
-  cardID: state.lists.shownCardID,
-  boardID: state.board.boardID
+  dueDate: state.lists.currentCard.dueDate
 });
 
 const mapDispatchToProps = dispatch => ({
-  addDueDate: (dueDate, cardID, listID, boardID) => dispatch(addDueDate(dueDate, cardID, listID, boardID)),
-  removeDueDate: (cardID, listID, boardID) => dispatch(removeDueDate(cardID, listID, boardID))
+  addDueDate: dueDate => dispatch(addDueDate(dueDate)),
+  removeDueDate: () => dispatch(removeDueDate())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DueDateModal);

@@ -20,7 +20,7 @@ const CardDetails = props => {
   useModalToggle(true, modalRef, props.close);
 
   const archiveCardHandler = () => {
-    props.archiveCard(props.cardID, props.listID, props.boardID);
+    props.archiveCard();
     props.close();
   };
 
@@ -40,15 +40,14 @@ const CardDetails = props => {
               <CloseBtnCircle close={props.close} />
             </div>
           </div>}
-        <CardTitle title={props.currentCard.title} listTitle={props.currentListTitle}
-        boardID={props.boardID} listID={props.listID} cardID={props.cardID} />
+        <CardTitle title={props.currentCard.title} listTitle={props.currentListTitle} />
         <div className={classes.DetailContent}>
           <div className={classes.LeftDetails}>
             <div className={classes.TopDetailsContainer}>
               {props.currentCard.members.length > 0 && <CardMembers members={props.currentCard.members} cardID={props.cardID} listID={props.listID} />}
-              {props.currentCard.labels.length > 0 && <CardLabels currentCard={props.currentCard} />}
+              {props.currentCard.labels.length > 0 && <CardLabels labels={props.currentCard.labels} />}
               {!!props.currentCard.dueDate &&
-                <CardDueDate currentCard={props.currentCard} listID={props.listID} cardID={props.cardID} boardID={props.boardID} />}
+                <CardDueDate currentDueDate={props.currentCard.dueDate} />}
             </div>
             <CardDesc currentDesc={props.currentCard.desc} />
             {props.currentCard.checklists.map(checklist => (
@@ -79,7 +78,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  archiveCard: (cardID, listID, boardID) => dispatch(archiveCard(cardID, listID, boardID))
+  archiveCard: () => dispatch(archiveCard())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CardDetails);
