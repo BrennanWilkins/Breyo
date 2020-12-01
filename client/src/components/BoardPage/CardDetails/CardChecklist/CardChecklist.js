@@ -33,19 +33,19 @@ const CardChecklist = props => {
   }, [props.items]);
 
   const deleteHandler = () => {
-    props.delete(props.checklistID, props.cardID, props.listID, props.boardID);
+    props.delete(props.checklistID);
   };
 
   const toggleItemCompleteHandler = itemID => {
-    props.toggleItem(itemID, props.checklistID, props.cardID, props.listID, props.boardID);
+    props.toggleItem(itemID, props.checklistID);
   };
 
   const deleteItemHandler = itemID => {
-    props.deleteItem(itemID, props.checklistID, props.cardID, props.listID, props.boardID);
+    props.deleteItem(itemID, props.checklistID);
   };
 
   const editItemHandler = (title, itemID) => {
-    props.editItem(title, itemID, props.checklistID, props.cardID, props.listID, props.boardID);
+    props.editItem(title, itemID, props.checklistID);
   };
 
   return (
@@ -73,7 +73,7 @@ const CardChecklist = props => {
           editItem={title => editItemHandler(title, item.itemID)} />
       ))}
       {!showAddItem && <div className={classes.AddBtn}><ActionBtn clicked={() => setShowAddItem(true)}>Add an item</ActionBtn></div>}
-      {showAddItem && <AddItem close={() => setShowAddItem(false)} checklistID={props.checklistID} cardID={props.cardID} listID={props.listID} boardID={props.boardID} />}
+      {showAddItem && <AddItem close={() => setShowAddItem(false)} checklistID={props.checklistID} />}
     </div>
   );
 };
@@ -81,9 +81,6 @@ const CardChecklist = props => {
 CardChecklist.propTypes = {
   title: PropTypes.string.isRequired,
   items: PropTypes.array.isRequired,
-  cardID: PropTypes.string.isRequired,
-  listID: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
   delete: PropTypes.func.isRequired,
   checklistID: PropTypes.string.isRequired,
   toggleItem: PropTypes.func.isRequired,
@@ -92,10 +89,10 @@ CardChecklist.propTypes = {
 };
 
 const mapDispatchToProps = dispatch => ({
-  delete: (checklistID, cardID, listID, boardID) => dispatch(deleteChecklist(checklistID, cardID, listID, boardID)),
-  toggleItem: (itemID, checklistID, cardID, listID, boardID) => dispatch(toggleChecklistItemIsComplete(itemID, checklistID, cardID, listID, boardID)),
-  deleteItem: (itemID, checklistID, cardID, listID, boardID) => dispatch(deleteChecklistItem(itemID, checklistID, cardID, listID, boardID)),
-  editItem: (title, itemID, checklistID, cardID, listID, boardID) => dispatch(editChecklistItem(title, itemID, checklistID, cardID, listID, boardID))
+  delete: checklistID => dispatch(deleteChecklist(checklistID)),
+  toggleItem: (itemID, checklistID) => dispatch(toggleChecklistItemIsComplete(itemID, checklistID)),
+  deleteItem: (itemID, checklistID) => dispatch(deleteChecklistItem(itemID, checklistID)),
+  editItem: (title, itemID, checklistID) => dispatch(editChecklistItem(title, itemID, checklistID))
 });
 
 export default connect(null, mapDispatchToProps)(CardChecklist);

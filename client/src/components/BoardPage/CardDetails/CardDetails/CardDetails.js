@@ -52,7 +52,7 @@ const CardDetails = props => {
             </div>
             <CardDesc currentDesc={props.currentCard.desc} />
             {props.currentCard.checklists.map(checklist => (
-              <CardChecklist key={checklist.checklistID} {...checklist} cardID={props.cardID} listID={props.listID} boardID={props.boardID} />
+              <CardChecklist key={checklist.checklistID} {...checklist} />
             ))}
             <CardActivity />
           </div>

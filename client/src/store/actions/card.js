@@ -138,8 +138,12 @@ export const addChecklist = (title, cardID, listID, boardID) => async dispatch =
   }
 };
 
-export const deleteChecklist = (checklistID, cardID, listID, boardID) => async dispatch => {
+export const deleteChecklist = checklistID => async (dispatch, getState) => {
   try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    const listID = state.lists.shownListID;
+    const cardID = state.lists.shownCardID;
     dispatch({ type: actionTypes.DELETE_CHECKLIST, checklistID, cardID, listID });
     const res = await axios.delete(`/card/checklist/${checklistID}/${cardID}/${listID}/${boardID}`);
     sendUpdate('delete/card/checklist', JSON.stringify({ checklistID, cardID, listID }));
@@ -164,8 +168,12 @@ export const editChecklistTitle = (title, checklistID) => async (dispatch, getSt
   }
 };
 
-export const addChecklistItem = (title, checklistID, cardID, listID, boardID) => async dispatch => {
+export const addChecklistItem = (title, checklistID) => async (dispatch, getState) => {
   try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    const listID = state.lists.shownListID;
+    const cardID = state.lists.shownCardID;
     const res = await axios.post('/card/checklist/item', { title, checklistID, cardID, listID, boardID });
     dispatch({ type: actionTypes.ADD_CHECKLIST_ITEM, title, itemID: res.data.itemID, checklistID, cardID, listID });
     sendUpdate('post/card/checklist/item', JSON.stringify({ title, itemID: res.data.itemID, checklistID, cardID, listID }));
@@ -174,8 +182,12 @@ export const addChecklistItem = (title, checklistID, cardID, listID, boardID) =>
   }
 };
 
-export const toggleChecklistItemIsComplete = (itemID, checklistID, cardID, listID, boardID) => async dispatch => {
+export const toggleChecklistItemIsComplete = (itemID, checklistID) => async (dispatch, getState) => {
   try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    const listID = state.lists.shownListID;
+    const cardID = state.lists.shownCardID;
     dispatch({ type: actionTypes.TOGGLE_CHECKLIST_ITEM, itemID, checklistID, cardID, listID });
     const res = await axios.put('/card/checklist/item/isComplete', { itemID, checklistID, cardID, listID, boardID });
     sendUpdate('put/card/checklist/item/isComplete', JSON.stringify({ itemID, checklistID, cardID, listID }));
@@ -185,8 +197,12 @@ export const toggleChecklistItemIsComplete = (itemID, checklistID, cardID, listI
   }
 };
 
-export const editChecklistItem = (title, itemID, checklistID, cardID, listID, boardID) => async dispatch => {
+export const editChecklistItem = (title, itemID, checklistID) => async (dispatch, getState) => {
   try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    const listID = state.lists.shownListID;
+    const cardID = state.lists.shownCardID;
     dispatch({ type: actionTypes.EDIT_CHECKLIST_ITEM, title, itemID, checklistID, cardID, listID });
     await axios.put('/card/checklist/item/title', { title, itemID, checklistID, cardID, listID, boardID });
     sendUpdate('put/card/checklist/item/title', JSON.stringify({ title, itemID, checklistID, cardID, listID }));
@@ -195,8 +211,12 @@ export const editChecklistItem = (title, itemID, checklistID, cardID, listID, bo
   }
 };
 
-export const deleteChecklistItem = (itemID, checklistID, cardID, listID, boardID) => async dispatch => {
+export const deleteChecklistItem = (itemID, checklistID) => async (dispatch, getState) => {
   try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    const listID = state.lists.shownListID;
+    const cardID = state.lists.shownCardID;
     dispatch({ type: actionTypes.DELETE_CHECKLIST_ITEM, itemID, checklistID, cardID, listID });
     await axios.put('/card/checklist/item/delete', { itemID, checklistID, cardID, listID, boardID });
     sendUpdate('put/card/checklist/item/delete', JSON.stringify({ itemID, checklistID, cardID, listID }));

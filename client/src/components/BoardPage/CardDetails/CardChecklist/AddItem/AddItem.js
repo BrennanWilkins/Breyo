@@ -16,7 +16,7 @@ const AddItem = props => {
     e.preventDefault();
     if (itemTitle === '' || itemTitle.length > 300) { return; }
     setItemTitle('');
-    props.addItem(itemTitle, props.checklistID, props.cardID, props.listID, props.boardID);
+    props.addItem(itemTitle, props.checklistID);
   };
 
   const keyPressHandler = e => { if (e.key === 'Enter') { addHandler(e); } };
@@ -35,14 +35,11 @@ const AddItem = props => {
 AddItem.propTypes = {
   close: PropTypes.func.isRequired,
   checklistID: PropTypes.string.isRequired,
-  cardID: PropTypes.string.isRequired,
-  listID: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
   addItem: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
-  addItem: (title, checklistID, cardID, listID, boardID) => dispatch(addChecklistItem(title, checklistID, cardID, listID, boardID))
+  addItem: (title, checklistID) => dispatch(addChecklistItem(title, checklistID))
 });
 
 export default connect(null, mapDispatchToProps)(AddItem);
