@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classes from './CardDetails.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
@@ -23,6 +23,8 @@ const CardDetails = props => {
     props.archiveCard();
     props.close();
   };
+
+  useEffect(() => { return () => props.close(); }, []);
 
   return (
     <div className={classes.Container}>

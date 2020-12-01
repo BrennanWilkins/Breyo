@@ -21,7 +21,7 @@ const App = props => {
 
   return (
     <BrowserRouter>
-      {props.isAuth ?
+      {props.autoLoginLoading ? <TempNavBar /> : (props.isAuth || localStorage['token']) ?
         <>
           <NavBar />
           <Notifications />
@@ -33,7 +33,6 @@ const App = props => {
           </Switch>
         </>
         :
-        props.autoLoginLoading ? <TempNavBar /> :
         <Switch>
           <Route exact path="/" render={() => <Suspense fallback={<Spinner />}><HomePage /></Suspense>} />
           <Route exact path="/login" render={() => <Suspense fallback={<Spinner />}><LoginPage /></Suspense>} />

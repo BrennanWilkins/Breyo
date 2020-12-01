@@ -21,10 +21,25 @@ const BoardPage = props => {
     connectSocket();
 
     return () => {
-      // close socket connection on navigation away
+      // close socket connection on navigating away
       closeSocket();
     };
   }, [props.match.params.boardID]);
+
+  const cardDetailsHandler = () => {
+    // set card details based on listID & cardID in pathname
+    const path = props.location.pathname;
+    if (!path.includes('/c/') || !path.includes('/l/')) {
+      if (!props.shownCardID || !props.shownListID) { return; }
+      // if path doesnt include cardID/listID but state does, then set cardID/listID state to null
+      return props.setCardDetails(null, null);
+    }
+    const listStart = path.indexOf('/l/');
+    const cardStart = path.indexOf('/c/');
+    const listID = path.slice(listStart + 3, cardStart);
+    const cardID = path.slice(cardStart + 3);
+    props.setCardDetails(cardID, listID);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +50,8 @@ const BoardPage = props => {
         document.title = res.data.data.title;
         document.body.style.overflow = 'hidden';
         props.updateActiveBoard(res.data.data);
+        // after page load check if url path has listID/cardID to open by default
+        cardDetailsHandler();
       } catch (err) {
         // if error return document style to default & navigate to dashboard
         document.title = 'Breyo';
@@ -51,17 +68,7 @@ const BoardPage = props => {
     props.history.push(`/board/${props.boardID}`);
   };
 
-  useEffect(() => {
-    // set card details based on listID & cardID in query params
-    const path = props.location.pathname;
-    if (!path.includes('/c/') || !path.includes('/l/')) {
-      if (!props.shownCardID || !props.shownListID) { return; }
-      return props.setCardDetails(null, null);
-    }
-    const listID = path.slice(path.indexOf('/l/') + 3, path.indexOf('/c/'));
-    const cardID = path.slice(path.indexOf('/c/') + 3);
-    props.setCardDetails(cardID, listID);
-  }, [props.location.pathname]);
+  useEffect(() => cardDetailsHandler(), [props.location.pathname]);
 
   const fallback = <div className={classes.Fallback}><Spinner /></div>;
 
