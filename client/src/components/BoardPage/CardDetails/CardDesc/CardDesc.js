@@ -11,39 +11,39 @@ import { updateCardDesc } from '../../../../store/actions';
 
 const CardDesc = props => {
   const [showEdit, setShowEdit] = useState(false);
-  const [descInput, setDescInput] = useState(props.currentCard.desc);
+  const [descInput, setDescInput] = useState(props.currentDesc);
   const [showFormattingHelp, setShowFormattingHelp] = useState(false);
   const descRef = useRef();
 
-  useEffect(() => setDescInput(props.currentCard.desc), [props.currentCard.desc]);
+  useEffect(() => setDescInput(props.currentDesc), [props.currentDesc]);
 
-  const formattedDesc = useMemo(() => parseToJSX(props.currentCard.desc), [props.currentCard.desc]);
+  const formattedDesc = useMemo(() => parseToJSX(props.currentDesc), [props.currentDesc]);
 
   useEffect(() => {
     if (showEdit) { descRef.current.focus(); }
   }, [showEdit]);
 
   const saveDescHandler = () => {
-    if (descInput.length > 600) { setShowEdit(false); return setDescInput(props.currentCard.desc); }
-    props.updateCardDesc(descInput, props.cardID, props.listID, props.boardID);
+    if (descInput.length > 600) { setShowEdit(false); return setDescInput(props.currentDesc); }
+    props.updateCardDesc(descInput);
     setShowEdit(false);
   };
 
   return (
     <div>
-      <div className={classes.Title}>{descIcon}Description{!showEdit && props.currentCard.desc.length > 0 &&
+      <div className={classes.Title}>{descIcon}Description{!showEdit && props.currentDesc.length > 0 &&
       <span className={classes.EditBtn}><ActionBtn clicked={() => setShowEdit(true)}>Edit</ActionBtn></span>}</div>
       {showEdit ? <>
         <TextArea className={classes.Input} minRows="2" maxRows="50" value={descInput} onChange={e => setDescInput(e.target.value)}
         ref={descRef} placeholder="Add a description for this card" />
         <div className={classes.Btns}>
           <div className={classes.LeftBtns}>
-            <span className={classes.SaveBtn}><Button clicked={saveDescHandler} disabled={descInput === props.currentCard.desc}>Save</Button></span>
-            <span className={classes.CloseBtn}><CloseBtn close={() => { setShowEdit(false); setDescInput(props.currentCard.desc); }} /></span>
+            <span className={classes.SaveBtn}><Button clicked={saveDescHandler} disabled={descInput === props.currentDesc}>Save</Button></span>
+            <span className={classes.CloseBtn}><CloseBtn close={() => { setShowEdit(false); setDescInput(props.currentDesc); }} /></span>
           </div>
           <span className={classes.FormatBtn}><ActionBtn clicked={() => setShowFormattingHelp(true)}>Formatting help</ActionBtn></span>
         </div>
-      </> : props.currentCard.desc.length === 0 ?
+      </> : props.currentDesc.length === 0 ?
         <div className={classes.NoDesc} onClick={() => setShowEdit(true)}>Add a description for this card</div>
         : <div className={classes.DescText}>{formattedDesc}</div>}
       {showFormattingHelp && <FormattingModal close={() => setShowFormattingHelp(false)} />}
@@ -52,15 +52,12 @@ const CardDesc = props => {
 };
 
 CardDesc.propTypes = {
-  boardID: PropTypes.string.isRequired,
-  listID: PropTypes.string.isRequired,
-  cardID: PropTypes.string.isRequired,
-  currentCard: PropTypes.object.isRequired,
+  currentDesc: PropTypes.string.isRequired,
   updateCardDesc: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
-  updateCardDesc: (desc, cardID, listID, boardID) => dispatch(updateCardDesc(desc, cardID, listID, boardID))
+  updateCardDesc: desc => dispatch(updateCardDesc(desc))
 });
 
 export default connect(null, mapDispatchToProps)(CardDesc);

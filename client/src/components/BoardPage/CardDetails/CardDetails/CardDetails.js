@@ -50,7 +50,7 @@ const CardDetails = props => {
               {!!props.currentCard.dueDate &&
                 <CardDueDate currentCard={props.currentCard} listID={props.listID} cardID={props.cardID} boardID={props.boardID} />}
             </div>
-            <CardDesc boardID={props.boardID} listID={props.listID} cardID={props.cardID} currentCard={props.currentCard} />
+            <CardDesc currentDesc={props.currentCard.desc} />
             {props.currentCard.checklists.map(checklist => (
               <CardChecklist key={checklist.checklistID} {...checklist} cardID={props.cardID} listID={props.listID} boardID={props.boardID} />
             ))}

@@ -60,8 +60,12 @@ export const updateCardTitle = (title, cardID, listID, boardID) => async dispatc
   }
 };
 
-export const updateCardDesc = (desc, cardID, listID, boardID) => async dispatch => {
+export const updateCardDesc = desc => async (dispatch, getState) => {
   try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    const listID = state.lists.shownListID;
+    const cardID = state.lists.shownCardID;
     dispatch({ type: actionTypes.UPDATE_CARD_DESC, desc, cardID, listID });
     await axios.put('/card/desc', { desc, cardID, listID, boardID });
     sendUpdate('put/card/desc', JSON.stringify({ desc, cardID, listID }));
