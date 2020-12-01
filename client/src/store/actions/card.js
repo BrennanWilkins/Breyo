@@ -269,8 +269,9 @@ export const deleteCard = (cardID, listID, boardID) => async dispatch => {
   }
 };
 
-export const addCardMember = (email, fullName, cardID, listID, boardID) => async dispatch => {
+export const addCardMember = (email, fullName) => async (dispatch, getState) => {
   try {
+    const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.ADD_CARD_MEMBER, email, fullName, cardID, listID });
     const res = await axios.post('/card/members', { email, cardID, listID, boardID });
     sendUpdate('post/card/members', JSON.stringify({ email, fullName, cardID, listID }));
@@ -280,12 +281,26 @@ export const addCardMember = (email, fullName, cardID, listID, boardID) => async
   }
 };
 
-export const removeCardMember = (email, cardID, listID, boardID) => async dispatch => {
+const removeCardMemberHelper = async (dispatch, email, cardID, listID, boardID) => {
+  dispatch({ type: actionTypes.REMOVE_CARD_MEMBER, email, cardID, listID });
+  const res = await axios.delete(`/card/members/${email}/${cardID}/${listID}/${boardID}`);
+  sendUpdate('delete/card/members', JSON.stringify({ email, cardID, listID }));
+  addRecentActivity(res.data.newActivity);
+};
+
+export const removeCardMemberCurrentCard = email => async (dispatch, getState) => {
   try {
-    dispatch({ type: actionTypes.REMOVE_CARD_MEMBER, email, cardID, listID });
-    const res = await axios.delete(`/card/members/${email}/${cardID}/${listID}/${boardID}`);
-    sendUpdate('delete/card/members', JSON.stringify({ email, cardID, listID }));
-    addRecentActivity(res.data.newActivity);
+    const { boardID, listID, cardID } = getCardState(getState);
+    removeCardMemberHelper(dispatch, email, cardID, listID, boardID);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
+
+export const removeCardMember = (email, cardID, listID) => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    removeCardMemberHelper(dispatch, email, cardID, listID, boardID);
   } catch (err) {
     dispatch(serverErr());
   }

@@ -5,14 +5,15 @@ import { useModalToggle } from '../../../utils/customHooks';
 import { CloseBtn } from '../Buttons/Buttons';
 import AccountInfo from '../AccountInfo/AccountInfo';
 import { connect } from 'react-redux';
-import { removeCardMember } from '../../../store/actions';
+import { removeCardMember, removeCardMemberCurrentCard } from '../../../store/actions';
 
 const CardMemberModal = props => {
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
 
   const removeHandler = () => {
-    props.removeCardMember(props.email, props.cardID, props.listID, props.boardID);
+    if (props.inCard) { props.removeCardMember(props.email, props.cardID, props.listID); }
+    else { props.removeCardMemberCurrentCard(props.email); }
     props.close();
   };
 
@@ -30,20 +31,16 @@ CardMemberModal.propTypes = {
   close: PropTypes.func.isRequired,
   fullName: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
-  cardID: PropTypes.string.isRequired,
-  listID: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
+  cardID: PropTypes.string,
+  listID: PropTypes.string,
   inCard: PropTypes.bool,
   top: PropTypes.number,
   left: PropTypes.number
 };
 
-const mapStateToProps = state => ({
-  boardID: state.board.boardID
-});
-
 const mapDispatchToProps = dispatch => ({
-  removeCardMember: (email, cardID, listID, boardID) => dispatch(removeCardMember(email, cardID, listID, boardID))
+  removeCardMember: (email, cardID, listID) => dispatch(removeCardMember(email, cardID, listID)),
+  removeCardMemberCurrentCard: email => dispatch(removeCardMemberCurrentCard(email))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CardMemberModal);
+export default connect(null, mapDispatchToProps)(CardMemberModal);

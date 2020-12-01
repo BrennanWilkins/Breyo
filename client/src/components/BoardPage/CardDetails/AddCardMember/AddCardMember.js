@@ -5,7 +5,7 @@ import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { checkIcon } from '../../../UI/icons';
-import { addCardMember, removeCardMember } from '../../../../store/actions';
+import { addCardMember, removeCardMemberCurrentCard } from '../../../../store/actions';
 
 const AddCardMember = props => {
   const modalRef = useRef();
@@ -29,9 +29,9 @@ const AddCardMember = props => {
 
   const memberHandler = index => {
     if (boardMembers[index].isMember) {
-      props.removeCardMember(boardMembers[index].email, props.cardID, props.listID, props.boardID);
+      props.removeCardMemberCurrentCard(boardMembers[index].email);
     } else {
-      props.addCardMember(boardMembers[index].email, boardMembers[index].fullName, props.cardID, props.listID, props.boardID);
+      props.addCardMember(boardMembers[index].email, boardMembers[index].fullName);
     }
   };
 
@@ -54,24 +54,18 @@ AddCardMember.propTypes = {
   members: PropTypes.array.isRequired,
   cardMembers: PropTypes.array.isRequired,
   addCardMember: PropTypes.func.isRequired,
-  removeCardMember: PropTypes.func.isRequired,
-  cardID: PropTypes.string.isRequired,
-  listID: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
+  removeCardMemberCurrentCard: PropTypes.func.isRequired,
   fromList: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
   members: state.board.members,
-  cardMembers: state.lists.currentCard.members,
-  cardID: state.lists.shownCardID,
-  listID: state.lists.shownListID,
-  boardID: state.board.boardID
+  cardMembers: state.lists.currentCard.members
 });
 
 const mapDispatchToProps = dispatch => ({
-  addCardMember: (email, fullName, cardID, listID, boardID) => dispatch(addCardMember(email, fullName, cardID, listID, boardID)),
-  removeCardMember: (email, cardID, listID, boardID) => dispatch(removeCardMember(email, cardID, listID, boardID))
+  addCardMember: (email, fullName) => dispatch(addCardMember(email, fullName)),
+  removeCardMemberCurrentCard: email => dispatch(removeCardMemberCurrentCard(email))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddCardMember);

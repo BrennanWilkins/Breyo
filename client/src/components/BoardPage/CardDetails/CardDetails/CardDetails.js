@@ -44,7 +44,7 @@ const CardDetails = props => {
         <div className={classes.DetailContent}>
           <div className={classes.LeftDetails}>
             <div className={classes.TopDetailsContainer}>
-              {props.currentCard.members.length > 0 && <CardMembers members={props.currentCard.members} cardID={props.cardID} listID={props.listID} />}
+              {props.currentCard.members.length > 0 && <CardMembers members={props.currentCard.members} />}
               {props.currentCard.labels.length > 0 && <CardLabels labels={props.currentCard.labels} />}
               {!!props.currentCard.dueDate &&
                 <CardDueDate currentDueDate={props.currentCard.dueDate} />}
@@ -64,15 +64,11 @@ const CardDetails = props => {
 
 CardDetails.propTypes = {
   close: PropTypes.func.isRequired,
-  cardID: PropTypes.string.isRequired,
-  listID: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
   currentCard: PropTypes.object.isRequired,
   currentListTitle: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
-  boardID: state.board.boardID,
   currentCard: state.lists.currentCard,
   currentListTitle: state.lists.currentListTitle
 });

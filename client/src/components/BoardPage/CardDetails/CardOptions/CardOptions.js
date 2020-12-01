@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import classes from './CardOptions.module.css';
+import PropTypes from 'prop-types';
 import { checklistIcon, labelIcon, clockIcon, copyIcon, archiveIcon, personIcon } from '../../../UI/icons';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import LabelModal from '../LabelModal/LabelModal';
@@ -36,6 +37,10 @@ const CardOptions = props => {
       {showDueDateModal && <DueDateModal close={() => setShowDueDateModal(false)} />}
     </div>
   );
+};
+
+CardOptions.propTypes = {
+  archiveCard: PropTypes.func.isRequired
 };
 
 export default CardOptions;

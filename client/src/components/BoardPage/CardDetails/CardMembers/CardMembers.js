@@ -5,6 +5,7 @@ import { AccountBtn } from '../../../UI/Buttons/Buttons';
 import { plusIcon } from '../../../UI/icons';
 import AddCardMember from '../AddCardMember/AddCardMember';
 import CardMemberModal from '../../../UI/CardMemberModal/CardMemberModal';
+import { connect } from 'react-redux';
 
 const CardMembers = props => {
   const [showAddMember, setShowAddMember] = useState(false);
@@ -17,7 +18,7 @@ const CardMembers = props => {
         <div key={member.email} className={classes.Member}>
           <span className={classes.AccountBtn}><AccountBtn clicked={() => setShownMember(member.email)}>{member.fullName.slice(0, 1)}</AccountBtn></span>
           {shownMember === member.email &&
-            <CardMemberModal cardID={props.cardID} listID={props.listID} fullName={member.fullName} email={member.email} close={() => setShownMember('')} />}
+            <CardMemberModal fullName={member.fullName} email={member.email} close={() => setShownMember('')} />}
         </div>
       ))}
       <span className={classes.AddContainer}>
@@ -29,9 +30,7 @@ const CardMembers = props => {
 };
 
 CardMembers.propTypes = {
-  members: PropTypes.array.isRequired,
-  cardID: PropTypes.string.isRequired,
-  listID: PropTypes.string.isRequired
+  members: PropTypes.array.isRequired
 };
 
 export default CardMembers;
