@@ -5,7 +5,6 @@ import { AccountBtn } from '../../../UI/Buttons/Buttons';
 import { plusIcon } from '../../../UI/icons';
 import AddCardMember from '../AddCardMember/AddCardMember';
 import CardMemberModal from '../../../UI/CardMemberModal/CardMemberModal';
-import { connect } from 'react-redux';
 
 const CardMembers = props => {
   const [showAddMember, setShowAddMember] = useState(false);

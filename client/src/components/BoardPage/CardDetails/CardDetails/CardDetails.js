@@ -63,7 +63,8 @@ const CardDetails = props => {
 CardDetails.propTypes = {
   close: PropTypes.func.isRequired,
   currentCard: PropTypes.object.isRequired,
-  currentListTitle: PropTypes.string.isRequired
+  currentListTitle: PropTypes.string.isRequired,
+  archiveCard: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({

@@ -65,6 +65,7 @@ BoardNavBar.propTypes = {
   updateTitle: PropTypes.func.isRequired,
   toggleIsStarred: PropTypes.func.isRequired,
   userEmail: PropTypes.string.isRequired,
+  userIsAdmin: PropTypes.bool.isRequired,
   showMenu: PropTypes.bool.isRequired,
   openMenu: PropTypes.func.isRequired,
   closeMenu: PropTypes.func.isRequired

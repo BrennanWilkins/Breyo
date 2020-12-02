@@ -16,7 +16,8 @@ const AccountInfo = props => (
 AccountInfo.propTypes = {
   fullName: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
-  givePadding: PropTypes.bool
+  givePadding: PropTypes.bool,
+  noBorder: PropTypes.bool
 };
 
 export default AccountInfo;

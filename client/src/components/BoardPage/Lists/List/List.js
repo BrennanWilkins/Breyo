@@ -4,7 +4,7 @@ import classes from './List.module.css';
 import { plusIcon, dotsIcon } from '../../../UI/icons';
 import TextArea from 'react-textarea-autosize';
 import { connect } from 'react-redux';
-import { updateListTitle, setCardDetails } from '../../../../store/actions';
+import { updateListTitle } from '../../../../store/actions';
 import AddCard from '../AddCard/AddCard';
 import Card from '../Card/Card';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
@@ -97,13 +97,11 @@ List.propTypes = {
   cards: PropTypes.array.isRequired,
   indexInBoard: PropTypes.number.isRequired,
   boardID: PropTypes.string.isRequired,
-  updateListTitle: PropTypes.func.isRequired,
-  setCardDetails: PropTypes.func.isRequired
+  updateListTitle: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
   updateListTitle: (title, listID, boardID) => dispatch(updateListTitle(title, listID, boardID)),
-  setCardDetails: (cardID, listID) => dispatch(setCardDetails(cardID, listID))
 });
 
 export default connect(null, mapDispatchToProps)(withRouter(List));

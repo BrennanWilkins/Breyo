@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { starIcon } from '../../UI/icons';
 import { toggleIsStarred } from '../../../store/actions';
 import { withRouter } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const BoardList = props => {
   const starRef = useRef();
@@ -24,6 +25,11 @@ const BoardList = props => {
       ))}
     </div>
   );
+};
+
+BoardList.propTypes = {
+  toggleIsStarred: PropTypes.func.isRequired,
+  boards: PropTypes.array.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({

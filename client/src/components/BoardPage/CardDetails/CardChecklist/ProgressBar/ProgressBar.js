@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import classes from './ProgressBar.module.css';
+import PropTypes from 'prop-types';
 
 const ProgressBar = props => {
   const barRef = useRef();
@@ -26,6 +27,10 @@ const ProgressBar = props => {
       </div>
     </div>
   );
+};
+
+ProgressBar.propTypes = {
+  progress: PropTypes.number.isRequired
 };
 
 export default ProgressBar;

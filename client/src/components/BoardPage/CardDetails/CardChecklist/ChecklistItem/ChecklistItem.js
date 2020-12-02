@@ -50,7 +50,9 @@ const ChecklistItem = props => {
 ChecklistItem.propTypes = {
   title: PropTypes.string.isRequired,
   isComplete: PropTypes.bool.isRequired,
-  toggleItemComplete: PropTypes.func.isRequired
+  toggleItemComplete: PropTypes.func.isRequired,
+  editItem: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired
 };
 
 export default ChecklistItem;

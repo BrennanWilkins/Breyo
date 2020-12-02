@@ -35,7 +35,9 @@ CardMemberModal.propTypes = {
   listID: PropTypes.string,
   inCard: PropTypes.bool,
   top: PropTypes.number,
-  left: PropTypes.number
+  left: PropTypes.number,
+  removeCardMember: PropTypes.func.isRequired,
+  removeCardMemberCurrentCard: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({

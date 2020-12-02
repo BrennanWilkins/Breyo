@@ -3,6 +3,7 @@ import classes from './FormattingModal.module.css';
 import { useModalToggle } from '../../../utils/customHooks';
 import { CloseBtn } from '../../UI/Buttons/Buttons';
 import { arrowIcon } from '../../UI/icons';
+import PropTypes from 'prop-types';
 
 const FormattingModal = props => {
   const modalRef = useRef();
@@ -36,6 +37,10 @@ const FormattingModal = props => {
       </div>
     </div>
   );
+};
+
+FormattingModal.propTypes = {
+  close: PropTypes.func.isRequired
 };
 
 export default FormattingModal;

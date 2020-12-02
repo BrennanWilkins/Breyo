@@ -88,7 +88,10 @@ ListActions.propTypes = {
   copyList: PropTypes.func.isRequired,
   archiveList: PropTypes.func.isRequired,
   archiveAllCards: PropTypes.func.isRequired,
-  userIsAdmin: PropTypes.bool.isRequired
+  userIsAdmin: PropTypes.bool.isRequired,
+  addNotif: PropTypes.func.isRequired,
+  top: PropTypes.number.isRequired,
+  left: PropTypes.number.isRequired
 };
 
 const mapStateToProps = state => ({

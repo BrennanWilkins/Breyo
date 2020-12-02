@@ -23,9 +23,9 @@ const BoardRect = props => {
 BoardRect.propTypes = {
   isStarred: PropTypes.bool.isRequired,
   toggleIsStarred: PropTypes.func.isRequired,
-  boardID: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired
+  color: PropTypes.string.isRequired,
+  nav: PropTypes.func.isRequired
 };
 
 export default BoardRect;
