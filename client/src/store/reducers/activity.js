@@ -36,6 +36,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SET_ALL_BOARD_ACTIVITY_SHOWN: return { ...state, allBoardActivityShown: true };
     case actionTypes.RESET_ALL_BOARD_ACTIVITY: return resetAllBoardActivity(state, action);
     case actionTypes.LEAVE_BOARD: return { ...initialState };
+    case actionTypes.LOGOUT: return { ...initialState };
     default: return state;
   }
 };

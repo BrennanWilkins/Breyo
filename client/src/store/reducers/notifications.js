@@ -14,6 +14,7 @@ const reducer = (state = initialState, action) => {
       ...state,
       notifs: state.notifs.filter(notif => notif.id !== action.id)
     };
+    case actionTypes.LOGOUT: return { ...initialState };
     default: return state;
   }
 };

@@ -52,6 +52,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DELETE_COMMENT: return deleteComment(state, action);
     case actionTypes.DELETE_BOARD_MEMBER: return deleteBoardMember(state, action);
     case actionTypes.LEAVE_BOARD: return { ...initialState };
+    case actionTypes.LOGOUT: return { ...initialState };
     default: return state;
   }
 };
