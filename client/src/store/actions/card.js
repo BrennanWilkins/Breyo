@@ -23,13 +23,11 @@ export const addCard = (title, boardID, listID) => async dispatch => {
 
 const setCardDetailsNull = dispatch => dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID: null, listID: null, currentCard: null, currentListTitle: null });
 
-export const setCardDetails = (cardID, listID) => (dispatch, getState) => {
-  // if card being closed then IDs will be null
-  if (!cardID || !listID) { return setCardDetailsNull(dispatch); }
+const findCard = (cardID, listID, dispatch, getState, callback) => {
   const state = getState();
   // card's listID could be in lists or archived lists
   let list = state.lists.lists.find(list => list.listID === listID) || state.lists.archivedLists.find(list => list.listID === listID);
-  if (!list) { return setCardDetailsNull(dispatch); }
+  if (!list) { return callback(); }
   let currentListTitle = list.title;
   let currentCard = null;
   currentCard = list.cards.find(card => card.cardID === cardID);
@@ -37,7 +35,7 @@ export const setCardDetails = (cardID, listID) => (dispatch, getState) => {
     // card not found in lists or archived lists, check in archivedCards
     currentCard = state.lists.allArchivedCards.find(card => card.cardID === cardID && card.listID === listID);
     // card not found anywhere
-    if (!currentCard) { return setCardDetailsNull(dispatch); }
+    if (!currentCard) { return callback(); }
     currentCard = { ...currentCard, isArchived: true };
   } else {
     // if card found in archivedLists then set list is archived
@@ -46,6 +44,14 @@ export const setCardDetails = (cardID, listID) => (dispatch, getState) => {
   }
   dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID, listID, currentCard, currentListTitle });
 };
+
+export const setCardDetails = (cardID, listID) => (dispatch, getState) => {
+  // if card being closed then IDs will be null
+  if (!cardID || !listID) { return setCardDetailsNull(dispatch); }
+  return findCard(cardID, listID, dispatch, getState, () => setCardDetailsNull(dispatch));
+};
+
+export const setCardDetailsInitial = (cardID, listID, push) => (dispatch, getState) => findCard(cardID, listID, dispatch, getState, () => push());
 
 export const setCardDetailsArchived = (cardID, listID, currentCard) => (dispatch, getState) => {
   // current list may be active or archived

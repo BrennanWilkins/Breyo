@@ -10,7 +10,7 @@ removeCardLabel, toggleDueDateIsComplete, addDueDate, removeDueDate, addChecklis
 deleteChecklist, addChecklistItem, toggleChecklistItemIsComplete, editChecklistItem,
 deleteChecklistItem, copyCard, archiveCard, setCardDetailsArchived, recoverCard,
 deleteCard, addCardMember, removeCardMember, removeCardMemberCurrentCard, addComment,
-updateComment, deleteComment, editChecklistTitle } from './card';
+updateComment, deleteComment, editChecklistTitle, setCardDetailsInitial } from './card';
 export { dndHandler } from './dndActions';
 export { getRecentCardActivity, resetCardActivity, setShownMemberActivity, deleteBoardActivity,
 getAllCardActivity, fetchFirstPageBoardActivity, fetchAllBoardActivity,

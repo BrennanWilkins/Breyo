@@ -6,9 +6,10 @@ import { connect } from 'react-redux';
 import BoardNavBar from '../BoardNavBar/BoardNavBar';
 import { initSocket, connectSocket, closeSocket }  from '../../../store/actions/socket';
 import { instance as axios } from '../../../axios';
-import { addNotif, updateActiveBoard, setCardDetails, setShownMemberActivity } from '../../../store/actions';
+import { addNotif, updateActiveBoard, setCardDetails, setShownMemberActivity, setCardDetailsInitial } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
 import ListContainer from '../Lists/ListContainer/ListContainer';
+import { useDidUpdate } from '../../../utils/customHooks';
 const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'));
 const MemberActivity = lazy(() => import('../MemberActivity/MemberActivity'));
 
@@ -29,16 +30,35 @@ const BoardPage = props => {
   const cardDetailsHandler = () => {
     // set card details based on listID & cardID in pathname
     const path = props.location.pathname;
-    if (!path.includes('/c/') || !path.includes('/l/')) {
-      if (!props.shownCardID || !props.shownListID) { return; }
-      // if path doesnt include cardID/listID but state does, then set cardID/listID state to null
-      return props.setCardDetails(null, null);
-    }
+    if (path === `/board/${props.boardID}`) { return props.setCardDetails(null, null); }
+    const { cardID, listID } = getIDs(path);
+    props.setCardDetails(cardID, listID);
+  };
+
+  const pathIsValid = path => {
+    if (path.length !== 85) { return false; }
+    let pathTest = /\/board\/[a-zA-Z0-9]{24}\/l\/[a-zA-Z0-9]{24}\/c\/[a-zA-Z0-9]{24}/;
+    return pathTest.test(path);
+  };
+
+  const getIDs = path => {
     const listStart = path.indexOf('/l/');
     const cardStart = path.indexOf('/c/');
     const listID = path.slice(listStart + 3, cardStart);
     const cardID = path.slice(cardStart + 3);
-    props.setCardDetails(cardID, listID);
+    return { listID, cardID };
+  };
+
+  const replaceHistory = () => props.history.replace(`/board/${props.match.params.boardID}`);
+
+  const cardDetailsInitialHandler = () => {
+    // set initial card details on page load/refresh based on listID & cardID in pathname
+    const path = props.location.pathname;
+    if (path === `/board/${props.match.params.boardID}` || path === '/') { return; }
+    // validate pathname before setting card details, if invalid then push history back to default
+    if (!pathIsValid(path)) { return replaceHistory(); }
+    const { cardID, listID } = getIDs(path);
+    props.setCardDetailsInitial(cardID, listID, () => closeDetailsHandler());
   };
 
   useEffect(() => {
@@ -51,7 +71,7 @@ const BoardPage = props => {
         document.body.style.overflow = 'hidden';
         props.updateActiveBoard(res.data.data);
         // after page load check if url path has listID/cardID to open by default
-        cardDetailsHandler();
+        cardDetailsInitialHandler();
       } catch (err) {
         // if error return document style to default & navigate to dashboard
         document.title = 'Breyo';
@@ -64,11 +84,9 @@ const BoardPage = props => {
     return () => { document.title = 'Breyo'; document.body.style.overflow = 'auto'; }
   }, []);
 
-  const closeDetailsHandler = () => {
-    props.history.push(`/board/${props.boardID}`);
-  };
+  const closeDetailsHandler = () => props.history.push(`/board/${props.match.params.boardID}`);
 
-  useEffect(() => cardDetailsHandler(), [props.location.pathname]);
+  useDidUpdate(() => cardDetailsHandler(), [props.location.pathname]);
 
   const fallback = <div className={classes.Fallback}><Spinner /></div>;
 
@@ -97,7 +115,10 @@ BoardPage.propTypes = {
   boardID: PropTypes.string.isRequired,
   setCardDetails: PropTypes.func.isRequired,
   shownMember: PropTypes.object,
-  closeMemberActivity: PropTypes.func.isRequired
+  closeMemberActivity: PropTypes.func.isRequired,
+  setCardDetailsInitial: PropTypes.func.isRequired,
+  shownCardID: PropTypes.string,
+  shownListID: PropTypes.string
 };
 
 const mapStateToProps = state => ({
@@ -112,6 +133,7 @@ const mapDispatchToProps = dispatch => ({
   addNotif: msg => dispatch(addNotif(msg)),
   updateActiveBoard: data => dispatch(updateActiveBoard(data)),
   setCardDetails: (cardID, listID) => dispatch(setCardDetails(cardID, listID)),
+  setCardDetailsInitial: (cardID, listID, push) => dispatch(setCardDetailsInitial(cardID, listID, push)),
   closeMemberActivity: () => dispatch(setShownMemberActivity(null))
 });
 

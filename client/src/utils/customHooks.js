@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export const useModalToggle = (show, ref, close) => {
   return useEffect(() => {
@@ -43,4 +43,14 @@ export const useModalPos = (show, ref) => {
     if (show) { window.addEventListener('resize', updatePos); }
     return () => window.removeEventListener('resize', updatePos);
   }, [show]);
+};
+
+// same as useEffect but doesnt get called on initial render
+export const useDidUpdate = (callback, deps) => {
+  const hasMounted = useRef(false);
+
+  useEffect(() => {
+    if (hasMounted.current) { callback(); }
+    else { hasMounted.current = true; }
+  }, deps);
 };
