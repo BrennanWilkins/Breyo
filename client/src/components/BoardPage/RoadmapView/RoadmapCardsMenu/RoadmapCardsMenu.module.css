@@ -1,0 +1,24 @@
+.Container, .Hide {
+  width: 300px;
+  height: 100%;
+  background: rgb(250,250,250);
+  transition: transform 250ms;
+  position: absolute;
+  right: 0;
+}
+.Hide {
+  transform: translateX(100%);
+}
+/* .Container::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Container::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Container::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+} */

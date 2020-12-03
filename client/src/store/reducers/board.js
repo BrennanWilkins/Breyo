@@ -10,7 +10,8 @@ const initialState = {
   creatorFullName: '',
   desc: '',
   isStarred: false,
-  userIsAdmin: false
+  userIsAdmin: false,
+  roadmapShown: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -29,6 +30,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ADD_BOARD_MEMBER: return addBoardMember(state, action);
     case actionTypes.DELETE_BOARD_MEMBER: return deleteBoardMember(state, action);
     case actionTypes.LOGOUT: return { ...initialState };
+    case actionTypes.TOGGLE_ROADMAP: return { ...state, roadmapShown: !state.roadmapShown };
     default: return state;
   }
 };

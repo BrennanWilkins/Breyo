@@ -1,0 +1,6 @@
+.Container {
+  width: 100%;
+  transition: width 250ms;
+  position: relative;
+  height: 100%;
+}

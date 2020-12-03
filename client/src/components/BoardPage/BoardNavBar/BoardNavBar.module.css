@@ -73,10 +73,18 @@
   font-size: 15px;
   margin-bottom: 4px;
 }
-.MenuBtn button {
+.MenuBtn button, .RoadBtn button {
   padding-right: 10px;
 }
-.MenuBtn {
+.RoadBtn svg {
+  margin-right: 3px;
+  width: 15px;
+  height: 15px;
+}
+.RoadBtn2 svg {
+  margin-right: 5px;
+}
+.MenuBtns {
   margin-left: auto;
 }
 .Container {

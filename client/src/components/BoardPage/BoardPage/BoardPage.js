@@ -13,6 +13,7 @@ import { useDidUpdate } from '../../../utils/customHooks';
 import { pathIsValid, getIDs } from '../../../utils/routerUtils';
 const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'));
 const MemberActivity = lazy(() => import('../MemberActivity/MemberActivity'));
+const RoadmapContainer = lazy(() => import('../RoadmapView/RoadmapContainer/RoadmapContainer'));
 
 const BoardPage = props => {
   const [showMenu, setShowMenu] = useState(false);
@@ -82,7 +83,7 @@ const BoardPage = props => {
     <>
     <div className={classes.Container} style={{ background: props.color }}>
       <BoardNavBar showMenu={showMenu} closeMenu={() => setShowMenu(false)} openMenu={() => setShowMenu(true)} />
-      <ListContainer showMenu={showMenu} />
+      {props.roadmapShown ? <Suspense fallback={<Spinner />}><RoadmapContainer showMenu={showMenu} /></Suspense> : <ListContainer showMenu={showMenu} />}
     </div>
     {props.shownCardID !== null && props.shownListID !== null &&
       <Suspense fallback={fallback}><CardDetails close={closeDetailsHandler} cardID={props.shownCardID} listID={props.shownListID} /></Suspense>}
@@ -105,7 +106,8 @@ BoardPage.propTypes = {
   closeMemberActivity: PropTypes.func.isRequired,
   setCardDetailsInitial: PropTypes.func.isRequired,
   shownCardID: PropTypes.string,
-  shownListID: PropTypes.string
+  shownListID: PropTypes.string,
+  roadmapShown: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -113,7 +115,8 @@ const mapStateToProps = state => ({
   boardID: state.board.boardID,
   shownCardID: state.lists.shownCardID,
   shownListID: state.lists.shownListID,
-  shownMember: state.activity.shownMemberActivity
+  shownMember: state.activity.shownMemberActivity,
+  roadmapShown: state.board.roadmapShown
 });
 
 const mapDispatchToProps = dispatch => ({

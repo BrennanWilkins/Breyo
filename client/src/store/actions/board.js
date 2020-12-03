@@ -247,3 +247,5 @@ export const leaveBoard = push => async (dispatch, getState) => {
     dispatch(addNotif('There was an error while leaving the board.'));
   }
 };
+
+export const toggleRoadmapView = () => ({ type: actionTypes.TOGGLE_ROADMAP });

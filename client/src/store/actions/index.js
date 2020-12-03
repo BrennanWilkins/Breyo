@@ -1,7 +1,7 @@
 export { login, logout, loginErr, signupErr, signup, authReset, autoLogin, getUserData } from './auth';
 export { createBoard, toggleIsStarred, updateActiveBoard, updateBoardTitle, sendInvite,
 addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc, deleteBoard, acceptInvite,
-rejectInvite, leaveBoard } from './board';
+rejectInvite, leaveBoard, toggleRoadmapView } from './board';
 export { addNotif, deleteNotif } from './notifications';
 export { updateListTitle, addList, copyList, archiveList, recoverList, deleteList,
 archiveAllCards, moveAllCards } from './lists';

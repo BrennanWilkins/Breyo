@@ -1,0 +1,40 @@
+.MenuToggle {
+  position: absolute;
+  top: calc(50% - 20px);
+  height: 40px;
+  width: 20px;
+  background: rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background 300ms;
+  z-index: 2;
+}
+.MenuToggle:hover {
+  background: rgba(0,0,0,0.3);
+}
+.Left {
+  left: -20px;
+  border-radius: 150px 0 0 150px;
+}
+.Right {
+  border-radius: 0 150px 150px 0;
+  right: -20px;
+}
+.Right .Collapsed, .Left .Expanded {
+  transform: rotate(180deg);
+}
+.Right .Icon {
+  right: 2px;
+}
+.Left .Icon {
+  left: 2px;
+}
+.Icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgb(70,70,70);
+  position: relative;
+}
