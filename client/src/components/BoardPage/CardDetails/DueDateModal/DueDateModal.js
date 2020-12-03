@@ -12,10 +12,13 @@ import { addDueDate, removeDueDate } from '../../../../store/actions';
 const DueDateModal = props => {
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
-  const [selectedDate, setSelectedDate] = useState(props.dueDate ? new Date(props.dueDate.dueDate) : new Date());
+  const [showStartDatePicker, setShowStartDatePicker] = useState(props.dueDate && props.dueDate.startDate);
+  const [selectedStartDate, setSelectedStartDate] = useState((props.dueDate && props.dueDate.startDate) ? new Date(props.dueDate.startDate) : null);
+  const [selectedDueDate, setSelectedDueDate] = useState(props.dueDate ? new Date(props.dueDate.dueDate) : new Date());
 
   const saveHandler = () => {
-    props.addDueDate(String(selectedDate));
+    const startDate = selectedStartDate ? String(selectedStartDate) : null;
+    props.addDueDate(startDate, String(selectedDueDate));
     props.close();
   };
 
@@ -25,13 +28,31 @@ const DueDateModal = props => {
     props.removeDueDate();
   };
 
+  const startDatePickerHandler = () => {
+    setShowStartDatePicker(shown => !shown);
+    if (showStartDatePicker) {
+      setSelectedStartDate(null);
+    } else {
+      setSelectedStartDate((props.dueDate && props.dueDate.startDate) ? new Date(props.dueDate.startDate) : new Date());
+    }
+  };
+
   return (
     <div ref={modalRef} className={props.fromDueDate ? classes.DueDateContainer : classes.Container}>
       <div className={classes.Title}>Due Date<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
       <div className={classes.DatePicker}>
-        <DatePicker selected={selectedDate} onChange={date => setSelectedDate(date)}
-        showPopperArrow={false} open showTimeSelect dateFormat="MM/dd/yyyy h:mm aa"
-        className={classes.Input} popperModifiers={{offset: { enabled: true, offset: '-72.5px, 0px' }}} />
+        {!showStartDatePicker && <div className={classes.AddStartDateBtn} onClick={startDatePickerHandler}>Add a start date</div>}
+        {showStartDatePicker && <div className={classes.RemoveStartDateBtn}><CloseBtn close={startDatePickerHandler} /></div>}
+        <div className={classes.Labels}>
+          <div>START DATE</div>
+          <div>DUE DATE</div>
+        </div>
+        {showStartDatePicker && <DatePicker selected={selectedStartDate} onChange={date => setSelectedStartDate(date)} selectsStart
+        showPopperArrow={false} showTimeSelect dateFormat="MM/dd/yyyy h:mm aa" startDate={selectedStartDate}
+        endDate={selectedDueDate} className={classes.Input} autoFocus />}
+        <DatePicker selected={selectedDueDate} onChange={date => setSelectedDueDate(date)} selectsEnd
+        showPopperArrow={false} showTimeSelect dateFormat="MM/dd/yyyy h:mm aa" startDate={selectedStartDate}
+        endDate={selectedDueDate} className={classes.Input} />
       </div>
       <div className={classes.Btns}>
         <span className={classes.SaveBtn}><Button clicked={saveHandler}>Save</Button></span>
@@ -54,7 +75,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  addDueDate: dueDate => dispatch(addDueDate(dueDate)),
+  addDueDate: (startDate, dueDate) => dispatch(addDueDate(startDate, dueDate)),
   removeDueDate: () => dispatch(removeDueDate())
 });
 

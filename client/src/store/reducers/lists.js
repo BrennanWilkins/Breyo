@@ -159,7 +159,7 @@ const toggleDueDate = (state, action) => {
 
 const addDueDate = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const dueDate = { dueDate: action.dueDate, isComplete: false };
+  const dueDate = { dueDate: action.dueDate, startDate: action.startDate, isComplete: false };
   card.dueDate = dueDate;
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };

@@ -118,12 +118,12 @@ export const toggleDueDateIsComplete = () => async (dispatch, getState) => {
   }
 };
 
-export const addDueDate = dueDate => async (dispatch, getState) => {
+export const addDueDate = (startDate, dueDate) => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID } = getCardState(getState);
-    dispatch({ type: actionTypes.ADD_DUE_DATE, dueDate, cardID, listID });
-    const res = await axios.post('/card/dueDate', { dueDate, cardID, listID, boardID });
-    sendUpdate('post/card/dueDate', JSON.stringify({ dueDate, cardID, listID }));
+    dispatch({ type: actionTypes.ADD_DUE_DATE, startDate, dueDate, cardID, listID });
+    const res = await axios.post('/card/dueDate', { startDate, dueDate, cardID, listID, boardID });
+    sendUpdate('post/card/dueDate', JSON.stringify({ startDate, dueDate, cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());

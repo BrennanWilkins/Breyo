@@ -158,7 +158,9 @@ router.post('/dueDate', auth, validate([
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'No card data found'; }
       if (isNaN(new Date(req.body.dueDate).getDate())) { throw 'Invalid due date format'; }
-      card.dueDate = { dueDate: req.body.dueDate, isComplete: false };
+      let startDate = req.body.startDate;
+      if (startDate !== null && isNaN(new Date(req.body.dueDate).getDate())) { throw 'Invalid due date format'; }
+      card.dueDate = { dueDate: req.body.dueDate, startDate, isComplete: false };
       await list.save();
 
       // format date in action & show year in date if not current year

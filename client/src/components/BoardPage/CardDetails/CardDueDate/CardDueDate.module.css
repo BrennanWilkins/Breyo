@@ -1,5 +1,7 @@
 .Container {
-  margin: 15px 18px 10px 47px;
+  margin: 15px 18px -10px 47px;
+  display: flex;
+  flex-wrap: wrap;
 }
 @media (max-width: 610px) {
   .Container {
@@ -18,4 +20,10 @@
 }
 .Btn {
   margin-left: 5px;
+}
+.StartBtn {
+  margin-right: 12px;
+}
+.DateContainer {
+  margin-bottom: 10px;
 }

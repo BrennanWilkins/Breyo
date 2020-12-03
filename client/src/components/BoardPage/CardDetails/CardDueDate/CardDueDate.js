@@ -13,12 +13,20 @@ const CardDueDate = props => {
 
   return (
     <div className={classes.Container}>
-      <div className={classes.Title}>DUE DATE</div>
-      <div className={classes.Input}>
-        <Checkbox checked={props.currentDueDate.isComplete} clicked={props.toggleIsComplete} />
-        <span className={classes.Btn}>
-          <ActionBtn clicked={() => setShowModal(true)}>{formatDate(props.currentDueDate.dueDate)}</ActionBtn>
+      {props.currentDueDate.startDate && <div className={classes.DateContainer}>
+        <div className={classes.Title}>START DATE</div>
+        <span className={classes.StartBtn}>
+          <ActionBtn clicked={() => setShowModal(true)}>{formatDate(props.currentDueDate.startDate)}</ActionBtn>
         </span>
+      </div>}
+      <div className={classes.DateContainer}>
+        <div className={classes.Title}>DUE DATE</div>
+        <div className={classes.Input}>
+          <Checkbox checked={props.currentDueDate.isComplete} clicked={props.toggleIsComplete} />
+          <span className={classes.Btn}>
+            <ActionBtn clicked={() => setShowModal(true)}>{formatDate(props.currentDueDate.dueDate)}</ActionBtn>
+          </span>
+        </div>
       </div>
       {showModal && <DueDateModal close={() => setShowModal(false)} fromDueDate />}
     </div>
