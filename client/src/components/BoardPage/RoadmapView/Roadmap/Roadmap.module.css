@@ -1,8 +1,100 @@
-.Container {
+.OuterContainer {
   width: 100%;
   height: 100%;
-  background: rgb(245,245,245);
+  background: rgb(250,250,250);
   transition: all 250ms;
   position: absolute;
   left: 0;
+}
+.InnerContainer {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+}
+.InnerContainer::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.InnerContainer::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.InnerContainer::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}
+.DatesContainer {
+  height: 35px;
+  background: white;
+  border-bottom: 1px solid #eee;
+  display: inline-flex;
+  min-width: 100%;
+}
+.CardsContainer {
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+.CardContainer {
+  cursor: pointer;
+  position: relative;
+}
+.CardInnerContainer:hover .Card {
+  background: rgb(252,252,252);
+}
+.Card, .CardComplete {
+  border-radius: 7px;
+  background: white;
+  box-sizing: border-box;
+  box-shadow: var(--box-shadow5);
+  border: 1px solid #ddd;
+  margin: 0 0 10px;
+  height: 45px;
+}
+.CardComplete {
+  background: rgba(var(--green), 0.7);
+}
+.CardComplete:hover {
+  background: rgb(var(--green)) !important;
+}
+.CardTitle {
+  font-size: 14px;
+  position: absolute;
+  top: 0;
+  left: 5px;
+  line-height: 45px;
+  white-space: nowrap;
+}
+.CardTitleInner {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.Month {
+  display: inline-block;
+  border-right: 1.2px solid #ddd;
+  height: 100%;
+  padding: 12px 3px 0;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: 14px;
+  color: rgb(120,120,120);
+  font-weight: 500;
+}
+.DateMarker {
+  position: absolute;
+  cursor: default;
+  z-index: 0;
+  width: 2px;
+  padding: 0 10px;
+}
+.DateMarker div {
+  width: 100%;
+  height: 100%;
+}
+.DateMarker:hover {
+  z-index: 2;
+}
+.DateMarker:hover div {
+  background: rgb(var(--red));
 }

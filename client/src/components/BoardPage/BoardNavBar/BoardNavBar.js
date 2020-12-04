@@ -59,7 +59,7 @@ const BoardNavBar = props => {
       </span>
       <span className={classes.MenuBtns}>
         <span className={`${classes.Btn} ${classes.RoadBtn} ${props.roadmapShown ? classes.RoadBtn2 : ''}`}>
-          <Button clicked={roadmapHandler}>{props.roadmapShown ? boardIcon : roadmapIcon}{props.roadmapShown ? 'Boards' : 'Roadmaps'}</Button>
+          <Button clicked={roadmapHandler}>{props.roadmapShown ? boardIcon : roadmapIcon}{props.roadmapShown ? 'Board' : 'Roadmaps'}</Button>
         </span>
         {!props.showMenu && <span className={`${classes.Btn} ${classes.MenuBtn}`}><Button clicked={props.openMenu}>{dotsIcon}Menu</Button></span>}
       </span>
