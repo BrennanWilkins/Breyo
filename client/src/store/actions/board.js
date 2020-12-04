@@ -248,4 +248,20 @@ export const leaveBoard = push => async (dispatch, getState) => {
   }
 };
 
-export const toggleRoadmapView = () => ({ type: actionTypes.TOGGLE_ROADMAP });
+export const openRoadmap = () => (dispatch, getState) => {
+  const state = getState();
+  if (!state.board.shownRoadmapListID) {
+    const listID = state.lists.lists[0].listID;
+    dispatch({ type: actionTypes.SET_SHOWN_ROADMAP_LIST, listID });
+  }
+  dispatch({ type: actionTypes.OPEN_ROADMAP });
+};
+
+export const closeRoadmap = () => ({ type: actionTypes.CLOSE_ROADMAP });
+
+export const openRoadmapList = listID => dispatch => {
+  dispatch({ type: actionTypes.OPEN_ROADMAP });
+  dispatch({ type: actionTypes.SET_SHOWN_ROADMAP_LIST, listID });
+};
+
+export const setShownRoadmapList = listID => ({ type: actionTypes.SET_SHOWN_ROADMAP_LIST, listID });

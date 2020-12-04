@@ -38,6 +38,10 @@
 .Option:hover {
   background: rgb(238,238,238);
 }
+.Option svg {
+  position: relative;
+  top: 2px;
+}
 .ShowBackBtn button, .HideBackBtn button {
   position: absolute;
   left: 0;

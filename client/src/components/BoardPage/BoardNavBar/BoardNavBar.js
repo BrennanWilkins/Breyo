@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardNavBar.module.css';
 import { connect } from 'react-redux';
-import { updateBoardTitle, toggleIsStarred, toggleRoadmapView } from '../../../store/actions';
+import { updateBoardTitle, toggleIsStarred, openRoadmap, closeRoadmap } from '../../../store/actions';
 import AutosizeInput from 'react-input-autosize';
 import Button, { AccountBtn } from '../../UI/Buttons/Buttons';
 import { starIcon, dotsIcon, roadmapIcon, boardIcon } from '../../UI/icons';
@@ -30,6 +30,11 @@ const BoardNavBar = props => {
     setInputTitle(e.target.value);
   };
 
+  const roadmapHandler = () => {
+    if (props.roadmapShown) { props.closeRoadmap(); }
+    else { props.openRoadmap(); }
+  };
+
   return (
     <div className={classes.NavBar} style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
       <BoardMenu show={props.showMenu} close={props.closeMenu} />
@@ -54,7 +59,7 @@ const BoardNavBar = props => {
       </span>
       <span className={classes.MenuBtns}>
         <span className={`${classes.Btn} ${classes.RoadBtn} ${props.roadmapShown ? classes.RoadBtn2 : ''}`}>
-          <Button clicked={props.toggleRoadmapView}>{props.roadmapShown ? boardIcon : roadmapIcon}{props.roadmapShown ? 'Boards' : 'Roadmaps'}</Button>
+          <Button clicked={roadmapHandler}>{props.roadmapShown ? boardIcon : roadmapIcon}{props.roadmapShown ? 'Boards' : 'Roadmaps'}</Button>
         </span>
         {!props.showMenu && <span className={`${classes.Btn} ${classes.MenuBtn}`}><Button clicked={props.openMenu}>{dotsIcon}Menu</Button></span>}
       </span>
@@ -74,7 +79,8 @@ BoardNavBar.propTypes = {
   showMenu: PropTypes.bool.isRequired,
   openMenu: PropTypes.func.isRequired,
   closeMenu: PropTypes.func.isRequired,
-  toggleRoadmapView: PropTypes.func.isRequired,
+  openRoadmap: PropTypes.func.isRequired,
+  closeRoadmap: PropTypes.func.isRequired,
   roadmapShown: PropTypes.bool.isRequired
 };
 
@@ -91,7 +97,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   updateTitle: (title, id) => dispatch(updateBoardTitle(title, id)),
   toggleIsStarred: boardID => dispatch(toggleIsStarred(boardID)),
-  toggleRoadmapView: () => dispatch(toggleRoadmapView())
+  openRoadmap: () => dispatch(openRoadmap()),
+  closeRoadmap: () => dispatch(closeRoadmap())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BoardNavBar);

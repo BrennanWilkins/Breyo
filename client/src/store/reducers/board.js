@@ -11,7 +11,8 @@ const initialState = {
   desc: '',
   isStarred: false,
   userIsAdmin: false,
-  roadmapShown: false
+  roadmapShown: false,
+  shownRoadmapListID: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -30,7 +31,9 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ADD_BOARD_MEMBER: return addBoardMember(state, action);
     case actionTypes.DELETE_BOARD_MEMBER: return deleteBoardMember(state, action);
     case actionTypes.LOGOUT: return { ...initialState };
-    case actionTypes.TOGGLE_ROADMAP: return { ...state, roadmapShown: !state.roadmapShown };
+    case actionTypes.OPEN_ROADMAP: return { ...state, roadmapShown: true };
+    case actionTypes.SET_SHOWN_ROADMAP_LIST: return { ...state, shownRoadmapListID: action.listID };
+    case actionTypes.CLOSE_ROADMAP: return { ...state, roadmapShown: false };
     default: return state;
   }
 };

@@ -3,10 +3,11 @@ import classes from './ListActions.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { BackBtn, CloseBtn } from '../../../UI/Buttons/Buttons';
-import { copyList, archiveList, archiveAllCards, addNotif } from '../../../../store/actions';
+import { copyList, archiveList, archiveAllCards, addNotif, openRoadmapList } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import MoveCards from './MoveCards';
 import TextArea from 'react-textarea-autosize';
+import { roadmapIcon } from '../../../UI/icons';
 
 const ListActions = props => {
   const modalRef = useRef();
@@ -51,6 +52,7 @@ const ListActions = props => {
 
   const defaultContent = (
     <>
+      <div className={classes.Option} onClick={() => props.openRoadmapList(props.listID)}>{roadmapIcon} Roadmap</div>
       <div className={classes.Option} onClick={() => setShowCopyList(true)}>Copy list</div>
       <div className={classes.Option} onClick={archiveHandler}>Archive list</div>
       <div className={classes.Option} onClick={archiveAllHandler}>Archive all cards in this list</div>
@@ -91,7 +93,8 @@ ListActions.propTypes = {
   userIsAdmin: PropTypes.bool.isRequired,
   addNotif: PropTypes.func.isRequired,
   top: PropTypes.number.isRequired,
-  left: PropTypes.number.isRequired
+  left: PropTypes.number.isRequired,
+  openRoadmapList: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -102,7 +105,8 @@ const mapDispatchToProps = dispatch => ({
   copyList: (title, listID, boardID) => dispatch(copyList(title, listID, boardID)),
   archiveList: (listID, boardID) => dispatch(archiveList(listID, boardID)),
   archiveAllCards: (listID, boardID) => dispatch(archiveAllCards(listID, boardID)),
-  addNotif: msg => dispatch(addNotif(msg))
+  addNotif: msg => dispatch(addNotif(msg)),
+  openRoadmapList: listID => dispatch(openRoadmapList(listID))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ListActions);
