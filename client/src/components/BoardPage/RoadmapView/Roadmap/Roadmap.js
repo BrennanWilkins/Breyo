@@ -41,7 +41,7 @@ const Roadmap = props => {
       const width = calcCardWidth(startDate, dueDate);
       const margin = calcCardMargin(startDate ? startDate : dueDate, minDate);
       const markerTop = -i * 55 - 10;
-      const markerHeight = containerRef.current.getBoundingClientRect().height - 45;
+      const markerHeight = containerRef.current.getBoundingClientRect().height - 46;
       // if calculated card width <= 30px then show card title outside card
       return (
         <div className={classes.CardContainer} key={card.cardID} style={{ width: `${width}px`, marginLeft: `${margin}px` }}>
@@ -50,8 +50,14 @@ const Roadmap = props => {
             <div style={width <= 30 ? {left: `${width + 5}px`} : { width: `${width - 5}px` }}
             className={`${classes.CardTitle} ${width >= 30 ? classes.CardTitleInner : ''}`}>{card.title}</div>
           </div>
-          {startDate && <div className={classes.DateMarker} style={{ marginLeft: '-10px', top: `${markerTop}px`, height: `${markerHeight}px` }}><div></div></div>}
-          <div className={classes.DateMarker} style={{ marginLeft: `${width - 11}px`, top: `${markerTop}px`, height: `${markerHeight}px` }}><div></div></div>
+          {startDate && <div className={classes.DateMarker} style={{ marginLeft: '-10px', top: `${markerTop}px`, height: `${markerHeight}px` }}>
+            <div className={classes.DateTooltip}>{format(startDate, `MMM d 'at' h:mm aa`)}</div>
+            <div className={classes.MarkerBar}></div>
+          </div>}
+          <div className={classes.DateMarker} style={{ marginLeft: `${width - 11}px`, top: `${markerTop}px`, height: `${markerHeight}px` }}>
+            <div className={classes.DateTooltip}>{format(dueDate, `MMM d 'at' h:mm aa`)}</div>
+            <div className={classes.MarkerBar}></div>
+          </div>
         </div>
       );
     });
