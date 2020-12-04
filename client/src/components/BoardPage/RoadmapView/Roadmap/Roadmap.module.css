@@ -96,13 +96,13 @@
   z-index: 2;
 }
 .DateMarker:hover .MarkerBar {
-  background: rgb(var(--red));
+  background: rgba(var(--red), 0.5);
 }
 .DateTooltip {
   display: none;
   position: absolute;
   top: -32px;
-  background: rgb(100,100,100);
+  background: rgb(130,130,130);
   color: white;
   border-radius: 4px;
   width: 60px;
@@ -113,4 +113,25 @@
 }
 .DateMarker:hover .DateTooltip {
   display: block;
+}
+.ZoomBtns {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+}
+.ZoomBtns div {
+  font-size: 20px;
+  color: rgb(100,100,100);
+  cursor: pointer;
+  margin: 4px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 25px;
+  padding: 7px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ZoomBtns div:hover {
+  background: rgba(0,0,0,0.15);
 }

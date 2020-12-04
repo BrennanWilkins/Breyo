@@ -2,6 +2,7 @@ import React, { useState, useLayoutEffect, useRef } from 'react';
 import classes from './Roadmap.module.css';
 import PropTypes from 'prop-types';
 import { differenceInCalendarDays, max, min, eachMonthOfInterval, format, startOfMonth } from 'date-fns';
+import { zoomInIcon, zoomOutIcon } from '../../../UI/icons';
 
 const Roadmap = props => {
   const [defaultDayWidth, setDefaultDayWidth] = useState(10);
@@ -66,11 +67,15 @@ const Roadmap = props => {
     // returns formatted array of all months from minDate to maxDate
     const months = eachMonthOfInterval({ start: minDate, end: maxDate }).map(month => format(new Date(month), 'MMM yyyy'));
     setMonthRange(months);
-  }, [props.cards]);
+  }, [props.cards, defaultDayWidth]);
 
   return (
     <div className={classes.OuterContainer} style={(props.cardsShown && props.listsShown) ? { width: 'calc(100% - 500px)', left: '250px' } :
     props.cardsShown ? { width: 'calc(100% - 250px)' } : props.listsShown ? { width: 'calc(100% - 250px)', left: '250px' } : null}>
+      <div className={classes.ZoomBtns}>
+        <div onClick={() => setDefaultDayWidth(prev => prev + 1)}>{zoomInIcon}</div>
+        <div onClick={() => defaultDayWidth > 1 && setDefaultDayWidth(prev => prev - 1)}>{zoomOutIcon}</div>
+      </div>
       <div className={classes.InnerContainer} ref={containerRef}>
         <div className={classes.DatesContainer}>
           {monthRange.map((month, i) => <div key={i} style={{ minWidth: `${defaultDayWidth * 30}px` }} className={classes.Month}>{month}</div>)}
