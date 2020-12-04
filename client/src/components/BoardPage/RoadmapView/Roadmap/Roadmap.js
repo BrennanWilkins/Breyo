@@ -25,6 +25,10 @@ const Roadmap = props => {
   };
 
   useLayoutEffect(() => {
+    if (!props.cards.length && cards.length) {
+      setCards([]);
+      return setMonthRange([]);
+    }
     if (!props.cards.length) { return; }
     const dates = [];
     for (let card of props.cards) {
@@ -81,6 +85,8 @@ const Roadmap = props => {
           {monthRange.map((month, i) => <div key={i} style={{ minWidth: `${defaultDayWidth * 30}px` }} className={classes.Month}>{month}</div>)}
         </div>
         <div className={classes.CardsContainer}>{cards}</div>
+        {!props.cards.length && <div className={classes.NoCards}>No don't have any cards added to this list's roadmap yet.
+        To add a card, add a start date or due date to the card.</div>}
       </div>
     </div>
   );
