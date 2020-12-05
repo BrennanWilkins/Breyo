@@ -4,22 +4,23 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgb(0,0,0,0.5);
+  background: rgba(0,0,0,0.5);
   overflow-x: hidden;
   overflow-y: auto;
   z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 .CardDetails {
-  position: absolute;
-  top: 45px;
-  left: max(calc(50% - 375px), 2%);
+  margin: 45px 0;
   width: 96%;
-  max-width: 750px;
+  max-width: 800px;
   background: rgb(246,246,246);
-  margin-bottom: 45px;
   padding: 15px;
   box-sizing: border-box;
   border-radius: 2px;
+  position: relative;
 }
 .LeftDetails {
   width: 80%;

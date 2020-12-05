@@ -53,14 +53,6 @@ export const setCardDetails = (cardID, listID) => (dispatch, getState) => {
 
 export const setCardDetailsInitial = (cardID, listID, push) => (dispatch, getState) => findCard(cardID, listID, dispatch, getState, () => push());
 
-export const setCardDetailsArchived = (cardID, listID, currentCard) => (dispatch, getState) => {
-  // current list may be active or archived
-  const lists = getState().lists;
-  const currentList = lists.lists.find(list => list.listID === listID) || lists.archivedLists.find(list => list.listID === listID);
-  const currentListTitle = currentList.title;
-  dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID, listID, currentCard: { ...currentCard, isArchived: true }, currentListTitle });
-};
-
 export const updateCardTitle = title => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID } = getCardState(getState);

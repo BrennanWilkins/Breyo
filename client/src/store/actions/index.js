@@ -8,9 +8,9 @@ archiveAllCards, moveAllCards } from './lists';
 export { addCard, setCardDetails, updateCardTitle, updateCardDesc, addCardLabel,
 removeCardLabel, toggleDueDateIsComplete, addDueDate, removeDueDate, addChecklist,
 deleteChecklist, addChecklistItem, toggleChecklistItemIsComplete, editChecklistItem,
-deleteChecklistItem, copyCard, archiveCard, setCardDetailsArchived, recoverCard,
-deleteCard, addCardMember, removeCardMember, removeCardMemberCurrentCard, addComment,
-updateComment, deleteComment, editChecklistTitle, setCardDetailsInitial } from './card';
+deleteChecklistItem, copyCard, archiveCard, recoverCard, deleteCard, addCardMember,
+removeCardMember, removeCardMemberCurrentCard, addComment, updateComment, deleteComment,
+editChecklistTitle, setCardDetailsInitial } from './card';
 export { dndHandler } from './dndActions';
 export { getRecentCardActivity, resetCardActivity, setShownMemberActivity, deleteBoardActivity,
 getAllCardActivity, fetchFirstPageBoardActivity, fetchAllBoardActivity,
