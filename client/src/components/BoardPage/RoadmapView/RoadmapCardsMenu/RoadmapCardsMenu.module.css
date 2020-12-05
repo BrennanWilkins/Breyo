@@ -1,13 +1,13 @@
 .Container, .Hide {
   width: 250px;
   height: 100%;
-  background: rgb(237,237,237);
   transition: transform 250ms;
   position: absolute;
   right: 0;
   padding: 10px;
   box-sizing: border-box;
-  box-shadow: var(--box-shadow4);
+  box-shadow: var(--box-shadow2);
+  background: rgb(250,250,250);
 }
 .Hide {
   transform: translateX(100%);

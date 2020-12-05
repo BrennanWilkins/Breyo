@@ -1,15 +1,18 @@
 .OuterContainer {
   width: 100%;
   height: 100%;
-  background: rgb(250,250,250);
   transition: all 250ms;
   position: absolute;
   left: 0;
+  z-index: 0;
+  background: rgb(240,240,240);
 }
 .InnerContainer {
   overflow: auto;
   width: 100%;
   height: 100%;
+  min-height: calc(100% - 36px);
+  position: relative;
 }
 .InnerContainer::-webkit-scrollbar-track {
   border-radius: 15px;
@@ -40,6 +43,10 @@
   cursor: pointer;
   position: relative;
 }
+.CardInnerContainer {
+  position: relative;
+  z-index: 1;
+}
 .CardInnerContainer:hover .Card {
   background: rgb(252,252,252);
 }
@@ -47,10 +54,10 @@
   border-radius: 7px;
   background: white;
   box-sizing: border-box;
-  box-shadow: var(--box-shadow5);
   border: 1px solid #ddd;
   margin: 0 0 10px;
   height: 45px;
+  box-shadow: var(--box-shadow7);
 }
 .CardComplete {
   background: rgba(var(--green), 0.7);
@@ -87,6 +94,8 @@
   z-index: 0;
   width: 2px;
   padding: 0 10px;
+  height: calc(100% - 36px);
+  top: 36px;
 }
 .MarkerBar {
   width: 100%;
@@ -96,7 +105,7 @@
   z-index: 2;
 }
 .DateMarker:hover .MarkerBar {
-  background: rgba(var(--red), 0.5);
+  background: rgba(var(--red), 0.65);
 }
 .DateTooltip {
   display: none;
@@ -146,4 +155,11 @@
   top: 0;
   padding: 20px;
   box-sizing: border-box;
+}
+.MonthSeparator {
+  position: absolute;
+  height: calc(100% - 35px);
+  top: 35px;
+  border-right: 1.2px solid rgb(225,225,225);
+  z-index: 0;
 }

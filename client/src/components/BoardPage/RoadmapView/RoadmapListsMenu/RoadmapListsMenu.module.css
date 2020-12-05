@@ -1,13 +1,14 @@
 .Container, .Hide {
   width: 250px;
   height: 100%;
-  background: rgb(237,237,237);
   transition: transform 250ms;
   position: absolute;
   left: 0;
   padding: 10px;
   box-sizing: border-box;
-  box-shadow: var(--box-shadow4);
+  box-shadow: var(--box-shadow2);
+  z-index: 0;
+  background: rgb(250,250,250);
 }
 .Hide {
   transform: translateX(-100%);
@@ -40,21 +41,19 @@
 }
 .ListBtn, .ListBtnActive {
   border-radius: 4px;
-  padding: 5px;
   margin: 5px 0;
-  box-shadow: var(--box-shadow6);
-  border: 1px solid #ddd;
   font-size: 15px;
   cursor: pointer;
-  background: white;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding: 7px 5px;
+  background: rgb(245,245,245);
 }
 .ListBtn:hover, .ListBtnActive:hover {
-  background: rgb(246,246,246);
+  background: rgb(233,233,233);
 }
 .ListBtnActive {
-  background: rgb(251,251,251);
   font-weight: 500;
+  text-decoration: underline;
 }

@@ -83,7 +83,7 @@ const BoardPage = props => {
     <>
     <div className={classes.Container} style={{ background: props.color }}>
       <BoardNavBar showMenu={showMenu} closeMenu={() => setShowMenu(false)} openMenu={() => setShowMenu(true)} />
-      {props.roadmapShown ? <Suspense fallback={<Spinner />}><RoadmapContainer showMenu={showMenu} /></Suspense> : <ListContainer showMenu={showMenu} />}
+      {props.roadmapShown ? <Suspense fallback=""><RoadmapContainer showMenu={showMenu} /></Suspense> : <ListContainer showMenu={showMenu} />}
     </div>
     {props.shownCardID !== null && props.shownListID !== null &&
       <Suspense fallback={fallback}><CardDetails close={closeDetailsHandler} cardID={props.shownCardID} listID={props.shownListID} /></Suspense>}
