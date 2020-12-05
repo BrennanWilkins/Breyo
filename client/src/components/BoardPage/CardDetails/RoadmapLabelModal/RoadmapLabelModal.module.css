@@ -8,18 +8,13 @@
   box-sizing: border-box;
   width: 200px;
   z-index: 2;
-  top: 65px;
   right: 0;
-}
-@media (max-width: 755px) {
-  .Container {
-    top: 81px;
-  }
+  top: 25px;
 }
 @media (max-width: 610px) {
   .Container {
     left: 0;
-    bottom: 80px;
+    bottom: 40px;
     right: auto;
     top: auto;
   }

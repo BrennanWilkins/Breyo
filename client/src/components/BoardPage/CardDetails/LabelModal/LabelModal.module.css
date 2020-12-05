@@ -19,7 +19,7 @@
 @media (max-width: 610px) {
   .Container {
     left: 0;
-    bottom: 80px;
+    bottom: 120px;
     right: auto;
     top: auto;
   }

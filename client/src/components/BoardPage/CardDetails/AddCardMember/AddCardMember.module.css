@@ -15,10 +15,10 @@
 }
 @media (max-width: 610px) {
   .Container {
-    left: 0;
-    right: auto;
     top: auto;
-    bottom: 40px;
+    right: auto;
+    left: 0;
+    bottom: 80px;
   }
 }
 .FromListContainer {

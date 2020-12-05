@@ -24,13 +24,15 @@ const CardOptions = props => {
       <span className={classes.BtnContainer}>
         <span className={classes.Btn}><ActionBtn clicked={() => setShowLabelModal(true)}>{labelIcon}Labels</ActionBtn></span>
         {showLabelModal && <LabelModal close={() => setShowLabelModal(false)} />}
-        <span className={`${classes.Btn} ${classes.RoadmapBtn}`}><ActionBtn clicked={() => setShowRoadmapLabelModal(true)}>{roadmapIcon}Roadmap Label</ActionBtn></span>
-        {showRoadmapLabelModal && <RoadmapLabelModal close={() => setShowRoadmapLabelModal(false)} />}
         <span className={classes.Btn}><ActionBtn clicked={() => setShowChecklistModal(true)}>{checklistIcon}Checklist</ActionBtn></span>
         {showChecklistModal && <ChecklistModal close={() => setShowChecklistModal(false)} />}
         <span className={classes.Btn}><ActionBtn clicked={() => setShowAddMemberModal(true)}>{personIcon}Member</ActionBtn></span>
         {showAddMemberModal && <AddCardMember close={() => setShowAddMemberModal(false)} />}
         <span className={classes.Btn}><ActionBtn clicked={() => setShowDueDateModal(true)}>{clockIcon}Due Date</ActionBtn></span>
+        <span className={classes.RoadmapBtnContainer}>
+          <span className={`${classes.Btn} ${classes.RoadmapBtn}`}><ActionBtn clicked={() => setShowRoadmapLabelModal(true)}>{roadmapIcon}Roadmap Label</ActionBtn></span>
+          {showRoadmapLabelModal && <RoadmapLabelModal close={() => setShowRoadmapLabelModal(false)} />}
+        </span>
       </span>
       <div className={classes.Title2}>ACTIONS</div>
       <span className={classes.BtnContainer2}>
