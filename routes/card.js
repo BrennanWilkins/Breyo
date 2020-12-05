@@ -25,7 +25,7 @@ router.post('/', auth, validate(
       if (!list) { throw 'List data not found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const title = req.body.title;
-      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [], comments: [] };
+      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [], comments: [], roadmapLabel: null };
       list.cards.push(card);
       const updatedList = await list.save();
       const cardID = updatedList.cards[updatedList.cards.length - 1]._id;
@@ -118,6 +118,45 @@ router.put('/label/remove', auth, validate([
       await list.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// add roadmap label to card
+router.post('/roadmapLabel', auth, validate(
+  [body('listID').isMongoId(),
+  body('boardID').isMongoId(),
+  body('cardID').isMongoId()]), useIsMember,
+  async (req, res) => {
+    try {
+      if (!LABEL_COLORS.includes(req.body.color)) { throw 'Invalid label color'; }
+      const list = await List.findById(req.body.listID);
+      if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
+      const card = list.cards.id(req.body.cardID);
+      if (!card) { throw 'No card data found'; }
+      card.roadmapLabel = req.body.color;
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// remove roadmap label from card
+router.delete('/roadmapLabel/:cardID/:listID/:boardID', auth, validate(
+  [param('listID').isMongoId(),
+  param('boardID').isMongoId(),
+  param('cardID').isMongoId()]), useIsMember,
+  async (req, res) => {
+    try {
+      const list = await List.findById(req.params.listID);
+      if (!list) { throw 'No list data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
+      const card = list.cards.id(req.params.cardID);
+      if (!card) { throw 'No card data found'; }
+      card.roadmapLabel = null;
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { console.log(err); res.sendStatus(500); }
   }
 );
 
@@ -442,6 +481,7 @@ router.post('/copy', auth, validate([
       if (!sourceCard) { throw 'Card data not found'; }
       // keep card labels in the copy if requested
       const labels = req.body.keepLabels === 'true' ? sourceCard.labels : [];
+      const roadmapLabel = req.body.keepLabels === 'true' ? sourceCard.roadmapLabel : null;
       const checklists = [];
       // create nested copy of card checklists if requested
       if (req.body.keepChecklists === 'true') {
@@ -450,7 +490,7 @@ router.post('/copy', auth, validate([
           checklists.push({ title: checklist.title, items });
         }
       }
-      const newCard = { title, labels, checklists, desc: '', dueDate: null, members: [], comments: [] };
+      const newCard = { title, labels, roadmapLabel, checklists, desc: '', dueDate: null, members: [], comments: [] };
       // add copied card to destination list
       destList.cards.splice(req.body.destIndex, 0, newCard);
       const updatedList = await destList.save();

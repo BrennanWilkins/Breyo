@@ -1,0 +1,70 @@
+.Container {
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  border: 1px solid rgb(227, 227, 227);
+  background: white;
+  position: absolute;
+  padding: 5px 5px 10px 5px;
+  box-sizing: border-box;
+  width: 200px;
+  z-index: 2;
+  top: 65px;
+  right: 0;
+}
+@media (max-width: 755px) {
+  .Container {
+    top: 81px;
+  }
+}
+@media (max-width: 610px) {
+  .Container {
+    left: 0;
+    bottom: 80px;
+    right: auto;
+    top: auto;
+  }
+}
+.Title {
+  position: relative;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1.2px solid #ddd;
+  color: rgb(103, 103, 103);
+  font-size: 15px;
+  line-height: 29px;
+  margin: 5px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.CloseBtn button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+}
+.Color {
+  width: 85%;
+  height: 30px;
+  border-radius: 4px;
+  margin: 5px auto;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.Color span {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  box-sizing: border-box;
+}
+.Color:hover span {
+  background: rgb(0,0,0,0.1);
+}

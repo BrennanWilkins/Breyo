@@ -90,6 +90,7 @@ router.post('/copy', auth, validate([
           }))
         })),
         labels: card.labels,
+        roadmapLabel: card.roadmapLabel,
         dueDate: card.dueDate,
         isArchived: false,
         members: card.members,

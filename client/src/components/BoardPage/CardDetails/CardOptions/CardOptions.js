@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import classes from './CardOptions.module.css';
 import PropTypes from 'prop-types';
-import { checklistIcon, labelIcon, clockIcon, copyIcon, archiveIcon, personIcon } from '../../../UI/icons';
+import { checklistIcon, labelIcon, clockIcon, copyIcon, archiveIcon, personIcon, roadmapIcon } from '../../../UI/icons';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import LabelModal from '../LabelModal/LabelModal';
 import DueDateModal from '../DueDateModal/DueDateModal';
 import ChecklistModal from '../ChecklistModal/ChecklistModal';
 import CopyCardModal from '../CopyCardModal/CopyCardModal';
 import AddCardMember from '../AddCardMember/AddCardMember';
+import RoadmapLabelModal from '../RoadmapLabelModal/RoadmapLabelModal';
 
 const CardOptions = props => {
   const [showLabelModal, setShowLabelModal] = useState(false);
@@ -15,6 +16,7 @@ const CardOptions = props => {
   const [showChecklistModal, setShowChecklistModal] = useState(false);
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [showRoadmapLabelModal, setShowRoadmapLabelModal] = useState(false);
 
   return (
     <div className={classes.Container}>
@@ -22,6 +24,8 @@ const CardOptions = props => {
       <span className={classes.BtnContainer}>
         <span className={classes.Btn}><ActionBtn clicked={() => setShowLabelModal(true)}>{labelIcon}Labels</ActionBtn></span>
         {showLabelModal && <LabelModal close={() => setShowLabelModal(false)} />}
+        <span className={`${classes.Btn} ${classes.RoadmapBtn}`}><ActionBtn clicked={() => setShowRoadmapLabelModal(true)}>{roadmapIcon}Roadmap Label</ActionBtn></span>
+        {showRoadmapLabelModal && <RoadmapLabelModal close={() => setShowRoadmapLabelModal(false)} />}
         <span className={classes.Btn}><ActionBtn clicked={() => setShowChecklistModal(true)}>{checklistIcon}Checklist</ActionBtn></span>
         {showChecklistModal && <ChecklistModal close={() => setShowChecklistModal(false)} />}
         <span className={classes.Btn}><ActionBtn clicked={() => setShowAddMemberModal(true)}>{personIcon}Member</ActionBtn></span>

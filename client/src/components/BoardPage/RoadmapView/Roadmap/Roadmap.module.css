@@ -45,12 +45,12 @@
 }
 .CardInnerContainer {
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 .CardInnerContainer:hover .Card {
   background: rgb(252,252,252);
 }
-.Card, .CardComplete {
+.Card {
   border-radius: 7px;
   background: white;
   box-sizing: border-box;
@@ -59,11 +59,15 @@
   height: 45px;
   box-shadow: var(--box-shadow7);
 }
-.CardComplete {
-  background: rgba(var(--green), 0.7);
-}
-.CardComplete:hover {
-  background: rgb(var(--green)) !important;
+.Card span {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  top: -1.4px;
+  left: -1.4px;
+  opacity: 0.5;
+  border-radius: 7px;
 }
 .CardTitle {
   font-size: 14px;
@@ -72,6 +76,12 @@
   left: 5px;
   line-height: 45px;
   white-space: nowrap;
+}
+.CardTitle svg {
+  position: relative;
+  top: 4px;
+  margin-right: 3px;
+  font-size: 17px;
 }
 .CardTitleInner {
   overflow: hidden;
@@ -127,7 +137,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  z-index: 3;
+  z-index: 4;
 }
 .ZoomBtns div {
   font-size: 20px;

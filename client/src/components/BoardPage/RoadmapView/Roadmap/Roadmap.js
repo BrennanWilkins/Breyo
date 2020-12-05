@@ -2,7 +2,7 @@ import React, { useState, useLayoutEffect } from 'react';
 import classes from './Roadmap.module.css';
 import PropTypes from 'prop-types';
 import { differenceInCalendarDays, max, min, eachMonthOfInterval, format, startOfMonth } from 'date-fns';
-import { zoomInIcon, zoomOutIcon } from '../../../UI/icons';
+import { zoomInIcon, zoomOutIcon, checkIcon } from '../../../UI/icons';
 
 const Roadmap = props => {
   const [defaultDayWidth, setDefaultDayWidth] = useState(10);
@@ -47,15 +47,17 @@ const Roadmap = props => {
       let dueDate = new Date(card.dueDate.dueDate);
       const width = calcCardWidth(startDate, dueDate);
       const margin = calcCardMargin(startDate ? startDate : dueDate, minDate);
-      if (startDate) { updatedMarkerDates.push({ date: startDate, left: margin }); }
-      updatedMarkerDates.push({ date: dueDate, left: margin + width });
-      // if calculated card width <= 30px then show card title outside card
+      if (startDate) { updatedMarkerDates.push({ date: startDate, left: margin, isStart: true }); }
+      updatedMarkerDates.push({ date: dueDate, left: margin + width, isStart: false });
+      // if calculated card width <= 50px then show card title outside card
       return (
         <div className={classes.CardContainer} key={card.cardID} style={{ width: `${width}px`, marginLeft: `${margin}px` }}>
           <div onClick={() => props.showDetails(card.cardID)} className={classes.CardInnerContainer}>
-            <div className={card.dueDate.isComplete ? classes.CardComplete : classes.Card}></div>
-            <div style={width <= 30 ? {left: `${width + 5}px`} : { width: `${width - 5}px` }}
-            className={`${classes.CardTitle} ${width >= 30 ? classes.CardTitleInner : ''}`}>{card.title}</div>
+            <div className={classes.Card}>
+              {card.roadmapLabel && <span style={{ background: card.roadmapLabel, border: `1.4px solid ${card.roadmapLabel}` }}></span>}
+            </div>
+            <div style={width <= 50 ? {left: `${width + 5}px`} : { width: `${width - 5}px` }}
+            className={`${classes.CardTitle} ${width >= 50 ? classes.CardTitleInner : ''}`}>{card.dueDate.isComplete && checkIcon}{card.title}</div>
           </div>
         </div>
       );
@@ -87,8 +89,8 @@ const Roadmap = props => {
         {monthRange.map((month, i) => (
           <div key={i} style={{ marginLeft: `${defaultDayWidth * 30 * i - 1.2}px`, width: `${defaultDayWidth * 30}px` }} className={classes.MonthSeparator}></div>
         ))}
-        {markerDates.map(({ date, left }, i) => (
-          <div key={i} className={classes.DateMarker} style={{ left: `${left - 10}px` }}>
+        {markerDates.map(({ date, left, isStart }, i) => (
+          <div key={i} className={classes.DateMarker} style={{ left: `${isStart ? left - 12 : left - 10}px` }}>
             <div className={classes.DateTooltip}>{format(date, `MMM d 'at' h:mm aa`)}</div>
             <div className={classes.MarkerBar}></div>
           </div>

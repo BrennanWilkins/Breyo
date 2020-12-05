@@ -39,3 +39,11 @@
     width: 48%;
   }
 }
+.RoadmapBtn button {
+  text-align: left;
+  padding-right: 2px;
+}
+.RoadmapBtn svg {
+  min-width: 15px;
+  min-height: 15px;
+}

@@ -75,6 +75,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
         title: card.title,
         desc: card.desc,
         members: card.members,
+        roadmapLabel: card.roadmapLabel,
         comments
       };
     });
@@ -105,6 +106,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
         title: card.title,
         desc: card.desc,
         members: card.members,
+        roadmapLabel: card.roadmapLabel,
         comments
       };
     });

@@ -22,6 +22,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.UPDATE_CARD_DESC: return updateCardDesc(state, action);
     case actionTypes.ADD_CARD_LABEL: return addCardLabel(state, action);
     case actionTypes.REMOVE_CARD_LABEL: return removeCardLabel(state, action);
+    case actionTypes.ADD_ROADMAP_LABEL: return addRoadmapLabel(state, action);
+    case actionTypes.REMOVE_ROADMAP_LABEL: return removeRoadmapLabel(state, action);
     case actionTypes.TOGGLE_DUE_DATE: return toggleDueDate(state, action);
     case actionTypes.ADD_DUE_DATE: return addDueDate(state, action);
     case actionTypes.REMOVE_DUE_DATE: return removeDueDate(state, action);
@@ -108,7 +110,7 @@ const addList = (state, action) => {
 const addCard = (state, action) => {
   const index = state.lists.findIndex(list => list.listID === action.listID);
   const cards = [...state.lists[index].cards];
-  cards.push({ title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID, members: [], comments: [] });
+  cards.push({ title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID, members: [], comments: [], roadmapLabel: null });
   const lists = [...state.lists];
   lists[index].cards = cards;
   return { ...state, lists };
@@ -146,6 +148,18 @@ const removeCardLabel = (state, action) => {
   const labels = [...card.labels];
   labels.splice(labels.indexOf(action.color), 1);
   card.labels = labels;
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const addRoadmapLabel = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  card.roadmapLabel = action.color;
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const removeRoadmapLabel = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  card.roadmapLabel = null;
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
@@ -307,6 +321,7 @@ const copyCard = (state, action) => {
   }));
   const newCard = { title: action.title, desc: '', checklists, dueDate: null, cardID: action.newCardID, members: [], comments: [] };
   newCard.labels = action.keepLabels ? [...action.currentCard.labels] : [];
+  newCard.roadmapLabel = action.keepLabels ? action.currentCard.roadmapLabel : null;
   cards.splice(action.destIndex, 0, newCard);
   list.cards = cards;
   lists[listIndex] = list;
@@ -404,6 +419,7 @@ const copyList = (state, action) => {
       })),
       dueDate: card.dueDate,
       labels: card.labels,
+      roadmapLabel: card.roadmapLabel,
       title: card.title,
       desc: card.desc,
       comments: [],

@@ -26,7 +26,8 @@ const CardSchema = new mongoose.Schema({
   labels: [],
   dueDate: {},
   members: [],
-  comments: [CommentSchema]
+  comments: [CommentSchema],
+  roadmapLabel: String
 });
 
 const ListSchema = new mongoose.Schema({
