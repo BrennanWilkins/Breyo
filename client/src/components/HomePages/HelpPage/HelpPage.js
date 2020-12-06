@@ -9,6 +9,7 @@ const HelpPage = () => {
   const ref4 = useRef();
   const ref5 = useRef();
   const ref6 = useRef();
+  const ref7 = useRef();
 
   const navigate = ref => {
     window.scrollTo({ top: ref.current.getBoundingClientRect().top + window.pageYOffset - 90, behavior: 'smooth' });
@@ -22,6 +23,7 @@ const HelpPage = () => {
       case 4: return navigate(ref4);
       case 5: return navigate(ref5);
       case 6: return navigate(ref6);
+      case 7: return navigate(ref7);
       default: return;
     }
   };
@@ -57,6 +59,11 @@ const HelpPage = () => {
           <p>If you would like to permanently delete a list or card, click on 'Archive' whether the board menu. From there you can delete any archived lists or cards.</p>
         </div>
         <div ref={ref6}>
+          <h2>Roadmaps</h2>
+          <p>The view your cards in the roadmap view, click on 'Roadmaps' on the board's page.
+          To add a card to the roadmap, add a start or due date to the card. You can add a roadmap label for the card in the card details modal.</p>
+        </div>
+        <div ref={ref7}>
           <h2>Card features</h2>
           <h3>Adding members to a card</h3>
           <p>To add a board member to a card, open the card details modal then click on 'Members' to add or remove members.</p>

@@ -23,7 +23,8 @@ const HelpNav = props => {
       <div onClick={() => navHandler(3)}>Creating a list</div>
       <div onClick={() => navHandler(4)}>Creating a card</div>
       <div onClick={() => navHandler(5)}>Deleting a list or card</div>
-      <div onClick={() => navHandler(6)}>Card features</div>
+      <div onClick={() => navHandler(6)}>Roadmaps</div>
+      <div onClick={() => navHandler(7)}>Card features</div>
     </>
   );
 
