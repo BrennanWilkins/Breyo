@@ -3,15 +3,16 @@ import classes from './BoardList.module.css';
 import { connect } from 'react-redux';
 import { starIcon } from '../../UI/icons';
 import { toggleIsStarred } from '../../../store/actions';
-import { withRouter } from 'react-router-dom';
+import { useHistory } from 'react-router';
 import PropTypes from 'prop-types';
 
 const BoardList = props => {
   const starRef = useRef();
+  let history = useHistory();
 
   const navHandler = (e, id) => {
     if (starRef.current.contains(e.target)) { return; }
-    props.history.push('/board/' + id);
+    history.push('/board/' + id);
   };
 
   return (
@@ -36,4 +37,4 @@ const mapDispatchToProps = dispatch => ({
   toggleIsStarred: boardID => dispatch(toggleIsStarred(boardID))
 });
 
-export default connect(null, mapDispatchToProps)(withRouter(BoardList));
+export default connect(null, mapDispatchToProps)(BoardList);
