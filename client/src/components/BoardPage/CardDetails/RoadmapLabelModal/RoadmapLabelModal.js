@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import classes from './RoadmapLabelModal.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import { LABEL_COLORS } from '../../../../utils/colors';
-import { CloseBtn } from '../../../UI/Buttons/Buttons';
 import { checkIcon } from '../../../UI/icons';
 import { connect } from 'react-redux';
 import { changeRoadmapLabel } from '../../../../store/actions';
+import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 
 const RoadmapLabelModal = props => {
   const modalRef = useRef();
@@ -19,7 +19,7 @@ const RoadmapLabelModal = props => {
 
   return (
     <div ref={modalRef} className={classes.Container}>
-      <div className={classes.Title}>Roadmap Label<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
+      <ModalTitle close={props.close} title="Roadmap Label" />
       {LABEL_COLORS.map((color, i) => (
         <div key={i} style={{background: color}} className={classes.Color} onClick={() => colorHandler(color)}>
           <span>{props.currentLabel === color && checkIcon}</span>

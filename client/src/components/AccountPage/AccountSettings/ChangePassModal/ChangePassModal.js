@@ -2,10 +2,10 @@ import React, { useRef, useState, useEffect } from 'react';
 import classes from './ChangePassModal.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
-import { CloseBtn } from '../../../UI/Buttons/Buttons';
 import { changePassValidation } from '../../../../utils/authValidation';
 import { instance as axios } from '../../../../axios';
 import { eyeIcon, eyeHideIcon, checkIcon } from '../../../UI/icons';
+import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 
 const ChangePassModal = props => {
   const modalRef = useRef();
@@ -45,7 +45,7 @@ const ChangePassModal = props => {
 
   return (
     <div className={classes.Container} ref={modalRef}>
-      <div className={classes.Title}>Change my password<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
+      <ModalTitle close={props.close} title="Change my password" />
       <div className={classes.Label}>Old password</div>
       <input type="password" value={oldPass} onChange={e => setOldPass(e.target.value)} />
       <div className={classes.Label}>New password</div>

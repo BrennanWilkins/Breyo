@@ -10,24 +10,6 @@
   padding: 5px;
   box-sizing: border-box;
 }
-.Title {
-  position: relative;
-  text-align: center;
-  padding-bottom: 10px;
-  border-bottom: 1.2px solid #ddd;
-  color: rgb(103, 103, 103);
-  font-size: 15px;
-  line-height: 29px;
-  margin: 5px;
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-.CloseBtn button {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin: 0;
-}
 .Label {
   font-size: 13px;
   margin: 4px 5px;

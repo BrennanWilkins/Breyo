@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './calendarStyles.css';
 import { connect } from 'react-redux';
 import { addDueDate, removeDueDate } from '../../../../store/actions';
+import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 
 const DueDateModal = props => {
   const modalRef = useRef();
@@ -39,7 +40,7 @@ const DueDateModal = props => {
 
   return (
     <div ref={modalRef} className={props.fromDueDate ? classes.DueDateContainer : classes.Container}>
-      <div className={classes.Title}>Due Date<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
+      <ModalTitle close={props.close} title="Due Date" />
       <div className={classes.DatePicker}>
         {!showStartDatePicker && <div className={classes.AddStartDateBtn} onClick={startDatePickerHandler}>Add a start date</div>}
         {showStartDatePicker && <div className={classes.RemoveStartDateBtn}><CloseBtn close={startDatePickerHandler} /></div>}

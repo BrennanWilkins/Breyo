@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import classes from './LabelModal.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import { LABEL_COLORS } from '../../../../utils/colors';
-import { CloseBtn } from '../../../UI/Buttons/Buttons';
 import { checkIcon } from '../../../UI/icons';
 import { connect } from 'react-redux';
 import { addCardLabel, removeCardLabel } from '../../../../store/actions';
+import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 
 const LabelModal = props => {
   const modalRef = useRef();
@@ -31,7 +31,7 @@ const LabelModal = props => {
 
   return (
     <div ref={modalRef} className={props.openFromMiddle ? classes.MiddleContainer : classes.Container}>
-      <div className={classes.Title}>Labels<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
+      <ModalTitle close={props.close} title="Labels" />
       {LABEL_COLORS.map((color, i) => (
         <div key={i} style={{background: color}} className={classes.Color} onClick={() => colorHandler(color)}>
           <span>{props.labels.includes(color) && checkIcon}</span>

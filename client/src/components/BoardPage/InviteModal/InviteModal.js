@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classes from './InviteModal.module.css';
-import Button, { CloseBtn } from '../../UI/Buttons/Buttons';
+import Button from '../../UI/Buttons/Buttons';
 import { useModalToggle, useModalPos } from '../../../utils/customHooks';
 import { connect } from 'react-redux';
 import { sendInvite } from '../../../store/actions';
+import ModalTitle from '../../UI/ModalTitle/ModalTitle';
 
 const InviteModal = props => {
   const [email, setEmail] = useState('');
@@ -14,10 +15,7 @@ const InviteModal = props => {
 
   return (
     <div className={classes.Container} ref={modalRef}>
-      <div className={classes.Title}>
-        Add a new member
-        <CloseBtn close={props.close} />
-      </div>
+      <ModalTitle close={props.close} title="Add a new member" light />
       <div className={classes.Input}>
         <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter user's email" />
         <Button disabled={email === '' || !props.isAdmin} clicked={() => { props.sendInvite(email, props.boardID); props.close(); }}>Send Invite</Button>

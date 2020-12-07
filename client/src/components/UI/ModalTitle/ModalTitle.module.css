@@ -1,0 +1,29 @@
+.Title, .LightTitle, .LighterTitle {
+  position: relative;
+  text-align: center;
+  padding-bottom: 7px;
+  border-bottom: 1.2px solid #ddd;
+  color: rgb(103, 103, 103);
+  font-size: 15px;
+  line-height: 29px;
+  margin: 5px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.LightTitle, .LighterTitle {
+  margin: 0 10px;
+  padding-bottom: 10px;
+  font-weight: 400;
+}
+.LighterTitle {
+  color: rgb(124, 124, 124);
+}
+.LightTitle {
+  color: rgb(112, 112, 112);
+}
+.CloseBtn button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+}

@@ -1,9 +1,9 @@
 import React, { useRef } from 'react';
 import classes from './FormattingModal.module.css';
 import { useModalToggle } from '../../../utils/customHooks';
-import { CloseBtn } from '../../UI/Buttons/Buttons';
 import { arrowIcon } from '../../UI/icons';
 import PropTypes from 'prop-types';
+import ModalTitle from '../../UI/ModalTitle/ModalTitle';
 
 const FormattingModal = props => {
   const modalRef = useRef();
@@ -11,10 +11,7 @@ const FormattingModal = props => {
 
   return (
     <div ref={modalRef} className={classes.Container}>
-      <div className={classes.Title}>
-        Formatting Help
-        <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
-      </div>
+      <ModalTitle close={props.close} title="Formatting Help" lighter />
       <div className={classes.Option}>
         <div>Bold</div>
         <span>*This text will be bold*{arrowIcon}</span>

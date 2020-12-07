@@ -25,23 +25,6 @@
   border-radius: 15px;
   background: rgb(197, 197, 197);
 }
-.Title {
-  position: relative;
-  text-align: center;
-  padding-bottom: 10px;
-  border-bottom: 1.2px solid #ddd;
-  color: rgb(124, 124, 124);
-  font-size: 15px;
-  line-height: 29px;
-  margin: 0 10px;
-  font-weight: 400;
-}
-.CloseBtn button {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin: 0;
-}
 .Option {
   padding: 18px 5px;
   margin: 0 10px;

@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import classes from './DeleteAccntModal.module.css';
-import { CloseBtn } from '../../../UI/Buttons/Buttons';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { deleteAccount } from '../../../../store/actions';
+import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 
 const DeleteAccntModal = props => {
   const modalRef = useRef();
@@ -19,7 +19,7 @@ const DeleteAccntModal = props => {
 
   return (
     <div className={classes.Container} ref={modalRef}>
-      <div className={classes.Title}>Delete my account<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
+      <ModalTitle close={props.close} title="Delete my account" />
       <div className={classes.Info}>
         Deleting your account cannot be undone. Any boards in which you are the only member will be deleted, and any boards in which you are the only
         admin will result in all other members being promoted to admin.

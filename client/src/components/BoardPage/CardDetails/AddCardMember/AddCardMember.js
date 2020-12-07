@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import classes from './AddCardMember.module.css';
-import { CloseBtn, AccountBtn } from '../../../UI/Buttons/Buttons';
+import { AccountBtn } from '../../../UI/Buttons/Buttons';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { checkIcon } from '../../../UI/icons';
 import { addCardMember, removeCardMemberCurrentCard } from '../../../../store/actions';
+import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 
 const AddCardMember = props => {
   const modalRef = useRef();
@@ -37,7 +38,7 @@ const AddCardMember = props => {
 
   return (
     <div ref={modalRef} className={props.fromList ? classes.FromListContainer : classes.Container}>
-      <div className={classes.Title}>Members<span className={classes.CloseBtn}><CloseBtn close={props.close} /></span></div>
+      <ModalTitle close={props.close} title="Members" />
       <div className={classes.SubTitle}>BOARD MEMBERS</div>
       {boardMembers.map((member, i) => (
         <div key={member.email} className={classes.Member} onClick={() => memberHandler(i)}>
