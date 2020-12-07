@@ -15,6 +15,7 @@ const ForgotPage = lazy(() => import('./components/AuthPages/ForgotPage'));
 const BoardPage = lazy(() => import('./components/BoardPage/BoardPage/BoardPage'));
 const HelpPage = lazy(() => import('./components/HomePages/HelpPage/HelpPage'));
 const TechPage = lazy(() => import('./components/HomePages/TechPage/TechPage'));
+const AccountPage = lazy(() => import('./components/AccountPage/AccountPage'));
 
 const App = props => {
   useEffect(() => props.autoLogin(), []);
@@ -29,6 +30,7 @@ const App = props => {
             <Route exact path="/" render={() => <Suspense fallback={<Spinner />}><DashboardPage /></Suspense>} />
             <Route path="/board/:boardID" render={() => <Suspense fallback={<Spinner />}><BoardPage /></Suspense>} />
             <Route exact path="/help" render={() => <Suspense fallback={<Spinner />}><HelpPage /></Suspense>} />
+            <Route exact path="/my-account" render={() => <Suspense fallback={<Spinner />}><AccountPage /></Suspense>} />
             <Redirect to="/" />
           </Switch>
         </>

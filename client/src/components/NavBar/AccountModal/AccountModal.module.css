@@ -3,12 +3,11 @@
   top: 45px;
   right: 5px;
   width: 300px;
-  height: 400px;
   background: white;
   transition: 250ms;
   box-shadow: var(--box-shadow4);
   border-radius: 4px;
-  padding: 10px 0;
+  padding: 10px 0 15px;
   box-sizing: border-box;
   font-size: 15px;
   overflow: hidden;
@@ -37,14 +36,20 @@
 .Options {
   padding-top: 15px;
 }
-.Options div {
-  padding: 8px 10px;
+.Options div, .Options a {
+  padding: 8px 0 8px 15px;
   cursor: pointer;
 }
 .Options a {
   display: block;
-  padding: 8px 10px;
   color: inherit;
+}
+.LineBreak {
+  margin: 15px auto;
+  display: block;
+  width: 280px;
+  height: 0.8px;
+  background: #ddd;
 }
 .Options div:hover, .Options a:hover {
   background: rgb(241, 241, 241);

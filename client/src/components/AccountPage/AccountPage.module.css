@@ -1,0 +1,64 @@
+.Container {
+  position: fixed;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 40px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.AccountInfo {
+  padding: 30px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 80%;
+  margin: auto;
+  text-align: center;
+}
+.NameIcon {
+  width: 55px;
+  height: 55px;
+  text-align: center;
+  text-transform: uppercase;
+  border-radius: 100px;
+  background: #ddd;
+  line-height: 55px;
+  font-weight: 500;
+  font-size: 28px;
+  margin: 10px 0;
+}
+.Name {
+  font-weight: 500;
+  font-size: 23px;
+  margin: 10px;
+}
+.Email {
+  margin: 10px 0;
+  font-size: 21px;
+  color: rgb(111, 111, 111);
+}
+.Btns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.Btns button {
+  width: 120px;
+  border-radius: 4px;
+  outline: none;
+  border: 0;
+  height: 40px;
+  line-height: 40px;
+  margin: 0 10px;
+  font-size: 16px;
+  font-weight: bold;
+  background: rgb(220,220,220);
+  cursor: pointer;
+}
+.ActiveBtn {
+  background: rgb(200,200,200) !important;
+}

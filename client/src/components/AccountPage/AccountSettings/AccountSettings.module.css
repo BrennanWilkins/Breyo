@@ -1,0 +1,18 @@
+.Container {
+  background: white;
+  flex-grow: 1;
+  position: relative;
+}
+.Option {
+  margin: 30px auto;
+  text-decoration: underline;
+  text-align: center;
+  cursor: pointer;
+  padding: 10px 0;
+  max-width: 600px;
+  border-radius: 4px;
+  width: 90%;
+}
+.Option:hover {
+  background: rgb(240,240,240);
+}
