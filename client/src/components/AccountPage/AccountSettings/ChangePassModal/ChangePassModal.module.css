@@ -1,7 +1,7 @@
 .Container {
   position: absolute;
   width: 300px;
-  height: 350px;
+  /* height: 350px; */
   background: white;
   box-shadow: var(--box-shadow4);
   border-radius: 3px;
@@ -66,4 +66,41 @@
 }
 .SaveBtn:hover {
   background: rgb(var(--green), 0.8);
+}
+.SaveBtn:disabled {
+  background: rgb(170,170,170);
+}
+.ErrMsg, .HideErrMsg {
+  text-align: center;
+  padding: 10px;
+  color: red;
+  font-size: 14px;
+  transition: all 300ms;
+}
+.HideErrMsg {
+  opacity: 0;
+  visibility: hidden;
+}
+.NewPassContainer {
+  position: relative;
+}
+.EyeIcon {
+  position: absolute;
+  top: 7px;
+  right: 12px;
+  cursor: pointer;
+  color: rgb(100,100,100);
+}
+.NewPassContainer input {
+  padding-right: 30px;
+}
+.SuccessMsg {
+  color: rgb(var(--green));
+  font-size: 14px;
+  text-align: center;
+  padding: 10px;
+}
+.SuccessMsg svg {
+  position: relative;
+  top: 3px;
 }

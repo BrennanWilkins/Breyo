@@ -24,12 +24,12 @@ const AccountModal = props => {
       {showInvites ? <Invites close={props.close} email={props.email} fullName={props.fullName} /> :
       <><AccountInfo fullName={props.fullName} email={props.email} givePadding />
       <div className={classes.Options}>
-        <div onClick={() => setShowInvites(true)}>Invites</div>
-        <Link to="/my-account?view=activity">Activity</Link>
-        <Link to="/my-account?view=settings">Settings</Link>
+        <div className={classes.Option} onClick={() => setShowInvites(true)}>Invites</div>
+        <div className={classes.Link} onClick={props.close}><Link to="/my-account?view=activity">Activity</Link></div>
+        <div className={classes.Link} onClick={props.close}><Link to="/my-account?view=settings">Settings</Link></div>
         <span className={classes.LineBreak}></span>
-        <Link to="/help">Help</Link>
-        <div onClick={props.logout}>Log Out</div>
+        <div className={classes.Link} onClick={props.close}><Link to="/help">Help</Link></div>
+        <div className={classes.Option} onClick={props.logout}>Log Out</div>
       </div></>}
     </div>
   );

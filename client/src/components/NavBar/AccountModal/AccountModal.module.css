@@ -36,11 +36,11 @@
 .Options {
   padding-top: 15px;
 }
-.Options div, .Options a {
+.Option, .Link a {
   padding: 8px 0 8px 15px;
   cursor: pointer;
 }
-.Options a {
+.Link a {
   display: block;
   color: inherit;
 }
@@ -51,7 +51,7 @@
   height: 0.8px;
   background: #ddd;
 }
-.Options div:hover, .Options a:hover {
+.Option:hover, .Link:hover {
   background: rgb(241, 241, 241);
 }
 .ShowBackBtn button, .HideBackBtn button {

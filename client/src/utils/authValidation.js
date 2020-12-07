@@ -43,3 +43,25 @@ export const loginValidation = (email, pass) => {
   }
   return '';
 }
+
+export const changePassValidation = (oldPass, newPass, confPass) => {
+  if (!oldPass.length) {
+    return 'Please enter your old password.';
+  }
+  if (!newPass.length) {
+    return 'Please enter your new password.';
+  }
+  if (!confPass.length) {
+    return 'Please re-enter your new password.';
+  }
+  if (newPass.length < 8) {
+    return 'Your new password must be at least 8 characters.';
+  }
+  if (newPass.length > 100) {
+    return 'Your new password cannot be over 100 characters.';
+  }
+  if (newPass !== confPass) {
+    return 'New password and confirm password must be the same.';
+  }
+  return '';
+};
