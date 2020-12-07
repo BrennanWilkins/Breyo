@@ -30,7 +30,7 @@ const ChangePassModal = props => {
     }
     try {
       setLoading(true);
-      await axios.post('auth/changePass', { newPassword: newPass, oldPassword: oldPass, confirmPassword: confirmPass });
+      await axios.post('/auth/changePass', { newPassword: newPass, oldPassword: oldPass, confirmPassword: confirmPass });
       setLoading(false);
       setChangeSuccess(true);
     } catch (err) {

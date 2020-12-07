@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import classes from './AccountSettings.module.css';
 import ChangePassModal from './ChangePassModal/ChangePassModal';
+import DeleteAccntModal from './DeleteAccntModal/DeleteAccntModal';
 
 const AccountSettings = props => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -11,6 +12,7 @@ const AccountSettings = props => {
       <div className={classes.Option} onClick={() => setShowPasswordModal(true)}>Change Password</div>
       <div className={classes.Option} onClick={() => setShowDeleteModal(true)}>Delete my account</div>
       {showPasswordModal && <ChangePassModal close={() => setShowPasswordModal(false)} />}
+      {showDeleteModal && <DeleteAccntModal close={() => setShowDeleteModal(false)} />}
     </div>
   );
 };

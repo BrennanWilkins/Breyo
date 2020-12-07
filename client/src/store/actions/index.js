@@ -1,4 +1,5 @@
-export { login, logout, loginErr, signupErr, signup, authReset, autoLogin, getUserData } from './auth';
+export { login, logout, loginErr, signupErr, signup, authReset, autoLogin, getUserData,
+deleteAccount } from './auth';
 export { createBoard, toggleIsStarred, updateActiveBoard, updateBoardTitle, sendInvite,
 addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc, deleteBoard, acceptInvite,
 rejectInvite, leaveBoard, openRoadmap, setShownRoadmapList, closeRoadmap, openRoadmapList } from './board';

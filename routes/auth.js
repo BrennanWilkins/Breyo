@@ -80,7 +80,7 @@ router.post('/autoLogin', auth,
   }
 );
 
-router.post('/changePass', auth, validate([body('newPassword').isLength({ min: 8, max: 100 })],'There is an error in one of the fields.'),
+router.post('/changePass', auth, validate([body('newPassword').isLength({ min: 8, max: 100 })], 'There is an error in one of the fields.'),
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
@@ -95,6 +95,38 @@ router.post('/changePass', auth, validate([body('newPassword').isLength({ min: 8
       await user.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
+  }
+);
+
+router.delete('/deleteAccount', auth,
+  async (req, res) => {
+    try {
+      const user = await User.findByIdAndDelete(req.userID);
+      for (let board of user.boards) {
+        if (!board.isAdmin) { continue; }
+        const board = await Board.findById(board.boardID);
+        // if user is only member of board then delete board
+        if (board.members.length === 1) {
+          await board.remove();
+          // remove all of board's lists & activities
+          await List.deleteMany({ boardID: board.boardID });
+          await Activity.deleteMany({ boardID: board.boardID });
+        } else {
+          // if user is admin of board then check if theres another admin, if not then promote all other users to admin
+          const adminCount = board.members.filter(member => member.isAdmin).length;
+          if (adminCount >= 2) { continue; }
+          board.members = board.members.filter(member => member.email !== user.email).map(member => ({ ...member, isAdmin: true }));
+          await board.save();
+          for (let boardMember of board.members) {
+            const member = await User.findOne({ email: boardMember.email });
+            const matchingBoard = member.boards.find(userBoard => userBoard.boardID === board.boardID);
+            matchingBoard.isAdmin = true;
+            await member.save();
+          }
+        }
+      }
+      res.sendStatus(200);
+    } catch (err) { console.log(err); res.sendStatus(500); }
   }
 );
 

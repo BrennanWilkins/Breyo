@@ -1,6 +1,7 @@
 import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
 import { addNotif } from './notifications';
+import { sendUpdate } from './socket';
 
 const loginDispatch = payload => ({ type: actionTypes.LOGIN, payload });
 
@@ -74,4 +75,13 @@ export const autoLogin = () => async dispatch => {
     dispatch(loginDispatch(res.data));
     dispatch({ type: actionTypes.AUTO_LOGIN_LOADING, bool: false });
   } catch (err) { dispatch(logout()); }
-}
+};
+
+export const deleteAccount = () => async dispatch => {
+  try {
+    await axios.delete('auth/deleteAccount');
+    dispatch(logout());
+  } catch (err) {
+    dispatch(addNotif('There was an error while deleting your account.'));
+  }
+};

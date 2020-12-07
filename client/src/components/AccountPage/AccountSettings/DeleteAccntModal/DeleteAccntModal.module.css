@@ -1,12 +1,12 @@
 .Container {
   position: absolute;
-  width: 300px;
+  width: 400px;
   background: white;
   box-shadow: var(--box-shadow4);
   border-radius: 3px;
-  top: 70px;
+  top: 140px;
   border: 1px solid #ddd;
-  left: calc(50% - 150px);
+  left: calc(50% - 200px);
   padding: 5px;
   box-sizing: border-box;
 }
@@ -28,16 +28,16 @@
   top: 0;
   margin: 0;
 }
-.Label {
-  font-size: 13px;
-  margin: 4px 5px;
+.Info {
+  font-size: 15px;
+  padding: 0 10px 10px;
   font-weight: 500;
-  color: rgb(120,120,120);
+  text-align: center;
 }
-.Container input {
+.Input {
   display: block;
-  width: calc(100% - 10px);
-  margin: 0 auto 10px;
+  width: calc(100% - 20px);
+  margin: 10px auto;
   padding: 6px 7px;
   box-sizing: border-box;
   border-radius: 4px;
@@ -45,61 +45,29 @@
   outline: none;
   background: rgb(250,250,250);
 }
-.Container input:hover {
+.Input:hover {
   background: rgb(240,240,240);
 }
-.Container input:focus {
+.Input:focus {
   border: 2px solid rgb(var(--red));
   background: white;
 }
-.SaveBtn {
-  background: rgb(var(--green));
+.DeleteBtn {
+  display: block;
+  background: red;
   border-radius: 4px;
   outline: none;
   border: 0;
   color: white;
   padding: 8px 10px;
   font-size: 14px;
-  margin: 5px;
+  margin: 20px auto;
   cursor: pointer;
+  transition: background 250ms;
 }
-.SaveBtn:hover {
-  background: rgb(var(--green), 0.8);
+.DeleteBtn:hover {
+  background: rgb(207, 4, 4);
 }
-.SaveBtn:disabled {
+.DeleteBtn:disabled {
   background: rgb(170,170,170);
-}
-.ErrMsg, .HideErrMsg {
-  text-align: center;
-  padding: 10px;
-  color: red;
-  font-size: 14px;
-  transition: all 300ms;
-}
-.HideErrMsg {
-  opacity: 0;
-  visibility: hidden;
-}
-.NewPassContainer {
-  position: relative;
-}
-.EyeIcon {
-  position: absolute;
-  top: 7px;
-  right: 12px;
-  cursor: pointer;
-  color: rgb(100,100,100);
-}
-.NewPassContainer input {
-  padding-right: 30px;
-}
-.SuccessMsg {
-  color: rgb(var(--green));
-  font-size: 14px;
-  text-align: center;
-  padding: 10px;
-}
-.SuccessMsg svg {
-  position: relative;
-  top: 3px;
 }
