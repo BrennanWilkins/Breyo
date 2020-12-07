@@ -1,0 +1,32 @@
+.AccountInfo {
+  padding: 40px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 80%;
+  margin: auto;
+  text-align: center;
+}
+.NameIcon {
+  width: 55px;
+  height: 55px;
+  text-align: center;
+  text-transform: uppercase;
+  border-radius: 100px;
+  background: #ddd;
+  line-height: 55px;
+  font-weight: 500;
+  font-size: 28px;
+  margin: 10px 0;
+}
+.Name {
+  font-weight: 500;
+  font-size: 23px;
+  margin: 10px;
+}
+.Email {
+  margin: 10px 0;
+  font-size: 20px;
+  color: rgb(111, 111, 111);
+}

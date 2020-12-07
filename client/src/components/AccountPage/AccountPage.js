@@ -5,6 +5,7 @@ import AccountSettings from './AccountSettings/AccountSettings';
 import UserActivity from './UserActivity/UserActivity';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import AccountHeader from './AccountHeader/AccountHeader';
 
 const AccountPage = props => {
   const [showSettings, setShowSettings] = useState(true);
@@ -15,11 +16,7 @@ const AccountPage = props => {
 
   return (
     <div className={classes.Container}>
-      <div className={classes.AccountInfo}>
-        <div className={classes.NameIcon}>{props.fullName.slice(0, 1)}</div>
-        <div className={classes.Name}>{props.fullName}</div>
-        <div className={classes.Email}>{props.email}</div>
-      </div>
+      <AccountHeader email={props.email} fullName={props.fullName} />
       <div className={classes.Btns}>
         <button className={!showSettings ? classes.ActiveBtn : null} onClick={() => setShowSettings(false)}>Activity</button>
         <button className={showSettings ? classes.ActiveBtn : null} onClick={() => setShowSettings(true)}>Settings</button>
