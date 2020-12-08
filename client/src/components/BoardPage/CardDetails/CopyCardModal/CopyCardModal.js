@@ -8,11 +8,10 @@ import PropTypes from 'prop-types';
 import { Checkbox } from '../../../UI/Inputs/Inputs';
 import { copyCard } from '../../../../store/actions';
 import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
+import Select from '../../../UI/Select/Select';
 
 const CopyCardModal = props => {
   const modalRef = useRef();
-  const listRef = useRef();
-  const positionRef = useRef();
   useModalToggle(true, modalRef, props.close);
   const [cardTitle, setCardTitle] = useState(props.currentCardTitle);
   const [keepChecklists, setKeepChecklists] = useState(true);
@@ -21,20 +20,13 @@ const CopyCardModal = props => {
   const [cardPosition, setCardPosition] = useState(0);
   const [positionArr, setPositionArr] = useState([]);
   const [selectedListID, setSelectedListID] = useState(props.currentListID);
-  const [showListSelect, setShowListSelect] = useState(false);
-  const [showPositionSelect, setShowPositionSelect] = useState(false);
-  useModalToggle(showListSelect, listRef, () => setShowListSelect(false));
-  useModalToggle(showPositionSelect, positionRef, () => setShowPositionSelect(false));
 
   useEffect(() => {
     const cards = props.lists.find(list => list.listID === selectedListID).cards;
     setCardPosition(cards.length);
     // create array of size cards.length + 1 to show all possible card positions
     setPositionArr([...Array(cards.length + 1)]);
-    setShowListSelect(false);
   }, [selectedListID]);
-
-  useEffect(() => setShowPositionSelect(false), [cardPosition]);
 
   const copyHandler = () => {
     if (cardTitle.length > 200) { return; }
@@ -53,26 +45,18 @@ const CopyCardModal = props => {
       </div>
       <div className={classes.CopyTitle}>COPY TO</div>
       <div className={classes.Selects}>
-        <div className={classes.ListSelect} onClick={() => setShowListSelect(true)}>
-          <div className={classes.SelectTitle}>List</div>
-          <div className={classes.SelectVal}>{listTitle}</div>
-          {showListSelect && <div className={classes.SelectModal} ref={listRef}>
-            {props.lists.map(list => (
-              <div key={list.listID} onClick={() => { setSelectedListID(list.listID); setListTitle(list.title); }}
-              className={list.listID === selectedListID ? classes.ActiveOption : classes.Option}>{list.title}</div>
-            ))}
-          </div>}
-        </div>
-        <div className={classes.PositionSelect} onClick={() => setShowPositionSelect(true)}>
-          <div className={classes.SelectTitle}>Position</div>
-          <div className={classes.SelectVal}>{cardPosition + 1}</div>
-          {showPositionSelect && <div className={classes.SelectModal} ref={positionRef}>
-            {positionArr.map((_, i) => (
-              <div key={i} onClick={() => setCardPosition(i)}
-              className={cardPosition === i ? classes.ActiveOption : classes.Option}>{i + 1}</div>
-            ))}
-          </div>}
-        </div>
+        <Select title="List" currentValue={listTitle} classNames={[classes.ListSelect]}>
+          {props.lists.map(list => (
+            <div key={list.listID} onClick={() => { setSelectedListID(list.listID); setListTitle(list.title); }}
+            className={list.listID === selectedListID ? classes.ActiveOption : null}>{list.title}</div>
+          ))}
+        </Select>
+        <Select title="Position" currentValue={String(cardPosition + 1)} classNames={[classes.PositionSelect]}>
+          {positionArr.map((_, i) => (
+            <div key={i} onClick={() => setCardPosition(i)}
+            className={cardPosition === i ? classes.ActiveOption : null}>{i + 1}</div>
+          ))}
+        </Select>
       </div>
       <div className={classes.CopyBtn}><Button clicked={copyHandler}>Copy Card</Button></div>
     </div>

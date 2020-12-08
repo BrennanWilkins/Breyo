@@ -66,56 +66,15 @@
   align-items: center;
   padding: 0 10px;
 }
-.ListSelect, .PositionSelect {
-  background: rgb(240, 240, 240);
-  border-radius: 4px;
+.ListSelect {
   width: 60%;
-  padding: 5px 8px;
-  box-sizing: border-box;
-  cursor: pointer;
-  position: relative;
-}
-.ListSelect:hover, .PositionSelect:hover {
-  background: rgb(230,230,230);
 }
 .PositionSelect {
   width: 40%;
   margin-left: 5px;
 }
-.SelectTitle {
-  color: rgb(var(--darkGray));
-  font-size: 13px;
-  margin-bottom: 5px;
-}
-.SelectVal {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 14.5px;
-}
-.SelectModal {
-  width: 100%;
-  position: absolute;
-  top: 50px;
-  left: 0;
-  background: white;
-  box-shadow: var(--box-shadow4);
-  max-height: 300px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-.Option, .ActiveOption {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 14.5px;
-  padding: 10px 5px;
-}
-.Option:hover {
-  background: rgb(var(--red), 0.3);
-}
 .ActiveOption {
-  background: rgb(var(--red), 0.5);
+  background: rgb(var(--red), 0.5) !important;
 }
 .CopyBtn button {
   background: rgb(var(--green));
