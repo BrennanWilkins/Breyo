@@ -54,7 +54,7 @@ const Roadmap = props => {
         <div className={classes.CardContainer} key={card.cardID} style={{ width: `${width}px`, marginLeft: `${margin}px` }}>
           <div onClick={() => props.showDetails(card.cardID)} className={classes.CardInnerContainer}>
             <div className={classes.Card}>
-              {card.roadmapLabel && <span style={{ background: card.roadmapLabel, border: `1.4px solid ${card.roadmapLabel}` }}></span>}
+              {card.roadmapLabel && <span style={{ background: card.roadmapLabel, border: `2px solid ${card.roadmapLabel}` }}></span>}
             </div>
             <div style={width <= 50 ? {left: `${width + 5}px`} : { width: `${width - 5}px` }}
             className={`${classes.CardTitle} ${width >= 50 ? classes.CardTitleInner : ''}`}>{card.dueDate.isComplete && checkIcon}{card.title}</div>

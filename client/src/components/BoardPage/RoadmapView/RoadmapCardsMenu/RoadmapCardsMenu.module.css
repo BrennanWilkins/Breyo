@@ -50,6 +50,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin: 8px 0;
 }
 .Card:hover {
   background: rgb(246,246,246);
