@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classes from './Card.module.css';
-import { editIcon, clockIcon, checklistIcon, commentIcon } from '../../../UI/icons';
+import { editIcon, clockIcon, checklistIcon, commentIcon, descIcon } from '../../../UI/icons';
 import { format } from 'date-fns';
 import { Draggable } from 'react-beautiful-dnd';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
@@ -44,6 +44,7 @@ const Card = props => {
               <div className={props.dueDate.isComplete ? `${classes.Btn} ${classes.BtnComplete}` : classes.Btn}>
                 {clockIcon}{format(new Date(props.dueDate.dueDate), 'MMM d')}
               </div>}
+            {props.desc !== '' && <div className={classes.Btn}>{descIcon}</div>}
             {totalChecklists > 0 &&
               <div className={completedChecklists === totalChecklists ? `${classes.Btn} ${classes.BtnComplete}` : classes.Btn}>
                 {checklistIcon}{completedChecklists}/{totalChecklists}
@@ -80,7 +81,8 @@ Card.propTypes = {
   setEmail: PropTypes.func.isRequired,
   setFullName: PropTypes.func.isRequired,
   setTop: PropTypes.func.isRequired,
-  setLeft: PropTypes.func.isRequired
+  setLeft: PropTypes.func.isRequired,
+  desc: PropTypes.string.isRequired
 };
 
 export default Card;
