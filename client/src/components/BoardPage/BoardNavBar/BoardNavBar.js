@@ -47,7 +47,7 @@ const BoardNavBar = props => {
       <span className={classes.Separator}></span>
       {props.members.map(member => (
         <span key={member.email} className={classes.Container}>
-          <span className={classes.AccountBtn}><AccountBtn clicked={() => setShowMember(member.email)}>{member.fullName.slice(0,1)}</AccountBtn></span>
+          <span className={classes.AccountBtn}><AccountBtn clicked={() => setShowMember(member.email)} title={member.fullName}>{member.fullName.slice(0,1)}</AccountBtn></span>
           {showMember === member.email &&
             <MemberModal close={() => setShowMember('')} fullName={member.fullName} email={member.email} userEmail={props.userEmail}
             isAdmin={member.isAdmin} adminCount={adminCount} userIsAdmin={props.userIsAdmin} boardID={props.boardID} />}

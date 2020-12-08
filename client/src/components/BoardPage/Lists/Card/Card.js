@@ -5,6 +5,7 @@ import { editIcon, clockIcon, checklistIcon, commentIcon, descIcon } from '../..
 import { format } from 'date-fns';
 import { Draggable } from 'react-beautiful-dnd';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
+import formatDate from '../../../../utils/formatDate';
 
 const Card = props => {
   const [completedChecklists, setCompletedChecklists] = useState(0);
@@ -41,7 +42,7 @@ const Card = props => {
           <div className={classes.Title}>{props.title}</div>
           <div className={classes.Btns}>
             {props.dueDate &&
-              <div className={props.dueDate.isComplete ? `${classes.Btn} ${classes.BtnComplete}` : classes.Btn}>
+              <div title={'Due ' + formatDate(new Date(props.dueDate.dueDate))} className={props.dueDate.isComplete ? `${classes.Btn} ${classes.BtnComplete}` : classes.Btn}>
                 {clockIcon}{format(new Date(props.dueDate.dueDate), 'MMM d')}
               </div>}
             {props.desc !== '' && <div className={classes.Btn}>{descIcon}</div>}
@@ -56,7 +57,7 @@ const Card = props => {
             {props.members.map(member => (
               <div key={member.email} className={classes.Member}>
                 <span className={classes.AccountBtn}>
-                  <AccountBtn clicked={e => accountBtnClickHandler(e, member.email, member.fullName)}>{member.fullName.slice(0, 1)}</AccountBtn>
+                  <AccountBtn title={member.fullName} clicked={e => accountBtnClickHandler(e, member.email, member.fullName)}>{member.fullName.slice(0, 1)}</AccountBtn>
                 </span>
               </div>
             ))}

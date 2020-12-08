@@ -7,7 +7,7 @@ const Button = props => (
 );
 
 export const AccountBtn = props => (
-  <button className={classes.AccountBtn} onClick={props.clicked}>{props.children}</button>
+  <button className={classes.AccountBtn} onClick={props.clicked} title={props.title}>{props.children}</button>
 );
 
 export const CloseBtn = props => (

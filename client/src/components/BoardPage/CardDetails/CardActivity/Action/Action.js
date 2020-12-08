@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { AccountBtn } from '../../../../UI/Buttons/Buttons';
 import Commenter from '../Commenter/Commenter';
 import parseActionMsg from '../../../../../utils/parseActionMsg';
-import formatDate from '../../../../../utils/formatDate';
+import formatDate, { formatDateLong } from '../../../../../utils/formatDate';
 import { Link } from 'react-router-dom';
 
 const Action = props => {
@@ -29,7 +29,7 @@ const Action = props => {
           <span className={classes.Msg}>{msg}</span>
         </div>
         <div className={classes.Date}>
-          {formatDate(props.date)}
+          <span title={formatDateLong(props.date)}>{formatDate(props.date)}</span>
           {props.boardTitle && <div className={classes.BoardLink}><span>-</span>in board <Link to={`/board/${props.boardID}`}>{props.boardTitle}</Link></div>}
         </div>
       </div>

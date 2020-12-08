@@ -10,4 +10,8 @@ const formatDate = date => {
   return formatted;
 };
 
+export const formatDateLong = date => {
+  return format(new Date(date), 'PPPp');
+};
+
 export default formatDate;

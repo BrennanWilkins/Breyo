@@ -15,7 +15,9 @@ const CardMembers = props => {
       <div className={classes.Title}>MEMBERS</div>
       {props.members.map(member => (
         <div key={member.email} className={classes.Member}>
-          <span className={classes.AccountBtn}><AccountBtn clicked={() => setShownMember(member.email)}>{member.fullName.slice(0, 1)}</AccountBtn></span>
+          <span className={classes.AccountBtn}>
+            <AccountBtn title={member.fullName} clicked={() => setShownMember(member.email)}>{member.fullName.slice(0, 1)}</AccountBtn>
+          </span>
           {shownMember === member.email &&
             <CardMemberModal fullName={member.fullName} email={member.email} close={() => setShownMember('')} />}
         </div>
