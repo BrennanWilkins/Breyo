@@ -118,5 +118,17 @@ router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIs
   }
 );
 
+// returns all of user's activity sorted by page (each page returns 100 activity) & by date
+router.get('/myActivity/:email/:page', auth, validate([param('page').isInt(), param('email').isEmail()]),
+  async (req, res) => {
+    try {
+      const skip = req.params.page * 100;
+      const activity = await Activity.find({ email: req.params.email }).sort('-date').skip(skip).limit(100).lean();
+      if (!activity) { throw 'No user activity found'; }
+      res.status(200).json({ activity });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;
 module.exports.addActivity = addActivity;

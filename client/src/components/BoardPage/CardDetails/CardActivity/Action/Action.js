@@ -5,6 +5,7 @@ import { AccountBtn } from '../../../../UI/Buttons/Buttons';
 import Commenter from '../Commenter/Commenter';
 import parseActionMsg from '../../../../../utils/parseActionMsg';
 import formatDate from '../../../../../utils/formatDate';
+import { Link } from 'react-router-dom';
 
 const Action = props => {
   const [showUser, setShowUser] = useState(false);
@@ -27,7 +28,10 @@ const Action = props => {
           <span className={classes.FullName}>{props.fullName} </span>
           <span className={classes.Msg}>{msg}</span>
         </div>
-        <div className={classes.Date}>{formatDate(props.date)}</div>
+        <div className={classes.Date}>
+          {formatDate(props.date)}
+          {props.boardTitle && <div className={classes.BoardLink}><span>-</span>in board <Link to={`/board/${props.boardID}`}>{props.boardTitle}</Link></div>}
+        </div>
       </div>
     </div>
   );
@@ -41,7 +45,8 @@ Action.propTypes = {
   isBoard: PropTypes.bool,
   cardID: PropTypes.string,
   listID: PropTypes.string,
-  boardID: PropTypes.string
+  boardID: PropTypes.string,
+  boardTitle: PropTypes.string
 };
 
 export default Action;

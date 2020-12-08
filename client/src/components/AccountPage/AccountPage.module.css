@@ -14,7 +14,7 @@
   justify-content: center;
   align-items: center;
 }
-.Btns button {
+.Btns a {
   width: 120px;
   border-radius: 4px;
   outline: none;
@@ -27,10 +27,12 @@
   background: rgb(220,220,220);
   cursor: pointer;
   transition: background 200ms;
+  color: black;
+  text-align: center;
 }
-.Btns button:hover {
+.Btns a:hover {
   background: rgb(210,210,210);
 }
-.ActiveBtn {
+.Active {
   background: rgb(200,200,200) !important;
 }

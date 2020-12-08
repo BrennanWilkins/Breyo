@@ -10,7 +10,6 @@ const DeleteAccntModal = props => {
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
   const [inputVal, setInputVal] = useState('');
-  const [err, setErr] = useState(false);
 
   const deleteHandler = () => {
     if (inputVal !== 'DELETE MY ACCOUNT FOREVER') { return; }
@@ -27,7 +26,6 @@ const DeleteAccntModal = props => {
       <div className={classes.Info}>If you are sure you would like to do this, please type 'DELETE MY ACCOUNT FOREVER' below.</div>
       <input className={classes.Input} value={inputVal} onChange={e => setInputVal(e.target.value)} />
       <button className={classes.DeleteBtn} onClick={deleteHandler}>DELETE MY ACCOUNT</button>
-      {err && <p>There was an error while deleting your account.</p>}
     </div>
   );
 };

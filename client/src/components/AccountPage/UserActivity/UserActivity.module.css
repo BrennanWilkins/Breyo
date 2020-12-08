@@ -1,5 +1,42 @@
 .Container {
   background: white;
   flex-grow: 1;
-  position: relative;
+}
+.Content {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.Title {
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  border-bottom: 1.2px solid #ddd;
+  padding-bottom: 10px;
+}
+.Title svg {
+  margin: 0 10px 0 5px;
+  font-size: 20px;
+}
+.ErrMsg {
+  text-align: center;
+  font-weight: 500;
+  font-size: 17px;
+  margin: 20px 0;
+}
+.Spinner {
+  margin: 20px 0;
+}
+.LoadMore {
+  margin: 15px 0 15px 45px;
+  text-decoration: underline;
+  color: rgb(100,100,100);
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-block;
+}
+.LoadMore:hover {
+  color: black;
 }
