@@ -2,13 +2,16 @@ import React, { useRef } from 'react';
 import classes from './BoardRect.module.css';
 import PropTypes from 'prop-types';
 import { starIcon } from '../../../UI/icons';
+import { useHistory } from 'react-router';
 
 const BoardRect = props => {
   const starRef = useRef();
+  let history = useHistory();
 
   const navHandler = e => {
     if (starRef.current.contains(e.target)) { return; }
-    props.nav();
+    history.push(`/board/${props.boardID}`);
+    props.close();
   };
 
   return (
@@ -25,7 +28,8 @@ BoardRect.propTypes = {
   toggleIsStarred: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
-  nav: PropTypes.func.isRequired
+  boardID: PropTypes.string.isRequired,
+  close: PropTypes.func.isRequired
 };
 
 export default BoardRect;

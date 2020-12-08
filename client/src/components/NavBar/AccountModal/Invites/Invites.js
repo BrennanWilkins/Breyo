@@ -4,11 +4,13 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Button from '../../../UI/Buttons/Buttons';
 import { acceptInvite, rejectInvite } from '../../../../store/actions';
-import { withRouter } from 'react-router-dom';
+import { useHistory } from 'react-router';
 
 const Invites = props => {
+  const history = useHistory();
+
   const acceptHandler = boardID => {
-    props.acceptInvite(boardID, props.email, props.fullName, props.history.push);
+    props.acceptInvite(boardID, props.email, props.fullName, history.push);
     props.close();
   };
 
@@ -48,4 +50,4 @@ const mapDispatchToProps = dispatch => ({
   rejectInvite: boardID => dispatch(rejectInvite(boardID))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Invites));
+export default connect(mapStateToProps, mapDispatchToProps)(Invites);

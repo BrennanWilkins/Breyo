@@ -11,7 +11,13 @@ import { Link } from 'react-router-dom';
 
 const AccountModal = props => {
   const modalRef = useRef();
-  useModalToggle(props.show, modalRef, props.close);
+
+  const closeHandler = () => {
+    props.close();
+    setTimeout(() => setShowInvites(false), [250]);
+  };
+
+  useModalToggle(props.show, modalRef, closeHandler);
   const [showInvites, setShowInvites] = useState(false);
 
   return (
@@ -21,7 +27,7 @@ const AccountModal = props => {
         {showInvites ? 'Invites' : 'Account'}
         <CloseBtn close={props.close} color="rgb(112, 112, 112)" />
       </div>
-      {showInvites ? <Invites close={props.close} email={props.email} fullName={props.fullName} /> :
+      {showInvites ? <Invites close={closeHandler} email={props.email} fullName={props.fullName} /> :
       <><AccountInfo fullName={props.fullName} email={props.email} givePadding />
       <div className={classes.Options}>
         <div className={classes.Option} onClick={() => setShowInvites(true)}>Invites</div>
