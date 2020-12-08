@@ -24,3 +24,19 @@ export const dndHandler = (source, destination, boardID) => async dispatch => {
     dispatch(serverErr());
   }
 };
+
+export const manualMoveCardHandler = (sourceListID, destListID, sourceIndex, destIndex) => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    if (sourceListID === destListID) {
+      const listID = sourceListID;
+      dispatch({ type: actionTypes.MOVE_CARD_SAME_LIST, sourceIndex, destIndex, listID });
+      await axios.put('/card/moveCard/sameList', { sourceIndex, destIndex, listID, boardID });
+      sendUpdate('put/card/moveCard/sameList', JSON.stringify({ sourceIndex, destIndex, listID }));
+    } else {
+      dispatch({ type: actionTypes.MOVE_CARD_DIFF_LIST, sourceIndex, destIndex, sourceID: sourceListID, destID: destListID });
+      await axios.put('/card/moveCard/diffList', { sourceIndex, destIndex, sourceID: sourceListID, targetID: destListID, boardID });
+      sendUpdate('put/card/moveCard/diffList', JSON.stringify({ sourceIndex, destIndex, sourceID: sourceListID, destID: destListID }));
+    }
+  } catch (err) { dispatch(serverErr()); }
+};

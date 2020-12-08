@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import classes from './CardOptions.module.css';
 import PropTypes from 'prop-types';
-import { checklistIcon, labelIcon, clockIcon, copyIcon, archiveIcon, personIcon, roadmapIcon } from '../../../UI/icons';
+import { checklistIcon, labelIcon, clockIcon, copyIcon, archiveIcon, personIcon,
+  roadmapIcon, arrowIcon } from '../../../UI/icons';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import LabelModal from '../LabelModal/LabelModal';
 import DueDateModal from '../DueDateModal/DueDateModal';
@@ -9,6 +10,7 @@ import ChecklistModal from '../ChecklistModal/ChecklistModal';
 import CopyCardModal from '../CopyCardModal/CopyCardModal';
 import AddCardMember from '../AddCardMember/AddCardMember';
 import RoadmapLabelModal from '../RoadmapLabelModal/RoadmapLabelModal';
+import ManualMoveModal from '../ManualMoveModal/ManualMoveModal';
 
 const CardOptions = props => {
   const [showLabelModal, setShowLabelModal] = useState(false);
@@ -17,6 +19,7 @@ const CardOptions = props => {
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [showRoadmapLabelModal, setShowRoadmapLabelModal] = useState(false);
+  const [showManualMoveModal, setShowManualMoveModal] = useState(false);
 
   return (
     <div className={classes.Container}>
@@ -36,11 +39,13 @@ const CardOptions = props => {
       </span>
       <div className={classes.Title2}>ACTIONS</div>
       <span className={classes.BtnContainer2}>
+        <span className={classes.Btn}><ActionBtn clicked={() => setShowManualMoveModal(true)}>{arrowIcon} Move</ActionBtn></span>
         <span className={classes.Btn}><ActionBtn clicked={() => setShowCopyModal(true)}>{copyIcon} Copy</ActionBtn></span>
         <span className={classes.Btn}><ActionBtn clicked={props.archiveCard}>{archiveIcon} Archive</ActionBtn></span>
       </span>
       {showCopyModal && <CopyCardModal close={() => setShowCopyModal(false)} />}
       {showDueDateModal && <DueDateModal close={() => setShowDueDateModal(false)} />}
+      {showManualMoveModal && <ManualMoveModal close={() => setShowManualMoveModal(false)} />}
     </div>
   );
 };

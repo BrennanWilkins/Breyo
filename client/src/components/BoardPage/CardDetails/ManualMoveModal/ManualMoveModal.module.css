@@ -15,50 +15,9 @@
   .Container {
     bottom: 95px;
     top: auto;
+    right: auto;
+    left: 15px;
   }
-}
-.Input {
-  resize: none;
-  width: 300px;
-  border: 2px solid rgb(var(--lightGray));
-  outline: none;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-family: 'Roboto', -apple-system, sans-serif;
-  padding: 8px;
-  font-size: 14px;
-  background: rgb(245,245,245);
-  margin: 5px auto;
-  display: block;
-}
-.Input:hover {
-  background: rgb(235,235,235);
-}
-.Input:focus {
-  background: white;
-  border: 2px solid rgb(var(--red));
-}
-.Keeps {
-  font-size: 14px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 12px 0;
-}
-.Keeps div {
-  margin-right: 5px;
-}
-.Checkbox {
-  margin-right: 15px !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.CopyTitle {
-  color: rgb(var(--darkGray));
-  font-size: 12.5px;
-  font-weight: 500;
-  margin: 15px 10px 5px;
 }
 .Selects {
   display: flex;
@@ -117,16 +76,16 @@
 .ActiveOption {
   background: rgb(var(--red), 0.5);
 }
-.CopyBtn button {
+.MoveBtn button {
   background: rgb(var(--green));
-  margin: 10px 10px 5px;
+  margin: 15px 10px 5px;
   font-weight: 400;
   font-size: 15px;
   padding: 5px 10px;
 }
-.CopyBtn button:hover {
+.MoveBtn button:hover {
   background: rgba(var(--green), 0.85);
 }
-.CopyBtn button:active {
+.MoveBtn button:active {
   background: rgb(19, 150, 25);
 }
