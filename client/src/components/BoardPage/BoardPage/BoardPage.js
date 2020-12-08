@@ -37,14 +37,14 @@ const BoardPage = props => {
     props.setCardDetails(cardID, listID);
   };
 
-  const replaceHistory = () => props.history.replace(`/board/${props.match.params.boardID}`);
+  const invalidLinkHandler = () => props.history.push(`/board/${props.match.params.boardID}`);
 
   const cardDetailsInitialHandler = () => {
     // set initial card details on page load/refresh based on listID & cardID in pathname
     const path = props.location.pathname;
     if (path === `/board/${props.match.params.boardID}` || path === '/') { return; }
     // validate pathname before setting card details, if invalid then push history back to default
-    if (!pathIsValid(path)) { return replaceHistory(); }
+    if (!pathIsValid(path)) { return invalidLinkHandler(); }
     const { cardID, listID } = getIDs(path);
     props.setCardDetailsInitial(cardID, listID, () => closeDetailsHandler());
   };
@@ -72,7 +72,10 @@ const BoardPage = props => {
     return () => { document.title = 'Breyo'; document.body.style.overflow = 'auto'; }
   }, []);
 
-  const closeDetailsHandler = () => props.history.push(`/board/${props.match.params.boardID}`);
+  const closeDetailsHandler = () => {
+    props.setCardDetails(null, null);
+    props.history.push(`/board/${props.match.params.boardID}`);
+  };
 
   useDidUpdate(() => cardDetailsHandler(), [props.location.pathname]);
 

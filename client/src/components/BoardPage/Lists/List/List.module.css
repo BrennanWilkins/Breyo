@@ -84,7 +84,8 @@
   overflow-y: auto;
   overflow-x: hidden;
   flex-grow: 1;
-  margin-top: 8px;
+  margin: 8px -4px 0;
+  padding: 0 4px;
 }
 .CardContainer::-webkit-scrollbar {
   border-radius: 15px;

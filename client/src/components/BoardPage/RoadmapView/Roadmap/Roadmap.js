@@ -84,7 +84,7 @@ const Roadmap = props => {
           ))}
         </div>
         <div className={classes.CardsContainer}>{cards}</div>
-        {!props.cards.length && <div className={classes.NoCards}>No don't have any cards added to this list's roadmap yet.
+        {!props.cards.length && <div className={classes.NoCards}>There aren't any cards added to this list's roadmap yet.
         To add a card, add a start date or due date to the card.</div>}
         {monthRange.map((month, i) => (
           <div key={i} style={{ marginLeft: `${defaultDayWidth * 30 * i - 1.2}px`, width: `${defaultDayWidth * 30}px` }} className={classes.MonthSeparator}></div>
