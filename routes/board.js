@@ -31,7 +31,7 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
 
       const decoded = jwt.decode(req.header('x-auth-token'));
       const isAdminInToken = req.userAdmins[req.params.boardID];
-      const isAdminInBoard = board.members.find(member => member.email === decoded.user.email);
+      const isAdminInBoard = board.members.find(member => member.email === decoded.user.email).isAdmin;
       // user's token is not up to date, send new token
       if (isAdminInBoard !== isAdminInToken) {
         const user = await User.findById(req.userID);
@@ -88,15 +88,18 @@ router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
       const board = await Board.findById(req.body.boardID);
       if (!board) { throw 'No board data found'; }
       board.color = req.body.color;
+      
       // for each member of board, update the board color in their model
-      for (let member of board.members) {
-        const user = await User.findOne({ email: member.email });
+      const emails = board.members.map(member => member.email);
+      const users = await User.find({ email: { $in: emails }});
+      for (let user of users) {
         const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
-        if (index < 0) { throw 'Board not found in user model'; }
+        if (index < 0) { throw 'Board not found in users model'; }
         user.boards[index].color = req.body.color;
         user.markModified('boards');
         await user.save();
       }
+
       await board.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
@@ -130,15 +133,18 @@ router.put('/title', auth, validate(
       const title = req.body.title;
       const oldTitle = board.title;
       board.title = title;
+
       // for each member of board, update board title in their user model
-      for (let member of board.members) {
-        const user = await User.findOne({ email: member.email });
+      const emails = board.members.map(member => member.email);
+      const users = await User.find({ email: { $in: emails }});
+      for (let user of users) {
         const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
         if (index < 0) { throw 'Board not found in users model'; }
         user.boards[index].title = title;
         user.markModified('boards');
         await user.save();
       }
+
       await board.save();
       const newActivity = await addActivity(null, `renamed this board from ${oldTitle} to ${title}`, null, null, board._id, req.userID);
       res.status(200).json({ newActivity });

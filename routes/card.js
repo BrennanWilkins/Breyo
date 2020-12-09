@@ -604,8 +604,7 @@ router.delete('/members/:email/:cardID/:listID/:boardID', auth, validate([
     try {
       const list = await List.findById(req.params.listID);
       const user = await User.findOne({ email: req.params.email });
-      const board = await Board.findById(req.params.boardID);
-      if (!list || !user || !board) { throw 'Data not found'; }
+      if (!list || !user) { throw 'Data not found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.params.cardID);
       if (!card) { throw 'Card data not found'; }

@@ -126,7 +126,7 @@ router.delete('/deleteAccount', auth,
         }
       }
       res.sendStatus(200);
-    } catch (err) { console.log(err); res.sendStatus(500); }
+    } catch (err) { res.sendStatus(500); }
   }
 );
 

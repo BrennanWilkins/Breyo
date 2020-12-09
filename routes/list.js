@@ -53,16 +53,16 @@ router.put('/moveList', auth, validate([
   body('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
-      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
+      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' });
       const list = lists.splice(req.body.sourceIndex, 1)[0];
       if (!list) { throw 'List not found'; }
       lists.splice(req.body.destIndex, 0, list);
       // update all lists in board to match new order
       for (let i = 0; i < lists.length; i++) {
-        if (lists[i].indexInBoard !== i) { lists[i].indexInBoard = i; }
-      }
-      for (let list of lists) {
-        await List.findByIdAndUpdate(list._id, { indexInBoard: list.indexInBoard });
+        if (lists[i].indexInBoard !== i) {
+          lists[i].indexInBoard = i;
+          await lists[i].save();
+        }
       }
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
