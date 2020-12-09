@@ -41,13 +41,9 @@ Invites.propTypes = {
   close: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => ({
-  invites: state.auth.invites
-});
-
 const mapDispatchToProps = dispatch => ({
   acceptInvite: (boardID, email, fullName, push) => dispatch(acceptInvite(boardID, email, fullName, push)),
   rejectInvite: boardID => dispatch(rejectInvite(boardID))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Invites);
+export default connect(null, mapDispatchToProps)(Invites);

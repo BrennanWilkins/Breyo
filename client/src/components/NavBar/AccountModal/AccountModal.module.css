@@ -39,6 +39,8 @@
 .Option, .Link a {
   padding: 8px 0 8px 15px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 .Link a {
   display: block;
@@ -62,4 +64,16 @@
 }
 .HideBackBtn button {
   left: -50px;
+}
+.InviteNotifIcon {
+  background: rgb(var(--red));
+  display: inline-block;
+  border-radius: 25px;
+  width: 17px;
+  height: 17px;
+  margin-left: 10px;
+  color: white;
+  font-size: 12px;
+  line-height: 17px;
+  text-align: center;
 }

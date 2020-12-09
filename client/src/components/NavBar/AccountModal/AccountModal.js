@@ -14,7 +14,7 @@ const AccountModal = props => {
 
   const closeHandler = () => {
     props.close();
-    setTimeout(() => setShowInvites(false), [250]);
+    setTimeout(() => setShowInvites(false), 250);
   };
 
   useModalToggle(props.show, modalRef, closeHandler);
@@ -27,10 +27,12 @@ const AccountModal = props => {
         {showInvites ? 'Invites' : 'Account'}
         <CloseBtn close={props.close} color="rgb(112, 112, 112)" />
       </div>
-      {showInvites ? <Invites close={closeHandler} email={props.email} fullName={props.fullName} /> :
+      {showInvites ? <Invites close={closeHandler} email={props.email} fullName={props.fullName} invites={props.invites} /> :
       <><AccountInfo fullName={props.fullName} email={props.email} givePadding />
       <div className={classes.Options}>
-        <div className={classes.Option} onClick={() => setShowInvites(true)}>Invites</div>
+        <div className={classes.Option} onClick={() => setShowInvites(true)}>Invites
+          {props.invites.length > 0 && <span className={classes.InviteNotifIcon}>{props.invites.length}</span>}
+        </div>
         <div className={classes.Link} onClick={props.close}><Link to="/my-account?view=activity">Activity</Link></div>
         <div className={classes.Link} onClick={props.close}><Link to="/my-account?view=settings">Settings</Link></div>
         <span className={classes.LineBreak}></span>
@@ -46,12 +48,14 @@ AccountModal.propTypes = {
   email: PropTypes.string.isRequired,
   logout: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
-  close: PropTypes.func.isRequired
+  close: PropTypes.func.isRequired,
+  invites: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
   fullName: state.auth.fullName,
-  email: state.auth.email
+  email: state.auth.email,
+  invites: state.auth.invites
 });
 
 const mapDispatchToProps = dispatch => ({
