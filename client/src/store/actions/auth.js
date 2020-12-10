@@ -24,8 +24,7 @@ export const getUserData = () => async dispatch => {
     const res = await axios.get('/auth/userData');
     dispatch(updateUserData(res.data.invites, res.data.boards));
   } catch (err) {
-    let msg = err.response ? err.response.data.msg : 'There was an error while retrieving your data.';
-    dispatch(addNotif(msg));
+    dispatch(addNotif('There was an error while retrieving your data.'));
   }
 };
 
