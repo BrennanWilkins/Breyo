@@ -5,12 +5,6 @@ import { sendUpdate } from './socket';
 
 const loginDispatch = payload => ({ type: actionTypes.LOGIN, payload });
 
-const logoutDispatch = () => ({ type: actionTypes.LOGOUT });
-
-const loginLoading = () => ({ type: actionTypes.LOGIN_LOADING });
-
-const signupLoading = () => ({ type: actionTypes.SIGNUP_LOADING });
-
 const updateUserData = (invites, boards) => ({ type: actionTypes.UPDATE_USER_DATA, invites, boards });
 
 export const loginErr = msg => ({ type: actionTypes.LOGIN_ERR, msg });
@@ -30,7 +24,7 @@ export const getUserData = () => async dispatch => {
 
 export const login = (email, password) => async dispatch => {
   try {
-    dispatch(loginLoading());
+    dispatch({ type: actionTypes.LOGIN_LOADING });
     const res = await axios.post('/auth/login', { email, password });
     dispatch(authSuccess(res.data));
   } catch (err) {
@@ -42,7 +36,7 @@ export const login = (email, password) => async dispatch => {
 
 export const signup = payload => async dispatch => {
   try {
-    dispatch(signupLoading());
+    dispatch({ type: actionTypes.SIGNUP_LOADING });
     const res = await axios.post('/auth/signup', { ...payload });
     dispatch(authSuccess(res.data));
   } catch(err) {
@@ -62,7 +56,7 @@ export const logout = () => dispatch => {
   // delete all local storage items & remove token from instance header on logout
   delete axios.defaults.headers.common['x-auth-token'];
   localStorage.removeItem('token');
-  dispatch(logoutDispatch());
+  dispatch({ type: actionTypes.LOGOUT });
 };
 
 export const autoLogin = () => async dispatch => {
