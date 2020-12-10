@@ -129,22 +129,27 @@ router.post('/archive', auth, validate([
   body('listID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
-      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' }).lean();
+      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' });
       if (!lists || lists.length === 0) { throw 'List data not found'; }
       const listIndex = lists.findIndex(list => String(list._id) === req.body.listID);
       if (listIndex === -1) { throw 'List not found in board lists'; }
-      lists.splice(listIndex, 1);
+
+      const archivedList = lists.splice(listIndex, 1)[0];
+
       // update all lists index in board to reflect missing list
       for (let i = 0; i < lists.length; i++) {
-        if (lists[i].indexInBoard !== i) { lists[i].indexInBoard = i; }
+        if (lists[i].indexInBoard !== i) {
+          lists[i].indexInBoard = i;
+          await lists[i].save();
+        }
       }
-      for (let list of lists) {
-        await List.findByIdAndUpdate(list._id, { indexInBoard: list.indexInBoard });
-      }
-      // set archived list's index to end of list & set as isArchived
-      const updatedList = await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: true });
 
-      const actionData = { msg: null, boardMsg: `archived list ${updatedList.title}`, cardID: null, listID: updatedList._id, boardID: req.body.boardID };
+      // set archived list's index to end of list & set as isArchived
+      archivedList.indexInBoard = lists.length;
+      archivedList.isArchived = true;
+      await archivedList.save();
+
+      const actionData = { msg: null, boardMsg: `archived list ${archivedList.title}`, cardID: null, listID: archivedList._id, boardID: req.body.boardID };
       const newActivity = await addActivity(actionData, req);
 
       res.status(200).json({ newActivity });
@@ -207,7 +212,7 @@ router.put('/archive/allCards', auth, validate([
         const newActivity = await addActivity(actionData, req);
         activities.push(newActivity);
       }
-      
+
       list.archivedCards = list.archivedCards.concat(list.cards);
       list.cards = [];
       await list.save();
