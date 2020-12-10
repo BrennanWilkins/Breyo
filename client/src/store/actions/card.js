@@ -252,8 +252,8 @@ export const copyCard = (title, keepChecklists, keepLabels, destListID, destInde
 export const archiveCard = () => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID } = getCardState(getState);
-    dispatch({ type: actionTypes.ARCHIVE_CARD, cardID, listID });
     const res = await axios.post('/card/archive', { cardID, listID, boardID });
+    dispatch({ type: actionTypes.ARCHIVE_CARD, cardID, listID });
     sendUpdate('post/card/archive', JSON.stringify({ cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {
@@ -264,7 +264,11 @@ export const archiveCard = () => async (dispatch, getState) => {
 export const recoverCard = (cardID, listID, boardID) => async dispatch => {
   try {
     dispatch({ type: actionTypes.RECOVER_CARD, cardID, listID });
-    const res = await axios.put('/card/archive/recover', { cardID, listID, boardID });
+    const res = await axios.put('/card/archive/recover', { cardID, listID, boardID }).catch(err => {
+      // if server error while recovering card then undo recover
+      dispatch({ type: actionTypes.ARCHIVE_CARD, cardID, listID });
+      throw err;
+    });
     sendUpdate('put/card/archive/recover', JSON.stringify({ cardID, listID }));
     addRecentActivity(res.data.newActivity);
   } catch (err) {

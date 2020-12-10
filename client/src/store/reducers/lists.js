@@ -43,6 +43,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DELETE_CARD: return deleteCard(state, action);
     case actionTypes.COPY_LIST: return copyList(state, action);
     case actionTypes.ARCHIVE_LIST: return archiveList(state, action);
+    case actionTypes.UNDO_ARCHIVE_LIST: return undoArchiveList(state, action);
     case actionTypes.RECOVER_LIST: return recoverList(state, action);
     case actionTypes.DELETE_LIST: return deleteList(state, action);
     case actionTypes.ARCHIVE_ALL_CARDS: return archiveAllCards(state, action);
@@ -435,7 +436,7 @@ const archiveList = (state, action) => {
   const listIndex = lists.findIndex(list => list.listID === action.listID);
   const archivedList = { ...lists.splice(listIndex, 1)[0] };
   archivedList.isArchived = true;
-  archivedList.indexInBoard = lists.length;
+  // archivedList.indexInBoard = lists.length;
   for (let i = 0; i < lists.length; i++) {
     if (lists[i].indexInBoard !== i) {
       const list = { ...lists[i] };
@@ -453,12 +454,21 @@ const archiveList = (state, action) => {
   return { ...state, lists, archivedLists };
 };
 
-const recoverList = (state, action) => {
+const recoverListHelper = (state, action, addToEnd) => {
   const lists = [...state.lists];
   const archivedLists = [...state.archivedLists];
   const listIndex = archivedLists.findIndex(list => list.listID === action.listID);
-  const archivedList = { ...archivedLists.splice(listIndex, 1)[0], isArchived: false, indexInBoard: lists.length };
-  lists.push(archivedList);
+
+  // if list is being recovered then make indexInBoard lists.length else if archiving is being undo then
+  // make indexInBoard stay as original index
+  const archivedList = { ...archivedLists.splice(listIndex, 1)[0], isArchived: false };
+  if (addToEnd) {
+    archivedList.indexInBoard = lists.length;
+    lists.push(archivedList);
+  } else {
+    lists.splice(archivedList.indexInBoard, 0, archivedList);
+  }
+
   if (state.currentCard && state.shownListID === action.listID) {
     const currentCard = { ...state.currentCard };
     delete currentCard.listIsArchived;
@@ -466,6 +476,10 @@ const recoverList = (state, action) => {
   }
   return { ...state, lists, archivedLists };
 };
+
+const undoArchiveList = (state, action) => recoverListHelper(state, action, false);
+
+const recoverList = (state, action) => recoverListHelper(state, action, true);
 
 const deleteList = (state, action) => {
   const archivedLists = [...state.archivedLists];
