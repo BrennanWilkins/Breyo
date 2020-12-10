@@ -28,8 +28,11 @@ router.post('/', auth, validate(
       const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [], comments: [], roadmapLabel: null };
       list.cards.push(card);
       const updatedList = await list.save();
+
       const cardID = updatedList.cards[updatedList.cards.length - 1]._id;
-      const newActivity = await addActivity(`created this card`, `added **(link)${title}** to ${list.title}`, cardID, list._id, req.body.boardID, req.userID);
+      const actionData = { msg: 'created this card', boardMsg: `added **(link)${title}** to ${list.title}`, cardID, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ cardID, newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -52,8 +55,11 @@ router.put('/title', auth, validate(
       const oldTitle = card.title;
       card.title = title;
       await list.save();
-      const newActivity = await addActivity(`renamed this card from ${oldTitle} to ${title}`, `renamed **(link)${title}** from ${oldTitle} to ${title}`,
-      card._id, list._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: `renamed this card from ${oldTitle} to ${title}`, boardMsg: `renamed **(link)${title}** from ${oldTitle} to ${title}`,
+        cardID: card._id, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -176,9 +182,12 @@ router.put('/dueDate/isComplete', auth, validate([
       card.dueDate.isComplete = !card.dueDate.isComplete;
       list.markModified('cards');
       await list.save();
+
       const completeText = card.dueDate.isComplete ? 'complete' : 'incomplete';
-      const newActivity = await addActivity(`marked the due date as ${completeText}`, `marked the due date on **(link)${card.title}** as ${completeText}`,
-         card._id, list._id, req.body.boardID, req.userID);
+      const actionData = { msg: `marked the due date as ${completeText}`, boardMsg: `marked the due date on **(link)${card.title}** as ${completeText}`,
+        cardID: card._id, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -207,8 +216,9 @@ router.post('/dueDate', auth, validate([
       format(new Date(req.body.dueDate), `MMM d 'at' h:mm aa`) :
       format(new Date(req.body.dueDate), `MMM d, yyyy 'at' h:mm aa`);
 
-      const newActivity = await addActivity(`set this card to be due ${date}`, `set **(link)${card.title}** to be due ${date}`,
-        card._id, list._id, req.body.boardID, req.userID);
+      const actionData = { msg: `set this card to be due ${date}`, boardMsg: `set **(link)${card.title}** to be due ${date}`,
+        cardID: card._id, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -229,8 +239,11 @@ router.delete('/dueDate/:cardID/:listID/:boardID', auth, validate([
       if (!card) { throw 'No card data found'; }
       card.dueDate = null;
       await list.save();
-      const newActivity = await addActivity(`removed the due date from this card`, `removed the due date from **(link)${card.title}**`,
-        card._id, list._id, req.params.boardID, req.userID);
+
+      const actionData = { msg: `removed the due date from this card`, boardMsg: `removed the due date from **(link)${card.title}**`,
+        cardID: card._id, listID: list._id, boardID: req.params.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -254,8 +267,11 @@ router.post('/checklist', auth, validate([
       const updatedList = await list.save();
       const checklists = updatedList.cards.id(req.body.cardID).checklists;
       const checklistID = checklists[checklists.length - 1]._id;
-      const newActivity = await addActivity(`added checklist ${title} to this card`, `added checklist ${title} to **(link)${card.title}**`,
-        card._id, list._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: `added checklist ${title} to this card`, boardMsg: `added checklist ${title} to **(link)${card.title}**`,
+        cardID: card._id, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ checklistID, newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -277,8 +293,11 @@ router.delete('/checklist/:checklistID/:cardID/:listID/:boardID', auth, validate
       const checklist = card.checklists.id(req.params.checklistID);
       checklist.remove();
       await list.save();
-      const newActivity = await addActivity(`removed checklist ${checklist.title} from this card`, `removed checklist ${checklist.title} from **(link)${card.title}**`,
-        card._id, list._id, req.params.boardID, req.userID);
+
+      const actionData = { msg: `removed checklist ${checklist.title} from this card`, boardMsg: `removed checklist ${checklist.title} from **(link)${card.title}**`,
+        cardID: card._id, listID: list._id, boardID: req.params.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -303,8 +322,11 @@ router.put('/checklist/title', auth, validate([
       const oldTitle = checklist.title;
       checklist.title = title;
       await list.save();
-      const newActivity = await addActivity(`renamed checklist ${oldTitle} to ${title}`, `renamed checklist ${oldTitle} to ${title} in **(link)${card.title}**`,
-        card._id, list._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: `renamed checklist ${oldTitle} to ${title}`, boardMsg: `renamed checklist ${oldTitle} to ${title} in **(link)${card.title}**`,
+        cardID: card._id, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -356,9 +378,12 @@ router.put('/checklist/item/isComplete', auth, validate([
       if (!item) { throw 'Checklist item not found'; }
       item.isComplete = !item.isComplete;
       await list.save();
+
       const cardMsg = item.isComplete ? `completed ${item.title} in checklist ${checklist.title}` : `marked ${item.title} incomplete in checklist ${checklist.title}`;
       const boardMsg = item.isComplete ? `completed ${item.title} in **(link)${card.title}**` : `marked ${item.title} incomplete in **(link)${card.title}**`;
-      const newActivity = await addActivity(cardMsg, boardMsg, card._id, list._id, req.body.boardID, req.userID);
+      const actionData = { msg: cardMsg, boardMsg, cardID: card._id, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -495,8 +520,11 @@ router.post('/copy', auth, validate([
       destList.cards.splice(req.body.destIndex, 0, newCard);
       const updatedList = await destList.save();
       const updatedCard = updatedList.cards[req.body.destIndex];
-      const newActivity = await addActivity(`copied this card to list ${destList.title}`, `copied **(link)${title}** to list ${destList.title}`,
-        updatedCard._id, destList._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: `copied this card to list ${destList.title}`, boardMsg: `copied **(link)${title}** to list ${destList.title}`,
+        cardID: updatedCard._id, listID: destList._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ cardID: updatedCard._id, checklists: updatedCard.checklists, newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -519,7 +547,11 @@ router.post('/archive', auth, validate([
       list.archivedCards.unshift(card);
       card.remove();
       await list.save();
-      const newActivity = await addActivity(`archived this card`, `archived **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: `archived this card`, boardMsg: `archived **(link)${card.title}**`,
+        cardID: card._id, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -539,7 +571,11 @@ router.put('/archive/recover', auth, validate([
       list.cards.push(card);
       card.remove();
       await list.save();
-      const newActivity = await addActivity(`recovered this card`, `recovered **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: `recovered this card`, boardMsg: `recovered **(link)${card.title}**`,
+        cardID: card._id, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -558,10 +594,15 @@ router.delete('/archive/:cardID/:listID/:boardID', auth, validate([
       if (!card) { throw 'Card data not found'; }
       card.remove();
       await list.save();
-      await addActivity(null, `deleted ${card.title} from list ${list.title}`, null, null, req.params.boardID, req.userID);
+
+      const actionData = { msg: null, boardMsg: `deleted ${card.title} from list ${list.title}`, cardID: null, listID: null, boardID: req.params.boardID };
+      const newActivity = await addActivity(actionData, req);
+
+      // delete all of cards activity & fetch new recent 20 activities
       await Activity.deleteMany({ cardID: card._id });
       const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').limit(20).lean();
       if (!activity) { throw 'No board activity found'; }
+
       res.status(200).json({ activity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -587,8 +628,11 @@ router.post('/members', auth, validate([
       if (card.members.find(member => member.email === user.email)) { throw 'User already a member of the card'; }
       card.members.push({ email: user.email, fullName: user.fullName });
       await list.save();
-      const newActivity = await addActivity(`added ${user.fullName} to this card`, `added ${user.fullName} to **(link)${card.title}**`,
-      card._id, list._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: `added ${user.fullName} to this card`, boardMsg: `added ${user.fullName} to **(link)${card.title}**`,
+        cardID: card._id, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { console.log(err); res.sendStatus(500); }
   }
@@ -610,8 +654,11 @@ router.delete('/members/:email/:cardID/:listID/:boardID', auth, validate([
       if (!card) { throw 'Card data not found'; }
       card.members = card.members.filter(member => member.email !== user.email);
       await list.save();
-      const newActivity = await addActivity(`removed ${user.fullName} from this card`, `removed ${user.fullName} from **(link)${card.title}**`,
-      card._id, list._id, req.params.boardID, req.userID);
+      
+      const actionData = { msg: `removed ${user.fullName} from this card`, boardMsg: `removed ${user.fullName} from **(link)${card.title}**`,
+        cardID: card._id, listID: list._id, boardID: req.params.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -626,12 +673,11 @@ router.post('/comments', auth, validate([
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      const user = await User.findById(req.userID);
-      if (!list || !user) { throw 'List or user data not found'; }
+      if (!list) { throw 'List data not found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const card = list.cards.id(req.body.cardID);
       if (!card) { throw 'Card data not found'; }
-      card.comments.push({ email: user.email, fullName: user.fullName, date: req.body.date, msg: req.body.msg, cardID: req.body.cardID, listID: req.body.listID });
+      card.comments.push({ email: req.email, fullName: req.fullName, date: req.body.date, msg: req.body.msg, cardID: req.body.cardID, listID: req.body.listID });
       const updatedList = await list.save();
       const updatedComments = updatedList.cards.id(req.body.cardID).comments;
       const commentID = updatedComments[updatedComments.length - 1]._id;
@@ -650,12 +696,11 @@ router.put('/comments', auth, validate([
   async (req, res) => {
     try {
       const list = await List.findById(req.body.listID);
-      const user = await User.findById(req.userID);
-      if (!list || !user) { throw 'List or user data not found'; }
+      if (!list) { throw 'List data not found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const comment = list.cards.id(req.body.cardID).comments.id(req.body.commentID);
       if (!comment) { throw 'Comment not found'; }
-      if (user.email !== comment.email) { throw 'User must be original author to edit'; }
+      if (req.email !== comment.email) { throw 'User must be original author to edit'; }
       comment.msg = req.body.msg;
       await list.save();
       res.sendStatus(200);
@@ -672,12 +717,11 @@ router.delete('/comments/:commentID/:cardID/:listID/:boardID', auth, validate([
   async (req, res) => {
     try {
       const list = await List.findById(req.params.listID);
-      const user = await User.findById(req.userID);
-      if (!list || !user) { throw 'No list or user data found'; }
+      if (!list) { throw 'List data found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
       const comment = list.cards.id(req.params.cardID).comments.id(req.params.commentID);
       if (!comment) { throw 'Comment not found'; }
-      if (user.email !== comment.email) { throw 'Must be original author to delete comment'; }
+      if (req.email !== comment.email) { throw 'Must be original author to delete comment'; }
       comment.remove();
       await list.save();
       res.sendStatus(200);

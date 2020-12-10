@@ -12,6 +12,8 @@ module.exports = (req, res, next) => {
         return res.status(401).json({ msg: 'TOKEN NOT VALID' });
       }
       req.userID = decoded.user._id;
+      req.email = decoded.user.email;
+      req.fullName = decoded.user.fullName;
       req.userMembers = {};
       req.userAdmins = {};
       for (let board of decoded.user.boards) {

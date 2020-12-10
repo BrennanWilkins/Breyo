@@ -22,7 +22,10 @@ router.post('/', auth, validate([
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false });
       const list = new List({ boardID: board._id, title, cards: [], archivedCards: [], indexInBoard: lists.length, isArchived: false });
       const newList = await list.save();
-      const newActivity = await addActivity(null, `added list ${title} to this board`, null, newList._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID: newList._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ listID: newList._id, newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -40,7 +43,10 @@ router.put('/title', auth, validate([
       const oldTitle = list.title;
       list.title = req.body.title;
       await list.save();
-      const newActivity = await addActivity(null, `renamed list ${oldTitle} to ${list.title}`, null, list._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: null, boardMsg: `renamed list ${oldTitle} to ${list.title}`, cardID: null, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
@@ -99,14 +105,18 @@ router.post('/copy', auth, validate([
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false });
       const newList = new List({ boardID: req.body.boardID, title: req.body.title, desc: list.desc, indexInBoard: lists.length, cards, archivedCards: [], isArchived: false });
       const updatedList = await newList.save();
+
       const activities = [];
-      const newActivity = await addActivity(null, `added list ${newList.title} to this board`, null, updatedList._id, req.body.boardID, req.userID);
+      const actionData = { msg: null, boardMsg: `added list ${newList.title} to this board`, cardID: null, listID: updatedList._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
       activities.push(newActivity);
       for (let card of list.cards) {
-        const newActivity = await addActivity(`copied this card from ${card.title} in list ${list.title}`,
-          `copied **(link)${card.title}** from ${card.title} in list ${list.title}`, card._id, list._id, req.body.boardID, req.userID);
+        const actionData = { msg: `copied this card from ${card.title} in list ${list.title}`, boardMsg: `copied **(link)${card.title}** from ${card.title} in list ${list.title}`,
+          cardID: card._id, listID: list._id, boardID: req.body.boardID };
+        const newActivity = await addActivity(actionData, req);
         activities.push(newActivity);
       }
+
       res.status(200).json({ newList: updatedList, activities });
     } catch (err) { res.sendStatus(500); }
   }
@@ -133,7 +143,10 @@ router.post('/archive', auth, validate([
       }
       // set archived list's index to end of list & set as isArchived
       const updatedList = await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: true });
-      const newActivity = await addActivity(null, `archived list ${updatedList.title}`, null, updatedList._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: null, boardMsg: `archived list ${updatedList.title}`, cardID: null, listID: updatedList._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -148,7 +161,10 @@ router.put('/archive/recover', auth, validate([
       const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).lean();
       if (!lists.length) { throw 'Lists data not found'; }
       const list = await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: false });
-      const newActivity = await addActivity(null, `recovered list ${list.title}`, null, list._id, req.body.boardID, req.userID);
+
+      const actionData = { msg: null, boardMsg: `recovered list ${list.title}`, cardID: null, listID: list._id, boardID: req.body.boardID };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
@@ -162,7 +178,11 @@ router.delete('/archive/:listID/:boardID', auth, validate([
   async (req, res) => {
     try {
       const list = await List.findByIdAndDelete(req.params.listID);
-      await addActivity(null, `deleted list ${list.title}`, null, null, req.params.boardID, req.userID);
+
+      const actionData = { msg: null, boardMsg: `deleted list ${list.title}`, cardID: null, listID: null, boardID: req.params.boardID };
+      const newActivity = await addActivity(actionData, req);
+
+      // delete all of lists activities & return new recent activities
       await Activity.deleteMany({ listID: list._id });
       const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').limit(20).lean();
       if (!activity) { throw 'No board activity found'; }
@@ -179,12 +199,15 @@ router.put('/archive/allCards', auth, validate([
     try {
       const list = await List.findById(req.body.listID);
       if (!list) { throw 'List data not found'; }
+
       // set all cards to isArchived & add action for each card
       const activities = [];
       for (let card of list.cards) {
-        const newActivity = await addActivity(`archived this card`, `archived **(link)${card.title}**`, card._id, list._id, req.body.boardID, req.userID);
+        const actionData = { msg: `archived this card`, boardMsg: `archived **(link)${card.title}**`, cardID: card._id, listID: list._id, boardID: req.body.boardID };
+        const newActivity = await addActivity(actionData, req);
         activities.push(newActivity);
       }
+      
       list.archivedCards = list.archivedCards.concat(list.cards);
       list.cards = [];
       await list.save();

@@ -9,21 +9,16 @@ const Activity = require('../models/activity');
 const User = require('../models/user');
 
 // for every action addActivity is called to create new doc in activity collection
-const addActivity = async (msg, boardMsg, cardID, listID, boardID, userID, email, fullName) => {
+const addActivity = async (data, req) => {
   try {
-    // email & fullName may be provided & if not then is retrived from user model
-    let userEmail; let userFullName;
-    if (email && fullName) { userEmail = email; userFullName = fullName; }
-    else {
-      const user = await User.findById(userID);
-      if (!user) { throw 'No user found'; }
-      userEmail = user.email; userFullName = user.fullName;
-    }
-    const activity = new Activity({ msg, boardMsg, email: userEmail, fullName: userFullName, cardID, listID, boardID, date: new Date() });
+    const { msg, boardMsg, cardID, listID, boardID, email, fullName } = data;
+    if (!req.email || !req.fullName) { throw 'User data not found'; }
+    const activity = new Activity({ msg, boardMsg, email: email || req.email, fullName: fullName || req.fullName, cardID, listID, boardID, date: new Date() });
     const newActivity = await activity.save();
     // board stores max past 200 actions
     const allActivity = await Activity.find({ boardID }).sort('-date').skip(200);
     for (let oldAction of allActivity) { oldAction.remove(); }
+
     return newActivity;
   } catch (err) { return new Error('Error adding activity'); }
 };

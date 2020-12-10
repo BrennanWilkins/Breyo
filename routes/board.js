@@ -59,16 +59,20 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
       const board = new Board({ title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
         color, creatorEmail: user.email, desc: '' });
       await board.save();
+
       // add board to user's boards
       const newBoard = { boardID: board._id, title, isStarred: false, isAdmin: true, color: board.color };
       user.boards.unshift(newBoard);
       await user.save();
+
       // add default lists to board (to do, doing, done)
       const list1 = new List({ boardID: board._id, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false });
       const list2 = new List({ boardID: board._id, title: 'Doing', cards: [], archivedCards: [], indexInBoard: 1, isArchived: false });
       const list3 = new List({ boardID: board._id, title: 'Done', cards: [], archivedCards: [], indexInBoard: 2, isArchived: false });
       await list1.save(); await list2.save(); await list3.save();
-      await addActivity(null, 'created this board', null, null, board._id, null, user.email, user.fullName);
+
+      const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID: board._id };
+      await addActivity(actionData, req);
 
       const decoded = jwt.decode(req.header('x-auth-token'));
       // update client's token to show new board, new token expires at same time
@@ -88,7 +92,7 @@ router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
       const board = await Board.findById(req.body.boardID);
       if (!board) { throw 'No board data found'; }
       board.color = req.body.color;
-      
+
       // for each member of board, update the board color in their model
       const emails = board.members.map(member => member.email);
       const users = await User.find({ email: { $in: emails }});
@@ -115,7 +119,10 @@ router.put('/desc', auth, validate([body('boardID').isMongoId(), body('desc').is
       if (!board) { throw 'No board data found'; }
       board.desc = req.body.desc;
       await board.save();
-      const newActivity = await addActivity(null, 'updated the board description', null, null, board._id, req.userID);
+
+      const actionData = { msg: null, boardMsg: 'updated the board description', cardID: null, listID: null, boardID: board._id };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
@@ -146,7 +153,10 @@ router.put('/title', auth, validate(
       }
 
       await board.save();
-      const newActivity = await addActivity(null, `renamed this board from ${oldTitle} to ${title}`, null, null, board._id, req.userID);
+
+      const actionData = { msg: null, boardMsg: `renamed this board from ${oldTitle} to ${title}`, cardID: null, listID: null, boardID: board._id };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
@@ -189,7 +199,10 @@ router.post('/admins', auth, validate([body('email').isEmail(), body('boardID').
       board.markModified('members');
       await user.save();
       await board.save();
-      const newActivity = await addActivity(null, `changed ${user.fullName} permissions to admin`, null, null, board._id, req.userID);
+
+      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to admin`, cardID: null, listID: null, boardID: board._id };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -245,7 +258,10 @@ router.delete('/admins/:email/:boardID', auth, validate([param('email').isEmail(
       board.markModified('members');
       await user.save();
       await board.save();
-      const newActivity = await addActivity(null, `changed ${user.fullName} permissions to member`, null, null, board._id, req.userID);
+
+      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to member`, cardID: null, listID: null, boardID: board._id };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
   }
@@ -291,7 +307,9 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
       board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
       await user.save();
       await board.save();
-      const newActivity = await addActivity(null, `was added to this board`, null, null, board._id, null, user.email, user.fullName);
+
+      const actionData = { msg: null, boardMsg: 'was added to this board', cardID: null, listID: null, boardID: board._id, email: user.email, fullName: user.fullName };
+      const newActivity = await addActivity(actionData, req);
 
       const decoded = jwt.decode(req.header('x-auth-token'));
       // update client's token to show new board, new token expires at same time
@@ -331,7 +349,10 @@ router.put('/members/remove', auth, validate([body('email').isEmail(), body('boa
       user.boards = user.boards.filter(board => board.boardID !== board._id);
       await board.save();
       await user.save();
-      const newActivity = await addActivity(null, `removed ${user.fullName} from this board`, null, null, board._id, req.userID);
+
+      const actionData = { msg: null, boardMsg: `removed ${user.fullName} from this board`, cardID: null, listID: null, boardID: board._id };
+      const newActivity = await addActivity(actionData, req);
+
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
@@ -388,7 +409,10 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
         // only need to update list if member changed
         if (shouldUpdate) { await list.save(); }
       }
-      const newActivity = await addActivity(null, `left this board`, null, null, board._id, null, user.email, user.fullName);
+
+      const actionData = { msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID: board._id };
+      const newActivity = await addActivity(actionData, req);
+      
       await user.save();
       await board.save();
       res.status(200).json({ newActivity });
