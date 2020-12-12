@@ -11,6 +11,7 @@ import Spinner from '../../UI/Spinner/Spinner';
 import ListContainer from '../Lists/ListContainer/ListContainer';
 import { useDidUpdate } from '../../../utils/customHooks';
 import { pathIsValid, getIDs } from '../../../utils/routerUtils';
+import { getPhotoURL } from '../../../utils/backgrounds';
 const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'));
 const MemberActivity = lazy(() => import('../MemberActivity/MemberActivity'));
 const RoadmapContainer = lazy(() => import('../RoadmapView/RoadmapContainer/RoadmapContainer'));
@@ -84,7 +85,8 @@ const BoardPage = props => {
   return (
     props.boardID !== props.match.params.boardID ? <Spinner /> :
     <>
-    <div className={classes.Container} style={{ background: props.color }}>
+    <div className={classes.Container} style={props.color[0] === '#' ? { background: props.color } :
+    { backgroundImage: getPhotoURL(props.color, 1280, 1280) }}>
       <BoardNavBar showMenu={showMenu} closeMenu={() => setShowMenu(false)} openMenu={() => setShowMenu(true)} />
       {props.roadmapShown ? <Suspense fallback=""><RoadmapContainer showMenu={showMenu} /></Suspense> : <ListContainer showMenu={showMenu} />}
     </div>

@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import classes from './RoadmapLabelModal.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
-import { LABEL_COLORS } from '../../../../utils/colors';
+import { LABEL_COLORS } from '../../../../utils/backgrounds';
 import { checkIcon } from '../../../UI/icons';
 import { connect } from 'react-redux';
 import { changeRoadmapLabel } from '../../../../store/actions';

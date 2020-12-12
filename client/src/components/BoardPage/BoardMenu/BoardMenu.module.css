@@ -80,6 +80,7 @@
   margin-right: 8px;
   border-radius: 4px;
   display: inline-block;
+  background-size: cover;
 }
 .Option svg {
   margin-right: 8px;

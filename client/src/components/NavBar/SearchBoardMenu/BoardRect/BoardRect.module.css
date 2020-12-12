@@ -4,9 +4,10 @@
   border-radius: 4px;
   position: relative;
   overflow: hidden;
+  background-size: cover;
 }
 .Title {
-  background: rgb(255,255,255,0.3);
+  background: rgba(255,255,255,0.3);
   float: right;
   width: 86%;
   height: 40px;
@@ -18,6 +19,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.DarkenTitle {
+  background: rgba(255,255,255,0.75);
 }
 .Overlay {
   transition: 200ms;
@@ -40,9 +44,12 @@
   color: #eee;
   cursor: pointer;
 }
+.NotStarred {
+  color: rgb(50,50,50);
+}
 .NotStarred:hover {
   transform: scale(1.15);
-  color: white;
+  color: rgb(65,65,65);
 }
 .Starred:hover {
   transform: scale(1.15);

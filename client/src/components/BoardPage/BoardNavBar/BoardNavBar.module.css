@@ -35,7 +35,7 @@
 .Input input:focus {
   cursor: text;
   background: white;
-  color: black;
+  color: black !important;
 }
 .StarBtn button {
   height: 33px;
@@ -89,4 +89,19 @@
 }
 .Container {
   position: relative;
+}
+.DarkenBtns .StarBtn button, .DarkenBtns .Input input:hover, .DarkenBtns .Btn button {
+  background: rgba(0,0,0,0.1);
+}
+.DarkenBtns .StarBtn button:hover, .DarkenBtns .Btn button:hover {
+  background: rgba(0,0,0,0.2);
+}
+.DarkenBtns .Input input {
+  color: rgb(50,50,50);
+}
+.DarkenBtns2 .StarBtn button, .DarkenBtns2 .Btn button {
+  background: rgba(0,0,0,0.3);
+}
+.DarkenBtns2 .StarBtn button:hover, .DarkenBtns2 .Btn button:hover {
+  background: rgba(0,0,0,0.4);
 }

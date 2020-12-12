@@ -9,16 +9,27 @@ import { starIcon, dotsIcon, roadmapIcon, boardIcon } from '../../UI/icons';
 import InviteModal from '../InviteModal/InviteModal';
 import BoardMenu from '../BoardMenu/BoardMenu';
 import MemberModal from '../MemberModal/MemberModal';
+import { LIGHT_PHOTO_IDS } from '../../../utils/backgrounds';
 
 const BoardNavBar = props => {
   const [inputTitle, setInputTitle] = useState(props.title);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showMember, setShowMember] = useState('');
   const [adminCount, setAdminCount] = useState(props.members.filter(member => member.isAdmin).length);
+  const [darkenBtns, setDarkenBtns] = useState(false);
+  const [darkenBtns2, setDarkenBtns2] = useState(false);
 
   useEffect(() => setAdminCount(props.members.filter(member => member.isAdmin).length), [props.members]);
 
   useEffect(() => setInputTitle(props.title), [props.title]);
+
+  useEffect(() => {
+    // if board background causes btns to be hard to see, add darken class
+    if (LIGHT_PHOTO_IDS.includes(props.color)) { setDarkenBtns(true); }
+    else { setDarkenBtns(false); }
+    if (props.color === LIGHT_PHOTO_IDS[1]) { setDarkenBtns2(true); }
+    else { setDarkenBtns2(false); }
+  }, [props.color]);
 
   const checkTitle = () => {
     if (inputTitle === props.title || inputTitle.length > 100 || inputTitle === '') { return setInputTitle(props.title); }
@@ -36,12 +47,12 @@ const BoardNavBar = props => {
   };
 
   return (
-    <div className={classes.NavBar} style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
+    <div className={`${classes.NavBar} ${darkenBtns2 ? classes.DarkenBtns2 : darkenBtns ? classes.DarkenBtns : ''}`} style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
       <BoardMenu show={props.showMenu} close={props.closeMenu} />
       <span className={props.showMenu ? `${classes.Input} ${classes.InputContracted}` : classes.Input}>
         <AutosizeInput value={inputTitle} onChange={inputTitleHandler} onBlur={checkTitle} />
       </span>
-      <span className={props.isStarred ? `${classes.StarBtn} ${classes.Highlight}` : classes.StarBtn}>
+      <span className={`${classes.StarBtn} ${props.isStarred ? classes.Hightlight : ''}`}>
         <Button clicked={() => props.toggleIsStarred(props.boardID)}>{starIcon}</Button>
       </span>
       <span className={classes.Separator}></span>
@@ -81,7 +92,8 @@ BoardNavBar.propTypes = {
   closeMenu: PropTypes.func.isRequired,
   openRoadmap: PropTypes.func.isRequired,
   closeRoadmap: PropTypes.func.isRequired,
-  roadmapShown: PropTypes.bool.isRequired
+  roadmapShown: PropTypes.bool.isRequired,
+  color: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -91,7 +103,8 @@ const mapStateToProps = state => ({
   isStarred: state.board.isStarred,
   userEmail: state.auth.email,
   userIsAdmin: state.board.userIsAdmin,
-  roadmapShown: state.board.roadmapShown
+  roadmapShown: state.board.roadmapShown,
+  color: state.board.color
 });
 
 const mapDispatchToProps = dispatch => ({

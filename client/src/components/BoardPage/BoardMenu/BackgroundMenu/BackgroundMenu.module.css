@@ -1,13 +1,13 @@
-.Colors {
+.Options {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   flex-wrap: wrap;
   animation: slideIn 200ms forwards;
   position: relative;
-  margin: -10px;
+  margin: -7px;
 }
-.Colors div {
+.Options div {
   height: 60px;
   border-radius: 4px;
   position: relative;
@@ -18,14 +18,15 @@
   color: white;
   margin: 5px;
   width: calc(50% - 10px);
+  background-size: cover;
 }
-.Colors span {
+.Options span {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
 }
-.Colors div:hover span {
+.Options div:hover span {
   background: rgb(255,255,255,0.2);
 }

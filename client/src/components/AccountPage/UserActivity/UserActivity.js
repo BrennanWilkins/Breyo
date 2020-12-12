@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import classes from './UserActivity.module.css';
 import { activityIcon } from '../../UI/icons';
 import Action from '../../BoardPage/CardDetails/CardActivity/Action/Action';
-import CommentAction from '../../BoardPage/CardDetails/CardActivity/Action/CommentAction';
 import AuthSpinner from '../../UI/AuthSpinner/AuthSpinner';
 import { instance as axios } from '../../../axios';
 import PropTypes from 'prop-types';

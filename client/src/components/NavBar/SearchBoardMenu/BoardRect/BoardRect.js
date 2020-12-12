@@ -3,6 +3,7 @@ import classes from './BoardRect.module.css';
 import PropTypes from 'prop-types';
 import { starIcon } from '../../../UI/icons';
 import { useHistory } from 'react-router';
+import { getPhotoURL } from '../../../../utils/backgrounds';
 
 const BoardRect = props => {
   const starRef = useRef();
@@ -15,8 +16,9 @@ const BoardRect = props => {
   };
 
   return (
-    <div className={classes.Rect} style={{background: props.color}} onClick={navHandler}>
-      <span className={classes.Title}>{props.title}</span>
+    <div className={classes.Rect} style={props.color[0] === '#' ? {background: props.color} :
+    {backgroundImage: getPhotoURL(props.color, 280)}} onClick={navHandler}>
+      <span className={props.color[0] === '#' ? classes.Title : `${classes.Title} ${classes.DarkenTitle}`}>{props.title}</span>
       <div className={classes.Overlay}></div>
       <div ref={starRef} onClick={props.toggleIsStarred} className={props.isStarred ? classes.Starred : classes.NotStarred}>{starIcon}</div>
     </div>

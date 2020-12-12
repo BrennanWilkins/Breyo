@@ -11,6 +11,7 @@ import AboutMenu from './AboutMenu/AboutMenu';
 import SettingsMenu from './SettingsMenu/SettingsMenu';
 import BackgroundMenu from './BackgroundMenu/BackgroundMenu';
 import ActivityMenu from './ActivityMenu/ActivityMenu';
+import { getPhotoURL } from '../../../utils/backgrounds';
 
 const BoardMenu = props => {
   const [showBoardDesc, setShowBoardDesc] = useState(false);
@@ -39,7 +40,9 @@ const BoardMenu = props => {
       <div className={classes.Options}>
         <div onClick={() => setShowBoardDesc(true)} className={classes.Option}>{boardIcon}About this board</div>
         <div onClick={() => setShowChangeBackground(true)} className={classes.Option}>
-          <span style={{ background: props.color }} className={classes.SmallColor}></span>Change background
+          <span style={props.color[0] === '#' ? { background: props.color } : {backgroundImage: getPhotoURL(props.color, 20) }} 
+          className={classes.SmallColor}></span>
+          Change background
         </div>
         <div onClick={() => setShowSettings(true)} className={classes.Option}><span className={classes.SettingsIcon}>{settingsIcon}</span>Settings</div>
         <div onClick={() => setShowArchive(true)} className={classes.Option}><span className={classes.ArchiveIcon}>{archiveFillIcon}</span>Archive</div>

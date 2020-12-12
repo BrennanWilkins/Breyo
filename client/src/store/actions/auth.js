@@ -1,7 +1,6 @@
 import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
 import { addNotif } from './notifications';
-import { sendUpdate } from './socket';
 
 const loginDispatch = payload => ({ type: actionTypes.LOGIN, payload });
 

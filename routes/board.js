@@ -13,9 +13,12 @@ const Activity = require('../models/activity');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
-const COLORS = ['rgb(240, 144, 0)', 'rgb(72, 154, 60)', 'rgb(113, 80, 223)',
-                'rgb(0,121,191)', 'rgb(240, 85, 68)', 'rgb(56, 187, 244)',
-                'rgb(173, 80, 147)', 'rgb(74, 50, 221)', 'rgb(4, 107, 139)'];
+const COLORS = ['#f05544', '#f09000', '#489a3c', '#0079bf', '#7150df',
+  '#38bbf4', '#ad5093', '#4a32dd', '#046b8b'];
+
+const PHOTO_IDS = ['1607556049122-5e3874a25a1f', '1605325811474-ba58cf3180d8', '1513580638-fda5563960d6',
+'1554129352-f8c3ab6d5595', '1596709097416-6d4206796022', '1587732282555-321fddb19dc0',
+'1605580556856-db8fae94b658', '1605738862138-6704bedb5202', '1605447781678-2a5baca0e07b'];
 
 // returns all board & list data for a given board
 router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMember,
@@ -46,12 +49,12 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
   }
 );
 
-// create a new board w given title/color
+// create a new board w given title/background
 router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 100 })], 'Please enter a valid title.'),
   async (req, res) => {
     try {
-      // if invalid color default to red
-      const color = COLORS.includes(req.body.color) ? req.body.color : COLORS[4];
+      // if invalid background then default to red
+      const color = COLORS.includes(req.body.color) || PHOTO_IDS.includes(req.body.color) ? req.body.color : COLORS[0];
       const user = await User.findById(req.userID);
       if (!user) { throw 'No user data found'; }
       const title = req.body.title;
@@ -88,10 +91,11 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
 router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
-      if (!COLORS.includes(String(req.body.color))) { throw 'Color not found'; }
+      const color = req.body.color;
+      if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { throw 'Background not found'; }
       const board = await Board.findById(req.body.boardID);
       if (!board) { throw 'No board data found'; }
-      board.color = req.body.color;
+      board.color = color;
 
       // for each member of board, update the board color in their model
       const emails = board.members.map(member => member.email);
@@ -99,7 +103,7 @@ router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
       for (let user of users) {
         const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
         if (index < 0) { throw 'Board not found in users model'; }
-        user.boards[index].color = req.body.color;
+        user.boards[index].color = color;
         user.markModified('boards');
         await user.save();
       }
@@ -412,7 +416,7 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
 
       const actionData = { msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID: board._id };
       const newActivity = await addActivity(actionData, req);
-      
+
       await user.save();
       await board.save();
       res.status(200).json({ newActivity });
