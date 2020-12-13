@@ -7,7 +7,7 @@ import { addRecentActivity } from './activity';
 const getCardState = getState => {
   // helper func for retrieving cardID/listID/boardID for card details actions
   const state = getState();
-  return { boardID: state.board.boardID, listID: state.lists.shownListID, cardID: state.lists.shownCardID };
+  return { boardID: state.board.boardID, listID: state.lists.shownListID, cardID: state.lists.shownCardID, state };
 };
 
 export const addCard = (title, boardID, listID) => async dispatch => {
@@ -327,10 +327,7 @@ export const removeCardMember = (email, cardID, listID) => async (dispatch, getS
 
 export const addComment = msg => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const boardID = state.board.boardID;
-    const listID = state.lists.shownListID;
-    const cardID = state.lists.shownCardID;
+    const { boardID, listID, cardID, state } = getCardState(getState);
     const date = String(new Date());
     const res = await axios.post('/card/comments', { msg, cardID, listID, date, boardID });
     const payload = { msg, commentID: res.data.commentID, cardID, date, listID, email: state.auth.email, fullName: state.auth.fullName };

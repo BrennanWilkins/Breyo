@@ -2,7 +2,7 @@ import { instance as axios } from '../../axios';
 import io from 'socket.io-client';
 import store from '../../store';
 import * as actionTypes from './actionTypes';
-import { addNotif } from './notifications';
+import { addNotif, serverErr } from './notifications';
 import socketMap from './socketMap';
 
 let socket = null;
@@ -51,7 +51,7 @@ export const initSocket = boardID => {
         axios.defaults.headers.common['x-auth-token'] = res.data.token;
         store.dispatch({ type: actionTypes.PROMOTE_SELF, boardID });
       }
-    } catch (err) { console.log(err); }
+    } catch (err) { store.dispatch(serverErr()); }
   });
 
   newSocket.on('delete/board/admins', async email => {
@@ -65,7 +65,7 @@ export const initSocket = boardID => {
         axios.defaults.headers.common['x-auth-token'] = res.data.token;
         store.dispatch({ type: actionTypes.DEMOTE_SELF, boardID });
       }
-    } catch (err) { console.log(err); }
+    } catch (err) { store.dispatch(serverErr()); }
   });
 
   for (let route in socketMap) {

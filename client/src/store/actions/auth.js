@@ -4,8 +4,6 @@ import { addNotif } from './notifications';
 
 const loginDispatch = payload => ({ type: actionTypes.LOGIN, payload });
 
-const updateUserData = (invites, boards) => ({ type: actionTypes.UPDATE_USER_DATA, invites, boards });
-
 export const loginErr = msg => ({ type: actionTypes.LOGIN_ERR, msg });
 
 export const signupErr = msg => ({ type: actionTypes.SIGNUP_ERR, msg });
@@ -15,7 +13,7 @@ export const authReset = () => ({ type: actionTypes.AUTH_RESET });
 export const getUserData = () => async dispatch => {
   try {
     const res = await axios.get('/auth/userData');
-    dispatch(updateUserData(res.data.invites, res.data.boards));
+    dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards })
   } catch (err) {
     dispatch(addNotif('There was an error while retrieving your data.'));
   }
