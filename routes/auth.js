@@ -66,9 +66,9 @@ router.post('/signup', validate(
       if (req.body.password !== req.body.confirmPassword) {
         return res.status(400).json({ msg: 'Password must be equal to confirm password.' });
       }
-      const checkEmail = await User.findOne({ email: req.body.email });
-      // if email already taken
-      if (checkEmail) { return res.status(400).json({ msg: 'That email is already taken.' }); }
+      // check if email exists in user collection already
+      const emailExists = await User.exists({ email: req.body.email });
+      if (emailExists) { return res.status(400).json({ msg: 'That email is already taken.' }); }
       const hashedPassword = await bcryptjs.hash(req.body.password, 10);
       const user = new User({ email: req.body.email, password: hashedPassword,
         fullName: req.body.fullName, invites: [], boards: [] });
@@ -120,21 +120,20 @@ router.delete('/deleteAccount', auth,
         const board = await Board.findById(board.boardID);
         // if user is only member of board then delete board
         if (board.members.length === 1) {
-          await board.remove();
-          // remove all of board's lists & activities
-          await List.deleteMany({ boardID: board.boardID });
-          await Activity.deleteMany({ boardID: board.boardID });
+          // remove board & all of board's lists & activities
+          await Promise.all([board.remove(), List.deleteMany({ boardID: board.boardID }), Activity.deleteMany({ boardID: board.boardID })]);
         } else {
           // if user is admin of board then check if theres another admin, if not then promote all other users to admin
           const adminCount = board.members.filter(member => member.isAdmin).length;
           if (adminCount >= 2) { continue; }
           board.members = board.members.filter(member => member.email !== user.email).map(member => ({ ...member, isAdmin: true }));
           await board.save();
-          for (let boardMember of board.members) {
-            const member = await User.findOne({ email: boardMember.email });
-            const matchingBoard = member.boards.find(userBoard => userBoard.boardID === board.boardID);
+          const emails = board.members.map(member => member.email);
+          const members = await User.find({ email: { $in: emails }});
+          for (let boardMember of members) {
+            const matchingBoard = boardMember.boards.find(userBoard => userBoard.boardID === board.boardID);
             matchingBoard.isAdmin = true;
-            await member.save();
+            await boardMember.save();
           }
         }
       }
