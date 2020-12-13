@@ -8,11 +8,22 @@ const config = require('config');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 
+const getJWTPayload = user => {
+  // create jwt sign payload for easier user data lookup
+  const userMembers = {};
+  const userAdmins = {};
+  for (let board of user.boards) {
+    userMembers[board.boardID] = true;
+    if (board.isAdmin) { userAdmins[board.boardID] = true; }
+  }
+  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins };
+};
+
 // returns a user's boards & invites to be used on dashboard page
 router.get('/userData', auth,
   async (req, res) => {
     try {
-      const user = await User.findById(req.userID);
+      const user = await User.findById(req.userID).select('boards invites').lean();
       if (!user) { throw 'user data not found'; }
       res.status(200).json({ boards: user.boards, invites: user.invites });
     } catch (err) { res.sendStatus(500); }
@@ -25,14 +36,15 @@ router.post('/login', validate(
   'Email and password cannot be empty.'),
   async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.body.email });
+      const user = await User.findOne({ email: req.body.email }).lean();
       // return 400 error if no user found
       if (!user) { return res.status(400).json({ msg: 'Incorrect username or password.' }); }
       const same = await bcryptjs.compare(req.body.password, user.password);
       // return 400 error if password incorrect
       if (!same) { return res.status(400).json({ msg: 'Incorrect email or password.' }); }
       // create jwt token that expires in 7 days
-      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
+      const jwtPayload = getJWTPayload(user);
+      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
       res.status(200).json({ token, fullName: user.fullName, email: user.email,
         invites: user.invites, boards: user.boards });
     } catch(err) { return res.status(500).json({ msg: 'There was an error while logging in.' }); }
@@ -63,7 +75,8 @@ router.post('/signup', validate(
       await user.save();
       // signup was successful, login
       // create jwt token that expires in 7 days
-      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: '7d' });
+      const jwtPayload = getJWTPayload(user);
+      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
       res.status(200).json({ token, email: user.email, fullName: user.fullName, invites: [], boards: [] });
     } catch(err) { res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
@@ -73,7 +86,7 @@ router.post('/signup', validate(
 router.post('/autoLogin', auth,
   async (req, res) => {
     try {
-      const user = await User.findById(req.userID);
+      const user = await User.findById(req.userID).lean();
       if (!user) { throw 'User data not found'; }
       res.status(200).json({ email: user.email, fullName: user.fullName, invites: user.invites, boards: user.boards });
     } catch(err) { res.sendStatus(500); }
@@ -131,3 +144,4 @@ router.delete('/deleteAccount', auth,
 );
 
 module.exports = router;
+module.exports.getJWTPayload = getJWTPayload;

@@ -11,15 +11,13 @@ module.exports = (req, res, next) => {
       if (err) {
         return res.status(401).json({ msg: 'TOKEN NOT VALID' });
       }
-      req.userID = decoded.user._id;
+
+      req.userID = decoded.user.userID;
       req.email = decoded.user.email;
       req.fullName = decoded.user.fullName;
-      req.userMembers = {};
-      req.userAdmins = {};
-      for (let board of decoded.user.boards) {
-        req.userMembers[board.boardID] = true;
-        if (board.isAdmin) { req.userAdmins[board.boardID] = true; }
-      }
+      req.userMembers = decoded.user.userMembers;
+      req.userAdmins = decoded.user.userAdmins;
+
       next();
     });
   } else {

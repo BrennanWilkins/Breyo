@@ -12,6 +12,7 @@ const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const { getJWTPayload } = require('./auth');
 
 const COLORS = ['#f05544', '#f09000', '#489a3c', '#0079bf', '#7150df',
   '#38bbf4', '#ad5093', '#4a32dd', '#046b8b'];
@@ -37,8 +38,9 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
       const isAdminInBoard = board.members.find(member => member.email === decoded.user.email).isAdmin;
       // user's token is not up to date, send new token
       if (isAdminInBoard !== isAdminInToken) {
-        const user = await User.findById(req.userID);
-        const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+        const user = await User.findById(req.userID).lean();
+        const jwtPayload = getJWTPayload(user);
+        const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
         data.invites = user.invites;
         data.boards = user.boards;
         data.token = token;
@@ -66,7 +68,7 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
       // add board to user's boards
       const newBoard = { boardID: board._id, title, isStarred: false, isAdmin: true, color: board.color };
       user.boards.unshift(newBoard);
-      await user.save();
+      const updatedUser = await user.save();
 
       // add default lists to board (to do, doing, done)
       const list1 = new List({ boardID: board._id, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false });
@@ -79,7 +81,8 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
 
       const decoded = jwt.decode(req.header('x-auth-token'));
       // update client's token to show new board, new token expires at same time
-      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+      const jwtPayload = getJWTPayload(updatedUser);
+      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
 
       res.status(200).json({ board: newBoard, token });
     } catch(err) { res.sendStatus(500); }
@@ -218,9 +221,10 @@ router.put('/admins/promoteUser', auth,
     try {
       const isAlreadyAdmin = req.userAdmins[req.body.boardID];
       if (isAlreadyAdmin) { throw 'User already an admin'; }
-      const user = await User.findById(req.userID);
+      const user = await User.findById(req.userID).lean();
       const decoded = jwt.decode(req.header('x-auth-token'));
-      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+      const jwtPayload = getJWTPayload(user);
+      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
       res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }
   }
@@ -233,9 +237,10 @@ router.put('/admins/demoteUser', auth,
       const isAdmin = req.userAdmins[req.body.boardID];
       const isMember = req.userMembers[req.body.boardID];
       if (!isAdmin && isMember) { throw 'User already demoted'; }
-      const user = await User.findById(req.userID);
+      const user = await User.findById(req.userID).lean();
       const decoded = jwt.decode(req.header('x-auth-token'));
-      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+      const jwtPayload = getJWTPayload(user);
+      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
       res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }
   }
@@ -309,7 +314,7 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
       user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false, color: board.color }];
       // add user to board members
       board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
-      await user.save();
+      const updatedUser = await user.save();
       await board.save();
 
       const actionData = { msg: null, boardMsg: 'was added to this board', cardID: null, listID: null, boardID: board._id, email: user.email, fullName: user.fullName };
@@ -317,7 +322,8 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
 
       const decoded = jwt.decode(req.header('x-auth-token'));
       // update client's token to show new board, new token expires at same time
-      const token = await jwt.sign({ user }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+      const jwtPayload = getJWTPayload(updatedUser);
+      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
 
       res.status(200).json({ token, newActivity, boards: user.boards, invites: user.invites });
     } catch(err) { res.sendStatus(500); }
