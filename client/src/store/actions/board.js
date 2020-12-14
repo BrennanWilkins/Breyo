@@ -222,6 +222,10 @@ export const acceptInvite = (boardID, email, fullName, push) => async (dispatch,
     dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards });
     sendUpdate('post/board/newMember', JSON.stringify({ email, fullName }));
   } catch (err) {
+    if (err.response && err.response.status === 400) {
+      dispatch({ type: actionTypes.REMOVE_INVITE, boardID });
+      return dispatch(addNotif('This board no longer exists.'));
+    }
     dispatch(addNotif('There was an error while joining the board.'));
   }
 };
