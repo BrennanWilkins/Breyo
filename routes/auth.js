@@ -36,17 +36,20 @@ router.post('/login', validate(
   'Email and password cannot be empty.'),
   async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.body.email }).lean();
+      const { email, password } = req.body;
+      const user = await User.findOne({ email }).lean();
       // return 400 error if no user found
       if (!user) { return res.status(400).json({ msg: 'Incorrect username or password.' }); }
-      const same = await bcryptjs.compare(req.body.password, user.password);
-      // return 400 error if password incorrect
+
+      // verify if correct password
+      const same = await bcryptjs.compare(password, user.password);
       if (!same) { return res.status(400).json({ msg: 'Incorrect email or password.' }); }
+
       // create jwt token that expires in 7 days
       const jwtPayload = getJWTPayload(user);
       const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
-      res.status(200).json({ token, fullName: user.fullName, email: user.email,
-        invites: user.invites, boards: user.boards });
+
+      res.status(200).json({ token, fullName: user.fullName, email, invites: user.invites, boards: user.boards });
     } catch(err) { return res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
 );
@@ -59,25 +62,29 @@ router.post('/signup', validate(
   'There was an error in one of the fields.'),
   async (req, res) => {
     try {
+      const { fullName, password, confirmPassword, email } = req.body;
       // user full name must be characters a-z or A-Z
-      if (!req.body.fullName.match(/^[ a-zA-Z]+$/)) {
+      if (!fullName.match(/^[ a-zA-Z]+$/)) {
         return res.status(400).json({ msg: 'Please enter a valid full name.' });
       }
-      if (req.body.password !== req.body.confirmPassword) {
+      if (password !== confirmPassword) {
         return res.status(400).json({ msg: 'Password must be equal to confirm password.' });
       }
+
       // check if email exists in user collection already
-      const emailExists = await User.exists({ email: req.body.email });
+      const emailExists = await User.exists({ email });
       if (emailExists) { return res.status(400).json({ msg: 'That email is already taken.' }); }
-      const hashedPassword = await bcryptjs.hash(req.body.password, 10);
-      const user = new User({ email: req.body.email, password: hashedPassword,
-        fullName: req.body.fullName, invites: [], boards: [] });
+
+      const hashedPassword = await bcryptjs.hash(password, 10);
+      const user = new User({ email, password: hashedPassword, fullName, invites: [], boards: [] });
       await user.save();
+
       // signup was successful, login
       // create jwt token that expires in 7 days
       const jwtPayload = getJWTPayload(user);
       const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
-      res.status(200).json({ token, email: user.email, fullName: user.fullName, invites: [], boards: [] });
+
+      res.status(200).json({ token, email, fullName, invites: [], boards: [] });
     } catch(err) { res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
 );
@@ -93,18 +100,26 @@ router.post('/autoLogin', auth,
   }
 );
 
-router.post('/changePass', auth, validate([body('newPassword').isLength({ min: 8, max: 100 })], 'There is an error in one of the fields.'),
+router.post('/changePass', auth, validate(
+  [body('newPassword').isLength({ min: 8, max: 100 }),
+  body('confirmPassword').isLength({ min: 8, max: 100 }),
+  body('oldPassword').not().isEmpty()
+  ], 'There is an error in one of the fields.'),
   async (req, res) => {
     try {
-      const user = await User.findById(req.userID);
-      if (req.body.newPassword !== req.body.confirmPassword) {
+      const { newPassword, confirmPassword, oldPassword } = req.body;
+      if (newPassword !== confirmPassword) {
         return res.status(400).json({ msg: 'Confirm password must be equal to your new password.' });
       }
+      const user = await User.findById(req.userID);
+
       // confirm that user entered old password correct
-      const same = await bcryptjs.compare(req.body.oldPassword, user.password);
+      const same = await bcryptjs.compare(oldPassword, user.password);
       if (!same) { return res.status(400).json({ msg: 'Incorrect password.' }); }
-      const hashedPass = await bcryptjs.hash(req.body.newPassword, 10);
+
+      const hashedPass = await bcryptjs.hash(newPassword, 10);
       user.password = hashedPass;
+
       await user.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
@@ -114,27 +129,30 @@ router.post('/changePass', auth, validate([body('newPassword').isLength({ min: 8
 router.delete('/deleteAccount', auth,
   async (req, res) => {
     try {
-      const user = await User.findByIdAndDelete(req.userID);
+      const user = await User.findByIdAndDelete(req.userID).lean();
+
       for (let board of user.boards) {
+        // if user is not an admin then nothing to do
         if (!board.isAdmin) { continue; }
-        const board = await Board.findById(board.boardID);
+        const boardID = String(board.boardID);
+        const board = await Board.findById(boardID);
         // if user is only member of board then delete board
         if (board.members.length === 1) {
           // remove board & all of board's lists & activities
-          await Promise.all([board.remove(), List.deleteMany({ boardID: board.boardID }), Activity.deleteMany({ boardID: board.boardID })]);
+          await Promise.all([board.remove(), List.deleteMany({ boardID }), Activity.deleteMany({ boardID })]);
         } else {
           // if user is admin of board then check if theres another admin, if not then promote all other users to admin
           const adminCount = board.members.filter(member => member.isAdmin).length;
           if (adminCount >= 2) { continue; }
           board.members = board.members.filter(member => member.email !== user.email).map(member => ({ ...member, isAdmin: true }));
-          await board.save();
           const emails = board.members.map(member => member.email);
           const members = await User.find({ email: { $in: emails }});
           for (let boardMember of members) {
-            const matchingBoard = boardMember.boards.find(userBoard => userBoard.boardID === board.boardID);
+            const matchingBoard = boardMember.boards.find(userBoard => String(userBoard.boardID) === boardID);
             matchingBoard.isAdmin = true;
-            await boardMember.save();
           }
+
+          await Promise.all([board.save(), ...members.map(member => member.save())]);
         }
       }
       res.sendStatus(200);
