@@ -46,7 +46,8 @@ const routes = [
   'post/board/newMember',
   'put/board/memberLeft',
   'delete/card/roadmapLabel',
-  'post/card/roadmapLabel'
+  'post/card/roadmapLabel',
+  'delete/board'
 ];
 
 module.exports = routes;

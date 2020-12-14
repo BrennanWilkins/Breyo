@@ -68,6 +68,12 @@ export const initSocket = boardID => {
     } catch (err) { store.dispatch(serverErr()); }
   });
 
+  newSocket.on('delete/board', data => {
+    const { boardID } = JSON.parse(data);
+    store.dispatch({ type: actionTypes.DELETE_BOARD, boardID });
+    window.location.reload();
+  });
+
   for (let route in socketMap) {
     newSocket.on(route, data => {
       const payload = JSON.parse(data);

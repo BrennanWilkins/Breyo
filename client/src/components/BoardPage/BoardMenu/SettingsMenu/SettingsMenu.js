@@ -4,10 +4,11 @@ import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import DeleteModal from '../DeleteModal/DeleteModal';
-import { withRouter } from 'react-router-dom';
 import { deleteBoard, deleteBoardActivity, leaveBoard } from '../../../../store/actions';
+import { useHistory } from 'react-router';
 
 const SettingsMenu = props => {
+  let history = useHistory();
   const [showDeleteBoard, setShowDeleteBoard] = useState(false);
   const [showDeleteActivity, setShowDeleteActivity] = useState(false);
   const [showLeaveBoard, setShowLeaveBoard] = useState(false);
@@ -16,8 +17,7 @@ const SettingsMenu = props => {
   useEffect(() => setAdminCount(props.members.filter(member => member.isAdmin).length), [props.members]);
 
   const deleteBoardHandler = () => {
-    props.deleteBoard();
-    props.history.push('/');
+    props.deleteBoard(history.push);
   };
 
   const deleteActivityHandler = () => {
@@ -27,7 +27,7 @@ const SettingsMenu = props => {
 
   const leaveBoardHandler = () => {
     setShowLeaveBoard(false);
-    props.leaveBoard(props.history.push);
+    props.leaveBoard(history.push);
   };
 
   return (
@@ -65,9 +65,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  deleteBoard: () => dispatch(deleteBoard()),
+  deleteBoard: push => dispatch(deleteBoard(push)),
   deleteBoardActivity: () => dispatch(deleteBoardActivity()),
   leaveBoard: push => dispatch(leaveBoard(push))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(SettingsMenu));
+export default connect(mapStateToProps, mapDispatchToProps)(SettingsMenu);

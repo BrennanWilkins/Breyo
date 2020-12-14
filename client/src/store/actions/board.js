@@ -198,11 +198,13 @@ export const updateBoardDesc = desc => async (dispatch, getState) => {
   }
 };
 
-export const deleteBoard = () => async (dispatch, getState) => {
+export const deleteBoard = push => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
     await axios.delete('/board/' + boardID);
+    sendUpdate('delete/board', JSON.stringify({ boardID }));
     dispatch({ type: actionTypes.DELETE_BOARD, boardID });
+    push('/');
   } catch (err) {
     dispatch(addNotif('There was an error while deleting the board.'));
   }
