@@ -21,6 +21,15 @@ const PHOTO_IDS = ['1607556049122-5e3874a25a1f', '1605325811474-ba58cf3180d8', '
 '1554129352-f8c3ab6d5595', '1596709097416-6d4206796022', '1587732282555-321fddb19dc0',
 '1605580556856-db8fae94b658', '1605738862138-6704bedb5202', '1605447781678-2a5baca0e07b'];
 
+const signNewToken = async (user, oldToken) => {
+  try {
+    const decoded = jwt.decode(oldToken);
+    const jwtPayload = getJWTPayload(user);
+    const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+    return token;
+  } catch (err) { return new Error('Error generating token'); }
+};
+
 // returns all board & list data for a given board
 router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
@@ -34,14 +43,12 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
       if (!board || !lists || !activity) { throw 'Board data not found'; }
       const data = { ...board, lists, activity };
 
-      const decoded = jwt.decode(req.header('x-auth-token'));
       const isAdminInToken = req.userAdmins[boardID];
-      const isAdminInBoard = board.members.find(member => member.email === decoded.user.email).isAdmin;
-      // user's token is not up to date, send new token
+      const isAdminInBoard = board.members.find(member => member.email === req.email).isAdmin;
+      // if user's token is not up to date, send new token
       if (isAdminInBoard !== isAdminInToken) {
         const user = await User.findById(req.userID).lean();
-        const jwtPayload = getJWTPayload(user);
-        const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+        const token = await signNewToken(user, req.header('x-auth-token'));
         data.invites = user.invites;
         data.boards = user.boards;
         data.token = token;
@@ -79,10 +86,8 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
 
       await Promise.all([board.save(), user.save(), List.insertMany([list1, list2, list3]), addActivity(actionData, req)]);
 
-      const decoded = jwt.decode(req.header('x-auth-token'));
       // update client's token to show new board, new token expires at same time
-      const jwtPayload = getJWTPayload(user);
-      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+      const token = await signNewToken(user, req.header('x-auth-token'));
 
       res.status(200).json({ board: newBoard, token });
     } catch(err) { res.sendStatus(500); }
@@ -121,7 +126,7 @@ router.put('/desc', auth, validate([body('boardID').isMongoId(), body('desc').is
   async (req, res) => {
     try {
       const boardID = req.body.boardID;
-      const board = await Board.findByIdAndUpdate(boardID, { desc: req.body.desc });
+      const board = await Board.findByIdAndUpdate(boardID, { desc: req.body.desc }).lean();
       if (!board) { throw 'No board data found'; }
 
       const actionData = { msg: null, boardMsg: 'updated the board description', cardID: null, listID: null, boardID };
@@ -140,8 +145,8 @@ router.put('/title', auth, validate(
   async (req, res) => {
     try {
       const { title, boardID } = req.body;
-      // const title = req.body.title;
       const board = await Board.findByIdAndUpdate(boardID, { title }).select('members title').lean();
+      if (!board) { throw 'No board data found'; }
       const oldTitle = board.title;
 
       // for each member of board, update board title in their user model
@@ -218,9 +223,7 @@ router.put('/admins/promoteUser', auth,
       const isAlreadyAdmin = req.userAdmins[req.body.boardID];
       if (isAlreadyAdmin) { throw 'User already an admin'; }
       const user = await User.findById(req.userID).lean();
-      const decoded = jwt.decode(req.header('x-auth-token'));
-      const jwtPayload = getJWTPayload(user);
-      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+      const token = await signNewToken(user, req.header('x-auth-token'));
       res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }
   }
@@ -234,9 +237,7 @@ router.put('/admins/demoteUser', auth,
       const isMember = req.userMembers[req.body.boardID];
       if (!isAdmin && isMember) { throw 'User already demoted'; }
       const user = await User.findById(req.userID).lean();
-      const decoded = jwt.decode(req.header('x-auth-token'));
-      const jwtPayload = getJWTPayload(user);
-      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+      const token = await signNewToken(user, req.header('x-auth-token'));
       res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }
   }
@@ -326,10 +327,8 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
       const actionData = { msg: null, boardMsg: 'was added to this board', cardID: null, listID: null, boardID: board._id, email: user.email, fullName: user.fullName };
       const newActivity = await addActivity(actionData, req);
 
-      const decoded = jwt.decode(req.header('x-auth-token'));
       // update client's token to show new board, new token expires at same time
-      const jwtPayload = getJWTPayload(user);
-      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+      const token = await signNewToken(user, req.header('x-auth-token'));
 
       res.status(200).json({ token, newActivity, boards: user.boards, invites: user.invites });
     } catch(err) { res.sendStatus(500); }
