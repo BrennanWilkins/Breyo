@@ -25,16 +25,17 @@ const PHOTO_IDS = ['1607556049122-5e3874a25a1f', '1605325811474-ba58cf3180d8', '
 router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.params.boardID).lean();
-      if (!board) { throw 'Board data not found'; }
-      const listData = await List.find({ boardID: board._id }).lean();
-      if (!listData) { throw 'List data not found'; }
-      const activity = await Activity.find({ boardID: board._id }).sort('-date').limit(20).lean();
-      if (!activity) { throw 'Activity data not found'; }
-      const data = { ...board, lists: listData, activity };
+      const boardID = req.params.boardID;
+      const [board, lists, activity] = await Promise.all([
+        Board.findById(boardID).lean(),
+        List.find({ boardID }).lean(),
+        Activity.find({ boardID }).sort('-date').limit(20).lean()
+      ]);
+      if (!board || !lists || !activity) { throw 'Board data not found'; }
+      const data = { ...board, lists, activity };
 
       const decoded = jwt.decode(req.header('x-auth-token'));
-      const isAdminInToken = req.userAdmins[req.params.boardID];
+      const isAdminInToken = req.userAdmins[boardID];
       const isAdminInBoard = board.members.find(member => member.email === decoded.user.email).isAdmin;
       // user's token is not up to date, send new token
       if (isAdminInBoard !== isAdminInToken) {
@@ -55,33 +56,32 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
 router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 100 })], 'Please enter a valid title.'),
   async (req, res) => {
     try {
+      let color = req.body.color;
       // if invalid background then default to red
-      const color = COLORS.includes(req.body.color) || PHOTO_IDS.includes(req.body.color) ? req.body.color : COLORS[0];
+      if (!COLORS.includes(req.body.color) && !PHOTO_IDS.includes(req.body.color)) { color = COLORS[0]; }
       const user = await User.findById(req.userID);
       if (!user) { throw 'No user data found'; }
       const title = req.body.title;
       // user is admin of new board by default
       const board = new Board({ title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
         color, creatorEmail: user.email, desc: '' });
-      await board.save();
 
       // add board to user's boards
       const newBoard = { boardID: board._id, title, isStarred: false, isAdmin: true, color: board.color };
       user.boards.unshift(newBoard);
-      const updatedUser = await user.save();
 
       // add default lists to board (to do, doing, done)
-      const list1 = new List({ boardID: board._id, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false });
-      const list2 = new List({ boardID: board._id, title: 'Doing', cards: [], archivedCards: [], indexInBoard: 1, isArchived: false });
-      const list3 = new List({ boardID: board._id, title: 'Done', cards: [], archivedCards: [], indexInBoard: 2, isArchived: false });
-      await list1.save(); await list2.save(); await list3.save();
+      const list1 = { boardID: board._id, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false };
+      const list2 = { boardID: board._id, title: 'Doing', cards: [], archivedCards: [], indexInBoard: 1, isArchived: false };
+      const list3 = { boardID: board._id, title: 'Done', cards: [], archivedCards: [], indexInBoard: 2, isArchived: false };
 
       const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID: board._id };
-      await addActivity(actionData, req);
+
+      await Promise.all([board.save(), user.save(), List.insertMany([list1, list2, list3]), addActivity(actionData, req)]);
 
       const decoded = jwt.decode(req.header('x-auth-token'));
       // update client's token to show new board, new token expires at same time
-      const jwtPayload = getJWTPayload(updatedUser);
+      const jwtPayload = getJWTPayload(user);
       const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
 
       res.status(200).json({ board: newBoard, token });
@@ -96,9 +96,8 @@ router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
     try {
       const color = req.body.color;
       if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { throw 'Background not found'; }
-      const board = await Board.findById(req.body.boardID);
+      const board = await Board.findByIdAndUpdate(req.body.boardID, { color }).select('members').lean();
       if (!board) { throw 'No board data found'; }
-      board.color = color;
 
       // for each member of board, update the board color in their model
       const emails = board.members.map(member => member.email);
@@ -108,10 +107,9 @@ router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
         if (index < 0) { throw 'Board not found in users model'; }
         user.boards[index].color = color;
         user.markModified('boards');
-        await user.save();
       }
+      await Promise.all(users.map(user => user.save()));
 
-      await board.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
@@ -122,12 +120,11 @@ router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
 router.put('/desc', auth, validate([body('boardID').isMongoId(), body('desc').isLength({ max: 600 })]), useIsMember,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.body.boardID);
+      const boardID = req.body.boardID;
+      const board = await Board.findByIdAndUpdate(boardID, { desc: req.body.desc });
       if (!board) { throw 'No board data found'; }
-      board.desc = req.body.desc;
-      await board.save();
 
-      const actionData = { msg: null, boardMsg: 'updated the board description', cardID: null, listID: null, boardID: board._id };
+      const actionData = { msg: null, boardMsg: 'updated the board description', cardID: null, listID: null, boardID };
       const newActivity = await addActivity(actionData, req);
 
       res.status(200).json({ newActivity });
@@ -142,26 +139,23 @@ router.put('/title', auth, validate(
   body('boardID').isMongoId()], 'Please enter a valid title.'), useIsMember,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.body.boardID);
-      if (!board) { throw 'No board data found'; }
-      const title = req.body.title;
+      const { title, boardID } = req.body;
+      // const title = req.body.title;
+      const board = await Board.findByIdAndUpdate(boardID, { title }).select('members title').lean();
       const oldTitle = board.title;
-      board.title = title;
 
       // for each member of board, update board title in their user model
       const emails = board.members.map(member => member.email);
       const users = await User.find({ email: { $in: emails }});
       for (let user of users) {
-        const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+        const index = user.boards.findIndex(board => String(board.boardID) === boardID);
         if (index < 0) { throw 'Board not found in users model'; }
         user.boards[index].title = title;
         user.markModified('boards');
-        await user.save();
       }
+      await Promise.all(users.map(user => user.save()));
 
-      await board.save();
-
-      const actionData = { msg: null, boardMsg: `renamed this board from ${oldTitle} to ${title}`, cardID: null, listID: null, boardID: board._id };
+      const actionData = { msg: null, boardMsg: `renamed this board from ${oldTitle} to ${title}`, cardID: null, listID: null, boardID };
       const newActivity = await addActivity(actionData, req);
 
       res.status(200).json({ newActivity });
@@ -190,24 +184,26 @@ router.put('/starred', auth, validate([body('boardID').isMongoId()]),
 router.post('/admins', auth, validate([body('email').isEmail(), body('boardID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.body.boardID);
-      const user = await User.findOne({ email: req.body.email });
+      const { email, boardID } = req.body;
+      const [board, user] = await Promise.all([Board.findById(boardID), User.findOne({ email })]);
       if (!board || !user) { throw 'Board or user data not found'; }
+
       // find user in board's members and change user to admin if found
-      const memberIndex = board.members.findIndex(member => member.email === user.email && !member.isAdmin);
+      const memberIndex = board.members.findIndex(member => member.email === email && !member.isAdmin);
       if (memberIndex === -1) { throw 'Member not found in board members'; }
       if (board.members.length <= 1) { throw 'Not enough board members to add new admin'; }
       board.members[memberIndex].isAdmin = true;
+
       // update board in user's board model to isAdmin
-      const boardIndex = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+      const boardIndex = user.boards.findIndex(board => String(board.boardID) === boardID);
       if (boardIndex === -1) { throw 'Board not found in users boards'; }
       user.boards[boardIndex].isAdmin = true;
       user.markModified('boards');
       board.markModified('members');
-      await user.save();
-      await board.save();
 
-      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to admin`, cardID: null, listID: null, boardID: board._id };
+      await Promise.all([user.save(), board.save()]);
+
+      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to admin`, cardID: null, listID: null, boardID };
       const newActivity = await addActivity(actionData, req);
 
       res.status(200).json({ newActivity });
@@ -251,24 +247,25 @@ router.put('/admins/demoteUser', auth,
 router.delete('/admins/:email/:boardID', auth, validate([param('email').isEmail(), param('boardID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.params.boardID);
-      const user = await User.findOne({ email: req.params.email });
+      const { email, boardID } = req.params;
+      const [board, user] = await Promise.all([Board.findById(boardID), User.findOne({ email })]);
       if (!board || !user) { throw 'No board or user data found'; }
+
       // find user in board's members and change user isAdmin to false if found
-      const memberIndex = board.members.findIndex(member => member.email === user.email && member.isAdmin);
+      const memberIndex = board.members.findIndex(member => member.email === email && member.isAdmin);
       if (memberIndex === -1) { throw 'User not found in boards members'; }
       const adminCount = board.members.filter(member => member.isAdmin).length;
       if (adminCount <= 1) { throw 'There must be at least 1 admin at all times'; }
       board.members[memberIndex].isAdmin = false;
-      const boardIndex = user.boards.findIndex(board => String(board.boardID) === String(req.params.boardID));
+      const boardIndex = user.boards.findIndex(board => String(board.boardID) === boardID);
       if (boardIndex === -1) { throw 'Board not found in users boards'; }
       user.boards[boardIndex].isAdmin = false;
+
       user.markModified('boards');
       board.markModified('members');
-      await user.save();
-      await board.save();
+      await Promise.all([user.save(), board.save()]);
 
-      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to member`, cardID: null, listID: null, boardID: board._id };
+      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to member`, cardID: null, listID: null, boardID };
       const newActivity = await addActivity(actionData, req);
 
       res.status(200).json({ newActivity });
@@ -281,21 +278,22 @@ router.delete('/admins/:email/:boardID', auth, validate([param('email').isEmail(
 router.post('/invites', auth, validate([body('email').isEmail(), body('boardID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.body.boardID);
-      const inviter = await User.findById(req.userID);
-      if (!board || !inviter) { throw 'No board or user data found'; }
-      // find user based on user's email
-      const invitee = await User.findOne({ email: req.body.email });
+      const { boardID, email } = req.body;
+      const [board, invitee] = await Promise.all([Board.findById(boardID).select('title').lean(), User.findOne({ email })]);
+      if (!board) { throw 'No board data found'; }
       if (!invitee) { return res.status(400).json({ msg: 'No user was found for that email.' }); }
+
       // user already invited
-      if (invitee.invites.find(invite => String(invite.boardID) === String(board._id))) {
+      if (invitee.invites.find(invite => String(invite.boardID) === boardID)) {
         return res.status(400).json({ msg: 'You have already invited this person to this board.' });
       }
-      if (invitee.boards.find(userBoard => String(userBoard.boardID) === String(board._id))) {
+      // user already member
+      if (invitee.boards.find(userBoard => String(userBoard.boardID) === boardID)) {
         return res.status(400).json({ msg: 'This user is already a member of this board.' });
       }
-      invitee.invites = [...invitee.invites, { inviterEmail: inviter.email, inviterName: inviter.fullName, title: board.title, boardID: board._id }];
-      invitee.save();
+
+      invitee.invites = [...invitee.invites, { inviterEmail: req.email, inviterName: req.fullName, title: board.title, boardID }];
+      await invitee.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
@@ -305,24 +303,32 @@ router.post('/invites', auth, validate([body('email').isEmail(), body('boardID')
 router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
-      const board = await Board.findById(req.body.boardID);
-      const user = await User.findById(req.userID);
-      if (!board || !user) { throw 'No board or user data found'; }
+      const boardID = req.body.boardID;
+      const [board, user] = await Promise.all([Board.findById(boardID), User.findById(req.userID)]);
+      if (!user) { throw 'No user data found'; }
+
       // remove invite from user's invites
-      user.invites = user.invites.filter(invite => String(invite.boardID) !== req.body.boardID);
+      user.invites = user.invites.filter(invite => String(invite.boardID) !== boardID);
+
+      if (!board) {
+        // board no longer exists, remove invite & return
+        await user.save();
+        return res.sendStatus(400);
+      }
+
       // add board to user model
       user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false, color: board.color }];
       // add user to board members
       board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
-      const updatedUser = await user.save();
-      await board.save();
+
+      await Promise.all([user.save(), board.save()]);
 
       const actionData = { msg: null, boardMsg: 'was added to this board', cardID: null, listID: null, boardID: board._id, email: user.email, fullName: user.fullName };
       const newActivity = await addActivity(actionData, req);
 
       const decoded = jwt.decode(req.header('x-auth-token'));
       // update client's token to show new board, new token expires at same time
-      const jwtPayload = getJWTPayload(updatedUser);
+      const jwtPayload = getJWTPayload(user);
       const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
 
       res.status(200).json({ token, newActivity, boards: user.boards, invites: user.invites });
@@ -334,9 +340,8 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
 router.put('/invites/reject', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
-      const board = await Board.findById(req.body.boardID);
       const user = await User.findById(req.userID);
-      if (!board || !user) { throw 'No board or user data found'; }
+      if (!user) { throw 'No user data found'; }
       // remove invite from user's model
       user.invites = user.invites.filter(invite => String(invite.boardID) !== req.body.boardID);
       await user.save();
@@ -350,17 +355,17 @@ router.put('/invites/reject', auth, validate([body('boardID').isMongoId()]),
 router.put('/members/remove', auth, validate([body('email').isEmail(), body('boardID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.body.boardID);
+      const { email, boardID } = req.body;
+      const [board, user] = await Promise.all([Board.findById(boardID), User.findOne({ email })]);
       if (!board) { throw 'No board data found'; }
-      const user = await User.findOne({ email: req.body.email });
       if (!user) { throw 'No user found for given email'; }
-      // remove user from board's members and remove board from user's boards
-      board.members = board.members.filter(member => member.email !== user.email);
-      user.boards = user.boards.filter(board => board.boardID !== board._id);
-      await board.save();
-      await user.save();
 
-      const actionData = { msg: null, boardMsg: `removed ${user.fullName} from this board`, cardID: null, listID: null, boardID: board._id };
+      // remove user from board's members and remove board from user's boards
+      board.members = board.members.filter(member => member.email !== email);
+      user.boards = user.boards.filter(board => String(board.boardID) !== boardID);
+      await Promise.all([board.save(), user.save()]);
+
+      const actionData = { msg: null, boardMsg: `removed ${user.fullName} from this board`, cardID: null, listID: null, boardID };
       const newActivity = await addActivity(actionData, req);
 
       res.status(200).json({ newActivity });
@@ -373,18 +378,22 @@ router.put('/members/remove', auth, validate([body('email').isEmail(), body('boa
 router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.params.boardID);
+      const boardID = req.params.boardID;
+      const board = await Board.findByIdAndDelete(boardID).select('members').lean();
       if (!board) { throw 'No board data found'; }
+
       // for each member of board remove board from its model
-      for (let member of board.members) {
-        const user = await User.findOne({ email: member.email });
-        if (!user) { throw 'User model for board member not found'; }
-        user.boards = user.boards.filter(board => String(board.boardID) !== String(req.params.boardID));
-        await user.save();
+      const emails = board.members.map(member => member.email);
+      const members = await User.find({ email: { $in: emails }});
+      for (let member of members) {
+        member.boards = member.boards.filter(board => String(board.boardID) !== boardID);
       }
-      await Board.findByIdAndDelete(req.params.boardID);
-      await List.deleteMany({ boardID: req.params.boardID });
-      await Activity.deleteMany({ boardID: req.params.boardID });
+
+      await Promise.all([
+        ...members.map(member => member.save()),
+        List.deleteMany({ boardID }),
+        Activity.deleteMany({ boardID })
+      ]);
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
@@ -394,9 +403,10 @@ router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIs
 router.put('/leave', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
-      const board = await Board.findById(req.body.boardID);
-      const user = await User.findById(req.userID);
+      const boardID = req.body.boardID;
+      const [board, user] = await Promise.all([Board.findById(boardID), User.findById(req.userID)]);
       if (!board || !user) { throw 'No board or user data found'; }
+
       const member = board.members.find(member => member.email === user.email);
       if (!member) { throw 'User not found in boards members'; }
       // check if user is able to leave board
@@ -404,10 +414,12 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
         const adminCount = board.members.filter(member => member.isAdmin).length;
         if (adminCount < 2) { throw 'There must be at least one other admin for user to leave board'; }
       }
-      user.boards = user.boards.filter(board => String(board.boardID) !== String(req.body.boardID));
+
+      user.boards = user.boards.filter(board => String(board.boardID) !== boardID);
       board.members = board.members.filter(member => member.email !== user.email);
+
       // remove user from cards they are a member of
-      const lists = await List.find({ boardID: board._id });
+      const lists = await List.find({ boardID });
       for (let list of lists) {
         let shouldUpdate = false;
         for (let card of list.cards) {
@@ -420,11 +432,11 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
         if (shouldUpdate) { await list.save(); }
       }
 
-      const actionData = { msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID: board._id };
+      await Promise.all([user.save(), board.save()]);
+
+      const actionData = { msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID };
       const newActivity = await addActivity(actionData, req);
 
-      await user.save();
-      await board.save();
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }

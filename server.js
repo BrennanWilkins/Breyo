@@ -20,10 +20,7 @@ io.use((socket, next) => {
   if (socket.handshake.query && socket.handshake.query.token) {
     jwt.verify(socket.handshake.query.token, config.get('AUTH_KEY'), (err, decoded) => {
       if (err) { return next(new Error('Unauthorized')); }
-      socket.userBoards = {};
-      for (let board of decoded.user.boards) {
-        socket.userBoards[board.boardID] = true;
-      }
+      socket.userBoards = decoded.user.userMembers;
       next();
     });
   } else { next(new Error('Unauthorized')); }
