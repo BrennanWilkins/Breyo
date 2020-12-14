@@ -22,9 +22,11 @@ const PHOTO_IDS = ['1607556049122-5e3874a25a1f', '1605325811474-ba58cf3180d8', '
 '1605580556856-db8fae94b658', '1605738862138-6704bedb5202', '1605447781678-2a5baca0e07b'];
 
 const signNewToken = async (user, oldToken) => {
+  // used to update user's jwt token when new board created or joined, or user promoted/demoted to/from admin
   try {
     const decoded = jwt.decode(oldToken);
     const jwtPayload = getJWTPayload(user);
+    // token expires at same time as oldToken
     const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
     return token;
   } catch (err) { return new Error('Error generating token'); }
@@ -69,25 +71,32 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
       const user = await User.findById(req.userID);
       if (!user) { throw 'No user data found'; }
       const title = req.body.title;
+
       // user is admin of new board by default
       const board = new Board({ title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
         color, creatorEmail: user.email, desc: '' });
+      const boardID = board._id;
 
       // add board to user's boards
-      const newBoard = { boardID: board._id, title, isStarred: false, isAdmin: true, color: board.color };
+      const newBoard = { boardID, title, isStarred: false, isAdmin: true, color };
       user.boards.unshift(newBoard);
 
       // add default lists to board (to do, doing, done)
-      const list1 = { boardID: board._id, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false };
-      const list2 = { boardID: board._id, title: 'Doing', cards: [], archivedCards: [], indexInBoard: 1, isArchived: false };
-      const list3 = { boardID: board._id, title: 'Done', cards: [], archivedCards: [], indexInBoard: 2, isArchived: false };
+      const list1 = { boardID, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false };
+      const list2 = { boardID, title: 'Doing', cards: [], archivedCards: [], indexInBoard: 1, isArchived: false };
+      const list3 = { boardID, title: 'Done', cards: [], archivedCards: [], indexInBoard: 2, isArchived: false };
 
-      const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID: board._id };
+      const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID };
 
-      await Promise.all([board.save(), user.save(), List.insertMany([list1, list2, list3]), addActivity(actionData, req)]);
+      const results = await Promise.all([
+        signNewToken(user, req.header('x-auth-token')),
+        board.save(),
+        user.save(),
+        List.insertMany([list1, list2, list3]),
+        addActivity(actionData, req)
+      ]);
 
-      // update client's token to show new board, new token expires at same time
-      const token = await signNewToken(user, req.header('x-auth-token'));
+      const token = results[0];
 
       res.status(200).json({ board: newBoard, token });
     } catch(err) { res.sendStatus(500); }
@@ -101,6 +110,7 @@ router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
     try {
       const color = req.body.color;
       if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { throw 'Background not found'; }
+
       const board = await Board.findByIdAndUpdate(req.body.boardID, { color }).select('members').lean();
       if (!board) { throw 'No board data found'; }
 
@@ -158,10 +168,11 @@ router.put('/title', auth, validate(
         user.boards[index].title = title;
         user.markModified('boards');
       }
-      await Promise.all(users.map(user => user.save()));
 
       const actionData = { msg: null, boardMsg: `renamed this board from ${oldTitle} to ${title}`, cardID: null, listID: null, boardID };
-      const newActivity = await addActivity(actionData, req);
+
+      const results = await Promise.all([addActivity(actionData, req), ...users.map(user => user.save())]);
+      const newActivity = results[0];
 
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
@@ -206,10 +217,10 @@ router.post('/admins', auth, validate([body('email').isEmail(), body('boardID').
       user.markModified('boards');
       board.markModified('members');
 
-      await Promise.all([user.save(), board.save()]);
-
       const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to admin`, cardID: null, listID: null, boardID };
-      const newActivity = await addActivity(actionData, req);
+
+      const results = await Promise.all([addActivity(actionData, req), user.save(), board.save()]);
+      const newActivity = results[0];
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -261,13 +272,13 @@ router.delete('/admins/:email/:boardID', auth, validate([param('email').isEmail(
       const boardIndex = user.boards.findIndex(board => String(board.boardID) === boardID);
       if (boardIndex === -1) { throw 'Board not found in users boards'; }
       user.boards[boardIndex].isAdmin = false;
-
       user.markModified('boards');
       board.markModified('members');
-      await Promise.all([user.save(), board.save()]);
 
       const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to member`, cardID: null, listID: null, boardID };
-      const newActivity = await addActivity(actionData, req);
+
+      const results = await Promise.all([addActivity(actionData, req), user.save(), board.save()]);
+      const newActivity = results[0];
 
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
@@ -322,13 +333,16 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
       // add user to board members
       board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
 
-      await Promise.all([user.save(), board.save()]);
-
       const actionData = { msg: null, boardMsg: 'was added to this board', cardID: null, listID: null, boardID: board._id, email: user.email, fullName: user.fullName };
-      const newActivity = await addActivity(actionData, req);
 
-      // update client's token to show new board, new token expires at same time
-      const token = await signNewToken(user, req.header('x-auth-token'));
+      const results = await Promise.all([
+        user.save(),
+        board.save(),
+        addActivity(actionData, req),
+        signNewToken(user, req.header('x-auth-token'))
+      ]);
+      const newActivity = results[2];
+      const token = results[3];
 
       res.status(200).json({ token, newActivity, boards: user.boards, invites: user.invites });
     } catch(err) { res.sendStatus(500); }
@@ -362,10 +376,11 @@ router.put('/members/remove', auth, validate([body('email').isEmail(), body('boa
       // remove user from board's members and remove board from user's boards
       board.members = board.members.filter(member => member.email !== email);
       user.boards = user.boards.filter(board => String(board.boardID) !== boardID);
-      await Promise.all([board.save(), user.save()]);
 
       const actionData = { msg: null, boardMsg: `removed ${user.fullName} from this board`, cardID: null, listID: null, boardID };
-      const newActivity = await addActivity(actionData, req);
+
+      const results = await Promise.all([addActivity(actionData, req), board.save(), user.save()]);
+      const newActivity = results[0];
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -393,6 +408,7 @@ router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIs
         List.deleteMany({ boardID }),
         Activity.deleteMany({ boardID })
       ]);
+
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
@@ -431,10 +447,10 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
         if (shouldUpdate) { await list.save(); }
       }
 
-      await Promise.all([user.save(), board.save()]);
-
       const actionData = { msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID };
-      const newActivity = await addActivity(actionData, req);
+
+      const results = await Promise.all([addActivity(actionData, req), user.save(), board.save()]);
+      const newActivity = results[0];
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
