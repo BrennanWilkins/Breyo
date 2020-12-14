@@ -52,7 +52,7 @@ const BoardNavBar = props => {
       <span className={props.showMenu ? `${classes.Input} ${classes.InputContracted}` : classes.Input}>
         <AutosizeInput value={inputTitle} onChange={inputTitleHandler} onBlur={checkTitle} />
       </span>
-      <span className={`${classes.StarBtn} ${props.isStarred ? classes.Hightlight : ''}`}>
+      <span className={`${classes.StarBtn} ${props.isStarred ? classes.Highlight : ''}`}>
         <Button clicked={() => props.toggleIsStarred(props.boardID)}>{starIcon}</Button>
       </span>
       <span className={classes.Separator}></span>
