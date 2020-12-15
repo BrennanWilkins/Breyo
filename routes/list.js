@@ -92,7 +92,8 @@ router.post('/copy', auth, validate([
   body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
-      const list = await List.findById(req.body.listID);
+      const { boardID, listID, title } = req.body;
+      const list = await List.findById(listID).select('cards desc title').lean();
       if (!list) { throw 'List data not found'; }
       // create deeply nested copy of all cards & all checklists/members/dueDate/etc of each card
       const cards = list.cards.map(card => ({
@@ -112,22 +113,28 @@ router.post('/copy', auth, validate([
         members: card.members,
         comments: []
       }));
-      const lists = await List.find({ boardID: req.body.boardID, isArchived: false });
-      const newList = new List({ boardID: req.body.boardID, title: req.body.title, desc: list.desc, indexInBoard: lists.length, cards, archivedCards: [], isArchived: false });
-      const updatedList = await newList.save();
+      const listsLength = await List.countDocuments({ boardID, isArchived: false });
+      const newList = new List({ boardID, title, desc: list.desc, indexInBoard: listsLength, cards, archivedCards: [], isArchived: false });
+      await newList.save();
 
-      const activities = [];
-      const actionData = { msg: null, boardMsg: `added list ${newList.title} to this board`, cardID: null, listID: updatedList._id, boardID: req.body.boardID };
-      const newActivity = await addActivity(actionData, req);
-      activities.push(newActivity);
+      const actions = [];
+      actions.push(new Activity({ msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID: newList._id,
+        boardID, email: req.email, fullName: req.fullName, date: new Date() }));
       for (let card of list.cards) {
-        const actionData = { msg: `copied this card from ${card.title} in list ${list.title}`, boardMsg: `copied **(link)${card.title}** from ${card.title} in list ${list.title}`,
-          cardID: card._id, listID: list._id, boardID: req.body.boardID };
-        const newActivity = await addActivity(actionData, req);
-        activities.push(newActivity);
+        actions.push(new Activity({
+          msg: `copied this card from ${card.title} in list ${list.title}`,
+          boardMsg: `copied **(link)${card.title}** from ${card.title} in list ${list.title}`,
+          cardID: card._id,
+          listID: newList._id,
+          boardID,
+          date: new Date(),
+          email: req.email,
+          fullName: req.fullName
+        }));
       }
+      const activities = await addActivities(actions, boardID);
 
-      res.status(200).json({ newList: updatedList, activities });
+      res.status(200).json({ newList, activities });
     } catch (err) { res.sendStatus(500); }
   }
 );

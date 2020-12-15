@@ -23,6 +23,7 @@ const addActivity = async (data, req) => {
   } catch (err) { return new Error('Error adding activity'); }
 };
 
+// adds many new activity docs at once
 const addActivities = async (actions, boardID) => {
   try {
     const activities = await Activity.insertMany(actions);
