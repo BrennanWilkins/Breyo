@@ -11,4 +11,6 @@ const ActivitySchema = new mongoose.Schema({
   boardMsg: String
 });
 
+ActivitySchema.index({ boardID: 1, date: -1 });
+
 module.exports = mongoose.model('Activity', ActivitySchema);
