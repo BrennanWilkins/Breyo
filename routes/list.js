@@ -7,7 +7,7 @@ const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsMember = require('../middleware/useIsMember');
 const useIsAdmin = require('../middleware/useIsAdmin');
-const { addActivity } = require('./activity');
+const { addActivity, addActivities } = require('./activity');
 const Activity = require('../models/activity');
 
 // authorization: member
@@ -219,16 +219,24 @@ router.put('/archive/allCards', auth, validate([
   body('listID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
-      const list = await List.findById(req.body.listID);
+      const { listID, boardID } = req.body;
+      const list = await List.findById(listID);
       if (!list) { throw 'List data not found'; }
 
       // set all cards to isArchived & add action for each card
-      const activities = [];
-      for (let card of list.cards) {
-        const actionData = { msg: `archived this card`, boardMsg: `archived **(link)${card.title}**`, cardID: card._id, listID: list._id, boardID: req.body.boardID };
-        const newActivity = await addActivity(actionData, req);
-        activities.push(newActivity);
-      }
+      const actionData = list.cards.map(card => (
+        new Activity({
+          msg: `archived this card`,
+          boardMsg: `archived **(link)${card.title}**`,
+          cardID: card._id,
+          listID,
+          boardID,
+          email: req.email,
+          fullName: req.fullName,
+          date: new Date()
+        })
+      ));
+      const activities = await addActivities(actionData, boardID);
 
       list.archivedCards = list.archivedCards.concat(list.cards);
       list.cards = [];

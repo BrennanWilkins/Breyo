@@ -23,6 +23,17 @@ const addActivity = async (data, req) => {
   } catch (err) { return new Error('Error adding activity'); }
 };
 
+const addActivities = async (actions, boardID) => {
+  try {
+    const activities = await Activity.insertMany(actions);
+
+    const allActivity = await Activity.find({ boardID }).sort('-date').skip(200);
+    for (let oldAction of allActivity) { oldAction.remove(); }
+
+    return activities;
+  } catch(err) { return new Error('Error adding activities'); }
+};
+
 // returns last 20 board actions
 router.get('/recent/board/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
@@ -127,3 +138,4 @@ router.get('/myActivity/:email/:page', auth, validate([param('page').isInt(), pa
 
 module.exports = router;
 module.exports.addActivity = addActivity;
+module.exports.addActivities = addActivities;
