@@ -115,7 +115,6 @@ router.post('/copy', auth, validate([
       }));
       const listsLength = await List.countDocuments({ boardID, isArchived: false });
       const newList = new List({ boardID, title, desc: list.desc, indexInBoard: listsLength, cards, archivedCards: [], isArchived: false });
-      await newList.save();
 
       const actions = [];
       actions.push(new Activity({ msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID: newList._id,
@@ -132,7 +131,8 @@ router.post('/copy', auth, validate([
           fullName: req.fullName
         }));
       }
-      const activities = await addActivities(actions, boardID);
+      const results = await Promise.all([addActivities(actions, boardID), newList.save()]);
+      const activities = results[0];
 
       res.status(200).json({ newList, activities });
     } catch (err) { res.sendStatus(500); }
@@ -243,11 +243,13 @@ router.put('/archive/allCards', auth, validate([
           date: new Date()
         })
       ));
-      const activities = await addActivities(actionData, boardID);
 
       list.archivedCards = list.archivedCards.concat(list.cards);
       list.cards = [];
-      await list.save();
+
+      const results = await Promise.all([addActivities(actionData, boardID), list.save()]);
+      const activities = results[0];
+
       res.status(200).json({ activities });
     } catch(err) { res.sendStatus(500); }
   }

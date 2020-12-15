@@ -40,8 +40,7 @@ io.use((socket, next) => {
 });
 
 const mongoose = require('mongoose');
-mongoose.set('useFindAndModify', false);
-mongoose.connect(config.get('DB_URL'), { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(config.get('DB_URL'), { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
