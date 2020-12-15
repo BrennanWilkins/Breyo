@@ -10,27 +10,32 @@ const useIsAdmin = require('../middleware/useIsAdmin');
 const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 
+// authorization: member
 // create a new list
 router.post('/', auth, validate([
   body('boardID').isMongoId(),
   body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
-      const board = await Board.findById(req.body.boardID);
-      if (!board) { throw 'Board data not found'; }
-      const title = req.body.title;
-      const lists = await List.find({ boardID: req.body.boardID, isArchived: false });
-      const list = new List({ boardID: board._id, title, cards: [], archivedCards: [], indexInBoard: lists.length, isArchived: false });
-      const newList = await list.save();
+      const { boardID, title } = req.body;
+      const board = await Board.exists({ _id: boardID });
+      if (!board) { throw 'New lists board not found'; }
 
-      const actionData = { msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID: newList._id, boardID: req.body.boardID };
-      const newActivity = await addActivity(actionData, req);
+      const listsLength = await List.countDocuments({ boardID, isArchived: false });
+      const list = new List({ boardID, title, cards: [], archivedCards: [], indexInBoard: listsLength, isArchived: false });
+      const listID = list._id;
 
-      res.status(200).json({ listID: newList._id, newActivity });
+      const actionData = { msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID, boardID };
+
+      const results = await Promise.all([addActivity(actionData, req), list.save()]);
+      const newActivity = results[0];
+
+      res.status(200).json({ listID, newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );
 
+// authorization: member
 // update list title
 router.put('/title', auth, validate([
   body('boardID').isMongoId(),
@@ -38,13 +43,12 @@ router.put('/title', auth, validate([
   body('title').isLength({ min: 1, max: 200 })]), useIsMember,
   async (req, res) => {
     try {
-      const list = await List.findById(req.body.listID);
+      const { boardID, listID, title } = req.body;
+      const list = await List.findByIdAndUpdate(listID, { title }).select('title').lean();
       if (!list) { throw 'List data not found'; }
       const oldTitle = list.title;
-      list.title = req.body.title;
-      await list.save();
 
-      const actionData = { msg: null, boardMsg: `renamed list ${oldTitle} to ${list.title}`, cardID: null, listID: list._id, boardID: req.body.boardID };
+      const actionData = { msg: null, boardMsg: `renamed list ${oldTitle} to ${title}`, cardID: null, listID, boardID };
       const newActivity = await addActivity(actionData, req);
 
       res.status(200).json({ newActivity });
@@ -52,6 +56,7 @@ router.put('/title', auth, validate([
   }
 );
 
+// authorization: member
 // move list to different index in board
 router.put('/moveList', auth, validate([
   body('sourceIndex').isInt(),
@@ -59,22 +64,27 @@ router.put('/moveList', auth, validate([
   body('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
-      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' });
-      const list = lists.splice(req.body.sourceIndex, 1)[0];
-      if (!list) { throw 'List not found'; }
-      lists.splice(req.body.destIndex, 0, list);
+      const { sourceIndex, destIndex, boardID } = req.body;
+      const lists = await List.find({ boardID, isArchived: false }).sort({ indexInBoard: 'asc' });
+      if (!lists) { throw 'List data not found'; }
+      const list = lists.splice(sourceIndex, 1)[0];
+      if (!list) { throw 'Invalid list sourceIndex'; }
+      lists.splice(destIndex, 0, list);
+
       // update all lists in board to match new order
       for (let i = 0; i < lists.length; i++) {
         if (lists[i].indexInBoard !== i) {
           lists[i].indexInBoard = i;
-          await lists[i].save();
         }
       }
+      await Promise.all(lists.map(list => list.save()));
+
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
 );
 
+// authorization: member
 // create a copy of a list
 router.post('/copy', auth, validate([
   body('boardID').isMongoId(),
@@ -129,45 +139,48 @@ router.post('/archive', auth, validate([
   body('listID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
-      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).sort({ indexInBoard: 'asc' });
+      const { boardID, listID } = req.body;
+      const lists = await List.find({ boardID, isArchived: false }).sort({ indexInBoard: 'asc' });
       if (!lists || lists.length === 0) { throw 'List data not found'; }
-      const listIndex = lists.findIndex(list => String(list._id) === req.body.listID);
+      const listIndex = lists.findIndex(list => String(list._id) === listID);
       if (listIndex === -1) { throw 'List not found in board lists'; }
 
       const archivedList = lists.splice(listIndex, 1)[0];
+      // set archived list's index to end of list & set as isArchived
+      archivedList.indexInBoard = lists.length;
+      archivedList.isArchived = true;
 
       // update all lists index in board to reflect missing list
       for (let i = 0; i < lists.length; i++) {
         if (lists[i].indexInBoard !== i) {
           lists[i].indexInBoard = i;
-          await lists[i].save();
         }
       }
 
-      // set archived list's index to end of list & set as isArchived
-      archivedList.indexInBoard = lists.length;
-      archivedList.isArchived = true;
-      await archivedList.save();
+      const actionData = { msg: null, boardMsg: `archived list ${archivedList.title}`, cardID: null, listID, boardID };
 
-      const actionData = { msg: null, boardMsg: `archived list ${archivedList.title}`, cardID: null, listID: archivedList._id, boardID: req.body.boardID };
-      const newActivity = await addActivity(actionData, req);
+      const results = await Promise.all([addActivity(actionData, req), archivedList.save(), ...lists.map(list => list.save())]);
+      const newActivity = results[0];
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );
 
+// authorization: member
 // send list to board from archive
 router.put('/archive/recover', auth, validate([
   body('boardID').isMongoId(),
   body('listID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
-      const lists = await List.find({ boardID: req.body.boardID, isArchived: false }).lean();
-      if (!lists.length) { throw 'Lists data not found'; }
-      const list = await List.findByIdAndUpdate(req.body.listID, { indexInBoard: lists.length, isArchived: false });
+      const { boardID, listID } = req.body;
+      const listsLength = await List.countDocuments({ boardID, isArchived: false });
+      if (!listsLength) { throw 'Lists data not found'; }
+      const list = await List.findByIdAndUpdate(listID, { indexInBoard: listsLength, isArchived: false }).select('title').lean();
+      if (!list) { throw 'List not found'; }
 
-      const actionData = { msg: null, boardMsg: `recovered list ${list.title}`, cardID: null, listID: list._id, boardID: req.body.boardID };
+      const actionData = { msg: null, boardMsg: `recovered list ${list.title}`, cardID: null, listID, boardID };
       const newActivity = await addActivity(actionData, req);
 
       res.status(200).json({ newActivity });
@@ -182,20 +195,24 @@ router.delete('/archive/:listID/:boardID', auth, validate([
   param('listID').isMongoId()]), useIsAdmin,
   async (req, res) => {
     try {
-      const list = await List.findByIdAndDelete(req.params.listID);
+      const { boardID, listID } = req.params;
+      const list = await List.findByIdAndDelete(listID).select('title');
+      if (!list) { throw 'List not found'; }
 
-      const actionData = { msg: null, boardMsg: `deleted list ${list.title}`, cardID: null, listID: null, boardID: req.params.boardID };
+      const actionData = { msg: null, boardMsg: `deleted list ${list.title}`, cardID: null, listID: null, boardID };
       const newActivity = await addActivity(actionData, req);
 
       // delete all of lists activities & return new recent activities
-      await Activity.deleteMany({ listID: list._id });
-      const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').limit(20).lean();
+      await Activity.deleteMany({ listID });
+      const activity = await Activity.find({ boardID }).sort('-date').limit(20).lean();
       if (!activity) { throw 'No board activity found'; }
+
       res.status(200).json({ activity });
     } catch(err) { res.sendStatus(500); }
   }
 );
 
+// authorization: member
 // Send all cards in list to archive
 router.put('/archive/allCards', auth, validate([
   body('boardID').isMongoId(),
@@ -221,6 +238,7 @@ router.put('/archive/allCards', auth, validate([
   }
 );
 
+// authorization: member
 // move all cards in a list to another list
 router.put('/moveAllCards', auth, validate([
   body('boardID').isMongoId(),
@@ -228,16 +246,19 @@ router.put('/moveAllCards', auth, validate([
   body('newListID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
-      const oldList = await List.findById(req.body.oldListID);
-      const newList = await List.findById(req.body.newListID);
+      const { oldListID, newListID } = req.body;
+      const [oldList, newList] = await Promise.all([List.findById(oldListID), List.findById(newListID)]);
       if (!oldList || !newList) { throw 'Old list or new list data not found'; }
       newList.cards = newList.cards.concat(oldList.cards);
       newList.archivedCards = newList.archivedCards.concat(oldList.archivedCards);
       oldList.cards = [];
       oldList.archivedCards = [];
-      await oldList.save();
-      await newList.save();
-      await Activity.updateMany({ listID: req.body.oldListID }, { listID: req.body.newListID });
+      await Promise.all([
+        oldList.save(),
+        newList.save(),
+        Activity.updateMany({ listID: oldListID }, { listID: newListID })
+      ]);
+
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
