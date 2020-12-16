@@ -39,7 +39,7 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
       const boardID = req.params.boardID;
       const [board, lists, activity] = await Promise.all([
         Board.findById(boardID).lean(),
-        List.find({ boardID }).lean(),
+        List.find({ boardID }).sort('indexInBoard').lean(),
         Activity.find({ boardID }).sort('-date').limit(20).lean()
       ]);
       if (!board || !lists || !activity) { throw 'Board data not found'; }
@@ -62,15 +62,14 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
 );
 
 // create a new board w given title/background
-router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 100 })], 'Please enter a valid title.'),
+router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 100 }), body('color').not().isEmpty()], 'Please enter a valid title.'),
   async (req, res) => {
     try {
-      let color = req.body.color;
+      let { color, title } = req.body;
       // if invalid background then default to red
-      if (!COLORS.includes(req.body.color) && !PHOTO_IDS.includes(req.body.color)) { color = COLORS[0]; }
+      if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { color = COLORS[0]; }
       const user = await User.findById(req.userID);
       if (!user) { throw 'No user data found'; }
-      const title = req.body.title;
 
       // user is admin of new board by default
       const board = new Board({ title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
@@ -105,20 +104,20 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
 
 // authorization: member
 // updates board color
-router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
+router.put('/color', auth, validate([body('boardID').isMongoId(), body('color').not().isEmpty()]), useIsMember,
   async (req, res) => {
     try {
-      const color = req.body.color;
+      const { boardID, color } = req.body;
       if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { throw 'Background not found'; }
 
-      const board = await Board.findByIdAndUpdate(req.body.boardID, { color }).select('members').lean();
+      const board = await Board.findByIdAndUpdate(boardID, { color }).select('members').lean();
       if (!board) { throw 'No board data found'; }
 
       // for each member of board, update the board color in their model
       const emails = board.members.map(member => member.email);
       const users = await User.find({ email: { $in: emails }});
       for (let user of users) {
-        const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+        const index = user.boards.findIndex(board => String(board.boardID) === boardID);
         if (index < 0) { throw 'Board not found in users model'; }
         user.boards[index].color = color;
         user.markModified('boards');
@@ -135,8 +134,8 @@ router.put('/color', auth, validate([body('boardID').isMongoId()]), useIsMember,
 router.put('/desc', auth, validate([body('boardID').isMongoId(), body('desc').isLength({ max: 600 })]), useIsMember,
   async (req, res) => {
     try {
-      const boardID = req.body.boardID;
-      const board = await Board.findByIdAndUpdate(boardID, { desc: req.body.desc }).lean();
+      const { boardID, desc } = req.body;
+      const board = await Board.findByIdAndUpdate(boardID, { desc }).lean();
       if (!board) { throw 'No board data found'; }
 
       const actionData = { msg: null, boardMsg: 'updated the board description', cardID: null, listID: null, boardID };
@@ -185,7 +184,7 @@ router.put('/starred', auth, validate([body('boardID').isMongoId()]),
     try {
       const user = await User.findById(req.userID);
       if (!user) { throw 'No user data found'; }
-      const index = user.boards.findIndex(board => String(board.boardID) === String(req.body.boardID));
+      const index = user.boards.findIndex(board => String(board.boardID) === req.body.boardID);
       if (index === -1) { throw 'Board not found in users board model'; }
       user.boards[index].isStarred = !user.boards[index].isStarred;
       user.markModified('boards');
@@ -228,7 +227,7 @@ router.post('/admins', auth, validate([body('email').isEmail(), body('boardID').
 );
 
 // user receives new token on permission change to admin
-router.put('/admins/promoteUser', auth,
+router.put('/admins/promoteUser', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const isAlreadyAdmin = req.userAdmins[req.body.boardID];
@@ -241,11 +240,12 @@ router.put('/admins/promoteUser', auth,
 );
 
 // user receives new token on permission change from admin to member
-router.put('/admins/demoteUser', auth,
+router.put('/admins/demoteUser', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
-      const isAdmin = req.userAdmins[req.body.boardID];
-      const isMember = req.userMembers[req.body.boardID];
+      const { boardID } = req.body;
+      const isAdmin = req.userAdmins[boardID];
+      const isMember = req.userMembers[boardID];
       if (!isAdmin && isMember) { throw 'User already demoted'; }
       const user = await User.findById(req.userID).lean();
       const token = await signNewToken(user, req.header('x-auth-token'));

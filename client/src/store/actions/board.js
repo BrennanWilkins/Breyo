@@ -118,7 +118,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
       isArchived: list.isArchived,
       cards
     };
-  }).sort((a,b) => a.indexInBoard - b.indexInBoard);
+  });
   const archivedLists = lists.filter(list => list.isArchived);
   lists = lists.filter(list => !list.isArchived);
 
