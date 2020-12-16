@@ -22,7 +22,7 @@ const UserActivity = props => {
     const fetchActivity = async page => {
       try {
         setLoading(true);
-        const res = await axios.get(`/activity/myActivity/${props.email}/${page}`);
+        const res = await axios.get(`/activity/myActivity/${page}`);
         setLoading(false);
         const data = res.data.activity.map(action => ({ ...action, boardTitle: boardTitles[action.boardID] }));
         setUserActivity(userActivity.concat(data));
@@ -53,12 +53,12 @@ const UserActivity = props => {
   );
 };
 
+UserActivity.propTypes = {
+  boards: PropTypes.array.isRequired
+};
+
 const mapStateToProps = state => ({
   boards: state.auth.boards
 });
-
-UserActivity.propTypes = {
-  email: PropTypes.string.isRequired
-};
 
 export default connect(mapStateToProps)(UserActivity);

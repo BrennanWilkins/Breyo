@@ -23,7 +23,7 @@ const AccountPage = props => {
         <Link to="/my-account?view=activity" className={!showSettings ? classes.Active : null}>Activity</Link>
         <Link to="/my-account?view=settings" className={showSettings ? classes.Active : null}>Settings</Link>
       </div>
-      {showSettings ? <AccountSettings /> : <UserActivity email={props.email} />}
+      {showSettings ? <AccountSettings /> : <UserActivity />}
     </div>
   );
 };
