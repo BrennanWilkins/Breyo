@@ -185,6 +185,20 @@ router.delete('/deleteAccount', auth,
           } else {
             await board.save();
           }
+
+          // remove user from all cards they are a member of
+          const lists = await List.find({ boardID });
+          for (let list of lists) {
+            let shouldUpdate = false;
+            for (let card of list.cards) {
+              for (let i = card.members.length - 1; i >= 0; i--) {
+                if (card.members[i].email === user.email) { card.members.splice(i, 1); }
+                shouldUpdate = true;
+              }
+            }
+            // only need to update list if member changed
+            if (shouldUpdate) { await list.save(); }
+          }
         }
       }
       res.sendStatus(200);
