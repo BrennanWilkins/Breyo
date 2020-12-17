@@ -1,16 +1,17 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const ItemSchema = new mongoose.Schema({
+const ItemSchema = new Schema({
   title: String,
   isComplete: Boolean
 });
 
-const ChecklistSchema = new mongoose.Schema({
+const ChecklistSchema = new Schema({
   title: String,
   items: [ItemSchema]
 });
 
-const CommentSchema = new mongoose.Schema({
+const CommentSchema = new Schema({
   email: String,
   fullName: String,
   msg: String,
@@ -19,7 +20,7 @@ const CommentSchema = new mongoose.Schema({
   listID: String
 });
 
-const CardSchema = new mongoose.Schema({
+const CardSchema = new Schema({
   title: String,
   desc: String,
   checklists: [ChecklistSchema],
@@ -30,7 +31,7 @@ const CardSchema = new mongoose.Schema({
   roadmapLabel: String
 });
 
-const ListSchema = new mongoose.Schema({
+const ListSchema = new Schema({
   boardID: String,
   title: String,
   cards: [CardSchema],
@@ -38,5 +39,7 @@ const ListSchema = new mongoose.Schema({
   indexInBoard: Number,
   isArchived: Boolean
 });
+
+ListSchema.index({ boardID: 1 });
 
 module.exports = mongoose.model('List', ListSchema);
