@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const { body } = require('express-validator');
+const { body, param } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const config = require('config');
@@ -163,10 +163,15 @@ router.post('/changePass', auth, validate(
   }
 );
 
-router.delete('/deleteAccount', auth,
+router.delete('/deleteAccount/:password', auth, validate([param('password').not().isEmpty()]),
   async (req, res) => {
     try {
-      const user = await User.findByIdAndDelete(req.userID).lean();
+      const user = await User.findById(req.userID);
+      // validate user's password
+      const same = await bcryptjs.compare(req.params.password, user.password);
+      if (!same) { return res.sendStatus(400); }
+
+      await user.remove();
 
       for (let boardID of user.boards) {
         const board = await Board.findById(boardID);

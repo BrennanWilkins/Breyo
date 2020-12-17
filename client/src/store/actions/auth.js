@@ -67,11 +67,14 @@ export const autoLogin = () => async dispatch => {
   } catch (err) { dispatch(logout()); }
 };
 
-export const deleteAccount = () => async dispatch => {
+export const deleteAccount = pass => async dispatch => {
   try {
-    await axios.delete('auth/deleteAccount');
+    await axios.delete(`auth/deleteAccount/${pass}`);
     dispatch(logout());
   } catch (err) {
+    if (err.response && err.response.status === 400) {
+      return dispatch(addNotif('Incorrect password.'));
+    }
     dispatch(addNotif('There was an error while deleting your account.'));
   }
 };
