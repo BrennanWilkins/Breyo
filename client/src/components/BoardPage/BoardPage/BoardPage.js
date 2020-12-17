@@ -71,7 +71,7 @@ const BoardPage = props => {
     };
     fetchData();
     return () => { document.title = 'Breyo'; document.body.style.overflow = 'auto'; }
-  }, []);
+  }, [props.match.params.boardID]);
 
   const closeDetailsHandler = () => {
     props.setCardDetails(null, null);
