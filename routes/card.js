@@ -709,7 +709,7 @@ router.post('/members', auth, validate([
       if (!list || !user) { throw 'Data not found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
 
-      if (!user.boards.find(board => String(board.boardID) === boardID)) { throw 'User must be member of board'; }
+      if (!user.boards.map(String).includes(boardID)) { throw 'User must be member of board'; }
 
       const card = list.cards.id(cardID);
       if (!card) { throw 'Card data not found'; }
@@ -828,7 +828,7 @@ router.delete('/comments/:commentID/:cardID/:listID/:boardID', auth, validate([
       if (!comment) { throw 'Comment not found'; }
       if (req.email !== comment.email) { throw 'Must be original author to delete comment'; }
       comment.remove();
-      
+
       await list.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }

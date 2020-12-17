@@ -7,6 +7,8 @@ const bcryptjs = require('bcryptjs');
 const config = require('config');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
+const List = require('../models/list');
+const Board = require('../models/board');
 
 const getJWTPayload = user => {
   // create jwt sign payload for easier user data lookup
@@ -19,11 +21,28 @@ const getJWTPayload = user => {
   return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins };
 };
 
+const getLeanJWTPayload = user => {
+  // create jwt sign payload for user data that hasnt been populated yet
+  const userMembers = {};
+  const userAdmins = {};
+  for (let boardID of user.boards) { userMembers[boardID] = true; }
+  for (let boardID of user.adminBoards) { userAdmins[boardID] = true; }
+  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins };
+};
+
 // returns a user's boards & invites to be used on dashboard page
 router.get('/userData', auth,
   async (req, res) => {
     try {
-      const user = await User.findById(req.userID).select('boards invites').lean();
+      const user = await User.findById(req.userID).populate('boards', 'title color').lean();
+      user.boards = user.boards.map(board => ({
+        boardID: board._id,
+        title: board.title,
+        color: board.color,
+        isStarred: user.starredBoards.includes(String(board._id)),
+        isAdmin: user.adminBoards.includes(String(board._id))
+      }));
+
       if (!user) { throw 'user data not found'; }
       res.status(200).json({ boards: user.boards, invites: user.invites });
     } catch (err) { res.sendStatus(500); }
@@ -37,7 +56,15 @@ router.post('/login', validate(
   async (req, res) => {
     try {
       const { email, password } = req.body;
-      const user = await User.findOne({ email }).lean();
+      const user = await User.findOne({ email }).populate('boards', 'title color').lean();
+      user.boards = user.boards.map(board => ({
+        boardID: board._id,
+        title: board.title,
+        color: board.color,
+        isStarred: user.starredBoards.includes(String(board._id)),
+        isAdmin: user.adminBoards.includes(String(board._id))
+      }));
+
       // return 400 error if no user found
       if (!user) { return res.status(400).json({ msg: 'Incorrect username or password.' }); }
 
@@ -76,7 +103,9 @@ router.post('/signup', validate(
       if (emailExists) { return res.status(400).json({ msg: 'That email is already taken.' }); }
 
       const hashedPassword = await bcryptjs.hash(password, 10);
-      const user = new User({ email, password: hashedPassword, fullName, invites: [], boards: [] });
+
+      const user = new User({ email, password: hashedPassword, fullName, invites: [], boards: [], adminBoards: [], starredBoards: [] });
+
       await user.save();
 
       // signup was successful, login
@@ -93,7 +122,15 @@ router.post('/signup', validate(
 router.post('/autoLogin', auth,
   async (req, res) => {
     try {
-      const user = await User.findById(req.userID).lean();
+      const user = await User.findById(req.userID).populate('boards', 'title color').lean();
+      user.boards = user.boards.map(board => ({
+        boardID: board._id,
+        title: board.title,
+        color: board.color,
+        isStarred: user.starredBoards.includes(String(board._id)),
+        isAdmin: user.adminBoards.includes(String(board._id))
+      }));
+
       if (!user) { throw 'User data not found'; }
       res.status(200).json({ email: user.email, fullName: user.fullName, invites: user.invites, boards: user.boards });
     } catch(err) { res.sendStatus(500); }
@@ -131,10 +168,7 @@ router.delete('/deleteAccount', auth,
     try {
       const user = await User.findByIdAndDelete(req.userID).lean();
 
-      for (let board of user.boards) {
-        // if user is not an admin then nothing to do
-        if (!board.isAdmin) { continue; }
-        const boardID = String(board.boardID);
+      for (let boardID of user.boards) {
         const board = await Board.findById(boardID);
         // if user is only member of board then delete board
         if (board.members.length === 1) {
@@ -142,23 +176,22 @@ router.delete('/deleteAccount', auth,
           await Promise.all([board.remove(), List.deleteMany({ boardID }), Activity.deleteMany({ boardID })]);
         } else {
           // if user is admin of board then check if theres another admin, if not then promote all other users to admin
-          const adminCount = board.members.filter(member => member.isAdmin).length;
-          if (adminCount >= 2) { continue; }
-          board.members = board.members.filter(member => member.email !== user.email).map(member => ({ ...member, isAdmin: true }));
-          const emails = board.members.map(member => member.email);
-          const members = await User.find({ email: { $in: emails }});
-          for (let boardMember of members) {
-            const matchingBoard = boardMember.boards.find(userBoard => String(userBoard.boardID) === boardID);
-            matchingBoard.isAdmin = true;
+          const adminCount = board.members.filter(member => member.email !== user.email && member.isAdmin).length;
+          board.members = board.members.filter(member => member.email !== user.email);
+          if (!adminCount) {
+            board.members = board.members.map(member => ({ ...member, isAdmin: true }));
+            const emails = board.members.map(member => member.email);
+            await Promise.all([board.save(), User.updateMany({ email: { $in: emails }}, { $push: { adminBoards: boardID }})]);
+          } else {
+            await board.save();
           }
-
-          await Promise.all([board.save(), ...members.map(member => member.save())]);
         }
       }
       res.sendStatus(200);
-    } catch (err) { res.sendStatus(500); }
+    } catch (err) { console.log(err); res.sendStatus(500); }
   }
 );
 
 module.exports = router;
 module.exports.getJWTPayload = getJWTPayload;
+module.exports.getLeanJWTPayload = getLeanJWTPayload;

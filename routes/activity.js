@@ -14,10 +14,6 @@ const addActivity = async (data, req) => {
     if (!req.email || !req.fullName) { throw 'User data not found'; }
     const activity = new Activity({ msg, boardMsg, email: email || req.email, fullName: fullName || req.fullName, cardID, listID, boardID, date: new Date() });
     const newActivity = await activity.save();
-    // board stores max past 200 actions
-    const allActivity = await Activity.find({ boardID }).sort('-date').skip(200);
-    for (let oldAction of allActivity) { oldAction.remove(); }
-
     return newActivity;
   } catch (err) { return new Error('Error adding activity'); }
 };

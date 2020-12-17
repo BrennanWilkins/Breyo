@@ -220,8 +220,8 @@ export const acceptInvite = (boardID, email, fullName, push) => async (dispatch,
     connectSocket();
     // automatically send user to the board
     push(`/board/${boardID}`);
-    addRecentActivity(res.data.newActivity);
     dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards });
+    addRecentActivity(res.data.newActivity);
     sendUpdate('post/board/newMember', JSON.stringify({ email, fullName }));
   } catch (err) {
     if (err.response && err.response.status === 400) {

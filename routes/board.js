@@ -12,7 +12,7 @@ const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { getJWTPayload } = require('./auth');
+const { getJWTPayload, getLeanJWTPayload } = require('./auth');
 
 const COLORS = ['#f05544', '#f09000', '#489a3c', '#0079bf', '#7150df',
   '#38bbf4', '#ad5093', '#4a32dd', '#046b8b'];
@@ -21,11 +21,11 @@ const PHOTO_IDS = ['1607556049122-5e3874a25a1f', '1605325811474-ba58cf3180d8', '
 '1554129352-f8c3ab6d5595', '1596709097416-6d4206796022', '1587732282555-321fddb19dc0',
 '1605580556856-db8fae94b658', '1605738862138-6704bedb5202', '1605447781678-2a5baca0e07b'];
 
-const signNewToken = async (user, oldToken) => {
+const signNewToken = async (user, oldToken, getLean) => {
   // used to update user's jwt token when new board created or joined, or user promoted/demoted to/from admin
   try {
     const decoded = jwt.decode(oldToken);
-    const jwtPayload = getJWTPayload(user);
+    const jwtPayload = getLean ? getLeanJWTPayload(user) : getJWTPayload(user);
     // token expires at same time as oldToken
     const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
     return token;
@@ -37,10 +37,11 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
   async (req, res) => {
     try {
       const boardID = req.params.boardID;
-      const [board, lists, activity] = await Promise.all([
+      const [board, lists, activity, activityCount] = await Promise.all([
         Board.findById(boardID).lean(),
         List.find({ boardID }).sort('indexInBoard').lean(),
-        Activity.find({ boardID }).sort('-date').limit(20).lean()
+        Activity.find({ boardID }).sort('-date').limit(20).lean(),
+        Activity.countDocuments({ boardID })
       ]);
       if (!board || !lists || !activity) { throw 'Board data not found'; }
       const data = { ...board, lists, activity };
@@ -48,12 +49,24 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
       const isAdminInToken = req.userAdmins[boardID];
       const isAdminInBoard = board.members.find(member => member.email === req.email).isAdmin;
       // if user's token is not up to date, send new token
-      if (isAdminInBoard !== isAdminInToken) {
-        const user = await User.findById(req.userID).lean();
-        const token = await signNewToken(user, req.header('x-auth-token'));
+      if ((!isAdminInToken && isAdminInBoard) || (isAdminInToken && !isAdminInBoard)) {
+        const user = await User.findById(req.userID).populate('boards', 'title color').lean();
+        user.boards = user.boards.map(board => ({
+          boardID: board._id,
+          title: board.title,
+          color: board.color,
+          isStarred: user.starredBoards.includes(String(board._id)),
+          isAdmin: user.adminBoards.includes(String(board._id))
+        }));
+        const token = await signNewToken(user, req.header('x-auth-token'), false);
         data.invites = user.invites;
         data.boards = user.boards;
         data.token = token;
+      }
+      // board stores max 200 past actions, if over 250 actions then delete ones over 200
+      if (activityCount > 250) {
+        const allActivity = await Activity.find({ boardID }).sort('-date').skip(200).select('_id').lean();
+        await Activity.deleteMany({ _id: { $in: allActivity.map(action => action._id) }});
       }
 
       res.status(200).json({ data });
@@ -77,8 +90,10 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
       const boardID = board._id;
 
       // add board to user's boards
+      user.boards.unshift(boardID);
+      user.adminBoards.unshift(boardID);
+
       const newBoard = { boardID, title, isStarred: false, isAdmin: true, color };
-      user.boards.unshift(newBoard);
 
       // add default lists to board (to do, doing, done)
       const list1 = { boardID, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false };
@@ -88,7 +103,7 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
       const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID };
 
       const results = await Promise.all([
-        signNewToken(user, req.header('x-auth-token')),
+        signNewToken(user, req.header('x-auth-token'), true),
         board.save(),
         user.save(),
         List.insertMany([list1, list2, list3]),
@@ -110,19 +125,8 @@ router.put('/color', auth, validate([body('boardID').isMongoId(), body('color').
       const { boardID, color } = req.body;
       if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { throw 'Background not found'; }
 
-      const board = await Board.findByIdAndUpdate(boardID, { color }).select('members').lean();
+      const board = await Board.findByIdAndUpdate(boardID, { color }).lean();
       if (!board) { throw 'No board data found'; }
-
-      // for each member of board, update the board color in their model
-      const emails = board.members.map(member => member.email);
-      const users = await User.find({ email: { $in: emails }});
-      for (let user of users) {
-        const index = user.boards.findIndex(board => String(board.boardID) === boardID);
-        if (index < 0) { throw 'Board not found in users model'; }
-        user.boards[index].color = color;
-        user.markModified('boards');
-      }
-      await Promise.all(users.map(user => user.save()));
 
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
@@ -154,24 +158,13 @@ router.put('/title', auth, validate(
   async (req, res) => {
     try {
       const { title, boardID } = req.body;
-      const board = await Board.findByIdAndUpdate(boardID, { title }).select('members title').lean();
+      const board = await Board.findByIdAndUpdate(boardID, { title }).select('title').lean();
       if (!board) { throw 'No board data found'; }
       const oldTitle = board.title;
 
-      // for each member of board, update board title in their user model
-      const emails = board.members.map(member => member.email);
-      const users = await User.find({ email: { $in: emails }});
-      for (let user of users) {
-        const index = user.boards.findIndex(board => String(board.boardID) === boardID);
-        if (index < 0) { throw 'Board not found in users model'; }
-        user.boards[index].title = title;
-        user.markModified('boards');
-      }
-
       const actionData = { msg: null, boardMsg: `renamed this board from ${oldTitle} to ${title}`, cardID: null, listID: null, boardID };
 
-      const results = await Promise.all([addActivity(actionData, req), ...users.map(user => user.save())]);
-      const newActivity = results[0];
+      const newActivity = await addActivity(actionData, req);
 
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
@@ -182,12 +175,14 @@ router.put('/title', auth, validate(
 router.put('/starred', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
+      const { boardID } = req.body;
       const user = await User.findById(req.userID);
       if (!user) { throw 'No user data found'; }
-      const index = user.boards.findIndex(board => String(board.boardID) === req.body.boardID);
-      if (index === -1) { throw 'Board not found in users board model'; }
-      user.boards[index].isStarred = !user.boards[index].isStarred;
-      user.markModified('boards');
+
+      const index = user.starredBoards.indexOf(boardID);
+      if (index === -1) { user.starredBoards.unshift(boardID); }
+      else { user.starredBoards.splice(index, 1); }
+
       await user.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
@@ -200,25 +195,24 @@ router.post('/admins', auth, validate([body('email').isEmail(), body('boardID').
   async (req, res) => {
     try {
       const { email, boardID } = req.body;
-      const [board, user] = await Promise.all([Board.findById(boardID), User.findOne({ email })]);
-      if (!board || !user) { throw 'Board or user data not found'; }
+      const board = await Board.findById(boardID);
+      if (!board) { throw 'Board data not found'; }
 
       // find user in board's members and change user to admin if found
       const memberIndex = board.members.findIndex(member => member.email === email && !member.isAdmin);
       if (memberIndex === -1) { throw 'Member not found in board members'; }
       if (board.members.length <= 1) { throw 'Not enough board members to add new admin'; }
-      board.members[memberIndex].isAdmin = true;
-
-      // update board in user's board model to isAdmin
-      const boardIndex = user.boards.findIndex(board => String(board.boardID) === boardID);
-      if (boardIndex === -1) { throw 'Board not found in users boards'; }
-      user.boards[boardIndex].isAdmin = true;
-      user.markModified('boards');
+      const member = board.members[memberIndex];
+      member.isAdmin = true;
       board.markModified('members');
 
-      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to admin`, cardID: null, listID: null, boardID };
+      const actionData = { msg: null, boardMsg: `changed ${member.fullName}'s permissions to admin`, cardID: null, listID: null, boardID };
 
-      const results = await Promise.all([addActivity(actionData, req), user.save(), board.save()]);
+      const results = await Promise.all([
+        addActivity(actionData, req),
+        User.findOneAndUpdate({ email }, { $push: { adminBoards: boardID }}),
+        board.save()
+      ]);
       const newActivity = results[0];
 
       res.status(200).json({ newActivity });
@@ -233,7 +227,7 @@ router.put('/admins/promoteUser', auth, validate([body('boardID').isMongoId()]),
       const isAlreadyAdmin = req.userAdmins[req.body.boardID];
       if (isAlreadyAdmin) { throw 'User already an admin'; }
       const user = await User.findById(req.userID).lean();
-      const token = await signNewToken(user, req.header('x-auth-token'));
+      const token = await signNewToken(user, req.header('x-auth-token'), true);
       res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }
   }
@@ -248,7 +242,7 @@ router.put('/admins/demoteUser', auth, validate([body('boardID').isMongoId()]),
       const isMember = req.userMembers[boardID];
       if (!isAdmin && isMember) { throw 'User already demoted'; }
       const user = await User.findById(req.userID).lean();
-      const token = await signNewToken(user, req.header('x-auth-token'));
+      const token = await signNewToken(user, req.header('x-auth-token'), true);
       res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }
   }
@@ -269,11 +263,11 @@ router.delete('/admins/:email/:boardID', auth, validate([param('email').isEmail(
       const adminCount = board.members.filter(member => member.isAdmin).length;
       if (adminCount <= 1) { throw 'There must be at least 1 admin at all times'; }
       board.members[memberIndex].isAdmin = false;
-      const boardIndex = user.boards.findIndex(board => String(board.boardID) === boardID);
-      if (boardIndex === -1) { throw 'Board not found in users boards'; }
-      user.boards[boardIndex].isAdmin = false;
-      user.markModified('boards');
       board.markModified('members');
+
+      const boardIndex = user.adminBoards.indexOf(boardID);
+      if (boardIndex === -1) { throw 'Board not found in users boards'; }
+      user.adminBoards.splice(boardIndex, 1);
 
       const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to member`, cardID: null, listID: null, boardID };
 
@@ -300,7 +294,7 @@ router.post('/invites', auth, validate([body('email').isEmail(), body('boardID')
         return res.status(400).json({ msg: 'You have already invited this person to this board.' });
       }
       // user already member
-      if (invitee.boards.find(userBoard => String(userBoard.boardID) === boardID)) {
+      if (invitee.boards.includes(boardID)) {
         return res.status(400).json({ msg: 'This user is already a member of this board.' });
       }
 
@@ -329,7 +323,7 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
       }
 
       // add board to user model
-      user.boards = [...user.boards, { boardID: board._id, title: board.title, isStarred: false, isAdmin: false, color: board.color }];
+      user.boards.push(boardID);
       // add user to board members
       board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
 
@@ -339,12 +333,21 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
         user.save(),
         board.save(),
         addActivity(actionData, req),
-        signNewToken(user, req.header('x-auth-token'))
+        signNewToken(user, req.header('x-auth-token'), true)
       ]);
       const newActivity = results[2];
       const token = results[3];
 
-      res.status(200).json({ token, newActivity, boards: user.boards, invites: user.invites });
+      const updatedUser = await User.findById(req.userID).populate('boards', 'title color').lean();
+      updatedUser.boards = updatedUser.boards.map(board => ({
+        boardID: board._id,
+        title: board.title,
+        color: board.color,
+        isStarred: user.starredBoards.includes(boardID),
+        isAdmin: user.adminBoards.includes(boardID)
+      }));
+
+      res.status(200).json({ token, newActivity, boards: updatedUser.boards, invites: updatedUser.invites });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -375,7 +378,7 @@ router.put('/members/remove', auth, validate([body('email').isEmail(), body('boa
 
       // remove user from board's members and remove board from user's boards
       board.members = board.members.filter(member => member.email !== email);
-      user.boards = user.boards.filter(board => String(board.boardID) !== boardID);
+      user.boards = user.boards.filter(userBoardID => String(userBoardID) !== boardID);
 
       const actionData = { msg: null, boardMsg: `removed ${user.fullName} from this board`, cardID: null, listID: null, boardID };
 
@@ -396,15 +399,10 @@ router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIs
       const board = await Board.findByIdAndDelete(boardID).select('members').lean();
       if (!board) { throw 'No board data found'; }
 
-      // for each member of board remove board from its model
       const emails = board.members.map(member => member.email);
-      const members = await User.find({ email: { $in: emails }});
-      for (let member of members) {
-        member.boards = member.boards.filter(board => String(board.boardID) !== boardID);
-      }
 
       await Promise.all([
-        ...members.map(member => member.save()),
+        User.updateMany({ email: { $in: emails }}, { $pull: { boards: boardID, adminBoards: boardID, starredBoards: boardID } }),
         List.deleteMany({ boardID }),
         Activity.deleteMany({ boardID })
       ]);
@@ -430,7 +428,7 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
         if (adminCount < 2) { throw 'There must be at least one other admin for user to leave board'; }
       }
 
-      user.boards = user.boards.filter(board => String(board.boardID) !== boardID);
+      user.boards = user.boards.filter(userBoardID => String(userBoardID) !== boardID);
       board.members = board.members.filter(member => member.email !== user.email);
 
       // remove user from cards they are a member of
