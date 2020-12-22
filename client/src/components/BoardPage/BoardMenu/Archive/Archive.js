@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import classes from './Archive.module.css';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import { connect } from 'react-redux';
@@ -6,11 +6,36 @@ import PropTypes from 'prop-types';
 import { recoverCard, deleteCard, recoverList, deleteList } from '../../../../store/actions';
 import DeleteModal from '../DeleteModal/DeleteModal';
 import { useHistory } from 'react-router';
+import { useDidUpdate } from '../../../../utils/customHooks';
 
 const Archive = props => {
   const [showCards, setShowCards] = useState(true);
   const [showDeleteID, setShowDeleteID] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [archivedCards, setArchivedCards] = useState([]);
+  const [archivedLists, setArchivedLists] = useState([]);
   let history = useHistory();
+  let timer = useRef();
+
+  useEffect(() => {
+    if (!searchQuery.length) { return setArchivedCards(props.archivedCards); }
+    setArchivedCards(props.archivedCards.filter(card => card.title.includes(searchQuery)));
+  }, [props.archivedCards]);
+
+  useEffect(() => {
+    if (!searchQuery.length) { return setArchivedLists(props.archivedLists); }
+    setArchivedLists(props.archivedLists.filter(list => list.title.includes(searchQuery)));
+  }, [props.archivedLists]);
+
+  useDidUpdate(() => {
+    // only filter archive after user stops typing for 400ms
+    clearTimeout(timer.current);
+
+    timer.current = setTimeout(() => {
+      setArchivedCards(props.archivedCards.filter(card => card.title.includes(searchQuery)));
+      setArchivedLists(props.archivedLists.filter(list => list.title.includes(searchQuery)));
+    }, 400);
+  }, [searchQuery]);
 
   const showDetailsHandler = (cardID, listID, card) => {
     history.push(`/board/${props.boardID}/l/${listID}/c/${cardID}`);
@@ -18,11 +43,13 @@ const Archive = props => {
 
   return (
     <>
+      <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className={classes.SearchInput}
+      placeholder={showCards ? 'Search archived cards' : 'Search archived lists'} />
       <div className={classes.Btns}>
         <span className={showCards ? classes.Active : null}><ActionBtn clicked={() => setShowCards(true)}>Archived cards</ActionBtn></span>
         <span className={!showCards ? classes.Active : null}><ActionBtn clicked={() => setShowCards(false)}>Archived lists</ActionBtn></span>
       </div>
-      {showCards ? props.archivedCards.map(card => (
+      {showCards ? archivedCards.map(card => (
         <div className={classes.CardContainer} key={card.cardID}>
           <div className={classes.Card} onClick={() => showDetailsHandler(card.cardID, card.listID, card)}><div>{card.title}</div></div>
           <div>
@@ -30,7 +57,7 @@ const Archive = props => {
             <span className={classes.Option} onClick={() => props.deleteCard(card.cardID, card.listID, props.boardID)}>Delete</span>
           </div>
         </div>
-      )) : props.archivedLists.map(list => (
+      )) : archivedLists.map(list => (
         <div className={classes.ListOuterContainer} key={list.listID}>
           <div className={classes.ListContainer}>
             <div className={classes.ListTitle}>{list.title}</div>
