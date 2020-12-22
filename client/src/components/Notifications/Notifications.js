@@ -14,7 +14,7 @@ const Notifications = props => (
         <div className={classes.Notif}>
           <span className={classes.Icon}>{alertIcon}</span>
           {msg}
-          <CloseBtn clicked={() => props.deleteNotif(id)} />
+          <CloseBtn close={() => props.deleteNotif(id)} />
         </div>
       </CSSTransition>
     ))}
