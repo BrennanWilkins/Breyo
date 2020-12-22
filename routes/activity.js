@@ -12,7 +12,8 @@ const addActivity = async (data, req) => {
   try {
     const { msg, boardMsg, cardID, listID, boardID, email, fullName } = data;
     if (!req.email || !req.fullName) { throw 'User data not found'; }
-    const activity = new Activity({ msg, boardMsg, email: email || req.email, fullName: fullName || req.fullName, cardID, listID, boardID, date: new Date() });
+    const activity = new Activity({ msg, boardMsg, email: email || req.email, fullName: fullName || req.fullName,
+      cardID, listID, boardID, date: new Date(), commentID: data.commentID || null, cardTitle: data.cardTitle || null });
     const newActivity = await activity.save();
     return newActivity;
   } catch (err) { return new Error('Error adding activity'); }

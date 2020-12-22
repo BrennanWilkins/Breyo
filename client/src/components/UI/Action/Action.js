@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import classes from './Action.module.css';
 import PropTypes from 'prop-types';
 import { AccountBtn } from '../Buttons/Buttons';
@@ -11,7 +11,7 @@ const Action = props => {
   const [showUser, setShowUser] = useState(false);
   const [msg, setMsg] = useState(props.msg);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (props.isBoard && props.cardID && props.listID && props.boardID) {
       setMsg(parseActionMsg(props.msg, props.cardID, props.listID, props.boardID));
     }

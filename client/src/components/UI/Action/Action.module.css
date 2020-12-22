@@ -44,7 +44,7 @@
   padding: 10px;
   font-size: 14px;
   box-sizing: border-box;
-  margin: 5px 11px 0 7px;
+  margin: 6px 11px 0 7px;
   border-radius: 4px;
   word-break: break-all;
   border: 1px solid rgb(227, 227, 227);
@@ -54,12 +54,17 @@
 .BoardLink {
   display: inline-block;
 }
-.BoardLink a {
+.BoardLink a, .CommentBoardLink a {
   text-decoration: underline;
   color: black;
   font-weight: 500;
   font-size: 12.5px;
 }
-.BoardLink span {
+.BoardLink span, .CommentBoardLink span {
   margin: 0 5px;
+}
+.CommentBoardLink {
+  font-size: 12px;
+  color: rgb(111, 111, 111);
+  margin: 7px 7px 5px;
 }

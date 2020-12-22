@@ -1,5 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
-import { concatSort, checkBoardActivity, updateActivityListID } from './reducerUtils';
+import { checkBoardActivity, updateActivityListID } from './reducerUtils';
 
 const initialState = {
   boardActivity: [],
@@ -31,8 +31,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DELETE_COMMENT: return deleteComment(state, action);
     case actionTypes.SET_LOADING_ALL_BOARD_ACTIVITY: return { ...state, allBoardActivityLoading: action.bool };
     case actionTypes.SET_ERR_ALL_BOARD_ACTIVITY: return { ...state, allBoardActivityErr: action.bool };
-    case actionTypes.SET_ALL_BOARD_ACTIVITY_FIRST_PAGE: return setAllBoardActivityFirstPage(state, action);
-    case actionTypes.SET_ALL_BOARD_ACTIVITY: return setAllBoardActivity(state, action);
+    case actionTypes.SET_ALL_BOARD_ACTIVITY: return { ...state, allBoardActivity: action.activity };
     case actionTypes.SET_ALL_BOARD_ACTIVITY_SHOWN: return { ...state, allBoardActivityShown: true };
     case actionTypes.RESET_ALL_BOARD_ACTIVITY: return resetAllBoardActivity(state, action);
     case actionTypes.LEAVE_BOARD: return { ...initialState };
@@ -49,9 +48,7 @@ const resetCardActivity = (state, action) => ({
 });
 
 const setCardActivity = (state, action) => {
-  const allComments = state.allComments.filter(comment => comment.cardID === action.cardID);
-  const cardActivity = concatSort(action.activity, allComments);
-  return { ...state, cardActivity, shownCardActivityID: action.cardID };
+  return { ...state, cardActivity: action.activity, shownCardActivityID: action.cardID };
 };
 
 const deleteBoardActivity = (state, action) => {
@@ -103,22 +100,20 @@ const setBoardActivity = (state, action) => ({
 
 const updateBoardActivityDeleteCard = (state, action) => {
   const allComments = state.allComments.filter(comment => comment.cardID !== action.cardID);
-  const combinedActivity = concatSort(action.activity, allComments).slice(0, 20);
   let allBoardActivity = state.allBoardActivity;
   if (checkBoardActivity(state)) {
     allBoardActivity = state.allBoardActivity.filter(activity => activity.cardID !== action.cardID);
   }
-  return { ...state, boardActivity: combinedActivity, allComments, allBoardActivity };
+  return { ...state, boardActivity: action.activity, allComments, allBoardActivity };
 };
 
 const updateBoardActivityDeleteList = (state, action) => {
   const allComments = state.allComments.filter(comment => comment.listID !== action.listID);
-  const combinedActivity = concatSort(action.activity, allComments).slice(0, 20);
   if (checkBoardActivity(state)) {
     const allBoardActivity = state.allBoardActivity.filter(activity => activity.listID !== action.listID);
-    return { ...state, boardActivity: combinedActivity, allComments, allBoardActivity };
+    return { ...state, boardActivity: action.activity, allComments, allBoardActivity };
   }
-  return { ...state, boardActivity: combinedActivity, allComments };
+  return { ...state, boardActivity: action.activity, allComments };
 };
 
 const addComment = (state, action) => {
@@ -151,7 +146,6 @@ const updateComment = (state, action) => {
   if (activityIndex !== -1) {
     boardActivity = [...boardActivity];
     boardActivity[activityIndex] = comment;
-    return { ...state, allComments, boardActivity };
   }
   let cardActivity = state.cardActivity;
   if (state.shownCardActivityID === action.cardID) {
@@ -172,17 +166,13 @@ const deleteComment = (state, action) => {
     const cardActivityIndex = cardActivity.findIndex(activity => activity.commentID === action.commentID);
     if (cardActivityIndex !== -1) { cardActivity.splice(cardActivityIndex, 1); }
   }
-  return { ...state, allComments, cardActivity };
-};
-
-const setAllBoardActivityFirstPage = (state, action) => {
-  const allBoardActivity = concatSort(action.activity, state.allComments).slice(0, 100);
-  return { ...state, allBoardActivity };
-};
-
-const setAllBoardActivity = (state, action) => {
-  const allBoardActivity = concatSort(action.activity, state.allComments);
-  return { ...state, allBoardActivity };
+  const activityIndex = state.boardActivity.findIndex(activity => activity.commentID === action.commentID);
+  let boardActivity = state.boardActivity;
+  if (activityIndex !== -1) {
+    boardActivity = [...boardActivity];
+    boardActivity.splice(activityIndex, 1);
+  }
+  return { ...state, allComments, cardActivity, boardActivity };
 };
 
 const resetAllBoardActivity = (state, action) => ({

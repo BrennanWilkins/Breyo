@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import classes from './UserActivity.module.css';
 import { activityIcon } from '../../UI/icons';
 import Action from '../../UI/Action/Action';
-import AuthSpinner from '../../UI/AuthSpinner/AuthSpinner';
+import CommentAction from '../../UI/Action/CommentAction';
+import Spinner from '../../UI/AuthSpinner/AuthSpinner';
 import { instance as axios } from '../../../axios';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -41,13 +42,14 @@ const UserActivity = props => {
       <div className={classes.Content}>
         <div className={classes.Title}>{activityIcon} My Activity</div>
           {err ? <div className={classes.ErrMsg}>Your activity could not be retrieved.</div> :
-            userActivity.map(action => (
-              <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
-              msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} boardTitle={action.boardTitle} />
-            ))
+            userActivity.map(action => {
+              if (action.commentID) { return <CommentAction key={action._id} {...action} />; }
+              return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
+              msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} boardTitle={action.boardTitle} />;
+            })
           }
           {(!allLoaded && userActivity.length > 0) && <div className={classes.LoadMore} onClick={() => setPage(currPage => currPage + 1)}>Load more activity</div>}
-          {loading && <div className={classes.Spinner}><AuthSpinner /></div>}
+          {loading && <div className={classes.Spinner}><Spinner /></div>}
       </div>
     </div>
   );

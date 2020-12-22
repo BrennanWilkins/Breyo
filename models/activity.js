@@ -8,7 +8,9 @@ const ActivitySchema = new mongoose.Schema({
   boardID: String,
   listID: String,
   cardID: String,
-  boardMsg: String
+  boardMsg: String,
+  commentID: String,
+  cardTitle: String
 });
 
 ActivitySchema.index({ boardID: 1, date: -1 });

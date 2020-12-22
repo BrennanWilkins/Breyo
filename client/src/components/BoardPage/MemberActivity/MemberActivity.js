@@ -8,7 +8,6 @@ import Action from '../../UI/Action/Action';
 import CommentAction from '../../UI/Action/CommentAction';
 import AuthSpinner from '../../UI/AuthSpinner/AuthSpinner';
 import { instance as axios } from '../../../axios';
-import { connect } from 'react-redux';
 
 const MemberActivity = props => {
   const modalRef = useRef();
@@ -22,7 +21,7 @@ const MemberActivity = props => {
       try {
         const data = await axios.get(`/activity/member/${email}/${boardID}`);
         setLoading(false);
-        setUserActivity(data.data.activity.concat(props.allComments.filter(comment => comment.email === props.email)).sort((a,b) => new Date(b.date) - new Date(a.date)));
+        setUserActivity(data.data.activity);
       } catch (err) {
         setLoading(false);
         setErr(true);
@@ -48,7 +47,7 @@ const MemberActivity = props => {
         <div className={classes.Activity}>
           {loading ? <div className={classes.Spinner}><AuthSpinner /></div> : !err ?
             userActivity.map(action => {
-              if (action.commentID) { return <CommentAction key={action.commentID} {...action} boardID={props.boardID} />; }
+              if (action.commentID) { return <CommentAction key={action.commentID} {...action} />; }
               return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
               msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />;
             }) :
@@ -64,12 +63,7 @@ MemberActivity.propTypes = {
   email: PropTypes.string.isRequired,
   fullName: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
-  path: PropTypes.string.isRequired,
-  allComments: PropTypes.array.isRequired
+  path: PropTypes.string.isRequired
 };
 
-const mapStateToProps = state => ({
-  allComments: state.activity.allComments
-});
-
-export default connect(mapStateToProps)(MemberActivity);
+export default MemberActivity;

@@ -23,6 +23,7 @@ const CommentAction = props => {
           <span className={classes.Date}>{formatDate(props.date)}</span>
         </div>
         <div className={classes.Comment}>{props.msg}</div>
+        {props.boardTitle && <div className={classes.CommentBoardLink}><span>-</span>in board <Link to={`/board/${props.boardID}`}>{props.boardTitle}</Link></div>}
       </div>
     </div>
   );
@@ -36,7 +37,8 @@ CommentAction.propTypes = {
   cardID: PropTypes.string.isRequired,
   listID: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
-  cardTitle: PropTypes.string.isRequired
+  cardTitle: PropTypes.string.isRequired,
+  boardTitle: PropTypes.string
 };
 
 export default CommentAction;

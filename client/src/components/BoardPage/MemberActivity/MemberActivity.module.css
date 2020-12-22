@@ -8,18 +8,19 @@
   overflow-x: hidden;
   overflow-y: auto;
   z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 .Modal {
-  position: absolute;
-  top: 45px;
-  left: max(calc(50% - 300px), 2%);
+  margin: 45px 0;
   width: 96%;
   max-width: 600px;
   background: rgb(246,246,246);
-  margin-bottom: 45px;
   padding: 15px;
   box-sizing: border-box;
   border-radius: 2px;
+  position: relative;
   min-height: 300px;
 }
 .Title {

@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { fetchFirstPageBoardActivity, fetchAllBoardActivity,
   setAllBoardActivityShown, resetAllBoardActivity } from '../../../../store/actions';
+import Spinner from '../../../UI/AuthSpinner/AuthSpinner';
 
 const ActivityMenu = props => {
   const [showAll, setShowAll] = useState(true);
@@ -32,9 +33,10 @@ const ActivityMenu = props => {
         <div className={showAll ? classes.Active : classes.Inactive} onClick={() => setShowAll(true)}>All</div>
         <div className={!showAll ? classes.Active : classes.Inactive} onClick={() => setShowAll(false)}>Comments</div>
       </div>
+      {props.isLoading && !moreLoaded && <div className={classes.Spinner}><Spinner /></div>}
       {showAll ?
         props.allBoardActivity.map(action => {
-          if (action.commentID) { return <CommentAction key={action.commentID} {...action} boardID={props.boardID} />; }
+          if (action.commentID) { return <CommentAction key={action._id} {...action} />; }
           return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
           msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />;
         }) :

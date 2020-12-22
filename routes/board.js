@@ -13,13 +13,7 @@ const Activity = require('../models/activity');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const { getJWTPayload, getLeanJWTPayload } = require('./auth');
-
-const COLORS = ['#f05544', '#f09000', '#489a3c', '#0079bf', '#7150df',
-  '#38bbf4', '#ad5093', '#4a32dd', '#046b8b'];
-
-const PHOTO_IDS = ['1607556049122-5e3874a25a1f', '1605325811474-ba58cf3180d8', '1513580638-fda5563960d6',
-'1554129352-f8c3ab6d5595', '1596709097416-6d4206796022', '1587732282555-321fddb19dc0',
-'1605580556856-db8fae94b658', '1605738862138-6704bedb5202', '1605447781678-2a5baca0e07b'];
+const { COLORS, PHOTO_IDS } = require('./constants');
 
 const signNewToken = async (user, oldToken, getLean) => {
   // used to update user's jwt token when new board created or joined, or user promoted/demoted to/from admin

@@ -11,8 +11,7 @@ const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 const { format } = require('date-fns');
 const isThisYear = require('date-fns/isThisYear');
-
-const LABEL_COLORS = ['#F60000', '#FF8C00', '#FFEE00', '#4DE94C', '#3783FF', '#4815AA'];
+const { LABEL_COLORS } = require('./constants');
 
 // authorization: member
 // create a new card
@@ -779,9 +778,13 @@ router.post('/comments', auth, validate([
       if (!card) { throw 'Card data not found'; }
       card.comments.push({ email: req.email, fullName: req.fullName, date, msg, cardID, listID });
       const commentID = card.comments[card.comments.length - 1]._id;
-      await list.save();
 
-      res.status(200).json({ commentID, cardTitle: card.title });
+      const actionData = { msg, boardMsg: msg, cardID, listID, boardID, commentID, cardTitle: card.title };
+
+      const results = await Promise.all([addActivity(actionData, req), list.save()]);
+      const newActivity = results[0];
+
+      res.status(200).json({ commentID, cardTitle: card.title, newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -796,16 +799,18 @@ router.put('/comments', auth, validate([
   body('msg').isLength({ min: 1, max: 400 })]), useIsMember,
   async (req, res) => {
     try {
-      const list = await List.findById(req.body.listID);
+      const { listID, cardID, commentID, msg } = req.body;
+      const list = await List.findById(listID);
       if (!list) { throw 'List data not found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
 
-      const comment = list.cards.id(req.body.cardID).comments.id(req.body.commentID);
+      const comment = list.cards.id(cardID).comments.id(commentID);
       if (!comment) { throw 'Comment not found'; }
       if (req.email !== comment.email) { throw 'User must be original author to edit'; }
-      comment.msg = req.body.msg;
+      comment.msg = msg;
 
-      await list.save();
+      await Promise.all([list.save(), Activity.updateOne({ commentID }, { msg, boardMsg: msg })]);
+
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -820,16 +825,18 @@ router.delete('/comments/:commentID/:cardID/:listID/:boardID', auth, validate([
   param('commentID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
-      const list = await List.findById(req.params.listID);
+      const { listID, cardID, commentID } = req.params;
+      const list = await List.findById(listID);
       if (!list) { throw 'List data found'; }
       if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
 
-      const comment = list.cards.id(req.params.cardID).comments.id(req.params.commentID);
+      const comment = list.cards.id(cardID).comments.id(commentID);
       if (!comment) { throw 'Comment not found'; }
       if (req.email !== comment.email) { throw 'Must be original author to delete comment'; }
       comment.remove();
 
-      await list.save();
+      await Promise.all([list.save(), Activity.deleteOne({ commentID })]);
+
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }

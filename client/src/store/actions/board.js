@@ -126,8 +126,8 @@ export const updateActiveBoard = data => (dispatch, getState) => {
   dispatch({ type: actionTypes.SET_LIST_DATA, payload: listPayload });
 
   allComments.sort((a, b) => new Date(b.date) - new Date(a.date));
-  const combinedActivity = data.activity.concat(allComments).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
-  const activityPayload = { activity: combinedActivity, allComments };
+
+  const activityPayload = { activity: data.activity, allComments };
   dispatch({ type: actionTypes.SET_BOARD_ACTIVITY, payload: activityPayload });
 };
 
