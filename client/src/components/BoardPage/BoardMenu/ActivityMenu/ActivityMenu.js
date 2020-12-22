@@ -33,7 +33,7 @@ const ActivityMenu = props => {
         <div className={showAll ? classes.Active : classes.Inactive} onClick={() => setShowAll(true)}>All</div>
         <div className={!showAll ? classes.Active : classes.Inactive} onClick={() => setShowAll(false)}>Comments</div>
       </div>
-      {props.isLoading && !moreLoaded && <div className={classes.Spinner}><Spinner /></div>}
+      {props.isLoading && !props.allBoardActivity.length && <div className={classes.Spinner}><Spinner /></div>}
       {showAll ?
         props.allBoardActivity.map(action => {
           if (action.commentID) { return <CommentAction key={action._id} {...action} />; }

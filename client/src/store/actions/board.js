@@ -57,7 +57,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
         date: comment.date,
         commentID: comment._id,
         msg: comment.msg
-      })).sort((a,b) => new Date(b.date) - new Date(a.date));
+      })).reverse();
       allComments = allComments.concat(comments.map(comment => ({...comment, cardTitle: card.title})));
       return {
         cardID: card._id,
@@ -88,7 +88,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
         date: comment.date,
         commentID: comment._id,
         msg: comment.msg
-      })).sort((a,b) => new Date(b.date) - new Date(a.date));
+      })).reverse();
       allComments = allComments.concat(comments.map(comment => ({ ...comment, cardTitle: card.title })));
       return {
         cardID: card._id,

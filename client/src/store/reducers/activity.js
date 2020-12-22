@@ -31,7 +31,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DELETE_COMMENT: return deleteComment(state, action);
     case actionTypes.SET_LOADING_ALL_BOARD_ACTIVITY: return { ...state, allBoardActivityLoading: action.bool };
     case actionTypes.SET_ERR_ALL_BOARD_ACTIVITY: return { ...state, allBoardActivityErr: action.bool };
-    case actionTypes.SET_ALL_BOARD_ACTIVITY: return { ...state, allBoardActivity: action.activity };
+    case actionTypes.SET_ALL_BOARD_ACTIVITY_FIRST_PAGE: return { ...state, allBoardActivity: action.activity };
+    case actionTypes.SET_ALL_BOARD_ACTIVITY: return { ...state, allBoardActivity: state.allBoardActivity.concat(action.activity) };
     case actionTypes.SET_ALL_BOARD_ACTIVITY_SHOWN: return { ...state, allBoardActivityShown: true };
     case actionTypes.RESET_ALL_BOARD_ACTIVITY: return resetAllBoardActivity(state, action);
     case actionTypes.LEAVE_BOARD: return { ...initialState };

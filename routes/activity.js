@@ -86,7 +86,7 @@ router.get('/all/board/:boardID/firstPage', auth, validate([param('boardID').isM
 router.get('/all/board/:boardID/allActions', auth, validate([param('boardID').isMongoId()]), useIsMember,
   async (req, res) => {
     try {
-      const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').lean();
+      const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').skip(100).lean();
       if (!activity) { throw 'No board activity found'; }
       res.status(200).json({ activity });
     } catch (err) { res.sendStatus(500); }

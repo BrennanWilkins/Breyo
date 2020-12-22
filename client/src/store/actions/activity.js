@@ -65,7 +65,7 @@ export const fetchFirstPageBoardActivity = () => async (dispatch, getState) => {
     dispatch({ type: actionTypes.SET_LOADING_ALL_BOARD_ACTIVITY, bool: true });
     const res = await axios.get(`/activity/all/board/${boardID}/firstPage`);
     dispatch({ type: actionTypes.SET_LOADING_ALL_BOARD_ACTIVITY, bool: false });
-    dispatch({ type: actionTypes.SET_ALL_BOARD_ACTIVITY, activity: res.data.activity });
+    dispatch({ type: actionTypes.SET_ALL_BOARD_ACTIVITY_FIRST_PAGE, activity: res.data.activity });
   } catch (err) {
     dispatch({ type: actionTypes.SET_LOADING_ALL_BOARD_ACTIVITY, bool: false });
     dispatch({ type: actionTypes.SET_ERR_ALL_BOARD_ACTIVITY, bool: true });
