@@ -1,9 +1,9 @@
 import React, { useRef } from 'react';
 import classes from './Commenter.module.css';
 import PropTypes from 'prop-types';
-import AccountInfo from '../../../../UI/AccountInfo/AccountInfo';
-import { CloseBtn } from '../../../../UI/Buttons/Buttons';
-import { useModalToggle } from '../../../../../utils/customHooks';
+import AccountInfo from '../../AccountInfo/AccountInfo';
+import { CloseBtn } from '../../Buttons/Buttons';
+import { useModalToggle } from '../../../../utils/customHooks';
 
 const Commenter = props => {
   const modalRef = useRef();

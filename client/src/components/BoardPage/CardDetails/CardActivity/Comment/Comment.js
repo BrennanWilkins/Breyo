@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import classes from './Comment.module.css';
 import PropTypes from 'prop-types';
 import { AccountBtn } from '../../../../UI/Buttons/Buttons';
-import Commenter from '../Commenter/Commenter';
+import Commenter from '../../../../UI/Action/Commenter/Commenter';
 import DeleteModal from './DeleteModal/DeleteModal';
 import { connect } from 'react-redux';
 import { deleteComment, updateComment } from '../../../../../store/actions';

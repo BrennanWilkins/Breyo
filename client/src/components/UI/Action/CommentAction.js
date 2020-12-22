@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import classes from './Action.module.css';
 import PropTypes from 'prop-types';
-import { AccountBtn } from '../../../../UI/Buttons/Buttons';
-import Commenter from '../Commenter/Commenter';
-import formatDate from '../../../../../utils/formatDate';
+import { AccountBtn } from '../Buttons/Buttons';
+import Commenter from './Commenter/Commenter';
+import formatDate from '../../../utils/formatDate';
 import { Link } from 'react-router-dom';
 
 const CommentAction = props => {

@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import Comment from './Comment/Comment';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import { getRecentCardActivity, resetCardActivity, getAllCardActivity } from '../../../../store/actions';
-import Action from './Action/Action';
+import Action from '../../../UI/Action/Action';
 import AuthSpinner from '../../../UI/AuthSpinner/AuthSpinner';
 
 const CardActivity = props => {

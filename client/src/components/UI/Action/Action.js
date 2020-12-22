@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import classes from './Action.module.css';
 import PropTypes from 'prop-types';
-import { AccountBtn } from '../../../../UI/Buttons/Buttons';
-import Commenter from '../Commenter/Commenter';
-import parseActionMsg from '../../../../../utils/parseActionMsg';
-import formatDate, { formatDateLong } from '../../../../../utils/formatDate';
+import { AccountBtn } from '../Buttons/Buttons';
+import Commenter from './Commenter/Commenter';
+import parseActionMsg from '../../../utils/parseActionMsg';
+import formatDate, { formatDateLong } from '../../../utils/formatDate';
 import { Link } from 'react-router-dom';
 
 const Action = props => {

@@ -5,8 +5,8 @@ import { CloseBtn, BackBtn } from '../../UI/Buttons/Buttons';
 import { connect } from 'react-redux';
 import { boardIcon, activityIcon, settingsIcon, archiveFillIcon } from '../../UI/icons';
 import Archive from './Archive/Archive';
-import Action from '../CardDetails/CardActivity/Action/Action';
-import CommentAction from '../CardDetails/CardActivity/Action/CommentAction';
+import Action from '../../UI/Action/Action';
+import CommentAction from '../../UI/Action/CommentAction';
 import AboutMenu from './AboutMenu/AboutMenu';
 import SettingsMenu from './SettingsMenu/SettingsMenu';
 import BackgroundMenu from './BackgroundMenu/BackgroundMenu';
@@ -40,7 +40,7 @@ const BoardMenu = props => {
       <div className={classes.Options}>
         <div onClick={() => setShowBoardDesc(true)} className={classes.Option}>{boardIcon}About this board</div>
         <div onClick={() => setShowChangeBackground(true)} className={classes.Option}>
-          <span style={props.color[0] === '#' ? { background: props.color } : {backgroundImage: getPhotoURL(props.color, 20) }} 
+          <span style={props.color[0] === '#' ? { background: props.color } : {backgroundImage: getPhotoURL(props.color, 20) }}
           className={classes.SmallColor}></span>
           Change background
         </div>
