@@ -2,3 +2,33 @@
   position: relative;
   margin: 15px 10px;
 }
+.BoardLink {
+  margin: 15px 10px;
+}
+.BoardLink label {
+  font-weight: 500;
+  font-size: 13px;
+  color: rgb(100,100,100);
+}
+.BoardLink input {
+  width: 100%;
+  margin: 5px 0;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 2px solid #eee;
+  padding: 5px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border 150ms;
+}
+.BoardLink input:hover {
+  border: 2px solid #ddd;
+}
+.BoardLink input:focus {
+  border: 2px solid rgb(var(--red));
+}
+.BoardLink div {
+  color: rgb(125,125,125);
+  font-size: 13px;
+  margin-bottom: 20px;
+}

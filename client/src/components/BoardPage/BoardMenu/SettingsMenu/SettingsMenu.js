@@ -32,6 +32,13 @@ const SettingsMenu = props => {
 
   return (
     <>
+      <div className={classes.BoardLink}>
+        <label>
+          Link to this board
+          <input value={`https://breyo.herokuapp.com/board/${props.boardID}`} onFocus={e => e.target.select()} readOnly />
+        </label>
+        <div>Only other board members will be able to access this link.</div>
+      </div>
       <div className={classes.ModalContainer}>
         <ActionBtn clicked={() => setShowLeaveBoard(true)}>Leave this board</ActionBtn>
         {showLeaveBoard && <DeleteModal confirmText="LEAVE BOARD" close={() => setShowLeaveBoard(false)}
@@ -56,12 +63,14 @@ SettingsMenu.propTypes = {
   deleteBoard: PropTypes.func.isRequired,
   deleteBoardActivity: PropTypes.func.isRequired,
   members: PropTypes.array.isRequired,
-  leaveBoard: PropTypes.func.isRequired
+  leaveBoard: PropTypes.func.isRequired,
+  boardID: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
   userIsAdmin: state.board.userIsAdmin,
-  members: state.board.members
+  members: state.board.members,
+  boardID: state.board.boardID
 });
 
 const mapDispatchToProps = dispatch => ({
