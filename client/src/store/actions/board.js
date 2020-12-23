@@ -7,9 +7,10 @@ import { addRecentActivity } from './activity';
 export const createBoard = (title, color) => async dispatch => {
   try {
     const res = await axios.post('/board', { title, color });
-    axios.defaults.headers.common['x-auth-token'] = res.data.token;
-    localStorage['token'] = res.data.token;
-    dispatch({ type: actionTypes.CREATE_BOARD, payload: res.data.board });
+    const { token, board } = res.data;
+    axios.defaults.headers.common['x-auth-token'] = token;
+    localStorage['token'] = token;
+    dispatch({ type: actionTypes.CREATE_BOARD, payload: board });
   } catch (err) {
     let msg = err.response && err.response.data.msg ? err.response.data.msg : 'Your board could not be created.';
     dispatch(addNotif(msg));
@@ -27,13 +28,34 @@ export const toggleIsStarred = boardID => async (dispatch, getState) => {
   }
 };
 
+const formatCardData = card => {
+  let { _id: cardID, comments, checklists, ...restCard } = card;
+
+  comments = comments.map(comment => {
+    const { _id: commentID, ...restComment } = comment;
+    return { ...restComment, commentID };
+  }).reverse();
+
+  checklists = checklists.map(checklist => ({
+    title: checklist.title,
+    checklistID: checklist._id,
+    items: checklist.items.map(item => ({
+      itemID: item._id,
+      title: item.title,
+      isComplete: item.isComplete
+    }))
+  }));
+
+  return { cardID, comments, checklists, ...restCard };
+};
+
 export const updateActiveBoard = data => (dispatch, getState) => {
+  const { _id: boardID, members, desc, creatorEmail, color, title, activity } = data;
   const state = getState();
-  const activeBoard = state.auth.boards.find(board => board.boardID === data._id);
-  const isStarred = activeBoard.isStarred;
-  const creator = data.members.find(member => member.email === data.creatorEmail);
+  const activeBoard = state.auth.boards.find(board => board.boardID === boardID);
+  const { isStarred, isAdmin: userIsAdmin } = activeBoard;
+  const creator = data.members.find(member => member.email === creatorEmail);
   const creatorFullName = creator.fullName;
-  const userIsAdmin = activeBoard.isAdmin;
 
   if (data.invites && data.boards) {
     dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: data.invites, boards: data.boards });
@@ -41,83 +63,25 @@ export const updateActiveBoard = data => (dispatch, getState) => {
 
   if (data.token) { axios.defaults.headers.common['x-auth-token'] = data.token; }
 
-  const boardPayload = { isStarred, creatorFullName, userIsAdmin, title: data.title, members: data.members,
-    color: data.color, boardID: data._id, desc: data.desc, creatorEmail: data.creatorEmail };
+  const boardPayload = { isStarred, creatorFullName, userIsAdmin, title, members, color, boardID, desc, creatorEmail };
   dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload: boardPayload });
 
   let allArchivedCards = [];
   let allComments = [];
   let lists = data.lists.map(list => {
+    const { _id: listID, indexInBoard, title, isArchived } = list;
     const cards = list.cards.map(card => {
-      const comments = card.comments.map(comment => ({
-        email: comment.email,
-        fullName: comment.fullName,
-        cardID: comment.cardID,
-        listID: comment.listID,
-        date: comment.date,
-        commentID: comment._id,
-        msg: comment.msg
-      })).reverse();
-      allComments = allComments.concat(comments.map(comment => ({...comment, cardTitle: card.title})));
-      return {
-        cardID: card._id,
-        checklists: card.checklists.map(checklist => ({
-          title: checklist.title,
-          checklistID: checklist._id,
-          items: checklist.items.map(item => ({
-            itemID: item._id,
-            title: item.title,
-            isComplete: item.isComplete
-          }))
-        })),
-        dueDate: card.dueDate,
-        labels: card.labels,
-        title: card.title,
-        desc: card.desc,
-        members: card.members,
-        roadmapLabel: card.roadmapLabel,
-        comments
-      };
+      const formatted = formatCardData(card);
+      allComments = allComments.concat(formatted.comments.map(comment => ({ ...comment, cardTitle: card.title })));
+      return formatted;
     });
     const archivedCards = list.archivedCards.map(card => {
-      const comments = card.comments.map(comment => ({
-        email: comment.email,
-        fullName: comment.fullName,
-        cardID: comment.cardID,
-        listID: comment.listID,
-        date: comment.date,
-        commentID: comment._id,
-        msg: comment.msg
-      })).reverse();
-      allComments = allComments.concat(comments.map(comment => ({ ...comment, cardTitle: card.title })));
-      return {
-        cardID: card._id,
-        checklists: card.checklists.map(checklist => ({
-          title: checklist.title,
-          checklistID: checklist._id,
-          items: checklist.items.map(item => ({
-            itemID: item._id,
-            title: item.title,
-            isComplete: item.isComplete
-          }))
-        })),
-        dueDate: card.dueDate,
-        labels: card.labels,
-        title: card.title,
-        desc: card.desc,
-        members: card.members,
-        roadmapLabel: card.roadmapLabel,
-        comments
-      };
+      const formatted = formatCardData(card);
+      allComments = allComments.concat(formatted.comments.map(comment => ({ ...comment, cardTitle: card.title })));
+      return formatted;
     });
-    allArchivedCards = allArchivedCards.concat(archivedCards.map(card => ({ ...card, listID: list._id })));
-    return {
-      indexInBoard: list.indexInBoard,
-      listID: list._id,
-      title: list.title,
-      isArchived: list.isArchived,
-      cards
-    };
+    allArchivedCards = allArchivedCards.concat(archivedCards.map(card => ({ ...card, listID })));
+    return { indexInBoard, listID, title, isArchived, cards };
   });
   const archivedLists = lists.filter(list => list.isArchived);
   lists = lists.filter(list => !list.isArchived);
@@ -127,7 +91,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
 
   allComments.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  const activityPayload = { activity: data.activity, allComments };
+  const activityPayload = { activity, allComments };
   dispatch({ type: actionTypes.SET_BOARD_ACTIVITY, payload: activityPayload });
 };
 
@@ -213,15 +177,16 @@ export const deleteBoard = push => async (dispatch, getState) => {
 export const acceptInvite = (boardID, email, fullName, push) => async (dispatch, getState) => {
   try {
     const res = await axios.put('/board/invites/accept', { boardID });
-    axios.defaults.headers.common['x-auth-token'] = res.data.token;
-    localStorage['token'] = res.data.token;
+    const { token, invites, boards, newActivity } = res.data;
+    axios.defaults.headers.common['x-auth-token'] = token;
+    localStorage['token'] = token;
     // manually connect socket
     initSocket(boardID);
     connectSocket();
     // automatically send user to the board
     push(`/board/${boardID}`);
-    dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards });
-    addRecentActivity(res.data.newActivity);
+    dispatch({ type: actionTypes.UPDATE_USER_DATA, invites, boards });
+    addRecentActivity(newActivity);
     sendUpdate('post/board/newMember', JSON.stringify({ email, fullName }));
   } catch (err) {
     if (err.response && err.response.status === 400) {

@@ -1,21 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classes from './List.module.css';
-import { plusIcon, dotsIcon } from '../../../UI/icons';
-import TextArea from 'react-textarea-autosize';
-import { connect } from 'react-redux';
-import { updateListTitle } from '../../../../store/actions';
+import { plusIcon } from '../../../UI/icons';
 import AddCard from '../AddCard/AddCard';
 import Card from '../Card/Card';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import ListActions from '../ListActions/ListActions';
-import { withRouter } from 'react-router-dom';
 import CardMemberModal from '../../../UI/CardMemberModal/CardMemberModal';
+import { useHistory } from 'react-router';
+import ListTitle from './ListTitle';
 
 const List = props => {
-  const [titleInput, setTitleInput] = useState(props.title);
+  let history = useHistory();
   const [showAddCard, setShowAddCard] = useState(false);
-  const [showTitleInput, setShowTitleInput] = useState(false);
   const [showListActions, setShowListActions] = useState(false);
   const inputRef = useRef();
   const actionsRef = useRef();
@@ -34,17 +31,8 @@ const List = props => {
     setActionsLeft(rect.left);
   }, [showListActions]);
 
-  useEffect(() => setTitleInput(props.title), [props.title]);
-
-  const editTitleHandler = () => {
-    if (titleInput === props.title) { return setShowTitleInput(false); }
-    if (titleInput.length === 0 || titleInput.length > 200) { setShowTitleInput(false); return setTitleInput(props.title); }
-    props.updateListTitle(titleInput, props.listID, props.boardID);
-    setShowTitleInput(false);
-  };
-
   const setCardDetailsHandler = cardID => {
-    props.history.push(`/board/${props.boardID}/l/${props.listID}/c/${cardID}`);
+    history.push(`/board/${props.boardID}/l/${props.listID}/c/${cardID}`);
   };
 
   const blurInputHandler = e => {
@@ -56,12 +44,7 @@ const List = props => {
     <Draggable draggableId={props.listID} index={props.indexInBoard}>
       {(provided, snapshot) => (
         <div className={classes.List} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} onMouseDown={blurInputHandler}>
-          <div className={classes.ListTop}>
-            {!showTitleInput ? <div className={classes.ListTitle} onClick={() => setShowTitleInput(true)}>{titleInput}</div> :
-            <TextArea maxRows="10" ref={inputRef} value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.TitleInput}
-            onFocus={e => e.target.select()} autoFocus onBlur={editTitleHandler} onKeyPress={e => { if (e.key === 'Enter') { e.preventDefault(); editTitleHandler(); }}} />}
-            <div ref={actionsRef} className={classes.CardOptionBtn} onClick={() => setShowListActions(true)}>{dotsIcon}</div>
-          </div>
+          <ListTitle title={props.title} refs={{ actionsRef, inputRef }} showActions={() => setShowListActions(true)} listID={props.listID} />
           <Droppable droppableId={props.listID}>
             {(provided, snapshot) => (
               <div className={classes.CardContainer} ref={provided.innerRef}>
@@ -96,12 +79,7 @@ List.propTypes = {
   listID: PropTypes.string.isRequired,
   cards: PropTypes.array.isRequired,
   indexInBoard: PropTypes.number.isRequired,
-  boardID: PropTypes.string.isRequired,
-  updateListTitle: PropTypes.func.isRequired
+  boardID: PropTypes.string.isRequired
 };
 
-const mapDispatchToProps = dispatch => ({
-  updateListTitle: (title, listID, boardID) => dispatch(updateListTitle(title, listID, boardID)),
-});
-
-export default connect(null, mapDispatchToProps)(withRouter(List));
+export default List;

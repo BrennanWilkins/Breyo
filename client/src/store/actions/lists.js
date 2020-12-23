@@ -4,8 +4,9 @@ import { addNotif, serverErr } from './notifications';
 import { sendUpdate } from './socket';
 import { addRecentActivity, addRecentActivities } from './activity';
 
-export const updateListTitle = (title, listID, boardID) => async dispatch => {
+export const updateListTitle = (title, listID) => async (dispatch, getState) => {
   try {
+    const boardID = getState().board.boardID;
     dispatch({ type: actionTypes.UPDATE_LIST_TITLE, title, listID });
     const res = await axios.put('/list/title', { title, listID, boardID });
     sendUpdate('put/list/title', JSON.stringify({ title, listID }));
