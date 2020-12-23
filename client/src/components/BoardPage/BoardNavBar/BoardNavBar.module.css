@@ -105,3 +105,10 @@
 .DarkenBtns2 .StarBtn button:hover, .DarkenBtns2 .Btn button:hover {
   background: rgba(0,0,0,0.4);
 }
+.AdminIcon {
+  font-size: 16px;
+  position: absolute;
+  bottom: -3.5px;
+  right: 2px;
+  color: rgb(85,85,85);
+}
