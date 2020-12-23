@@ -12,7 +12,8 @@ const initialState = {
   isStarred: false,
   userIsAdmin: false,
   roadmapShown: false,
-  shownRoadmapListID: null
+  shownRoadmapListID: null,
+  showCreateBoard: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -34,6 +35,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.OPEN_ROADMAP: return { ...state, roadmapShown: true };
     case actionTypes.SET_SHOWN_ROADMAP_LIST: return { ...state, shownRoadmapListID: action.listID };
     case actionTypes.CLOSE_ROADMAP: return { ...state, roadmapShown: false };
+    case actionTypes.TOGGLE_CREATE_BOARD: return { ...state, showCreateBoard: !state.showCreateBoard };
     default: return state;
   }
 };

@@ -2,7 +2,8 @@ export { login, logout, loginErr, signupErr, signup, authReset, autoLogin, getUs
 deleteAccount } from './auth';
 export { createBoard, toggleIsStarred, updateActiveBoard, updateBoardTitle, sendInvite,
 addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc, deleteBoard, acceptInvite,
-rejectInvite, leaveBoard, openRoadmap, setShownRoadmapList, closeRoadmap, openRoadmapList } from './board';
+rejectInvite, leaveBoard, openRoadmap, setShownRoadmapList, closeRoadmap, openRoadmapList,
+toggleCreateBoard } from './board';
 export { addNotif, deleteNotif } from './notifications';
 export { updateListTitle, addList, copyList, archiveList, recoverList, deleteList,
 archiveAllCards, moveAllCards } from './lists';

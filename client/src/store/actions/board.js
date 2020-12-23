@@ -238,3 +238,5 @@ export const openRoadmapList = listID => dispatch => {
 };
 
 export const setShownRoadmapList = listID => ({ type: actionTypes.SET_SHOWN_ROADMAP_LIST, listID });
+
+export const toggleCreateBoard = () => ({ type: actionTypes.TOGGLE_CREATE_BOARD });

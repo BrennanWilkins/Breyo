@@ -2,7 +2,7 @@ import React from 'react';
 import classes from './BoardList.module.css';
 import { connect } from 'react-redux';
 import { starIcon } from '../../UI/icons';
-import { toggleIsStarred } from '../../../store/actions';
+import { toggleIsStarred, toggleCreateBoard } from '../../../store/actions';
 import { useHistory } from 'react-router';
 import PropTypes from 'prop-types';
 import { getPhotoURL } from '../../../utils/backgrounds';
@@ -29,17 +29,23 @@ const BoardList = props => {
           <div onClick={e => starClickHandler(e, board.boardID)} className={board.isStarred ? classes.Starred : classes.NotStarred}>{starIcon}</div>
         </div>
       ))}
+      {props.isMyBoards && <div className={classes.CreateBoard} onClick={props.toggleCreateBoard}>
+        <div className={classes.CreateText}>Create a new board</div>
+      </div>}
     </div>
   );
 };
 
 BoardList.propTypes = {
   toggleIsStarred: PropTypes.func.isRequired,
-  boards: PropTypes.array.isRequired
+  boards: PropTypes.array.isRequired,
+  isMyBoards: PropTypes.bool,
+  toggleCreateBoard: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
-  toggleIsStarred: boardID => dispatch(toggleIsStarred(boardID))
+  toggleIsStarred: boardID => dispatch(toggleIsStarred(boardID)),
+  toggleCreateBoard: () => dispatch(toggleCreateBoard())
 });
 
 export default connect(null, mapDispatchToProps)(BoardList);

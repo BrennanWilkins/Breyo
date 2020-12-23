@@ -10,9 +10,9 @@ import CreateBoard from '../CreateBoard/CreateBoard';
 import AccountModal from '../AccountModal/AccountModal';
 import SearchBoardMenu from '../SearchBoardMenu/SearchBoardMenu';
 import LogoTitle from '../../UI/LogoTitle/LogoTitle';
+import { toggleCreateBoard } from '../../../store/actions';
 
 const NavBar = props => {
-  const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showBoardMenu, setShowBoardMenu] = useState(false);
   const location = useLocation();
@@ -25,23 +25,30 @@ const NavBar = props => {
       </div>
       <LogoTitle />
       <div className={classes.Section}>
-        <Button clicked={() => setShowCreateBoard(true)}>{plusIcon}</Button>
+        <Button clicked={props.toggleCreateBoard}>{plusIcon}</Button>
         <AccountBtn clicked={() => setShowAccountModal(true)}>{props.fullName.slice(0, 1)}</AccountBtn>
       </div>
-      <CreateBoard show={showCreateBoard} close={() => setShowCreateBoard(false)} />
+      <CreateBoard show={props.showCreateBoard} close={props.toggleCreateBoard} />
       <AccountModal show={showAccountModal} close={() => setShowAccountModal(false)} />
       <SearchBoardMenu show={showBoardMenu} close={() => setShowBoardMenu(false)} />
-      {showCreateBoard && <div className={classes.Backdrop}></div>}
+      {props.showCreateBoard && <div className={classes.Backdrop}></div>}
     </div>
   );
 };
 
 NavBar.propTypes = {
-  fullName: PropTypes.string.isRequired
+  fullName: PropTypes.string.isRequired,
+  showCreateBoard: PropTypes.bool.isRequired,
+  toggleCreateBoard: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  fullName: state.auth.fullName
+  fullName: state.auth.fullName,
+  showCreateBoard: state.board.showCreateBoard
 });
 
-export default connect(mapStateToProps)(NavBar);
+const mapDispatchToProps = dispatch => ({
+  toggleCreateBoard: () => dispatch(toggleCreateBoard())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(NavBar);

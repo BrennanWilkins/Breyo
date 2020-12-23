@@ -5,7 +5,7 @@
   flex-wrap: wrap;
   margin-bottom: 20px;
 }
-.Board {
+.Board, .CreateBoard {
   border-radius: 4px;
   width: 200px;
   height: 100px;
@@ -15,6 +15,7 @@
   position: relative;
   margin: 5px;
   background-size: cover;
+  background: rgb(232, 232, 232);
 }
 .Overlay {
   transition: 250ms;
@@ -63,4 +64,16 @@
 .Starred {
   color: rgb(255, 222, 0);
   right: 10px;
+}
+.CreateText {
+  font-size: 14px;
+  color: rgb(100,100,100);
+  text-align: center;
+  line-height: 100px;
+}
+.CreateBoard {
+  transition: background 250ms;
+}
+.CreateBoard:hover {
+  background: rgb(220,220,220);
 }

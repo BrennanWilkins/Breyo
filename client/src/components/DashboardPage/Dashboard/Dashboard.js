@@ -17,7 +17,7 @@ const Dashboard = props => {
       <div className={classes.Title}>{starIcon} Starred Boards</div>
       <BoardList boards={starredBoards} /></>}
       <div className={classes.Title}>{personIcon} My Boards</div>
-      <BoardList boards={props.boards} />
+      <BoardList boards={props.boards} isMyBoards />
     </div>
   );
 };
