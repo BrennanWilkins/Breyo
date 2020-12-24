@@ -89,7 +89,13 @@ const updateLists = (cards, cardIndex, card, list, lists, listIndex, state) => {
   cards[cardIndex] = card;
   list.cards = cards;
   lists[listIndex] = list;
-  return { ...state, lists, currentCard: card };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
+  }
+
+  return { ...state, lists, currentCard: card, filteredLists };
 };
 
 // finds checklist items within a card based on ID
@@ -111,23 +117,36 @@ const setListData = (state, action) => ({
 const updateListTitle = (state, action) => {
   const lists = findAndReplace(state.lists, 'listID', action.listID, 'title', action.title);
   const currentListTitle = state.currentListTitle ? action.title : null;
-  return { ...state, lists, currentListTitle };
+  const filteredLists = state.cardsAreFiltered ? findAndReplace(state.filteredLists, 'listID', action.listID, 'title', action.title) : state.filteredLists;
+  return { ...state, lists, currentListTitle, filteredLists };
 };
 
 const addList = (state, action) => {
   const list = { listID: action.listID, title: action.title, cards: [], indexInBoard: state.lists.length };
-  const lists = [...state.lists];
-  lists.push(list);
-  return { ...state, lists };
+  const lists = [...state.lists, list];
+  const filteredLists = state.cardsAreFiltered ? [...state.filteredLists, list] : state.filteredLists;
+  return { ...state, lists, filteredLists };
 };
 
 const addCard = (state, action) => {
   const index = state.lists.findIndex(list => list.listID === action.listID);
   const cards = [...state.lists[index].cards];
-  cards.push({ title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID, members: [], comments: [], roadmapLabel: null });
+  const card = { title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID, members: [], comments: [], roadmapLabel: null };
+  cards.push(card);
   const lists = [...state.lists];
   lists[index].cards = cards;
-  return { ...state, lists };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    if (filterCardHelper(state.searchQueries, card)) {
+      filteredLists = [...filteredLists];
+      const index = filteredLists.findIndex(list => list.listID === action.listID);
+      const cards = [...filteredLists[index].cards, card];
+      filteredLists[index].cards = cards;
+    }
+  }
+
+  return { ...state, lists, filteredLists };
 };
 
 const setCardDetails = (state, action) => ({
@@ -282,7 +301,13 @@ const moveList = (state, action) => {
       lists[i] = list;
     }
   }
-  return { ...state, lists };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
+  }
+
+  return { ...state, lists, filteredLists };
 };
 
 const moveCardSameList = (state, action) => {
@@ -294,7 +319,13 @@ const moveCardSameList = (state, action) => {
   cards.splice(action.destIndex, 0, card);
   list.cards = cards;
   lists[listIndex] = list;
-  return { ...state, lists };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
+  }
+
+  return { ...state, lists, filteredLists };
 };
 
 const moveCardDiffList = (state, action) => {
@@ -311,10 +342,19 @@ const moveCardDiffList = (state, action) => {
   destList.cards = destCards;
   lists[sourceIndex] = sourceList;
   lists[destIndex] = destList;
-  if (state.currentCard && state.currentCard.cardID === card.cardID) {
-    return { ...state, lists, shownListID: action.destID, currentListTitle: destList.title }
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
   }
-  return { ...state, lists };
+
+  let shownListID = state.shownListID;
+  let currentListTitle = state.currentListTitle;
+  if (state.currentCard && state.currentCard.cardID === card.cardID) {
+    shownListID = action.destID;
+    currentListTitle = destList.title;
+  }
+  return { ...state, lists, shownListID, currentListTitle, filteredLists };
 };
 
 const copyCard = (state, action) => {
@@ -339,7 +379,13 @@ const copyCard = (state, action) => {
   cards.splice(action.destIndex, 0, newCard);
   list.cards = cards;
   lists[listIndex] = list;
-  return { ...state, lists };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
+  }
+
+  return { ...state, lists, filteredLists };
 };
 
 const archiveCard = (state, action) => {
@@ -353,12 +399,19 @@ const archiveCard = (state, action) => {
   lists[listIndex] = list;
   const allArchivedCards = [...state.allArchivedCards];
   allArchivedCards.unshift({ ...card, listID: action.listID });
-  if (state.currentCard && state.currentCard.cardID === action.cardID) {
-    const currentCard = { ...state.currentCard };
+
+  let currentCard = state.currentCard;
+  if (currentCard && currentCard.cardID === action.cardID) {
+    currentCard = { ...state.currentCard };
     currentCard.isArchived = true;
-    return { ...state, lists, allArchivedCards, currentCard };
   }
-  return { ...state, lists, allArchivedCards };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
+  }
+
+  return { ...state, lists, allArchivedCards, currentCard, filteredLists };
 };
 
 const recoverCard = (state, action) => {
@@ -375,12 +428,18 @@ const recoverCard = (state, action) => {
     cards.push(card);
     list.cards = cards;
     lists[listIndex] = list;
-    if (state.currentCard && state.currentCard.cardID === action.cardID) {
-      const currentCard = { ...state.currentCard };
-      delete currentCard.isArchived;
-      return { ...state, lists, allArchivedCards, currentCard };
+
+    let filteredLists = state.filteredLists;
+    if (state.cardsAreFiltered) {
+      filteredLists = filterListsHelper(state.searchQueries, lists);
     }
-    return { ...state, lists, allArchivedCards };
+
+    let currentCard = state.currentCard;
+    if (currentCard && currentCard.cardID === action.cardID) {
+      currentCard = { ...state.currentCard };
+      delete currentCard.isArchived;
+    }
+    return { ...state, lists, allArchivedCards, currentCard, filteredLists };
   } else {
     const archivedLists = [...state.archivedLists];
     const listIndex = archivedLists.findIndex(list => list.listID === action.listID);
@@ -393,13 +452,14 @@ const recoverCard = (state, action) => {
     cards.push(card);
     list.cards = cards;
     archivedLists[listIndex] = list;
-    if (state.currentCard && state.currentCard.cardID === action.cardID) {
-      const currentCard = { ...state.currentCard };
+
+    let currentCard = state.currentCard;
+    if (currentCard && currentCard.cardID === action.cardID) {
+      currentCard = { ...state.currentCard };
       delete currentCard.isArchived;
       currentCard.listIsArchived = true;
-      return { ...state, archivedLists, allArchivedCards, currentCard };
     }
-    return { ...state, archivedLists, allArchivedCards };
+    return { ...state, archivedLists, allArchivedCards, currentCard };
   }
 };
 
@@ -407,6 +467,7 @@ const deleteCard = (state, action) => {
   const allArchivedCards = [...state.allArchivedCards];
   const cardIndex = allArchivedCards.findIndex(card => card.cardID === action.cardID);
   allArchivedCards.splice(cardIndex, 1);
+
   if (state.currentCard && state.currentCard.cardID === action.cardID) {
     return { ...state, allArchivedCards, currentCard: null, shownCardID: null, shownListID: null, currentListTitle: null };
   }
@@ -441,7 +502,13 @@ const copyList = (state, action) => {
     }))
   };
   lists.push(newList);
-  return { ...state, lists };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
+  }
+
+  return { ...state, lists, filteredLists };
 };
 
 const archiveList = (state, action) => {
@@ -459,12 +526,18 @@ const archiveList = (state, action) => {
   }
   const archivedLists = [...state.archivedLists];
   archivedLists.push(archivedList);
-  if (state.currentCard && state.shownListID === action.listID) {
-    const currentCard = { ...state.currentCard };
-    currentCard.listIsArchived = true;
-    return { ...state, lists, archivedLists, currentCard };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
   }
-  return { ...state, lists, archivedLists };
+
+  let currentCard = state.currentCard;
+  if (currentCard && state.shownListID === action.listID) {
+    currentCard = { ...state.currentCard };
+    currentCard.listIsArchived = true;
+  }
+  return { ...state, lists, archivedLists, currentCard, filteredLists };
 };
 
 const recoverListHelper = (state, action, addToEnd) => {
@@ -482,12 +555,17 @@ const recoverListHelper = (state, action, addToEnd) => {
     lists.splice(archivedList.indexInBoard, 0, archivedList);
   }
 
-  if (state.currentCard && state.shownListID === action.listID) {
-    const currentCard = { ...state.currentCard };
-    delete currentCard.listIsArchived;
-    return { ...state, lists, archivedLists, currentCard };
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
   }
-  return { ...state, lists, archivedLists };
+
+  let currentCard = state.currentCard;
+  if (currentCard && state.shownListID === action.listID) {
+    currentCard = { ...state.currentCard };
+    delete currentCard.listIsArchived;
+  }
+  return { ...state, lists, archivedLists, currentCard, filteredLists };
 };
 
 const undoArchiveList = (state, action) => recoverListHelper(state, action, false);
@@ -499,6 +577,7 @@ const deleteList = (state, action) => {
   const listIndex = archivedLists.findIndex(list => list.listID === action.listID);
   archivedLists.splice(listIndex, 1);
   const allArchivedCards = state.allArchivedCards.filter(card => card.listID !== action.listID);
+
   if (state.currentCard && state.shownListID === action.listID) {
     return { ...state, archivedLists, allArchivedCards, currentCard: null, shownCardID: null, shownListID: null, currentListTitle: null };
   }
@@ -512,12 +591,18 @@ const archiveAllCards = (state, action) => {
   const allArchivedCards = state.allArchivedCards.concat(list.cards.map(card => ({ ...card, listID: list.listID })));
   list.cards = [];
   lists[listIndex] = list;
-  if (state.currentCard && state.shownListID === action.listID) {
-    const currentCard = { ...state.currentCard };
-    currentCard.isArchived = true;
-    return { ...state, lists, allArchivedCards, currentCard };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
   }
-  return { ...state, lists, allArchivedCards };
+
+  let currentCard = state.currentCard;
+  if (currentCard && state.shownListID === action.listID) {
+    currentCard = { ...state.currentCard };
+    currentCard.isArchived = true;
+  }
+  return { ...state, lists, allArchivedCards, currentCard, filteredLists };
 };
 
 const moveAllCards = (state, action) => {
@@ -530,10 +615,16 @@ const moveAllCards = (state, action) => {
   oldList.cards = [];
   lists[oldListIndex] = oldList;
   lists[newListIndex] = newList;
-  if (state.currentCard && state.shownListID === action.oldListID) {
-    return { ...state, lists, shownListID: action.newListID, currentListTitle: newList.title };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
   }
-  return { ...state, lists };
+
+  if (state.currentCard && state.shownListID === action.oldListID) {
+    return { ...state, lists, shownListID: action.newListID, currentListTitle: newList.title, filteredLists };
+  }
+  return { ...state, lists, filteredLists };
 };
 
 const addCardMember = (state, action) => {
@@ -601,7 +692,13 @@ const deleteBoardMember = (state, action) => {
       lists[listIdx] = list;
     }
   }
-  return { ...state, lists };
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
+  }
+
+  return { ...state, lists, filteredLists };
 };
 
 const checkForQuery = searchQueries => {
@@ -612,6 +709,7 @@ const checkForQuery = searchQueries => {
 };
 
 const filterListsHelper = (searchQueries, lists) => {
+  // filters all cards in all lists by search queries
   const { titleQuery, dueDateQuery, memberQuery, labels } = searchQueries;
   lists = lists.map(list => {
     let cards = [...list.cards];
@@ -632,6 +730,22 @@ const filterListsHelper = (searchQueries, lists) => {
     return { ...list, cards };
   });
   return lists;
+};
+
+const filterCardHelper = (searchQueries, card) => {
+  // returns true if card passes all search queries else returns false
+  const { titleQuery, dueDateQuery, memberQuery, labels } = searchQueries;
+  if (titleQuery !== '' && !card.title.includes(titleQuery)) { return false; }
+  if (memberQuery !== '' && !card.members.find(member => member.email === memberQuery)) { return false; }
+  if (labels.length) {
+    if (!card.labels.length) { return false; }
+    if (!labels.every(label => card.labels.includes(label))) { return false; }
+  }
+  if (dueDateQuery !== '') {
+    if (!card.dueDate) { return false; }
+    if (!filterByDueDate(dueDateQuery, card.dueDate)) { return false; }
+  }
+  return true;
 };
 
 const addTitleSearchQuery = (state, action) => {
