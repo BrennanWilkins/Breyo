@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classes from './BoardMenu.module.css';
 import { CloseBtn, BackBtn } from '../../UI/Buttons/Buttons';
 import { connect } from 'react-redux';
-import { boardIcon, activityIcon, settingsIcon, archiveFillIcon } from '../../UI/icons';
+import { boardIcon, activityIcon, settingsIcon, archiveFillIcon, searchIcon } from '../../UI/icons';
 import Archive from './Archive/Archive';
 import Action from '../../UI/Action/Action';
 import CommentAction from '../../UI/Action/CommentAction';
@@ -12,6 +12,7 @@ import SettingsMenu from './SettingsMenu/SettingsMenu';
 import BackgroundMenu from './BackgroundMenu/BackgroundMenu';
 import ActivityMenu from './ActivityMenu/ActivityMenu';
 import { getPhotoURL } from '../../../utils/backgrounds';
+import SearchCardsMenu from './SearchCardsMenu/SearchCardsMenu';
 
 const BoardMenu = props => {
   const [showBoardDesc, setShowBoardDesc] = useState(false);
@@ -19,6 +20,7 @@ const BoardMenu = props => {
   const [showSettings, setShowSettings] = useState(false);
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
 
   const resetState = () => {
     setShowChangeBackground(false);
@@ -26,14 +28,15 @@ const BoardMenu = props => {
     setShowAllActivity(false);
     setShowSettings(false);
     setShowArchive(false);
+    setShowSearch(false);
   };
 
   useEffect(() => resetState(), [props.show]);
 
-  const showBackBtn = showChangeBackground || showBoardDesc || showAllActivity || showSettings || showArchive;
+  const showBackBtn = showChangeBackground || showBoardDesc || showAllActivity || showSettings || showArchive || showSearch;
 
   const title = showBoardDesc ? 'About this board' : showChangeBackground ? 'Change Background' :
-  showAllActivity ? 'Activity' : showSettings ? 'Board Settings' : showArchive ? 'Archive' : 'Menu';
+  showAllActivity ? 'Activity' : showSettings ? 'Board Settings' : showArchive ? 'Archive' : showSearch ? 'Search Cards' : 'Menu';
 
   const defaultContent = (
     <div>
@@ -44,6 +47,7 @@ const BoardMenu = props => {
           className={classes.SmallColor}></span>
           Change background
         </div>
+        <div onClick={() => setShowSearch(true)} className={classes.Option}><span className={classes.SettingsIcon}>{searchIcon}</span>Search Cards</div>
         <div onClick={() => setShowSettings(true)} className={classes.Option}><span className={classes.SettingsIcon}>{settingsIcon}</span>Settings</div>
         <div onClick={() => setShowArchive(true)} className={classes.Option}><span className={classes.ArchiveIcon}>{archiveFillIcon}</span>Archive</div>
       </div>
@@ -59,7 +63,7 @@ const BoardMenu = props => {
     </div>
   );
 
-  const content = showBoardDesc ? <AboutMenu /> : showChangeBackground ? <BackgroundMenu /> :
+  const content = showBoardDesc ? <AboutMenu /> : showChangeBackground ? <BackgroundMenu /> : showSearch ? <SearchCardsMenu /> :
   showSettings ? <SettingsMenu /> : showArchive ? <Archive /> : showAllActivity ? <ActivityMenu /> : defaultContent;
 
   return (

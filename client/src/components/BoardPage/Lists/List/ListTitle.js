@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import classes from './List.module.css';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';

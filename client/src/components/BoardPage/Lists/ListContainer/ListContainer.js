@@ -8,20 +8,22 @@ import { dndHandler } from '../../../../store/actions';
 import PropTypes from 'prop-types';
 
 const ListContainer = props => {
-  const onDragEndHandler = ({ source, destination }) => {
+  const onDragEndHandler = ({ source, destination, draggableId }) => {
     // list/card dropped in invalid place
     if (!destination) { return; }
     // list/card dropped in original place
     if (source.index === destination.index && source.droppableId === destination.droppableId) { return; }
-    props.dndHandler(source, destination, props.boardID);
+    props.dndHandler(source, destination, draggableId, props.boardID);
   };
+
+  const lists = props.cardsAreFiltered ? props.filteredLists : props.lists;
 
   return (
     <DragDropContext onDragEnd={onDragEndHandler}>
       <Droppable droppableId="droppable" direction="horizontal" type="list">
         {(provided, snapshot) => (
           <div className={classes.Container} ref={provided.innerRef} style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
-            {props.lists.map(list => <List key={list.listID} {...list} boardID={props.boardID} />)}
+            {lists.map(list => <List key={list.listID} {...list} boardID={props.boardID} />)}
             {provided.placeholder}
             <AddList listCount={props.lists.length} boardID={props.boardID} />
           </div>
@@ -35,16 +37,20 @@ ListContainer.propTypes = {
   lists: PropTypes.array.isRequired,
   boardID: PropTypes.string.isRequired,
   dndHandler: PropTypes.func.isRequired,
-  showMenu: PropTypes.bool.isRequired
+  showMenu: PropTypes.bool.isRequired,
+  cardsAreFiltered: PropTypes.bool.isRequired,
+  filteredLists: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
   lists: state.lists.lists,
-  boardID: state.board.boardID
+  boardID: state.board.boardID,
+  cardsAreFiltered: state.lists.cardsAreFiltered,
+  filteredLists: state.lists.filteredLists
 });
 
 const mapDispatchToProps = dispatch => ({
-  dndHandler: (source, destination, boardID) => dispatch(dndHandler(source, destination, boardID))
+  dndHandler: (source, destination, draggableID, boardID) => dispatch(dndHandler(source, destination, draggableID, boardID))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ListContainer);

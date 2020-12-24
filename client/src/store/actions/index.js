@@ -17,3 +17,5 @@ export { dndHandler, manualMoveCardHandler } from './dndActions';
 export { getRecentCardActivity, resetCardActivity, setShownMemberActivity, deleteBoardActivity,
 getAllCardActivity, fetchFirstPageBoardActivity, fetchAllBoardActivity,
 setAllBoardActivityShown, resetAllBoardActivity } from './activity';
+export { addTitleSearchQuery, addDueDateSearchQuery, addMemberSearchQuery, addLabelSearchQuery,
+resetSearchQuery } from './cardSearchQueries';

@@ -1,5 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
-import { findAndReplace } from './reducerUtils';
+import { findAndReplace, filterByDueDate } from './reducerUtils';
 
 const initialState = {
   lists: [],
@@ -8,7 +8,15 @@ const initialState = {
   currentCard: null,
   currentListTitle: null,
   allArchivedCards: [],
-  archivedLists: []
+  archivedLists: [],
+  searchQueries: {
+    titleQuery: '',
+    memberQuery: '',
+    dueDateQuery: '',
+    labels: []
+  },
+  filteredLists: [],
+  cardsAreFiltered: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -56,6 +64,11 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DELETE_BOARD_MEMBER: return deleteBoardMember(state, action);
     case actionTypes.LEAVE_BOARD: return { ...initialState };
     case actionTypes.LOGOUT: return { ...initialState };
+    case actionTypes.ADD_TITLE_SEARCH_QUERY: return addTitleSearchQuery(state, action);
+    case actionTypes.ADD_MEMBER_SEARCH_QUERY: return addMemberSearchQuery(state, action);
+    case actionTypes.ADD_LABEL_SEARCH_QUERY: return addLabelSearchQuery(state, action);
+    case actionTypes.ADD_DUE_DATE_SEARCH_QUERY: return addDueDateSearchQuery(state, action);
+    case actionTypes.RESET_SEARCH_QUERY: return resetSearchQuery(state, action);
     default: return state;
   }
 };
@@ -589,6 +602,91 @@ const deleteBoardMember = (state, action) => {
     }
   }
   return { ...state, lists };
+};
+
+const checkForQuery = searchQueries => {
+  // return false if no queries, else true
+  if (searchQueries.titleQuery === '' && searchQueries.dueDateQuery === '' &&
+  searchQueries.memberQuery === '' && !searchQueries.labels.length) { return false; }
+  return true;
+};
+
+const filterListsHelper = (searchQueries, lists) => {
+  const { titleQuery, dueDateQuery, memberQuery, labels } = searchQueries;
+  lists = lists.map(list => {
+    let cards = [...list.cards];
+    if (titleQuery !== '') { cards = cards.filter(card => card.title.includes(titleQuery)); }
+    if (memberQuery !== '') { cards = cards.filter(card => card.members.find(member => member.email === memberQuery)); }
+    if (labels.length) {
+      cards = cards.filter(card => {
+        if (!card.labels.length) { return false; }
+        return labels.every(label => card.labels.includes(label));
+      });
+    }
+    if (dueDateQuery !== '') {
+      cards = cards.filter(card => {
+        if (!card.dueDate) { return false; }
+        return filterByDueDate(dueDateQuery, card.dueDate);
+      });
+    }
+    return { ...list, cards };
+  });
+  return lists;
+};
+
+const addTitleSearchQuery = (state, action) => {
+  const searchQueries = { ...state.searchQueries };
+  searchQueries.titleQuery = action.title;
+  if (action.title === '') {
+    if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
+  }
+  const filteredLists = filterListsHelper(searchQueries, state.lists);
+  return { ...state, searchQueries, cardsAreFiltered: true, filteredLists };
+};
+
+const addLabelSearchQuery = (state, action) => {
+  const searchQueries = { ...state.searchQueries };
+  const labels = [...searchQueries.labels];
+  const labelIndex = labels.indexOf(action.label);
+  if (labelIndex === -1) { labels.push(action.label); }
+  else { labels.splice(labelIndex, 1); }
+  searchQueries.labels = labels;
+  if (!labels.length) {
+    if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
+  }
+  const filteredLists = filterListsHelper(searchQueries, state.lists);
+  return { ...state, searchQueries, cardsAreFiltered: true, filteredLists };
+};
+
+const addMemberSearchQuery = (state, action) => {
+  const searchQueries = { ...state.searchQueries };
+  searchQueries.memberQuery = action.email;
+  if (action.email === '') {
+    if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
+  }
+  const filteredLists = filterListsHelper(searchQueries, state.lists);
+  return { ...state, searchQueries, cardsAreFiltered: true, filteredLists };
+};
+
+const addDueDateSearchQuery = (state, action) => {
+  const searchQueries = { ...state.searchQueries };
+  let cardsAreFiltered = state.cardsAreFiltered;
+  searchQueries.dueDateQuery = action.query;
+  if (action.query === '') {
+    if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
+  }
+  const filteredLists = filterListsHelper(searchQueries, state.lists);
+  return { ...state, searchQueries, cardsAreFiltered: true, filteredLists };
+};
+
+const resetSearchQuery = (state, action) => {
+  const searchQueries = {
+    titleQuery: '',
+    memberQuery: '',
+    dueDateQuery: '',
+    labels: []
+  };
+  return { ...state, cardsAreFiltered: false, searchQueries, filteredLists: [] };
 };
 
 export default reducer;

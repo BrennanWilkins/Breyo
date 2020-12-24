@@ -1,0 +1,98 @@
+.Label {
+  font-weight: 500;
+  font-size: 14px;
+  color: rgb(100,100,100);
+}
+.Input input {
+  width: 100%;
+  margin-top: 5px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 2px solid #eee;
+  padding: 5px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border 150ms;
+}
+.Input input:hover {
+  border: 2px solid #ddd;
+}
+.Input input:focus {
+  border: 2px solid rgb(var(--red));
+}
+.ClearSearch {
+  color: rgb(100,100,100);
+  font-size: 15px;
+  padding: 7px;
+  border-radius: 4px;
+  transition: background 250ms;
+  cursor: pointer;
+  text-decoration: underline;
+  margin: 10px 0;
+  text-align: center;
+}
+.ClearSearch:hover {
+  background: rgb(240,240,240);
+  color: black;
+}
+.CardLabels {
+  margin: 5px -2.5px 10px;
+  padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1.2px solid #ddd;
+}
+.CardLabel {
+  display: inline-flex;
+  margin: 2.5px;
+  width: 50px;
+  border-radius: 4px;
+  height: 35px;
+  cursor: pointer;
+  transition: filter 250ms;
+  color: white;
+  font-size: 20px;
+  justify-content: center;
+  align-items: center;
+}
+.CardLabel:hover {
+  filter: brightness(0.93);
+}
+.BoardMembers {
+  margin: 5px 0 10px;
+}
+.Member {
+  transition: background 200ms;
+  cursor: pointer;
+  padding: 5px;
+  box-sizing: border-box;
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+.Member:hover, .DateFilters div:hover {
+  background: rgb(242,242,242);
+}
+.Member button, .Member button:hover {
+  background: rgb(225,225,225);
+}
+.Member svg, .DateFilters svg {
+  margin-left: auto;
+  margin-right: 5px;
+  font-size: 18px;
+}
+.DateFilters {
+  margin: 5px 0 10px;
+  padding-bottom: 10px;
+  border-bottom: 1.2px solid #ddd;
+}
+.DateFilters div {
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
