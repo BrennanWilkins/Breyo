@@ -86,6 +86,9 @@
 }
 .MenuBtns {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 .Container {
   position: relative;

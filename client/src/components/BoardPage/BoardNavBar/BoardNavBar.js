@@ -10,6 +10,7 @@ import InviteModal from '../InviteModal/InviteModal';
 import BoardMenu from '../BoardMenu/BoardMenu';
 import MemberModal from '../MemberModal/MemberModal';
 import { LIGHT_PHOTO_IDS } from '../../../utils/backgrounds';
+import QueryCountBtn from '../../UI/QueryCountBtn/QueryCountBtn';
 
 const BoardNavBar = props => {
   const [inputTitle, setInputTitle] = useState(props.title);
@@ -18,6 +19,7 @@ const BoardNavBar = props => {
   const [adminCount, setAdminCount] = useState(props.members.filter(member => member.isAdmin).length);
   const [darkenBtns, setDarkenBtns] = useState(false);
   const [darkenBtns2, setDarkenBtns2] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => setAdminCount(props.members.filter(member => member.isAdmin).length), [props.members]);
 
@@ -46,9 +48,16 @@ const BoardNavBar = props => {
     else { props.openRoadmap(); }
   };
 
+  const openSearchHandler = () => {
+    props.openMenu();
+    setTimeout(() => {
+      setShowSearch(true);
+    }, 250);
+  };
+
   return (
     <div className={`${classes.NavBar} ${darkenBtns2 ? classes.DarkenBtns2 : darkenBtns ? classes.DarkenBtns : ''}`} style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
-      <BoardMenu show={props.showMenu} close={props.closeMenu} />
+      <BoardMenu show={props.showMenu} close={props.closeMenu} showSearch={showSearch} setShowSearch={bool => setShowSearch(bool)} />
       <span className={props.showMenu ? `${classes.Input} ${classes.InputContracted}` : classes.Input}>
         <AutosizeInput value={inputTitle} onChange={inputTitleHandler} onBlur={checkTitle} />
       </span>
@@ -72,6 +81,7 @@ const BoardNavBar = props => {
         {showInviteModal && <InviteModal boardID={props.boardID} close={() => setShowInviteModal(false)} />}
       </span>
       <span className={classes.MenuBtns}>
+        {props.cardsAreFiltered && <QueryCountBtn openMenu={openSearchHandler} />}
         <span className={`${classes.Btn} ${classes.RoadBtn} ${props.roadmapShown ? classes.RoadBtn2 : ''}`}>
           <Button clicked={roadmapHandler}>{props.roadmapShown ? boardIcon : roadmapIcon}{props.roadmapShown ? 'Board' : 'Roadmaps'}</Button>
         </span>
@@ -96,7 +106,8 @@ BoardNavBar.propTypes = {
   openRoadmap: PropTypes.func.isRequired,
   closeRoadmap: PropTypes.func.isRequired,
   roadmapShown: PropTypes.bool.isRequired,
-  color: PropTypes.string.isRequired
+  color: PropTypes.string.isRequired,
+  cardsAreFiltered: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -107,7 +118,8 @@ const mapStateToProps = state => ({
   userEmail: state.auth.email,
   userIsAdmin: state.board.userIsAdmin,
   roadmapShown: state.board.roadmapShown,
-  color: state.board.color
+  color: state.board.color,
+  cardsAreFiltered: state.lists.cardsAreFiltered
 });
 
 const mapDispatchToProps = dispatch => ({

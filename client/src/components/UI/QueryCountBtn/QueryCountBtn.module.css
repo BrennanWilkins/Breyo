@@ -1,0 +1,27 @@
+.QueryCountBtn {
+  height: 33px;
+  padding: 0 5px 0 7px;
+  font-weight: 400;
+  font-size: 15px;
+  margin: 0 3px 4px 3px;
+  border-radius: 4px;
+  background: rgb(var(--green));
+  display: inline-flex;
+  align-items: center;
+  color: white;
+  cursor: pointer;
+  transition: filter 250ms;
+  background: rgb(64, 162, 37);
+}
+.QueryCountBtn:hover {
+  filter: brightness(1.07);
+}
+.CloseBtn {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 0 7px;
+}
+.CloseBtn button {
+  margin: 0;
+  color: white;
+}
