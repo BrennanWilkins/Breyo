@@ -1,14 +1,9 @@
 .Input {
-  resize: none;
   width: 100%;
   border: 0;
-  outline: none;
   border-radius: 4px;
   margin-right: 5px;
-  box-sizing: border-box;
-  font-family: 'Roboto', -apple-system, sans-serif;
   padding: 8px;
-  font-size: 14px;
   background: white;
   box-shadow: var(--cardShadow);
 }

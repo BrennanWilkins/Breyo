@@ -784,7 +784,6 @@ const addMemberSearchQuery = (state, action) => {
 
 const addDueDateSearchQuery = (state, action) => {
   const searchQueries = { ...state.searchQueries };
-  let cardsAreFiltered = state.cardsAreFiltered;
   searchQueries.dueDateQuery = action.query;
   if (action.query === '') {
     if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }

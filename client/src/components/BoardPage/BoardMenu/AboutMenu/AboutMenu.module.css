@@ -16,16 +16,11 @@
 }
 .DescInput {
   display: block;
-  resize: none;
   margin: 15px auto 10px;
   padding: 10px;
   border-radius: 4px;
-  font-size: 14px;
-  box-sizing: border-box;
   width: 305px;
   border: 2px solid rgb(var(--red));
-  outline: none;
-  font-family: 'Roboto', -apple-system, sans-serif;
 }
 .Btns {
   padding: 0 10px;

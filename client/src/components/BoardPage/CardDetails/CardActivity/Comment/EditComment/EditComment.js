@@ -21,7 +21,7 @@ const EditComment = props => {
   return (
     <div ref={editRef} className={classes.Container}>
       <form onSubmit={submitHandler}>
-        <TextArea ref={inputRef} maxRows="10" className={classes.Input} value={commentInput} onChange={e => setCommentInput(e.target.value)} />
+        <TextArea ref={inputRef} maxRows="20" className={classes.Input} value={commentInput} onChange={e => setCommentInput(e.target.value)} />
         <SubmitBtns disabled={commentInput === ''} text="Save" close={props.close} />
       </form>
     </div>

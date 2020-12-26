@@ -65,14 +65,11 @@
 .Input {
   border: 2px solid #eee;
   border-radius: 3px;
-  outline: none;
   padding: 8px 5px;
-  box-sizing: border-box;
   font-size: 15px;
   margin: 5px 10px 10px;
-  font-family: 'Roboto', -apple-system, sans-serif;
-  resize: none;
   transition: border 100ms;
+  overflow-y: auto;
 }
 .Input:hover {
   background: rgb(250, 250, 250);

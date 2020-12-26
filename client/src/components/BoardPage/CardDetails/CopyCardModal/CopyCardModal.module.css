@@ -18,18 +18,14 @@
   }
 }
 .Input {
-  resize: none;
   width: 300px;
   border: 2px solid rgb(var(--lightGray));
-  outline: none;
   border-radius: 4px;
-  box-sizing: border-box;
-  font-family: 'Roboto', -apple-system, sans-serif;
   padding: 8px;
-  font-size: 14px;
   background: rgb(245,245,245);
   margin: 5px auto;
   display: block;
+  overflow-y: auto;
 }
 .Input:hover {
   background: rgb(235,235,235);

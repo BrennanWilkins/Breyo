@@ -6,16 +6,11 @@
   border: 2px solid transparent;
   background: transparent;
   border-radius: 3px;
-  outline: none;
   padding: 7px;
   width: calc(100% - 70px);
-  box-sizing: border-box;
-  font-size: 19px;
   font-weight: 500;
-  resize: none;
-  font-family: 'Roboto', -apple-system, sans-serif;
-  overflow: hidden;
   cursor: pointer;
+  font-size: 19px;
 }
 .Input:focus {
   border: 2px solid rgb(var(--red));

@@ -2,15 +2,11 @@
   flex-grow: 1;
 }
 .Input {
-  resize: none;
   border: 2px solid rgb(230,230,230);
   border-radius: 3px;
-  outline: none;
   background: white;
   padding: 7px;
   width: 100%;
-  box-sizing: border-box;
-  font-family: 'Roboto', -apple-system, sans-serif;
-  overflow: hidden;
   font-size: 15px;
+  overflow-y: auto;
 }

@@ -40,16 +40,11 @@
 }
 .Input {
   display: block;
-  resize: none;
   margin: 5px 0 10px 45px;
   padding: 10px;
   border-radius: 4px;
-  font-size: 14px;
-  box-sizing: border-box;
   width: calc(100% - 60px);
   border: 2px solid rgb(var(--red));
-  outline: none;
-  font-family: 'Roboto', -apple-system, sans-serif;
 }
 .EditBtn button {
   margin: 0 0 0 20px;

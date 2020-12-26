@@ -11,11 +11,6 @@
 }
 .Input {
   width: 100%;
-  resize: none;
-  overflow: hidden;
-  font-family: 'Roboto', -apple-system, sans-serif;
-  outline: none;
   border: 0;
   margin-bottom: 5px;
-  font-size: 14px;
 }

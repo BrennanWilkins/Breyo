@@ -16,24 +16,22 @@
 }
 .TitleInput, .ListTitle {
   background: transparent;
-  outline: none;
   padding: 5px;
-  font-size: 15px;
+  font-size: 15px !important;
   font-weight: 500;
   cursor: pointer;
   border-radius: 3px;
   border: 2px solid transparent;
   width: 240px;
   box-sizing: border-box;
-  font-family: 'Roboto', -apple-system, sans-serif;
   overflow: hidden;
 }
 .ListTitle {
   word-wrap: break-word;
 }
 .TitleInput {
-  resize: none;
   transition: background 100ms, border 100ms;
+  overflow-y: auto;
 }
 .TitleInput:focus {
   background: white;
