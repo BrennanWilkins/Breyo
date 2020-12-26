@@ -9,6 +9,7 @@ const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const List = require('../models/list');
 const Board = require('../models/board');
+const nodemailer = require('nodemailer');
 
 const getJWTPayload = user => {
   // create jwt sign payload for easier user data lookup
@@ -76,6 +77,8 @@ router.post('/login', validate(
       const jwtPayload = getJWTPayload(user);
       const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
 
+      if (user.recoverPassID) { await User.updateOne({ _id: req.userID }, { recoverPassID: null }); }
+
       res.status(200).json({ token, fullName: user.fullName, email, invites: user.invites, boards: user.boards });
     } catch(err) { return res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
@@ -104,8 +107,7 @@ router.post('/signup', validate(
 
       const hashedPassword = await bcryptjs.hash(password, 10);
 
-      const user = new User({ email, password: hashedPassword, fullName, invites: [], boards: [], adminBoards: [], starredBoards: [] });
-
+      const user = new User({ email, password: hashedPassword, fullName, invites: [], boards: [], adminBoards: [], starredBoards: [], recoverPassID: null });
       await user.save();
 
       // signup was successful, login
@@ -132,6 +134,8 @@ router.post('/autoLogin', auth,
       }));
 
       if (!user) { throw 'User data not found'; }
+      if (user.recoverPassID) { await User.updateOne({ _id: req.userID }, { recoverPassID: null }); }
+
       res.status(200).json({ email: user.email, fullName: user.fullName, invites: user.invites, boards: user.boards });
     } catch(err) { res.sendStatus(500); }
   }
@@ -207,7 +211,66 @@ router.delete('/deleteAccount/:password', auth, validate([param('password').not(
         }
       }
       res.sendStatus(200);
-    } catch (err) { console.log(err); res.sendStatus(500); }
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.get('/forgotPassword/:email', validate([param('email').isEmail()]),
+  async (req, res) => {
+    try {
+      const email = req.params.email;
+      const user = await User.findOne({ email });
+      if (!user) { return res.status(400).json({ msg: 'No user was found for the provided email.' }); }
+      // return error if recovery token already present
+      if (user.recoverPassID) { return res.status(400).json({ msg: 'A recovery link has already been sent to that email address.'}); }
+
+      // create jwt token that expires in 8hr to recover password
+      const recoverPassID = await jwt.sign({ email }, config.get('AUTH_KEY'), { expiresIn: '8h' });
+
+      user.recoverPassID = recoverPassID;
+      await user.save();
+
+      // send email to user with link to recover password
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        secure: false,
+        tls: { rejectUnauthorized: false },
+        auth: { user: config.get('BREYO_EMAIL'), pass: config.get('BREYO_PASS') }
+      });
+      const hRef = `http://localhost:3000/recover-password/${recoverPassID}`;
+      const mailOptions = {
+        from: config.get('BREYO_EMAIL'),
+        to: email,
+        subject: 'Recover your Breyo password',
+        html: `<h2>Click the link below to change your password.</h2><p><a href="${hRef}">Recover password</a></p>`
+      };
+      await transporter.sendMail(mailOptions);
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+router.post('/forgotPassword', validate([body('recoverPassID').not().isEmpty(), body('newPassword').isLength({ min: 8, max: 100 })]),
+  async (req, res) => {
+    try {
+      const { recoverPassID, newPassword } = req.body;
+      jwt.verify(recoverPassID, config.get('AUTH_KEY'), async (err, decoded) => {
+        if (err) {
+          if (err.name === 'TokenExpiredError') {
+            const user = await User.updateOne({ email: decoded.email }, { recoverPassID: null });
+            return res.status(400).json({ msg: 'Your recovery link has expired.' });
+          }
+          throw err;
+        }
+        try {
+          const hashedPass = await bcryptjs.hash(newPassword, 10);
+          await User.updateOne({ email: decoded.email }, { recoverPassID: null, password: hashedPass });
+        } catch (err) { throw err; }
+      });
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
   }
 );
 

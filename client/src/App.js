@@ -12,6 +12,7 @@ const DashboardPage = lazy(() => import('./components/DashboardPage/Dashboard/Da
 const LoginPage = lazy(() => import('./components/AuthPages/LoginPage'));
 const SignupPage = lazy(() => import('./components/AuthPages/SignupPage'));
 const ForgotPage = lazy(() => import('./components/AuthPages/ForgotPage'));
+const RecoverPage = lazy(() => import('./components/AuthPages/RecoverPage'));
 const BoardPage = lazy(() => import('./components/BoardPage/BoardPage/BoardPage'));
 const HelpPage = lazy(() => import('./components/HomePages/HelpPage/HelpPage'));
 const TechPage = lazy(() => import('./components/HomePages/TechPage/TechPage'));
@@ -40,6 +41,7 @@ const App = props => {
           <Route exact path="/login" render={() => <Suspense fallback={<Spinner />}><LoginPage /></Suspense>} />
           <Route exact path="/signup" render={() => <Suspense fallback={<Spinner />}><SignupPage /></Suspense>} />
           <Route exact path="/forgot-password" render={() => <Suspense fallback={<Spinner />}><ForgotPage /></Suspense>} />
+          <Route exact path="/recover-password/:recoverPassID" render={() => <Suspense fallback={<Spinner />}><RecoverPage /></Suspense>} />
           <Route exact path="/help" render={() => <Suspense fallback={<Spinner />}><HelpPage /></Suspense>} />
           <Route exact path="/tech" render={() => <Suspense fallback={<Spinner />}><TechPage /></Suspense>} />
           <Redirect to="/" />
