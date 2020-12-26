@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { Draggable } from 'react-beautiful-dnd';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
 import formatDate from '../../../../utils/formatDate';
+import { LABEL_COLORS } from '../../../../utils/backgrounds';
 
 const Card = props => {
   const [completedChecklists, setCompletedChecklists] = useState(0);
@@ -37,7 +38,7 @@ const Card = props => {
     <Draggable draggableId={props.cardID} index={props.index}>
       {(provided, snapshot) => (
         <div className={classes.Card} onClick={props.showDetails} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-          {props.labels.length > 0 && <div className={classes.Labels}>{props.labels.map(color => <div key={color} style={{background: color}}></div>)}</div>}
+          {props.labels.length > 0 && <div className={classes.Labels}>{LABEL_COLORS.filter(color => props.labels.includes(color)).map(color => <div key={color} style={{background: color}}></div>)}</div>}
           <div className={classes.EditIcon}>{editIcon}</div>
           <div className={classes.Title}>{props.title}</div>
           <div className={classes.Btns}>

@@ -4,6 +4,7 @@ import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import { plusIcon } from '../../../UI/icons';
 import LabelModal from '../LabelModal/LabelModal';
 import PropTypes from 'prop-types';
+import { LABEL_COLORS } from '../../../../utils/backgrounds';
 
 const CardLabels = props => {
   const [showLabelModal, setShowLabelModal] = useState(false);
@@ -12,7 +13,7 @@ const CardLabels = props => {
     <div className={classes.Container}>
       <div className={classes.Title}>LABELS</div>
       <div className={classes.Labels}>
-        {props.labels.map(color => <div key={color} className={classes.Label} style={{background: color}}></div>)}
+        {LABEL_COLORS.filter(color => props.labels.includes(color)).map(color => <div key={color} className={classes.Label} style={{background: color}}></div>)}
         <div className={classes.Btn}>
           <span className={classes.AddBtn}><ActionBtn clicked={() => setShowLabelModal(true)}>{plusIcon}</ActionBtn></span>
           {showLabelModal && <LabelModal openFromMiddle close={() => setShowLabelModal(false)} />}
