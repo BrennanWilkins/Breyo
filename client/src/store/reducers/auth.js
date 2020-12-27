@@ -5,6 +5,7 @@ const initialState = {
   isAuth: false,
   fullName: '',
   email: '',
+  avatar: null,
   invites: [],
   boards: [],
   loginLoading: false,
@@ -36,6 +37,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.UPDATE_BOARD_TITLE: return updateBoardTitle(state, action);
     case actionTypes.UPDATE_COLOR: return updateColor(state, action);
     case actionTypes.AUTO_LOGIN_LOADING: return { ...state, autoLoginLoading: action.bool };
+    case actionTypes.CHANGE_AVATAR: return { ...state, avatar: action.url };
+    case actionTypes.DELETE_AVATAR: return { ...state, avatar: null };
     default: return state;
   }
 };
@@ -52,7 +55,8 @@ const login = (state, action) => ({
   loginErrMsg: '',
   signupLoading: false,
   signupErr: false,
-  signupErrMsg: ''
+  signupErrMsg: '',
+  avatar: action.payload.avatar
 });
 
 const loginLoading = (state, action) => ({

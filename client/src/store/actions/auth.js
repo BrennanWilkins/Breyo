@@ -78,3 +78,7 @@ export const deleteAccount = pass => async dispatch => {
     dispatch(addNotif('There was an error while deleting your account.'));
   }
 };
+
+export const changeAvatar = url => ({ type: actionTypes.CHANGE_AVATAR, url });
+
+export const deleteAvatar = () => ({ type: actionTypes.DELETE_AVATAR });

@@ -18,7 +18,7 @@ const AccountPage = props => {
 
   return (
     <div className={classes.Container}>
-      <AccountHeader email={props.email} fullName={props.fullName} />
+      <AccountHeader email={props.email} fullName={props.fullName} avatar={props.avatar} />
       <div className={classes.Btns}>
         <Link to="/my-account?view=activity" className={!showSettings ? classes.Active : null}>Activity</Link>
         <Link to="/my-account?view=settings" className={showSettings ? classes.Active : null}>Settings</Link>
@@ -30,12 +30,14 @@ const AccountPage = props => {
 
 AccountPage.propTypes = {
   email: PropTypes.string.isRequired,
-  fullName: PropTypes.string.isRequired
+  fullName: PropTypes.string.isRequired,
+  avatar: PropTypes.string
 };
 
 const mapStateToProps = state => ({
   email: state.auth.email,
-  fullName: state.auth.fullName
+  fullName: state.auth.fullName,
+  avatar: state.auth.avatar
 });
 
 export default connect(mapStateToProps)(withRouter(AccountPage));

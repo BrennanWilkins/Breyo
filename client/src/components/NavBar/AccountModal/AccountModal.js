@@ -28,7 +28,7 @@ const AccountModal = props => {
         <CloseBtn close={props.close} color="rgb(112, 112, 112)" />
       </div>
       {showInvites ? <Invites close={closeHandler} email={props.email} fullName={props.fullName} invites={props.invites} /> :
-      <><AccountInfo fullName={props.fullName} email={props.email} givePadding />
+      <><AccountInfo fullName={props.fullName} email={props.email} givePadding avatar={props.avatar} />
       <div className={classes.Options}>
         <div className={classes.Option} onClick={() => setShowInvites(true)}>Invites
           {props.invites.length > 0 && <span className={classes.InviteNotifIcon}>{props.invites.length}</span>}
@@ -49,13 +49,15 @@ AccountModal.propTypes = {
   logout: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
-  invites: PropTypes.array.isRequired
+  invites: PropTypes.array.isRequired,
+  avatar: PropTypes.string
 };
 
 const mapStateToProps = state => ({
   fullName: state.auth.fullName,
   email: state.auth.email,
-  invites: state.auth.invites
+  invites: state.auth.invites,
+  avatar: state.auth.avatar
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -2,6 +2,7 @@
   background: white;
   flex-grow: 1;
   position: relative;
+  min-height: 400px;
 }
 .Option {
   margin: 30px auto;

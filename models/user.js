@@ -9,7 +9,8 @@ const UserSchema = new Schema({
   boards: [{ type: Schema.Types.ObjectId, ref: 'Board' }],
   adminBoards: [String],
   starredBoards: [String],
-  recoverPassID: String
+  recoverPassID: String,
+  avatar: String
 });
 
 UserSchema.index({ email: 1 });

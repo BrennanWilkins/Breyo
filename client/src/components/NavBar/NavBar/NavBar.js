@@ -26,7 +26,7 @@ const NavBar = props => {
       <LogoTitle />
       <div className={classes.Section}>
         <Button clicked={props.toggleCreateBoard}>{plusIcon}</Button>
-        <AccountBtn clicked={() => setShowAccountModal(true)}>{props.fullName.slice(0, 1)}</AccountBtn>
+        <AccountBtn isImg={!!props.avatar} clicked={() => setShowAccountModal(true)}>{props.avatar ? <img src={props.avatar} alt="" /> : props.fullName[0]}</AccountBtn>
       </div>
       <CreateBoard show={props.showCreateBoard} close={props.toggleCreateBoard} />
       <AccountModal show={showAccountModal} close={() => setShowAccountModal(false)} />
@@ -39,12 +39,14 @@ const NavBar = props => {
 NavBar.propTypes = {
   fullName: PropTypes.string.isRequired,
   showCreateBoard: PropTypes.bool.isRequired,
-  toggleCreateBoard: PropTypes.func.isRequired
+  toggleCreateBoard: PropTypes.func.isRequired,
+  avatar: PropTypes.string
 };
 
 const mapStateToProps = state => ({
   fullName: state.auth.fullName,
-  showCreateBoard: state.board.showCreateBoard
+  showCreateBoard: state.board.showCreateBoard,
+  avatar: state.auth.avatar
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -15,6 +15,11 @@
   font-size: 18px;
   margin-right: 10px;
   cursor: pointer;
+  overflow: hidden;
+}
+.NameIcon img {
+  width: 100%;
+  height: 100%;
 }
 .Email {
   font-size: 14px;
