@@ -188,12 +188,11 @@ router.delete('/deleteAccount/:password', auth, validate([param('password').not(
           await Promise.all([board.remove(), List.deleteMany({ boardID }), Activity.deleteMany({ boardID })]);
         } else {
           // if user is admin of board then check if theres another admin, if not then promote all other users to admin
-          const adminCount = board.members.filter(member => member.email !== user.email && member.isAdmin).length;
-          board.members = board.members.filter(member => member.email !== user.email);
+          const adminCount = board.admins.filter(id => id !== req.userID).length;
+          board.members = board.members.filter(id => String(id) !== req.userID);
           if (!adminCount) {
-            board.members = board.members.map(member => ({ ...member, isAdmin: true }));
-            const emails = board.members.map(member => member.email);
-            await Promise.all([board.save(), User.updateMany({ email: { $in: emails }}, { $push: { adminBoards: boardID }})]);
+            board.admins = [...board.members];
+            await Promise.all([board.save(), User.updateMany({ _id: { $in: board.members }}, { $push: { adminBoards: boardID }})]);
           } else {
             await board.save();
           }

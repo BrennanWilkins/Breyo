@@ -32,16 +32,25 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
     try {
       const boardID = req.params.boardID;
       const [board, lists, activity, activityCount] = await Promise.all([
-        Board.findById(boardID).lean(),
+        Board.findById(boardID).populate('members', 'email fullName avatar').lean(),
         List.find({ boardID }).sort('indexInBoard').lean(),
         Activity.find({ boardID }).sort('-date').limit(20).lean(),
         Activity.countDocuments({ boardID })
       ]);
       if (!board || !lists || !activity) { throw 'Board data not found'; }
-      const data = { ...board, lists, activity };
+
+      board.members = board.members.map(member => ({
+        email: member.email,
+        fullName: member.fullName,
+        avatar: member.avatar,
+        isAdmin: board.admins.includes(String(member._id))
+      }));
+
+      const { admins, ...boardData } = board;
+      const data = { ...boardData, lists, activity };
 
       const isAdminInToken = req.userAdmins[boardID];
-      const isAdminInBoard = board.members.find(member => member.email === req.email).isAdmin;
+      const isAdminInBoard = admins.includes(req.userID);
       // if user's token is not up to date, send new token
       if ((!isAdminInToken && isAdminInBoard) || (isAdminInToken && !isAdminInBoard)) {
         const user = await User.findById(req.userID).populate('boards', 'title color').lean();
@@ -57,6 +66,7 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
         data.boards = user.boards;
         data.token = token;
       }
+      
       // board stores max 200 past actions, if over 250 actions then delete ones over 200
       if (activityCount > 250) {
         const allActivity = await Activity.find({ boardID }).sort('-date').skip(200).select('_id').lean();
@@ -79,8 +89,7 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
       if (!user) { throw 'No user data found'; }
 
       // user is admin of new board by default
-      const board = new Board({ title, members: [{ email: user.email, fullName: user.fullName, isAdmin: true }],
-        color, creatorEmail: user.email, desc: '' });
+      const board = new Board({ title, members: [req.userID], admins: [req.userID], color, creatorEmail: user.email, desc: '' });
       const boardID = board._id;
 
       // add board to user's boards
@@ -119,8 +128,7 @@ router.put('/color', auth, validate([body('boardID').isMongoId(), body('color').
       const { boardID, color } = req.body;
       if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { throw 'Background not found'; }
 
-      const board = await Board.findByIdAndUpdate(boardID, { color }).lean();
-      if (!board) { throw 'No board data found'; }
+      await Board.updateOne({ _id: boardID }, { color });
 
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
@@ -133,8 +141,7 @@ router.put('/desc', auth, validate([body('boardID').isMongoId(), body('desc').is
   async (req, res) => {
     try {
       const { boardID, desc } = req.body;
-      const board = await Board.findByIdAndUpdate(boardID, { desc }).lean();
-      if (!board) { throw 'No board data found'; }
+      await Board.updateOne({ _id: boardID }, { desc });
 
       const actionData = { msg: null, boardMsg: 'updated the board description', cardID: null, listID: null, boardID };
       const newActivity = await addActivity(actionData, req);
@@ -189,22 +196,20 @@ router.post('/admins', auth, validate([body('email').isEmail(), body('boardID').
   async (req, res) => {
     try {
       const { email, boardID } = req.body;
-      const board = await Board.findById(boardID);
+      const [board, user] = await Promise.all([await Board.findById(boardID), await User.findOne({ email })]);
       if (!board) { throw 'Board data not found'; }
 
-      // find user in board's members and change user to admin if found
-      const memberIndex = board.members.findIndex(member => member.email === email && !member.isAdmin);
-      if (memberIndex === -1) { throw 'Member not found in board members'; }
-      if (board.members.length <= 1) { throw 'Not enough board members to add new admin'; }
-      const member = board.members[memberIndex];
-      member.isAdmin = true;
-      board.markModified('members');
+      // add user to board's admins & board to user's adminBoards
+      if (!board.members.includes(user._id)) { throw 'Member not found in board members'; }
+      if (board.admins.includes(String(user._id))) { throw 'User already an admin'; }
+      board.admins.push(user._id);
+      user.adminBoards.push(boardID);
 
-      const actionData = { msg: null, boardMsg: `changed ${member.fullName}'s permissions to admin`, cardID: null, listID: null, boardID };
+      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to admin`, cardID: null, listID: null, boardID };
 
       const results = await Promise.all([
         addActivity(actionData, req),
-        User.findOneAndUpdate({ email }, { $push: { adminBoards: boardID }}),
+        user.save(),
         board.save()
       ]);
       const newActivity = results[0];
@@ -251,14 +256,12 @@ router.delete('/admins/:email/:boardID', auth, validate([param('email').isEmail(
       const [board, user] = await Promise.all([Board.findById(boardID), User.findOne({ email })]);
       if (!board || !user) { throw 'No board or user data found'; }
 
-      // find user in board's members and change user isAdmin to false if found
-      const memberIndex = board.members.findIndex(member => member.email === email && member.isAdmin);
-      if (memberIndex === -1) { throw 'User not found in boards members'; }
-      const adminCount = board.members.filter(member => member.isAdmin).length;
-      if (adminCount <= 1) { throw 'There must be at least 1 admin at all times'; }
-      board.members[memberIndex].isAdmin = false;
-      board.markModified('members');
-
+      // remove user from board's admins
+      const adminIndex = board.admins.indexOf(String(user._id));
+      if (adminIndex === -1) { throw 'User not found in boards admins'; }
+      if (board.admins.length <= 1) { throw 'There must be at least 1 admin at all times'; }
+      board.admins.splice(adminIndex, 1);
+      // remove board from user's adminBoards
       const boardIndex = user.adminBoards.indexOf(boardID);
       if (boardIndex === -1) { throw 'Board not found in users boards'; }
       user.adminBoards.splice(boardIndex, 1);
@@ -316,10 +319,9 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
         return res.sendStatus(400);
       }
 
-      // add board to user model
+      // add board to user model & user to board's members
       user.boards.push(boardID);
-      // add user to board members
-      board.members = [...board.members, { email: user.email, fullName: user.fullName, isAdmin: false }];
+      board.members.push(user._id);
 
       const actionData = { msg: null, boardMsg: 'was added to this board', cardID: null, listID: null, boardID: board._id, email: user.email, fullName: user.fullName };
 
@@ -366,17 +368,18 @@ router.put('/members/remove', auth, validate([body('email').isEmail(), body('boa
   async (req, res) => {
     try {
       const { email, boardID } = req.body;
-      const [board, user] = await Promise.all([Board.findById(boardID), User.findOne({ email })]);
-      if (!board) { throw 'No board data found'; }
+      const user = await User.findOne({ email }).select('fullName boards').lean();
       if (!user) { throw 'No user found for given email'; }
-
-      // remove user from board's members and remove board from user's boards
-      board.members = board.members.filter(member => member.email !== email);
-      user.boards = user.boards.filter(userBoardID => String(userBoardID) !== boardID);
+      if (!user.boards.find(id => String(id) === boardID)) { throw 'User not a member of the board'; }
+      if (req.email === email) { throw 'Cannot remove yourself'; }
 
       const actionData = { msg: null, boardMsg: `removed ${user.fullName} from this board`, cardID: null, listID: null, boardID };
 
-      const results = await Promise.all([addActivity(actionData, req), board.save(), user.save()]);
+      const results = await Promise.all([
+        addActivity(actionData, req),
+        Board.updateOne({ _id: boardID }, { $pull: { boards: user._id, admins: user._id } }),
+        User.updateOne({ email }, { $pull: { boards: boardID, adminBoards: boardID, starredBoards: boardID } })
+      ]);
       const newActivity = results[0];
 
       res.status(200).json({ newActivity });
@@ -390,13 +393,11 @@ router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIs
   async (req, res) => {
     try {
       const boardID = req.params.boardID;
-      const board = await Board.findByIdAndDelete(boardID).select('members').lean();
+      const board = await Board.findByIdAndDelete(boardID).select('members');
       if (!board) { throw 'No board data found'; }
 
-      const emails = board.members.map(member => member.email);
-
       await Promise.all([
-        User.updateMany({ email: { $in: emails }}, { $pull: { boards: boardID, adminBoards: boardID, starredBoards: boardID } }),
+        User.updateMany({ _id: { $in: board.members }}, { $pull: { boards: board._id, adminBoards: boardID, starredBoards: boardID } }),
         List.deleteMany({ boardID }),
         Activity.deleteMany({ boardID })
       ]);
@@ -411,19 +412,16 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const boardID = req.body.boardID;
-      const [board, user] = await Promise.all([Board.findById(boardID), User.findById(req.userID)]);
-      if (!board || !user) { throw 'No board or user data found'; }
+      const board = await Board.findById(boardID);
+      if (!board) { throw 'No board data found'; }
 
-      const member = board.members.find(member => member.email === user.email);
-      if (!member) { throw 'User not found in boards members'; }
       // check if user is able to leave board
-      if (member.isAdmin) {
-        const adminCount = board.members.filter(member => member.isAdmin).length;
-        if (adminCount < 2) { throw 'There must be at least one other admin for user to leave board'; }
+      if (board.admins.includes(req.userID) && board.admins.length < 2) {
+        throw 'There must be at least one other admin for user to leave board';
       }
 
-      user.boards = user.boards.filter(userBoardID => String(userBoardID) !== boardID);
-      board.members = board.members.filter(member => member.email !== user.email);
+      board.members = board.members.filter(id => String(id) !== req.userID);
+      board.admins = board.admins.filter(id => id !== req.userID);
 
       // remove user from cards they are a member of
       const lists = await List.find({ boardID });
@@ -431,7 +429,7 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
         let shouldUpdate = false;
         for (let card of list.cards) {
           for (let i = card.members.length - 1; i >= 0; i--) {
-            if (card.members[i].email === user.email) { card.members.splice(i, 1); }
+            if (card.members[i].email === req.email) { card.members.splice(i, 1); }
             shouldUpdate = true;
           }
         }
@@ -441,7 +439,11 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
 
       const actionData = { msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID };
 
-      const results = await Promise.all([addActivity(actionData, req), user.save(), board.save()]);
+      const results = await Promise.all([
+        addActivity(actionData, req),
+        User.updateOne({ _id: req.userID }, { $pull: { boards: board._id, starredBoards: boardID, adminBoards: boardID }}),
+        board.save()
+      ]);
       const newActivity = results[0];
 
       res.status(200).json({ newActivity });
