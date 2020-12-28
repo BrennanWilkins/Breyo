@@ -21,7 +21,7 @@ const CardMemberModal = props => {
     <div ref={modalRef} style={props.inCard ? {top: props.top + 'px', left: props.left + 'px'} : null}
     className={props.inCard ? classes.FixedContainer : classes.Container}>
       <div className={classes.CloseBtn}><CloseBtn close={props.close} /></div>
-      <AccountInfo fullName={props.fullName} email={props.email} noBorder />
+      <AccountInfo fullName={props.fullName} email={props.email} noBorder avatar={props.avatars[props.email]} />
       <div className={classes.RemoveBtn} onClick={removeHandler}>Remove from card</div>
     </div>
   );
@@ -37,12 +37,17 @@ CardMemberModal.propTypes = {
   top: PropTypes.number,
   left: PropTypes.number,
   removeCardMember: PropTypes.func.isRequired,
-  removeCardMemberCurrentCard: PropTypes.func.isRequired
+  removeCardMemberCurrentCard: PropTypes.func.isRequired,
+  avatars: PropTypes.object.isRequired
 };
+
+const mapStateToProps = state => ({
+  avatars: state.board.avatars
+});
 
 const mapDispatchToProps = dispatch => ({
   removeCardMember: (email, cardID, listID) => dispatch(removeCardMember(email, cardID, listID)),
   removeCardMemberCurrentCard: email => dispatch(removeCardMemberCurrentCard(email))
 });
 
-export default connect(null, mapDispatchToProps)(CardMemberModal);
+export default connect(mapStateToProps, mapDispatchToProps)(CardMemberModal);

@@ -29,7 +29,7 @@ const AboutMenu = props => {
   return (
     <>
       <div className={classes.Title}>{personIcon}Created by</div>
-      <AccountInfo fullName={props.creatorFullName} email={props.creatorEmail} givePadding noBorder />
+      <AccountInfo fullName={props.creator.fullName} email={props.creator.email} avatar={props.creator.avatar} givePadding noBorder />
       <div className={classes.Title}>{descIcon}Description
         {!showEditDesc && props.desc.length > 0 &&
           <span className={classes.EditBtn}><ActionBtn clicked={() => setShowEditDesc(true)}>Edit</ActionBtn></span>}
@@ -52,15 +52,13 @@ const AboutMenu = props => {
 };
 
 AboutMenu.propTypes = {
-  creatorEmail: PropTypes.string.isRequired,
-  creatorFullName: PropTypes.string.isRequired,
+  creator: PropTypes.object.isRequired,
   desc: PropTypes.string.isRequired,
   updateDesc: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  creatorEmail: state.board.creatorEmail,
-  creatorFullName: state.board.creatorFullName,
+  creator: state.board.creator,
   desc: state.board.desc
 });
 

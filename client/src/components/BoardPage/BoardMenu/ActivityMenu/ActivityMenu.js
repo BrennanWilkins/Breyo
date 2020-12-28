@@ -36,11 +36,11 @@ const ActivityMenu = props => {
       {props.isLoading && !props.allBoardActivity.length && <div className={classes.Spinner}><Spinner /></div>}
       {showAll ?
         props.allBoardActivity.map(action => {
-          if (action.commentID) { return <CommentAction key={action._id} {...action} />; }
+          if (action.commentID) { return <CommentAction key={action._id} {...action} avatar={props.avatars[action.email]} />; }
           return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
-          msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />;
+          msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} avatar={props.avatars[action.email]} />;
         }) :
-        props.allComments.map(comment => <CommentAction key={comment.commentID} {...comment} boardID={props.boardID} />)}
+        props.allComments.map(comment => <CommentAction key={comment.commentID} {...comment} boardID={props.boardID} avatar={props.avatars[comment.email]} />)}
       {!props.isLoading && !moreLoaded && showAll && <div className={classes.LoadMore} onClick={loadMoreHandler}>Load more activity</div>}
       {props.hasErr && <div className={classes.Err}>There was an error while fetching the activity.</div>}
     </div>
@@ -56,7 +56,8 @@ ActivityMenu.propTypes = {
   setShown: PropTypes.func.isRequired,
   reset: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  hasErr: PropTypes.bool.isRequired
+  hasErr: PropTypes.bool.isRequired,
+  avatars: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -64,7 +65,8 @@ const mapStateToProps = state => ({
   allComments: state.activity.allComments,
   allBoardActivity: state.activity.allBoardActivity,
   isLoading: state.activity.allBoardActivityLoading,
-  hasErr: state.activity.allBoardActivityErr
+  hasErr: state.activity.allBoardActivityErr,
+  avatars: state.board.avatars
 });
 
 const mapDispatchToProps = dispatch => ({

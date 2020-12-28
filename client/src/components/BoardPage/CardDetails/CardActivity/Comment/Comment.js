@@ -29,8 +29,12 @@ const Comment = props => {
   return (
     <><div className={classes.Comment}>
       <span className={classes.AccountInfo}>
-        <span className={classes.AccountBtn}><AccountBtn clicked={() => setShowCommenter(true)}>{props.fullName.slice(0, 1)}</AccountBtn></span>
-        {showCommenter && <Commenter close={() => setShowCommenter(false)} email={props.email} fullName={props.fullName} />}
+        <span className={classes.AccountBtn}>
+          <AccountBtn isImg={!!props.avatar} clicked={() => setShowCommenter(true)}>
+            {props.avatar ? <img src={props.avatar} alt="" /> : props.fullName[0]}
+          </AccountBtn>
+        </span>
+        {showCommenter && <Commenter close={() => setShowCommenter(false)} email={props.email} fullName={props.fullName} avatar={props.avatar} />}
       </span>
       <div className={classes.CommentDetail}>
         <div>
@@ -61,7 +65,8 @@ Comment.propTypes = {
   msg: PropTypes.string.isRequired,
   userComment: PropTypes.bool.isRequired,
   deleteComment: PropTypes.func.isRequired,
-  updateComment: PropTypes.func.isRequired
+  updateComment: PropTypes.func.isRequired,
+  avatar: PropTypes.string
 };
 
 const mapDispatchToProps = dispatch => ({

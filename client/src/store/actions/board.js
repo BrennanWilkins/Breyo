@@ -53,18 +53,23 @@ export const updateActiveBoard = data => (dispatch, getState) => {
   const { _id: boardID, members, desc, creatorEmail, color, title, activity } = data;
   const state = getState();
   const activeBoard = state.auth.boards.find(board => board.boardID === boardID);
-  const { isStarred, isAdmin: userIsAdmin } = activeBoard;
-  const creator = data.members.find(member => member.email === creatorEmail);
-  const creatorFullName = creator.fullName;
+  let { isStarred, isAdmin: userIsAdmin } = activeBoard;
+  const { isAdmin, ...creator} = data.members.find(member => member.email === creatorEmail);
 
   if (data.invites && data.boards) {
+    const userEmail = state.auth.email;
+    userIsAdmin = members.find(member => member.email === userEmail).isAdmin;
     dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: data.invites, boards: data.boards });
   }
 
   if (data.token) { axios.defaults.headers.common['x-auth-token'] = data.token; }
 
-  const boardPayload = { isStarred, creatorFullName, userIsAdmin, title, members, color, boardID, desc, creatorEmail };
+  const boardPayload = { isStarred, creator, userIsAdmin, title, members, color, boardID, desc };
   dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload: boardPayload });
+
+  const avatars = {};
+  for (let member of data.members) { avatars[member.email] = member.avatar; }
+  dispatch({ type: actionTypes.SET_BOARD_AVATARS, avatars });
 
   let allArchivedCards = [];
   let allComments = [];

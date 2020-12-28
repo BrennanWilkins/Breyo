@@ -6,14 +6,14 @@ const initialState = {
   members: [],
   color: 'rgb(250, 250, 250)',
   boardID: '',
-  creatorEmail: '',
-  creatorFullName: '',
+  creator: { email: '', fullName: '', avatar: null },
   desc: '',
   isStarred: false,
   userIsAdmin: false,
   roadmapShown: false,
   shownRoadmapListID: null,
-  showCreateBoard: false
+  showCreateBoard: false,
+  avatars: {}
 };
 
 const reducer = (state = initialState, action) => {
@@ -36,6 +36,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SET_SHOWN_ROADMAP_LIST: return { ...state, shownRoadmapListID: action.listID };
     case actionTypes.CLOSE_ROADMAP: return { ...state, roadmapShown: false };
     case actionTypes.TOGGLE_CREATE_BOARD: return { ...state, showCreateBoard: !state.showCreateBoard };
+    case actionTypes.SET_BOARD_AVATARS: return { ...state, avatars: action.avatars };
     default: return state;
   }
 };
@@ -46,10 +47,9 @@ const updateActiveBoard = (state, action) => ({
   members: action.payload.members,
   color: action.payload.color,
   boardID: action.payload.boardID,
-  creatorEmail: action.payload.creatorEmail,
+  creator: action.payload.creator,
   desc: action.payload.desc,
   isStarred: action.payload.isStarred,
-  creatorFullName: action.payload.creatorFullName,
   userIsAdmin: action.payload.userIsAdmin
 });
 

@@ -12,8 +12,10 @@ const CommentAction = props => {
   return (
     <div className={classes.Action}>
       <span className={classes.AccountInfo}>
-        <span className={classes.AccountBtn}><AccountBtn clicked={() => setShowUser(true)}>{props.fullName.slice(0, 1)}</AccountBtn></span>
-        {showUser && <Commenter close={() => setShowUser(false)} email={props.email} fullName={props.fullName} />}
+        <span className={classes.AccountBtn}><AccountBtn clicked={() => setShowUser(true)} isImg={!!props.avatar}>
+          {props.avatar ? <img src={props.avatar} alt="" /> : props.fullName[0]}
+        </AccountBtn></span>
+        {showUser && <Commenter close={() => setShowUser(false)} email={props.email} fullName={props.fullName} avatar={props.avatar} />}
       </span>
       <div className={classes.Detail}>
         <div className={classes.MsgContainer}>

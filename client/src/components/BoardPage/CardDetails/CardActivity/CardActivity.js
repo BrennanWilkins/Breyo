@@ -42,10 +42,10 @@ const CardActivity = props => {
       <AddComment />
       {showDetails ?
         props.activity.map(action => {
-          if (action.commentID) { return <Comment key={action.commentID} {...action} userComment={props.userEmail === action.email} />; }
-          else { return <Action key={action._id} email={action.email} fullName={action.fullName} msg={action.msg} date={action.date} />; }
+          if (action.commentID) { return <Comment key={action.commentID} {...action} userComment={props.userEmail === action.email} avatar={props.avatars[action.email]} />; }
+          else { return <Action key={action._id} email={action.email} fullName={action.fullName} msg={action.msg} date={action.date} avatar={props.avatars[action.email]} />; }
         }) :
-        props.comments.map(comment => <Comment key={comment.commentID} {...comment} userComment={props.userEmail === comment.email} />)}
+        props.comments.map(comment => <Comment key={comment.commentID} {...comment} userComment={props.userEmail === comment.email} avatar={props.avatars[comment.email]} />)}
       {props.isLoading && <div className={classes.Spinner}><AuthSpinner /></div>}
       {!props.isLoading && showDetails && !allShown && <div className={classes.ViewAll} onClick={showAllHandler}>Show all actions...</div>}
     </div>
@@ -59,14 +59,16 @@ CardActivity.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   getRecentCardActivity: PropTypes.func.isRequired,
   resetCardActivity: PropTypes.func.isRequired,
-  getAllCardActivity: PropTypes.func.isRequired
+  getAllCardActivity: PropTypes.func.isRequired,
+  avatars: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
   comments: state.lists.currentCard.comments,
   userEmail: state.auth.email,
   activity: state.activity.cardActivity,
-  isLoading: state.activity.cardActivityLoading
+  isLoading: state.activity.cardActivityLoading,
+  avatars: state.board.avatars
 });
 
 const mapDispatchToProps = dispatch => ({

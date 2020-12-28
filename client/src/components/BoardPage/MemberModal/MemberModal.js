@@ -37,7 +37,7 @@ const MemberModal = props => {
     <div ref={modalRef} className={classes.Container} style={showPermission ? {width: '350px', height: '270px'} : null}>
       <div className={classes.CloseBtn}><CloseBtn close={props.close} /></div>
       {!showPermission ? <>
-      <AccountInfo fullName={props.fullName} email={props.email} />
+      <AccountInfo fullName={props.fullName} email={props.email} avatar={props.avatar} />
       <div className={classes.Options} style={{ paddingTop: '15px'}}>
         <div onClick={() => setShowPermission(true)}>Change Permissions ({props.isAdmin ? 'Admin' : 'Member'})</div>
         <div onClick={() => props.setShownMemberActivity({ email: props.email, fullName: props.fullName})}>View Member's Board Activity</div>
@@ -76,7 +76,8 @@ MemberModal.propTypes = {
   removeAdmin: PropTypes.func.isRequired,
   boardID: PropTypes.string.isRequired,
   demoteSelf: PropTypes.func.isRequired,
-  setShownMemberActivity: PropTypes.func.isRequired
+  setShownMemberActivity: PropTypes.func.isRequired,
+  avatar: PropTypes.string
 };
 
 const mapDispatchToProps = dispatch => ({

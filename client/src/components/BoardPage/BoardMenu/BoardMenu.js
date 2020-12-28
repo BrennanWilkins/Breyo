@@ -53,9 +53,9 @@ const BoardMenu = props => {
       <div className={classes.Activities}>
         <div onClick={() => setShowAllActivity(true)} className={`${classes.Option} ${classes.ActivityTitle}`}>{activityIcon}Activity</div>
         {props.activity.map(action => {
-          if (action.commentID) { return <CommentAction key={action.commentID} {...action} boardID={props.boardID} />; }
+          if (action.commentID) { return <CommentAction key={action.commentID} {...action} boardID={props.boardID} avatar={props.avatars[action.email]} />; }
           return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
-          msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />;
+          msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} avatar={props.avatars[action.email]} />;
         })}
         <div className={classes.ViewAll} onClick={() => setShowAllActivity(true)}>View all activity...</div>
       </div>
@@ -90,7 +90,8 @@ BoardMenu.propTypes = {
 const mapStateToProps = state => ({
   color: state.board.color,
   activity: state.activity.boardActivity,
-  boardID: state.board.boardID
+  boardID: state.board.boardID,
+  avatars: state.board.avatars
 });
 
 export default connect(mapStateToProps)(BoardMenu);

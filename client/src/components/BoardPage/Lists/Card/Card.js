@@ -4,9 +4,9 @@ import classes from './Card.module.css';
 import { editIcon, clockIcon, checklistIcon, commentIcon, descIcon } from '../../../UI/icons';
 import { format } from 'date-fns';
 import { Draggable } from 'react-beautiful-dnd';
-import { AccountBtn } from '../../../UI/Buttons/Buttons';
 import formatDate from '../../../../utils/formatDate';
 import { LABEL_COLORS } from '../../../../utils/backgrounds';
+import CardMembers from './CardMembers';
 
 const Card = props => {
   const [completedChecklists, setCompletedChecklists] = useState(0);
@@ -53,16 +53,7 @@ const Card = props => {
               </div>}
             {props.comments.length > 0 && <div className={classes.CommentBtn}>{commentIcon}{props.comments.length}</div>}
           </div>
-          {props.members.length > 0 &&
-          <div className={classes.Members}>
-            {props.members.map(member => (
-              <div key={member.email} className={classes.Member}>
-                <span className={classes.AccountBtn}>
-                  <AccountBtn title={member.fullName} clicked={e => accountBtnClickHandler(e, member.email, member.fullName)}>{member.fullName.slice(0, 1)}</AccountBtn>
-                </span>
-              </div>
-            ))}
-          </div>}
+          {props.members.length > 0 && <CardMembers members={props.members} clickHandler={accountBtnClickHandler} />}
         </div>
       )}
     </Draggable>

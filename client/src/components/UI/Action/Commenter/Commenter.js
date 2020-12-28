@@ -12,7 +12,7 @@ const Commenter = props => {
   return (
     <div className={classes.Container} ref={modalRef}>
       <div className={classes.CloseBtn}><CloseBtn close={props.close} /></div>
-      <AccountInfo fullName={props.fullName} email={props.email} noBorder />
+      <AccountInfo fullName={props.fullName} email={props.email} noBorder avatar={props.avatar} />
     </div>
   );
 };
@@ -20,7 +20,8 @@ const Commenter = props => {
 Commenter.propTypes = {
   close: PropTypes.func.isRequired,
   fullName: PropTypes.string.isRequired,
-  email: PropTypes.string.isRequired
+  email: PropTypes.string.isRequired,
+  avatar: PropTypes.string
 };
 
 export default Commenter;

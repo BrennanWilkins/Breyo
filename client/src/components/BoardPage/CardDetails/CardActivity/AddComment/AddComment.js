@@ -23,7 +23,11 @@ const AddComment = props => {
 
   return (
     <div className={classes.AddComment}>
-      <span ref={accntRef} className={classes.AccountBtn}><AccountBtn clicked={() => setShowCommentOptions(true)}>{props.fullName.slice(0, 1)}</AccountBtn></span>
+      <span ref={accntRef} className={classes.AccountBtn}>
+        <AccountBtn isImg={!!props.avatar} clicked={() => setShowCommentOptions(true)}>
+          {props.avatar ? <img src={props.avatar} alt="" /> : props.fullName[0]}
+        </AccountBtn>
+      </span>
       <div ref={commentRef} className={showCommentOptions ? classes.CommentInputShow : classes.CommentInputHide}>
         <TextArea maxRows="20" className={showCommentOptions ? classes.FocusInput : classes.Input} value={commentInput} onChange={e => setCommentInput(e.target.value)}
         placeholder="Write a comment" onFocus={() => setShowCommentOptions(true)} />
@@ -35,11 +39,13 @@ const AddComment = props => {
 
 AddComment.propTypes = {
   fullName: PropTypes.string.isRequired,
-  addComment: PropTypes.func.isRequired
+  addComment: PropTypes.func.isRequired,
+  avatar: PropTypes.string
 };
 
 const mapStateToProps = state => ({
-  fullName: state.auth.fullName
+  fullName: state.auth.fullName,
+  avatar: state.auth.avatar
 });
 
 const mapDispatchToProps = dispatch => ({

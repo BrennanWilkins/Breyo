@@ -13,7 +13,7 @@
 }
 .Member {
   display: inline-block;
-  vertical-align: bottom;
+  vertical-align: top;
   position: relative;
 }
 .AccountBtn button, .AddBtn button {
