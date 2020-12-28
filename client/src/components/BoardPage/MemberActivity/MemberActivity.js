@@ -8,6 +8,7 @@ import Action from '../../UI/Action/Action';
 import CommentAction from '../../UI/Action/CommentAction';
 import AuthSpinner from '../../UI/AuthSpinner/AuthSpinner';
 import { instance as axios } from '../../../axios';
+import { connect } from 'react-redux';
 
 const MemberActivity = props => {
   const modalRef = useRef();
@@ -47,9 +48,9 @@ const MemberActivity = props => {
         <div className={classes.Activity}>
           {loading ? <div className={classes.Spinner}><AuthSpinner /></div> : !err ?
             userActivity.map(action => {
-              if (action.commentID) { return <CommentAction key={action.commentID} {...action} />; }
+              if (action.commentID) { return <CommentAction key={action.commentID} {...action} avatar={props.avatars[action.email]} />; }
               return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
-              msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} />;
+              msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} avatar={props.avatars[action.email]} />;
             }) :
             <div className={classes.ErrMsg}>This user's activity could not be retrieved.</div>}
         </div>
@@ -63,7 +64,12 @@ MemberActivity.propTypes = {
   email: PropTypes.string.isRequired,
   fullName: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,
-  path: PropTypes.string.isRequired
+  path: PropTypes.string.isRequired,
+  avatars: PropTypes.object.isRequired
 };
 
-export default MemberActivity;
+const mapStateToProps = state => ({
+  avatars: state.board.avatars
+});
+
+export default connect(mapStateToProps)(MemberActivity);
