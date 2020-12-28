@@ -42,9 +42,7 @@ const AddCardMember = props => {
       <div className={classes.SubTitle}>BOARD MEMBERS</div>
       {boardMembers.map((member, i) => (
         <div key={member.email} className={classes.Member} onClick={() => memberHandler(i)}>
-          <AccountBtn isImg={!!member.avatar}>
-            {member.avatar ? <img src={member.avatar} alt="" /> : member.fullName[0]}
-          </AccountBtn>
+          <AccountBtn avatar={member.avatar}>{member.fullName[0]}</AccountBtn>
           {member.fullName}{member.isMember && checkIcon}
         </div>
       ))}

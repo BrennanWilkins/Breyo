@@ -30,9 +30,7 @@ const Comment = props => {
     <><div className={classes.Comment}>
       <span className={classes.AccountInfo}>
         <span className={classes.AccountBtn}>
-          <AccountBtn isImg={!!props.avatar} clicked={() => setShowCommenter(true)}>
-            {props.avatar ? <img src={props.avatar} alt="" /> : props.fullName[0]}
-          </AccountBtn>
+          <AccountBtn avatar={props.avatar} clicked={() => setShowCommenter(true)}>{props.fullName[0]}</AccountBtn>
         </span>
         {showCommenter && <Commenter close={() => setShowCommenter(false)} email={props.email} fullName={props.fullName} avatar={props.avatar} />}
       </span>

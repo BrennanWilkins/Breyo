@@ -7,7 +7,9 @@ const Button = props => (
 );
 
 export const AccountBtn = props => (
-  <button className={props.isImg ? classes.AccountBtnImg : classes.AccountBtn} onClick={props.clicked} title={props.title}>{props.children}</button>
+  <button className={props.avatar ? classes.AccountBtnImg : classes.AccountBtn} onClick={props.clicked} title={props.title}>
+    {props.avatar ? <img src={props.avatar} alt="" /> : props.children}
+  </button>
 );
 
 export const CloseBtn = props => (

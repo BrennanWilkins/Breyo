@@ -14,20 +14,17 @@ const CardMembers = props => {
   return (
     <div className={classes.Container}>
       <div className={classes.Title}>MEMBERS</div>
-      {props.members.map(member => {
-        const avatar = props.avatars[member.email];
-        return (
-          <div key={member.email} className={classes.Member}>
-            <span className={classes.AccountBtn}>
-              <AccountBtn title={member.fullName} clicked={() => setShownMember(member.email)} isImg={!!avatar}>
-                {avatar ? <img src={avatar} alt="" /> : member.fullName[0]}
-              </AccountBtn>
-            </span>
-            {shownMember === member.email &&
-              <CardMemberModal fullName={member.fullName} email={member.email} close={() => setShownMember('')} />}
-          </div>
-        );
-      })}
+      {props.members.map(member => (
+        <div key={member.email} className={classes.Member}>
+          <span className={classes.AccountBtn}>
+            <AccountBtn title={member.fullName} clicked={() => setShownMember(member.email)} avatar={props.avatars[member.email]}>
+              {member.fullName[0]}
+            </AccountBtn>
+          </span>
+          {shownMember === member.email &&
+            <CardMemberModal fullName={member.fullName} email={member.email} close={() => setShownMember('')} />}
+        </div>
+      ))}
       <span className={classes.AddContainer}>
         <span className={classes.AddBtn}><AccountBtn clicked={() => setShowAddMember(true)}>{plusIcon}</AccountBtn></span>
         {showAddMember && <AddCardMember fromList close={() => setShowAddMember(false)} />}

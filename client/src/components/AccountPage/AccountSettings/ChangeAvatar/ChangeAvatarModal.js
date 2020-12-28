@@ -20,10 +20,10 @@ const ChangeAvatarModal = props => {
       </div>
       {(props.avatar && !props.picSelected) && <div className={`${classes.Option} ${props.selectedPic === props.avatar ? classes.Selected: ''}`}
       onClick={() => props.setPic('current')}>
-        <AccountBtn isImg><img src={props.avatar} alt="" /></AccountBtn> Current picture {props.selectedPic === props.avatar && checkIcon}
+        <AccountBtn avatar={props.avatar}></AccountBtn> Current picture {props.selectedPic === props.avatar && checkIcon}
       </div>}
       {props.picSelected && <div className={`${classes.Option} ${classes.Selected}`}>
-        <AccountBtn isImg><img src={props.selectedPic} alt="" /></AccountBtn> Selected picture {checkIcon}
+        <AccountBtn avatar={props.selectedPic}></AccountBtn> Selected picture {checkIcon}
       </div>}
       <div className={classes.FileBtn}>
         <input ref={fileInput} type="file" accept="image/*" tabIndex="-1" onChange={e => props.setPic(e.target.files[0])} />

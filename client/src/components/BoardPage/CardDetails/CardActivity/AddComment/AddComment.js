@@ -24,9 +24,7 @@ const AddComment = props => {
   return (
     <div className={classes.AddComment}>
       <span ref={accntRef} className={classes.AccountBtn}>
-        <AccountBtn isImg={!!props.avatar} clicked={() => setShowCommentOptions(true)}>
-          {props.avatar ? <img src={props.avatar} alt="" /> : props.fullName[0]}
-        </AccountBtn>
+        <AccountBtn avatar={props.avatar} clicked={() => setShowCommentOptions(true)}>{props.fullName[0]}</AccountBtn>
       </span>
       <div ref={commentRef} className={showCommentOptions ? classes.CommentInputShow : classes.CommentInputHide}>
         <TextArea maxRows="20" className={showCommentOptions ? classes.FocusInput : classes.Input} value={commentInput} onChange={e => setCommentInput(e.target.value)}

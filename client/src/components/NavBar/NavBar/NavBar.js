@@ -26,7 +26,7 @@ const NavBar = props => {
       <LogoTitle />
       <div className={classes.Section}>
         <Button clicked={props.toggleCreateBoard}>{plusIcon}</Button>
-        <AccountBtn isImg={!!props.avatar} clicked={() => setShowAccountModal(true)}>{props.avatar ? <img src={props.avatar} alt="" /> : props.fullName[0]}</AccountBtn>
+        <AccountBtn avatar={props.avatar} clicked={() => setShowAccountModal(true)}>{props.fullName[0]}</AccountBtn>
       </div>
       <CreateBoard show={props.showCreateBoard} close={props.toggleCreateBoard} />
       <AccountModal show={showAccountModal} close={() => setShowAccountModal(false)} />

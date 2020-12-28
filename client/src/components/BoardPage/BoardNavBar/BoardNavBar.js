@@ -68,9 +68,7 @@ const BoardNavBar = props => {
       {props.members.map(member => (
         <span key={member.email} className={classes.Container}>
           <span className={classes.AccountBtn}>
-            <AccountBtn isImg={!!member.avatar} clicked={() => setShowMember(member.email)} title={member.fullName}>
-              {member.avatar ? <img src={member.avatar} alt="" /> : member.fullName[0]}
-            </AccountBtn>
+            <AccountBtn avatar={member.avatar} clicked={() => setShowMember(member.email)} title={member.fullName}>{member.fullName[0]}</AccountBtn>
             {member.isAdmin && <div className={classes.AdminIcon}>{adminIcon}</div>}
           </span>
           {showMember === member.email &&

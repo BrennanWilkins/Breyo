@@ -62,7 +62,7 @@ const SearchCardsMenu = props => {
     <div className={classes.BoardMembers}>
       {props.members.map(member => (
         <div className={classes.Member} key={member.email} onClick={() => memberHandler(member.email)}>
-          <AccountBtn>{member.fullName.slice(0,1)}</AccountBtn>
+          <AccountBtn avatar={member.avatar}>{member.fullName[0]}</AccountBtn>
           {member.fullName}
           {memberQuery === member.email && checkIcon}
         </div>
