@@ -43,8 +43,8 @@ const UserActivity = props => {
         <div className={classes.Title}>{activityIcon} My Activity</div>
           {err ? <div className={classes.ErrMsg}>Your activity could not be retrieved.</div> :
             userActivity.map(action => {
-              if (action.commentID) { return <CommentAction key={action._id} {...action} />; }
-              return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
+              if (action.commentID) { return <CommentAction key={action._id} {...action} avatar={props.avatar} />; }
+              return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date} avatar={props.avatar}
               msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} boardTitle={action.boardTitle} />;
             })
           }
@@ -56,11 +56,13 @@ const UserActivity = props => {
 };
 
 UserActivity.propTypes = {
-  boards: PropTypes.array.isRequired
+  boards: PropTypes.array.isRequired,
+  avatar: PropTypes.string
 };
 
 const mapStateToProps = state => ({
-  boards: state.auth.boards
+  boards: state.auth.boards,
+  avatar: state.auth.avatar
 });
 
 export default connect(mapStateToProps)(UserActivity);
