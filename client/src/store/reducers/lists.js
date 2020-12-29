@@ -69,6 +69,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ADD_LABEL_SEARCH_QUERY: return addLabelSearchQuery(state, action);
     case actionTypes.ADD_DUE_DATE_SEARCH_QUERY: return addDueDateSearchQuery(state, action);
     case actionTypes.RESET_SEARCH_QUERY: return resetSearchQuery(state, action);
+    case actionTypes.MOVE_CHECKLIST_ITEM: return moveChecklistItem(state, action);
     default: return state;
   }
 };
@@ -800,6 +801,17 @@ const resetSearchQuery = (state, action) => {
     labels: []
   };
   return { ...state, cardsAreFiltered: false, searchQueries, filteredLists: [] };
+};
+
+const moveChecklistItem = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  const { checklists, checklistIndex, checklist, items } = findChecklistItems(card, action.checklistID);
+  const item = items.splice(action.sourceIndex, 1)[0];
+  items.splice(action.destIndex, 0, item);
+  checklist.items = items;
+  checklists[checklistIndex] = checklist;
+  card.checklists = checklists;
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
 export default reducer;

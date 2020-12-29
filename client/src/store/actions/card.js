@@ -4,7 +4,7 @@ import { addNotif, serverErr } from './notifications';
 import { sendUpdate } from './socket';
 import { addRecentActivity } from './activity';
 
-const getCardState = getState => {
+export const getCardState = getState => {
   // helper func for retrieving cardID/listID/boardID for card details actions
   const state = getState();
   return { boardID: state.board.boardID, listID: state.lists.shownListID, cardID: state.lists.shownCardID, state };
@@ -224,8 +224,8 @@ export const editChecklistItem = (title, itemID, checklistID) => async (dispatch
 export const deleteChecklistItem = (itemID, checklistID) => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID } = getCardState(getState);
-    dispatch({ type: actionTypes.DELETE_CHECKLIST_ITEM, itemID, checklistID, cardID, listID });
     await axios.put('/card/checklist/item/delete', { itemID, checklistID, cardID, listID, boardID });
+    dispatch({ type: actionTypes.DELETE_CHECKLIST_ITEM, itemID, checklistID, cardID, listID });
     sendUpdate('put/card/checklist/item/delete', JSON.stringify({ itemID, checklistID, cardID, listID }));
   } catch (err) {
     dispatch(serverErr());

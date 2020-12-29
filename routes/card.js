@@ -841,4 +841,31 @@ router.delete('/comments/:commentID/:cardID/:listID/:boardID', auth, validate([
   }
 );
 
+// authorization: member
+// move the position of a checklist item
+router.put('/checklist/moveItem', auth, validate(
+  [body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('boardID').isMongoId(),
+  body('checklistID').isMongoId(),
+  body('sourceIndex').isInt(),
+  body('destIndex').isInt()]), useIsMember,
+  async (req, res) => {
+    try {
+      const { cardID, listID, checklistID, sourceIndex, destIndex } = req.body;
+      const list = await List.findById(listID);
+      if (!list) { throw 'List data found'; }
+      if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
+
+      const checklist = list.cards.id(cardID).checklists.id(checklistID);
+      if (!checklist) { throw 'Checklist not found'; }
+      const item = checklist.items.splice(sourceIndex, 1)[0];
+      checklist.items.splice(destIndex, 0, item);
+
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;

@@ -13,7 +13,7 @@ deleteChecklist, addChecklistItem, toggleChecklistItemIsComplete, editChecklistI
 deleteChecklistItem, copyCard, archiveCard, recoverCard, deleteCard, addCardMember,
 removeCardMember, removeCardMemberCurrentCard, addComment, updateComment, deleteComment,
 editChecklistTitle, setCardDetailsInitial, changeRoadmapLabel } from './card';
-export { dndHandler, manualMoveCardHandler } from './dndActions';
+export { dndHandler, manualMoveCardHandler, checklistDndHandler } from './dndActions';
 export { getRecentCardActivity, resetCardActivity, setShownMemberActivity, deleteBoardActivity,
 getAllCardActivity, fetchFirstPageBoardActivity, fetchAllBoardActivity,
 setAllBoardActivityShown, resetAllBoardActivity } from './activity';

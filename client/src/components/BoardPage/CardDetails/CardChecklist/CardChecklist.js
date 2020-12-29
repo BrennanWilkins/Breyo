@@ -9,20 +9,20 @@ import ProgressBar from './ProgressBar/ProgressBar';
 import Item from './ChecklistItem/ChecklistItem';
 import AddItem from './AddItem/AddItem';
 import { deleteChecklist, toggleChecklistItemIsComplete, deleteChecklistItem,
-editChecklistItem } from '../../../../store/actions';
+editChecklistItem, checklistDndHandler } from '../../../../store/actions';
 import EditChecklistTitle from './EditChecklistTitle/EditChecklistTitle';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 const CardChecklist = props => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
-  const [shownItems, setShownItems] = useState(props.items);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [hideCompleted, setHideCompleted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showEditTitle, setShowEditTitle] = useState(false);
 
   useEffect(() => {
-    if (hideCompleted) { setShownItems(props.items.filter(item => !item.isComplete)); }
-    else { setShownItems(props.items); }
+    if (hideCompleted) { setFilteredItems(props.items.filter(item => !item.isComplete)); }
   }, [props.items, hideCompleted]);
 
   useEffect(() => {
@@ -48,6 +48,20 @@ const CardChecklist = props => {
     props.editItem(title, itemID, props.checklistID);
   };
 
+  const onDragEndHandler = ({ source, destination, draggableId }) => {
+    // item dropped in invalid place
+    if (!destination) { return; }
+    // item dropped in same place
+    if (source.index === destination.index) { return; }
+    // if completed items hidden, find correct index of item
+    let sourceIndex = hideCompleted ? props.items.findIndex(item => item.itemID === draggableId) : source.index;
+    let destIndex = destination.index;
+    destIndex = hideCompleted ? destIndex + props.items.length - filteredItems.length : destIndex;
+    props.dndHandler(sourceIndex, destIndex, props.checklistID);
+  };
+
+  const shownItems = hideCompleted ? filteredItems : props.items;
+
   return (
     <div>
       <div className={classes.TitleContainer}>
@@ -66,12 +80,21 @@ const CardChecklist = props => {
         </div>}
       </div>
       <ProgressBar progress={progress} />
-      {shownItems.map(item => (
-        <Item key={item.itemID} {...item}
-          toggleItemComplete={() => toggleItemCompleteHandler(item.itemID)}
-          deleteItem={() => deleteItemHandler(item.itemID)}
-          editItem={title => editItemHandler(title, item.itemID)} />
-      ))}
+      <DragDropContext onDragEnd={onDragEndHandler}>
+        <Droppable droppableId={props.checklistID} direction="vertical" type="list">
+          {(provided, snapshot) => (
+            <div ref={provided.innerRef}>
+              {shownItems.map((item, i) => (
+                <Item key={item.itemID} {...item} index={i} itemID={item.itemID}
+                  toggleItemComplete={() => toggleItemCompleteHandler(item.itemID)}
+                  deleteItem={() => deleteItemHandler(item.itemID)}
+                  editItem={title => editItemHandler(title, item.itemID)} />
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
       {!showAddItem && <div className={classes.AddBtn}><ActionBtn clicked={() => setShowAddItem(true)}>Add an item</ActionBtn></div>}
       {showAddItem && <AddItem close={() => setShowAddItem(false)} checklistID={props.checklistID} />}
     </div>
@@ -85,14 +108,16 @@ CardChecklist.propTypes = {
   checklistID: PropTypes.string.isRequired,
   toggleItem: PropTypes.func.isRequired,
   deleteItem: PropTypes.func.isRequired,
-  editItem: PropTypes.func.isRequired
+  editItem: PropTypes.func.isRequired,
+  dndHandler: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
   delete: checklistID => dispatch(deleteChecklist(checklistID)),
   toggleItem: (itemID, checklistID) => dispatch(toggleChecklistItemIsComplete(itemID, checklistID)),
   deleteItem: (itemID, checklistID) => dispatch(deleteChecklistItem(itemID, checklistID)),
-  editItem: (title, itemID, checklistID) => dispatch(editChecklistItem(title, itemID, checklistID))
+  editItem: (title, itemID, checklistID) => dispatch(editChecklistItem(title, itemID, checklistID)),
+  dndHandler: (sourceIndex, destIndex, checklistID) => dispatch(checklistDndHandler(sourceIndex, destIndex, checklistID))
 });
 
 export default connect(null, mapDispatchToProps)(CardChecklist);
