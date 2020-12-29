@@ -10,7 +10,7 @@ const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 const { format } = require('date-fns');
 const isThisYear = require('date-fns/isThisYear');
-const { LABEL_COLORS } = require('./constants');
+const { LABEL_COLORS } = require('./utils');
 
 // authorization: member
 // create a new card

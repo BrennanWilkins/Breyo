@@ -13,7 +13,7 @@ const Activity = require('../models/activity');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const { getJWTPayload, getLeanJWTPayload } = require('./auth');
-const { COLORS, PHOTO_IDS } = require('./constants');
+const { COLORS, PHOTO_IDS } = require('./utils');
 
 const signNewToken = async (user, oldToken, getLean) => {
   // used to update user's jwt token when new board created or joined, or user promoted/demoted to/from admin
@@ -66,7 +66,7 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
         data.boards = user.boards;
         data.token = token;
       }
-      
+
       // board stores max 200 past actions, if over 250 actions then delete ones over 200
       if (activityCount > 250) {
         const allActivity = await Activity.find({ boardID }).sort('-date').skip(200).select('_id').lean();

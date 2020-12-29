@@ -10,8 +10,7 @@ const validate = require('../middleware/validate');
 const List = require('../models/list');
 const Board = require('../models/board');
 const nodemailer = require('nodemailer');
-const cloudinary = require('cloudinary').v2;
-const sharp = require('sharp');
+const { resizeImg, cloudinary } = require('./utils');
 
 const getJWTPayload = user => {
   // create jwt sign payload for easier user data lookup
@@ -276,30 +275,17 @@ router.post('/forgotPassword', validate([body('recoverPassID').not().isEmpty(), 
   }
 );
 
-cloudinary.config({
-  cloud_name: config.get('CLOUDINARY_NAME'),
-  api_key: config.get('CLOUDINARY_API_KEY'),
-  api_secret: config.get('CLOUDINARY_API_SECRET')
-});
-
 router.post('/avatar', auth, validate([body('avatar').not().isEmpty()]),
   async (req, res) => {
     try {
-      // convert image to buffer, resize, & convert back to base64
-      let parts = req.body.avatar.split(';');
-      let mimType = parts[0].split(':')[1];
-      let imageData = parts[1].split(',')[1];
-      let img = Buffer(imageData, 'base64');
-      let resizedImageBuffer = await sharp(img).resize(150, 150).withMetadata().toBuffer();
-      let resizedImageData = resizedImageBuffer.toString('base64');
-      let avatar = `data:${mimType};base64,${resizedImageData}`;
+      const avatar = await resizeImg(req.body.avatar);
 
-      const data = await cloudinary.uploader.upload(avatar);
+      const data = await cloudinary.upload(avatar);
       const url = data.secure_url;
       const user = await User.findByIdAndUpdate(req.userID, { avatar: url }).select('avatar').lean();
       if (user.avatar) {
         // delete old avatar picture
-        await cloudinary.uploader.destroy(user.avatar.slice(user.avatar.lastIndexOf('/') + 1, user.avatar.lastIndexOf('.')));
+        await cloudinary.destroy(user.avatar.slice(user.avatar.lastIndexOf('/') + 1, user.avatar.lastIndexOf('.')));
       }
 
       res.status(200).json({ url });
@@ -311,7 +297,7 @@ router.delete('/avatar', auth,
   async (req, res) => {
     try {
       const user = await User.findByIdAndUpdate(req.userID, { avatar: null }).select('avatar').lean();
-      await cloudinary.uploader.destroy(user.avatar.slice(user.avatar.lastIndexOf('/') + 1, user.avatar.lastIndexOf('.')));
+      await cloudinary.destroy(user.avatar.slice(user.avatar.lastIndexOf('/') + 1, user.avatar.lastIndexOf('.')));
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }

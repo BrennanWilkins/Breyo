@@ -1,6 +1,3 @@
-const jwt = require('jsonwebtoken');
-const config = require('config');
-
 // verify that user is a member of the board
 const useIsMember = (req, res, next) => {
   // boardID may be sent in body or in params

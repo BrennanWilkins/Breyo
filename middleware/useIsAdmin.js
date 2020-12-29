@@ -1,6 +1,3 @@
-const jwt = require('jsonwebtoken');
-const config = require('config');
-
 // verify that the user is an admin of the board
 const useIsAdmin = (req, res, next) => {
   // boardID may be sent in body or in params
