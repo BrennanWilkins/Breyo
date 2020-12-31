@@ -19,3 +19,4 @@ getAllCardActivity, fetchFirstPageBoardActivity, fetchAllBoardActivity,
 setAllBoardActivityShown, resetAllBoardActivity } from './activity';
 export { addTitleSearchQuery, addDueDateSearchQuery, addMemberSearchQuery, addLabelSearchQuery,
 resetSearchQuery } from './cardSearchQueries';
+export { createTeam } from './team';

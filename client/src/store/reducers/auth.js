@@ -14,7 +14,9 @@ const initialState = {
   signupLoading: false,
   signupErr: false,
   signupErrMsg: '',
-  autoLoginLoading: false
+  autoLoginLoading: false,
+  teams: [],
+  teamInvites: []
 };
 
 const reducer = (state = initialState, action) => {
@@ -39,6 +41,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.AUTO_LOGIN_LOADING: return { ...state, autoLoginLoading: action.bool };
     case actionTypes.CHANGE_AVATAR: return { ...state, avatar: action.url };
     case actionTypes.DELETE_AVATAR: return { ...state, avatar: null };
+    case actionTypes.CREATE_TEAM: return { ...state, teams: [...state.teams, action.team] };
     default: return state;
   }
 };
