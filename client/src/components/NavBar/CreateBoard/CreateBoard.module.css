@@ -110,7 +110,7 @@
   transform: rotate(90deg);
 }
 .BoardTeam {
-  color: white;
+  color: rgba(255,255,255,0.8);
   border-radius: 4px;
   background: rgb(255,255,255,0.3);
   display: inline-flex;

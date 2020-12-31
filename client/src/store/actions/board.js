@@ -10,10 +10,22 @@ export const createBoard = (title, color) => async dispatch => {
     const { token, board } = res.data;
     axios.defaults.headers.common['x-auth-token'] = token;
     localStorage['token'] = token;
-    dispatch({ type: actionTypes.CREATE_BOARD, payload: board });
+    dispatch({ type: actionTypes.CREATE_BOARD, board });
   } catch (err) {
     let msg = err.response && err.response.data.msg ? err.response.data.msg : 'Your board could not be created.';
     dispatch(addNotif(msg));
+  }
+};
+
+export const createTeamBoard = (title, color, teamID) => async dispatch => {
+  try {
+    const res = await axios.post('/board/teamBoard', { title, color, teamID });
+    const { token, board } = res.data;
+    axios.defaults.headers.common['x-auth-token'] = token;
+    localStorage['token'] = token;
+    dispatch({ type: actionTypes.CREATE_TEAM_BOARD, board });
+  } catch (err) {
+    dispatch(addNotif('Your board could not be created.'));
   }
 };
 

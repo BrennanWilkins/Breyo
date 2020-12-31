@@ -5,7 +5,7 @@ import { useModalToggle } from '../../../utils/customHooks';
 import Button, { CloseBtn } from '../../UI/Buttons/Buttons';
 import { checkIcon, dotsIcon, teamIcon, personIcon } from '../../UI/icons';
 import { connect } from 'react-redux';
-import { createBoard } from '../../../store/actions';
+import { createBoard, createTeamBoard } from '../../../store/actions';
 import { COLORS, PHOTO_IDS, getPhotoURL } from '../../../utils/backgrounds';
 import BackgroundModal from './BackgroundModal/BackgroundModal';
 
@@ -28,6 +28,7 @@ const CreateBoard = props => {
   const submitHandler = () => {
     if (boardTitle === '' || boardTitle.length > 100) { return; }
     props.close();
+    props.teamID ? props.createTeamBoard(boardTitle, boardBackground, props.teamID) :
     props.createBoard(boardTitle, boardBackground);
   };
 
@@ -79,7 +80,8 @@ CreateBoard.propTypes = {
   close: PropTypes.func.isRequired,
   createBoard: PropTypes.func.isRequired,
   teamID: PropTypes.string,
-  teamTitle: PropTypes.string
+  teamTitle: PropTypes.string,
+  createTeamBoard: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -88,7 +90,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  createBoard: (title, color) => dispatch(createBoard(title, color))
+  createBoard: (title, color) => dispatch(createBoard(title, color)),
+  createTeamBoard: (title, color, teamID) => dispatch(createTeamBoard(title, color, teamID))
 });
 
-export default connect(null, mapDispatchToProps)(CreateBoard);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateBoard);

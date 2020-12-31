@@ -13,7 +13,7 @@ export const authReset = () => ({ type: actionTypes.AUTH_RESET });
 export const getUserData = () => async dispatch => {
   try {
     const res = await axios.get('/auth/userData');
-    dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: res.data.invites, boards: res.data.boards })
+    dispatch({ type: actionTypes.UPDATE_USER_DATA, ...res.data });
   } catch (err) {
     dispatch(addNotif('There was an error while retrieving your data.'));
   }
