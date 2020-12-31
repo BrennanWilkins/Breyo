@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { createTeam } from '../../../store/actions';
 import { useHistory } from 'react-router';
 import { scrumBoard } from '../../UI/illustrations';
-// import { checkURL } from '../../../utils/teamValidation';
+import { checkURL } from '../../../utils/teamValidation';
 
 const CreateTeam = props => {
   const history = useHistory();
@@ -29,8 +29,8 @@ const CreateTeam = props => {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       if (url === '') { return; }
-      // const urlIsValid = checkURL(url);
-      // if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
+      const urlIsValid = checkURL(url);
+      if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
       axios.get('/team/checkURL/' + url).then(res => {
         if (res.data.urlTaken) { setUrlErrMsg('That URL is already taken.'); }
       });
@@ -38,8 +38,8 @@ const CreateTeam = props => {
   }, [url]);
 
   const submitHandler = () => {
-    // const urlIsValid = checkURL(url);
-    // if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
+    const urlIsValid = checkURL(url);
+    if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
     if (title.length > 100) { return setErrMsg('Your team name cannot be over 100 characters.'); }
     if (desc.length > 400) { return setErrMsg('Your team description cannot be over 400 characters.'); }
     setLoading(true);
