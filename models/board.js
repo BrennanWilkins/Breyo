@@ -7,7 +7,8 @@ const BoardSchema = new Schema({
   title: String,
   color: String,
   desc: String,
-  creatorEmail: String
+  creatorEmail: String,
+  teamID: String
 });
 
 module.exports = mongoose.model('Board', BoardSchema);

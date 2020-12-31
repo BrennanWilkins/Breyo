@@ -14,6 +14,7 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const { getJWTPayload, getLeanJWTPayload } = require('./auth');
 const { COLORS, PHOTO_IDS } = require('./utils');
+const Team = require('../models/team');
 
 const signNewToken = async (user, oldToken, getLean) => {
   // used to update user's jwt token when new board created or joined, or user promoted/demoted to/from admin
@@ -59,7 +60,8 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
           title: board.title,
           color: board.color,
           isStarred: user.starredBoards.includes(String(board._id)),
-          isAdmin: user.adminBoards.includes(String(board._id))
+          isAdmin: user.adminBoards.includes(String(board._id)),
+          teamID: board.teamID
         }));
         const token = await signNewToken(user, req.header('x-auth-token'), false);
         data.invites = user.invites;
@@ -89,7 +91,7 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
       if (!user) { throw 'No user data found'; }
 
       // user is admin of new board by default
-      const board = new Board({ title, members: [req.userID], admins: [req.userID], color, creatorEmail: user.email, desc: '' });
+      const board = new Board({ title, members: [req.userID], admins: [req.userID], color, creatorEmail: user.email, desc: '', teamID: null });
       const boardID = board._id;
 
       // add board to user's boards
@@ -340,7 +342,8 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
         title: board.title,
         color: board.color,
         isStarred: user.starredBoards.includes(boardID),
-        isAdmin: user.adminBoards.includes(boardID)
+        isAdmin: user.adminBoards.includes(boardID),
+        teamID: board.teamID
       }));
 
       res.status(200).json({ token, newActivity, boards: updatedUser.boards, invites: updatedUser.invites });
@@ -395,6 +398,8 @@ router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIs
       const boardID = req.params.boardID;
       const board = await Board.findByIdAndDelete(boardID).select('members');
       if (!board) { throw 'No board data found'; }
+
+      if (board.teamID) { await Team.updateOne({ _id: board.teamID }, { $pull: { boards: board._id } }); }
 
       await Promise.all([
         User.updateMany({ _id: { $in: board.members }}, { $pull: { boards: board._id, adminBoards: boardID, starredBoards: boardID } }),
@@ -452,3 +457,4 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
 );
 
 module.exports = router;
+module.exports.signNewToken = signNewToken;

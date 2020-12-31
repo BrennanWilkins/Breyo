@@ -19,18 +19,6 @@ const addActivity = async (data, req) => {
   } catch (err) { return new Error('Error adding activity'); }
 };
 
-// adds many new activity docs at once
-const addActivities = async (actions, boardID) => {
-  try {
-    const activities = await Activity.insertMany(actions);
-
-    const allActivity = await Activity.find({ boardID }).sort('-date').skip(200);
-    for (let oldAction of allActivity) { oldAction.remove(); }
-
-    return activities;
-  } catch(err) { return new Error('Error adding activities'); }
-};
-
 // authorization: member
 // returns last 20 board actions
 router.get('/recent/board/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMember,
@@ -142,4 +130,3 @@ router.get('/myActivity/:page', auth, validate([param('page').isInt()]),
 
 module.exports = router;
 module.exports.addActivity = addActivity;
-module.exports.addActivities = addActivities;

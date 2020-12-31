@@ -11,6 +11,7 @@ const List = require('../models/list');
 const Board = require('../models/board');
 const nodemailer = require('nodemailer');
 const { resizeImg, cloudinary } = require('./utils');
+const Team = require('../models/team');
 
 const getJWTPayload = user => {
   // create jwt sign payload for easier user data lookup
@@ -20,7 +21,12 @@ const getJWTPayload = user => {
     userMembers[board.boardID] = true;
     if (board.isAdmin) { userAdmins[board.boardID] = true; }
   }
-  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins };
+  const userTeams = {};
+  for (let team of user.teams) {
+    if (team._id) { userTeams[team._id] = true; }
+    else { userTeams[team] = true; }
+  }
+  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins, userTeams };
 };
 
 const getLeanJWTPayload = user => {
@@ -29,24 +35,31 @@ const getLeanJWTPayload = user => {
   const userAdmins = {};
   for (let boardID of user.boards) { userMembers[boardID] = true; }
   for (let boardID of user.adminBoards) { userAdmins[boardID] = true; }
-  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins };
+  const userTeams = {};
+  for (let team of user.teams) {
+    if (team._id) { userTeams[team._id] = true; }
+    else { userTeams[team] = true; }
+  }
+  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins, userTeams };
 };
 
-// returns a user's boards & invites to be used on dashboard page
+// returns a user's boards/invites/teams to be used on dashboard page
 router.get('/userData', auth,
   async (req, res) => {
     try {
-      const user = await User.findById(req.userID).populate('boards', 'title color').lean();
+      const user = await User.findById(req.userID).populate('boards', 'title color').populate('teams', 'title boards').lean();
+      if (!user) { throw 'user data not found'; }
+
       user.boards = user.boards.map(board => ({
         boardID: board._id,
         title: board.title,
         color: board.color,
         isStarred: user.starredBoards.includes(String(board._id)),
-        isAdmin: user.adminBoards.includes(String(board._id))
+        isAdmin: user.adminBoards.includes(String(board._id)),
+        teamID: board.teamID
       }));
 
-      if (!user) { throw 'user data not found'; }
-      res.status(200).json({ boards: user.boards, invites: user.invites });
+      res.status(200).json({ boards: user.boards, invites: user.invites, teams: user.teams, teamInvites: user.teamInvites });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -58,14 +71,7 @@ router.post('/login', validate(
   async (req, res) => {
     try {
       const { email, password } = req.body;
-      const user = await User.findOne({ email }).populate('boards', 'title color').lean();
-      user.boards = user.boards.map(board => ({
-        boardID: board._id,
-        title: board.title,
-        color: board.color,
-        isStarred: user.starredBoards.includes(String(board._id)),
-        isAdmin: user.adminBoards.includes(String(board._id))
-      }));
+      const user = await User.findOne({ email }).populate('boards', 'title color').populate('teams', 'title boards').lean();
 
       // return 400 error if no user found
       if (!user) { return res.status(400).json({ msg: 'Incorrect username or password.' }); }
@@ -74,13 +80,24 @@ router.post('/login', validate(
       const same = await bcryptjs.compare(password, user.password);
       if (!same) { return res.status(400).json({ msg: 'Incorrect email or password.' }); }
 
+      user.boards = user.boards.map(board => ({
+        boardID: board._id,
+        title: board.title,
+        color: board.color,
+        isStarred: user.starredBoards.includes(String(board._id)),
+        isAdmin: user.adminBoards.includes(String(board._id)),
+        teamID: board.teamID
+      }));
+
       // create jwt token that expires in 7 days
       const jwtPayload = getJWTPayload(user);
       const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
 
       if (user.recoverPassID) { await User.updateOne({ _id: req.userID }, { recoverPassID: null }); }
 
-      res.status(200).json({ token, fullName: user.fullName, email, invites: user.invites, boards: user.boards, avatar: user.avatar });
+      const { fullName, invites, boards, avatar, teams, teamInvites } = user;
+
+      res.status(200).json({ token, fullName, email, invites, boards, avatar, teams, teamInvites });
     } catch(err) { return res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
 );
@@ -109,7 +126,7 @@ router.post('/signup', validate(
       const hashedPassword = await bcryptjs.hash(password, 10);
 
       const user = new User({ email, password: hashedPassword, fullName, invites: [], boards: [],
-        adminBoards: [], starredBoards: [], recoverPassID: null, avatar: null });
+        adminBoards: [], starredBoards: [], recoverPassID: null, avatar: null, teams: [] });
       await user.save();
 
       // signup was successful, login
@@ -117,7 +134,7 @@ router.post('/signup', validate(
       const jwtPayload = getJWTPayload(user);
       const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
 
-      res.status(200).json({ token, email, fullName, invites: [], boards: [] });
+      res.status(200).json({ token, email, fullName, invites: [], boards: [], teams: [], teamInvites: [] });
     } catch(err) { res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
 );
@@ -126,19 +143,23 @@ router.post('/signup', validate(
 router.post('/autoLogin', auth,
   async (req, res) => {
     try {
-      const user = await User.findById(req.userID).populate('boards', 'title color').lean();
+      const user = await User.findById(req.userID).populate('boards', 'title color').populate('teams', 'title boards').lean();
+      if (!user) { throw 'User data not found'; }
+
       user.boards = user.boards.map(board => ({
         boardID: board._id,
         title: board.title,
         color: board.color,
         isStarred: user.starredBoards.includes(String(board._id)),
-        isAdmin: user.adminBoards.includes(String(board._id))
+        isAdmin: user.adminBoards.includes(String(board._id)),
+        teamID: board.teamID
       }));
 
-      if (!user) { throw 'User data not found'; }
       if (user.recoverPassID) { await User.updateOne({ _id: req.userID }, { recoverPassID: null }); }
 
-      res.status(200).json({ email: user.email, fullName: user.fullName, invites: user.invites, boards: user.boards, avatar: user.avatar });
+      const { email, fullName, invites, boards, avatar, teams, teamInvites } = user;
+
+      res.status(200).json({ email, fullName, invites, boards, avatar, teams, teamInvites });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -211,6 +232,8 @@ router.delete('/deleteAccount/:password', auth, validate([param('password').not(
           }
         }
       }
+      await Team.updateMany({ _id: { $in: user.teams }}, { $pull: { members: user._id }});
+
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }

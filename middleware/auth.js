@@ -17,6 +17,7 @@ module.exports = (req, res, next) => {
       req.fullName = decoded.user.fullName;
       req.userMembers = decoded.user.userMembers;
       req.userAdmins = decoded.user.userAdmins;
+      req.userTeams = decoded.user.userTeams;
 
       next();
     });

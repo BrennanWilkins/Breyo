@@ -10,6 +10,7 @@ const cardRouter = require('./routes/card');
 const activityRouter = require('./routes/activity');
 const jwt = require('jsonwebtoken');
 const socketRoutes = require('./routes/socket');
+const teamRouter = require('./routes/team');
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use('/api/board', boardRouter);
 app.use('/api/list', listRouter);
 app.use('/api/card', cardRouter);
 app.use('/api/activity', activityRouter);
+app.use('/api/team', teamRouter);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'));

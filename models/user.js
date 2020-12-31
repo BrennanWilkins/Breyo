@@ -6,11 +6,13 @@ const UserSchema = new Schema({
   password: String,
   fullName: String,
   invites: [],
+  teamInvites: [],
   boards: [{ type: Schema.Types.ObjectId, ref: 'Board' }],
   adminBoards: [String],
   starredBoards: [String],
   recoverPassID: String,
-  avatar: String
+  avatar: String,
+  teams: [{ type: Schema.Types.ObjectId, ref: 'Team' }]
 });
 
 UserSchema.index({ email: 1 });
