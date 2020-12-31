@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { updateBoardTitle, toggleIsStarred, openRoadmap, closeRoadmap } from '../../../store/actions';
 import AutosizeInput from 'react-input-autosize';
 import Button, { AccountBtn } from '../../UI/Buttons/Buttons';
-import { starIcon, dotsIcon, roadmapIcon, boardIcon, adminIcon } from '../../UI/icons';
+import { starIcon, dotsIcon, roadmapIcon, boardIcon, adminIcon, teamIcon } from '../../UI/icons';
 import InviteModal from '../InviteModal/InviteModal';
 import BoardMenu from '../BoardMenu/BoardMenu';
 import MemberModal from '../MemberModal/MemberModal';
@@ -80,6 +80,7 @@ const BoardNavBar = props => {
         <span className={classes.Btn}><Button clicked={() => setShowInviteModal(true)}>Invite</Button></span>
         {showInviteModal && <InviteModal boardID={props.boardID} close={() => setShowInviteModal(false)} />}
       </span>
+      {props.team.teamID && <span className={`${classes.Btn} ${classes.TeamBtn}`}><Button>{teamIcon}<div>{props.team.title}</div></Button></span>}
       <span className={classes.MenuBtns}>
         {props.cardsAreFiltered && <QueryCountBtn openMenu={openSearchHandler} />}
         <span className={`${classes.Btn} ${classes.RoadBtn} ${props.roadmapShown ? classes.RoadBtn2 : ''}`}>
@@ -107,7 +108,8 @@ BoardNavBar.propTypes = {
   closeRoadmap: PropTypes.func.isRequired,
   roadmapShown: PropTypes.bool.isRequired,
   color: PropTypes.string.isRequired,
-  cardsAreFiltered: PropTypes.bool.isRequired
+  cardsAreFiltered: PropTypes.bool.isRequired,
+  team: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -119,7 +121,8 @@ const mapStateToProps = state => ({
   userIsAdmin: state.board.userIsAdmin,
   roadmapShown: state.board.roadmapShown,
   color: state.board.color,
-  cardsAreFiltered: state.lists.cardsAreFiltered
+  cardsAreFiltered: state.lists.cardsAreFiltered,
+  team: state.board.team
 });
 
 const mapDispatchToProps = dispatch => ({

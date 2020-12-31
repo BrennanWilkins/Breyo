@@ -15,7 +15,8 @@ const initialState = {
   showCreateBoard: false,
   createBoardTeamID: null,
   createBoardTeamTitle: null,
-  avatars: {}
+  avatars: {},
+  team: { teamID: null, title: '', url: '' }
 };
 
 const reducer = (state = initialState, action) => {
@@ -52,7 +53,8 @@ const updateActiveBoard = (state, action) => ({
   creator: action.payload.creator,
   desc: action.payload.desc,
   isStarred: action.payload.isStarred,
-  userIsAdmin: action.payload.userIsAdmin
+  userIsAdmin: action.payload.userIsAdmin,
+  team: action.payload.team
 });
 
 const addAdmin = (state, action) => {

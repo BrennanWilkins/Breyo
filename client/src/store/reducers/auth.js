@@ -60,7 +60,8 @@ const login = (state, action) => ({
   signupLoading: false,
   signupErr: false,
   signupErrMsg: '',
-  avatar: action.payload.avatar
+  avatar: action.payload.avatar,
+  teams: action.payload.teams.map(team => ({ teamID: team._id, title: team.title, boards: team.boards, url: team.url })),
 });
 
 const loginLoading = (state, action) => ({

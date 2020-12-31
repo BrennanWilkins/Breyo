@@ -62,11 +62,18 @@ const formatCardData = card => {
 };
 
 export const updateActiveBoard = data => (dispatch, getState) => {
-  const { _id: boardID, members, desc, creatorEmail, color, title, activity } = data;
+  const { _id: boardID, members, desc, creatorEmail, color, title, activity, teamID } = data;
   const state = getState();
   const activeBoard = state.auth.boards.find(board => board.boardID === boardID);
   let { isStarred, isAdmin: userIsAdmin } = activeBoard;
   const { isAdmin, ...creator} = data.members.find(member => member.email === creatorEmail);
+
+  let team = { teamID, title: '', url: '' };
+  if (teamID) {
+    const teamData = state.auth.teams.find(team => team.teamID === teamID);
+    team.title = teamData.title;
+    team.url = teamData.url;
+  }
 
   if (data.invites && data.boards) {
     const userEmail = state.auth.email;
@@ -76,7 +83,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
 
   if (data.token) { axios.defaults.headers.common['x-auth-token'] = data.token; }
 
-  const boardPayload = { isStarred, creator, userIsAdmin, title, members, color, boardID, desc };
+  const boardPayload = { isStarred, creator, userIsAdmin, title, members, color, boardID, desc, team };
   dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload: boardPayload });
 
   const avatars = {};

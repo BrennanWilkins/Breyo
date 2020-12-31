@@ -115,3 +115,13 @@
   right: 2px;
   color: rgb(85,85,85);
 }
+.TeamBtn svg {
+  margin: 0 5px 0 2px;
+}
+.TeamBtn div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 250px;
+  margin-right: 5px;
+}
