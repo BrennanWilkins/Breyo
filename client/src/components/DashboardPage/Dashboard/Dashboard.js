@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { getUserData } from '../../../store/actions';
 import BoardList from '../BoardList/BoardList';
 import { personIcon, starIcon } from '../../UI/icons';
+import TeamNavBar from '../TeamNavBar/TeamNavBar';
 
 const Dashboard = props => {
   useEffect(() => props.getUserData(), []);
@@ -17,18 +18,26 @@ const Dashboard = props => {
       <div className={classes.Title}>{starIcon} Starred Boards</div>
       <BoardList boards={starredBoards} /></>}
       <div className={classes.Title}>{personIcon} My Boards</div>
-      <BoardList boards={props.boards} isMyBoards />
+      <BoardList boards={props.boards.filter(board => !board.teamID)} createPersonal />
+      {props.teams.map(team => (
+        <div key={team.teamID}>
+          <TeamNavBar title={team.title} url={team.url} teamID={team.teamID} />
+          <BoardList boards={props.boards.filter(board => board.teamID === team.teamID)} teamID={team.teamID} teamTitle={team.title} />
+        </div>
+      ))}
     </div>
   );
 };
 
 Dashboard.propTypes = {
   getUserData: PropTypes.func.isRequired,
-  boards: PropTypes.array.isRequired
+  boards: PropTypes.array.isRequired,
+  teams: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
-  boards: state.auth.boards
+  boards: state.auth.boards,
+  teams: state.auth.teams
 });
 
 const mapDispatchToProps = dispatch => ({

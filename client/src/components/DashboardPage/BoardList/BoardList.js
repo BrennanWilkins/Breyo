@@ -2,13 +2,13 @@ import React from 'react';
 import classes from './BoardList.module.css';
 import { connect } from 'react-redux';
 import { starIcon } from '../../UI/icons';
-import { toggleIsStarred, toggleCreateBoard } from '../../../store/actions';
+import { toggleIsStarred, toggleCreateBoard, openCreateTeamBoard } from '../../../store/actions';
 import { useHistory } from 'react-router';
 import PropTypes from 'prop-types';
 import { getPhotoURL } from '../../../utils/backgrounds';
 
 const BoardList = props => {
-  let history = useHistory();
+  const history = useHistory();
 
   const navHandler = boardID => {
     history.push('/board/' + boardID);
@@ -29,7 +29,10 @@ const BoardList = props => {
           <div onClick={e => starClickHandler(e, board.boardID)} className={board.isStarred ? classes.Starred : classes.NotStarred}>{starIcon}</div>
         </div>
       ))}
-      {props.isMyBoards && <div className={classes.CreateBoard} onClick={props.toggleCreateBoard}>
+      {props.createPersonal && <div className={classes.CreateBoard} onClick={props.toggleCreateBoard}>
+        <div className={classes.CreateText}>Create a new board</div>
+      </div>}
+      {props.teamID && <div className={classes.CreateBoard} onClick={() => props.openCreateTeamBoard(props.teamID, props.teamTitle)}>
         <div className={classes.CreateText}>Create a new board</div>
       </div>}
     </div>
@@ -39,13 +42,17 @@ const BoardList = props => {
 BoardList.propTypes = {
   toggleIsStarred: PropTypes.func.isRequired,
   boards: PropTypes.array.isRequired,
-  isMyBoards: PropTypes.bool,
-  toggleCreateBoard: PropTypes.func.isRequired
+  createPersonal: PropTypes.bool,
+  toggleCreateBoard: PropTypes.func.isRequired,
+  teamID: PropTypes.string,
+  teamTitle: PropTypes.string,
+  openCreateTeamBoard: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
   toggleIsStarred: boardID => dispatch(toggleIsStarred(boardID)),
-  toggleCreateBoard: () => dispatch(toggleCreateBoard())
+  toggleCreateBoard: () => dispatch(toggleCreateBoard()),
+  openCreateTeamBoard: (teamID, teamTitle) => dispatch(openCreateTeamBoard(teamID, teamTitle))
 });
 
 export default connect(null, mapDispatchToProps)(BoardList);
