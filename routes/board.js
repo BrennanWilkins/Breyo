@@ -7,6 +7,7 @@ const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsAdmin = require('../middleware/useIsAdmin');
 const useIsMember = require('../middleware/useIsMember');
+const useIsTeamMember = require('../middleware/useIsTeamMember');
 const List = require('../models/list');
 const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
@@ -80,7 +81,7 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
   }
 );
 
-// create a new board w given title/background
+// create a new personal board w given title/background
 router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 100 }), body('color').not().isEmpty()], 'Please enter a valid title.'),
   async (req, res) => {
     try {
@@ -95,8 +96,8 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
       const boardID = board._id;
 
       // add board to user's boards
-      user.boards.unshift(boardID);
-      user.adminBoards.unshift(boardID);
+      user.boards.push(boardID);
+      user.adminBoards.push(boardID);
 
       const newBoard = { boardID, title, isStarred: false, isAdmin: true, color };
 
@@ -112,6 +113,50 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
         board.save(),
         user.save(),
         List.insertMany([list1, list2, list3]),
+        addActivity(actionData, req)
+      ]);
+
+      const token = results[0];
+
+      res.status(200).json({ board: newBoard, token });
+    } catch(err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: team member
+// create a new team board w given title/background
+router.post('/teamBoard', auth, validate([
+  body('title').trim().isLength({ min: 1, max: 100 }),
+  body('color').not().isEmpty(),
+  body('teamID').isMongoId()]),
+  useIsTeamMember,
+  async (req, res) => {
+    try {
+      let { color, title, teamID } = req.body;
+      // if invalid background then default to red
+      if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { color = COLORS[0]; }
+      const [user, team] = await Promise.all([User.findById(req.userID), Team.findById(teamID)]);
+      if (!user || !team) { throw 'No user or team data found'; }
+
+      // user is admin of new board by default
+      const board = new Board({ title, members: [req.userID], admins: [req.userID], color, creatorEmail: user.email, desc: '', teamID });
+      const boardID = board._id;
+
+      // add board to user's boards
+      user.boards.push(boardID);
+      user.adminBoards.push(boardID);
+      // add board to team's boards
+      team.boards.push(boardID);
+
+      const newBoard = { boardID, title, isStarred: false, isAdmin: true, color, teamID };
+
+      const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID };
+
+      const results = await Promise.all([
+        signNewToken(user, req.header('x-auth-token'), true),
+        board.save(),
+        user.save(),
+        team.save(),
         addActivity(actionData, req)
       ]);
 
