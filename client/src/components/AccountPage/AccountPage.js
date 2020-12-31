@@ -20,8 +20,8 @@ const AccountPage = props => {
     <div className={classes.Container}>
       <AccountHeader email={props.email} fullName={props.fullName} avatar={props.avatar} />
       <div className={classes.Btns}>
-        <Link to="/my-account?view=activity" className={!showSettings ? classes.Active : null}>Activity</Link>
-        <Link to="/my-account?view=settings" className={showSettings ? classes.Active : null}>Settings</Link>
+        <Link to="/my-account?view=activity" className={!showSettings ? classes.Active : classes.Btn}>Activity</Link>
+        <Link to="/my-account?view=settings" className={showSettings ? classes.Active : classes.Btn}>Settings</Link>
       </div>
       {showSettings ? <AccountSettings /> : <UserActivity />}
     </div>

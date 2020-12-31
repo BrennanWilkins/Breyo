@@ -14,9 +14,9 @@
   justify-content: center;
   align-items: center;
 }
-.Btns a {
+.Btn, .Active {
   width: 120px;
-  border-radius: 4px;
+  border-radius: 4px 4px 0 0;
   outline: none;
   border: 0;
   height: 40px;
@@ -29,10 +29,15 @@
   transition: background 200ms;
   color: black;
   text-align: center;
+  position: relative;
+  top: 1px;
+  z-index: 2;
 }
-.Btns a:hover {
+.Btn:hover {
   background: rgb(210,210,210);
 }
 .Active {
-  background: rgb(200,200,200) !important;
+  background: white;
+  border: 1px solid rgb(230, 230, 230);
+  border-bottom-color: white;
 }
