@@ -13,6 +13,8 @@ const initialState = {
   roadmapShown: false,
   shownRoadmapListID: null,
   showCreateBoard: false,
+  createBoardTeamID: null,
+  createBoardTeamTitle: null,
   avatars: {}
 };
 
@@ -35,7 +37,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.OPEN_ROADMAP: return { ...state, roadmapShown: true };
     case actionTypes.SET_SHOWN_ROADMAP_LIST: return { ...state, shownRoadmapListID: action.listID };
     case actionTypes.CLOSE_ROADMAP: return { ...state, roadmapShown: false };
-    case actionTypes.TOGGLE_CREATE_BOARD: return { ...state, showCreateBoard: !state.showCreateBoard };
+    case actionTypes.TOGGLE_CREATE_BOARD: return toggleCreateBoard(state, action);
     case actionTypes.SET_BOARD_AVATARS: return { ...state, avatars: action.avatars };
     default: return state;
   }
@@ -72,6 +74,12 @@ const addBoardMember = (state, action) => {
 const deleteBoardMember = (state, action) => {
   const members = state.members.filter(member => member.email !== action.email);
   return { ...state, members };
+};
+
+const toggleCreateBoard = (state, action) => {
+  const createBoardTeamID = action.teamID || null;
+  const createBoardTeamTitle = action.teamTitle || null;
+  return { ...state, createBoardTeamID, createBoardTeamTitle, showCreateBoard: !state.showCreateBoard };
 };
 
 export default reducer;

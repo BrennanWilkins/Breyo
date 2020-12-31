@@ -12,13 +12,13 @@ const CreateMenu = props => {
   return (
     <div ref={modalRef} className={classes.Container}>
       <ModalTitle title="Create" close={props.close} light />
-      <div className={classes.Option} style={{ marginTop: '5px' }} onClick={() => { props.toggleCreateBoard(); props.close(); }}>
+      <div className={classes.Option} style={{ marginTop: '5px' }} onClick={() => { props.openCreateBoard(); props.close(); }}>
         <div className={classes.Title}>{boardIcon} Create a board</div>
         <div className={classes.Info}>
           A board consists of lists with cards. Boards allow you to track, manage, or organize your projects.
         </div>
       </div>
-      <div className={classes.Option} onClick={() => { props.toggleCreateTeam(); props.close(); }}>
+      <div className={classes.Option} onClick={() => { props.openCreateTeam(); props.close(); }}>
         <div className={classes.Title}>{teamIcon} Create a team</div>
         <div className={classes.Info}>
           A team consists of a group of boards and team members. Teams allow you to organize your organization or project across boards.
@@ -30,8 +30,8 @@ const CreateMenu = props => {
 
 CreateMenu.propTypes = {
   close: PropTypes.func.isRequired,
-  toggleCreateBoard: PropTypes.func.isRequired,
-  toggleCreateTeam: PropTypes.func.isRequired
+  openCreateBoard: PropTypes.func.isRequired,
+  openCreateTeam: PropTypes.func.isRequired
 };
 
 export default CreateMenu;

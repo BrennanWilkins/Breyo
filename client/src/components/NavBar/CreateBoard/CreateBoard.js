@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classes from './CreateBoard.module.css';
 import { useModalToggle } from '../../../utils/customHooks';
 import Button, { CloseBtn } from '../../UI/Buttons/Buttons';
-import { checkIcon, dotsIcon } from '../../UI/icons';
+import { checkIcon, dotsIcon, teamIcon, personIcon } from '../../UI/icons';
 import { connect } from 'react-redux';
 import { createBoard } from '../../../store/actions';
 import { COLORS, PHOTO_IDS, getPhotoURL } from '../../../utils/backgrounds';
@@ -52,6 +52,7 @@ const CreateBoard = props => {
             onChange={e => setBoardTitle(e.target.value)} placeholder="Board title" />
             <CloseBtn close={props.close} color="white" />
           </div>
+          <div className={classes.BoardTeam}>{props.teamID ? teamIcon : personIcon}{props.teamTitle || 'Personal'}</div>
         </div>
         <div className={classes.BackgroundSelect}>
           {options.map(option => (
@@ -76,8 +77,15 @@ const CreateBoard = props => {
 CreateBoard.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
-  createBoard: PropTypes.func.isRequired
+  createBoard: PropTypes.func.isRequired,
+  teamID: PropTypes.string,
+  teamTitle: PropTypes.string
 };
+
+const mapStateToProps = state => ({
+  teamID: state.board.createBoardTeamID,
+  teamTitle: state.board.createBoardTeamTitle
+});
 
 const mapDispatchToProps = dispatch => ({
   createBoard: (title, color) => dispatch(createBoard(title, color))

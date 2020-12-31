@@ -32,7 +32,7 @@ const NavBar = props => {
         <Button clicked={() => setShowCreateMenu(true)}>{plusIcon}</Button>
         <AccountBtn avatar={props.avatar} clicked={() => setShowAccountModal(true)}>{props.fullName[0]}</AccountBtn>
       </div>
-      {showCreateMenu && <CreateMenu close={() => setShowCreateMenu(false)} toggleCreateBoard={props.toggleCreateBoard} toggleCreateTeam={() => setShowCreateTeam(true)} />}
+      {showCreateMenu && <CreateMenu close={() => setShowCreateMenu(false)} openCreateBoard={props.toggleCreateBoard} openCreateTeam={() => setShowCreateTeam(true)} />}
       <CreateBoard show={props.showCreateBoard} close={props.toggleCreateBoard} />
       {showCreateTeam && <CreateTeam close={() => setShowCreateTeam(false)} />}
       <AccountModal show={showAccountModal} close={() => setShowAccountModal(false)} />
