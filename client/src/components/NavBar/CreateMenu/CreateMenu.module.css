@@ -1,0 +1,36 @@
+.Container {
+  position: fixed;
+  top: 45px;
+  right: 5px;
+  width: 300px;
+  background: white;
+  transition: 250ms;
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  padding: 10px 0;
+  box-sizing: border-box;
+  font-size: 15px;
+  overflow: hidden;
+}
+.Option {
+  cursor: pointer;
+  padding: 5px 0;
+}
+.Option:hover {
+  background: rgb(245,245,245);
+}
+.Title {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+}
+.Title svg {
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+}
+.Info {
+  padding: 0 10px;
+  font-size: 13px;
+  color: rgb(120,120,120);
+}
