@@ -53,7 +53,7 @@ const CreateBoard = props => {
             onChange={e => setBoardTitle(e.target.value)} placeholder="Board title" />
             <CloseBtn close={props.close} color="white" />
           </div>
-          <div className={classes.BoardTeam}>{props.teamID ? teamIcon : personIcon}{props.teamTitle || 'Personal'}</div>
+          <div className={classes.BoardTeam}>{props.teamID ? teamIcon : personIcon}<div>{props.teamTitle || 'Personal'}</div></div>
         </div>
         <div className={classes.BackgroundSelect}>
           {options.map(option => (
