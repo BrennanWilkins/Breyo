@@ -11,10 +11,14 @@ import AccountModal from '../AccountModal/AccountModal';
 import SearchBoardMenu from '../SearchBoardMenu/SearchBoardMenu';
 import LogoTitle from '../../UI/LogoTitle/LogoTitle';
 import { toggleCreateBoard } from '../../../store/actions';
+import CreateMenu from '../CreateMenu/CreateMenu';
+import CreateTeam from '../CreateTeam/CreateTeam';
 
 const NavBar = props => {
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showBoardMenu, setShowBoardMenu] = useState(false);
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
+  const [showCreateTeam, setShowCreateTeam] = useState(false);
   const location = useLocation();
 
   return location.pathname === '/help' ? null : (
@@ -25,13 +29,15 @@ const NavBar = props => {
       </div>
       <LogoTitle />
       <div className={classes.Section}>
-        <Button clicked={props.toggleCreateBoard}>{plusIcon}</Button>
+        <Button clicked={() => setShowCreateMenu(true)}>{plusIcon}</Button>
         <AccountBtn avatar={props.avatar} clicked={() => setShowAccountModal(true)}>{props.fullName[0]}</AccountBtn>
       </div>
+      {showCreateMenu && <CreateMenu close={() => setShowCreateMenu(false)} toggleCreateBoard={props.toggleCreateBoard} toggleCreateTeam={() => setShowCreateTeam(true)} />}
       <CreateBoard show={props.showCreateBoard} close={props.toggleCreateBoard} />
+      {showCreateTeam && <CreateTeam close={() => setShowCreateTeam(false)} />}
       <AccountModal show={showAccountModal} close={() => setShowAccountModal(false)} />
       <SearchBoardMenu show={showBoardMenu} close={() => setShowBoardMenu(false)} />
-      {props.showCreateBoard && <div className={classes.Backdrop}></div>}
+      {(props.showCreateBoard || showCreateTeam) && <div className={classes.Backdrop}></div>}
     </div>
   );
 };
