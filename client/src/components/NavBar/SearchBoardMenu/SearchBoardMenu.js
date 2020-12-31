@@ -4,7 +4,7 @@ import classes from './SearchBoardMenu.module.css';
 import { useModalToggle } from '../../../utils/customHooks';
 import { connect } from 'react-redux';
 import { CloseBtn, ExpandBtn } from '../../UI/Buttons/Buttons';
-import { starIcon, personIcon } from '../../UI/icons';
+import { starIcon, personIcon, teamIcon } from '../../UI/icons';
 import BoardRect from './BoardRect/BoardRect';
 import { toggleIsStarred } from '../../../store/actions';
 import { useHistory } from 'react-router';
@@ -16,15 +16,7 @@ const SearchBoardMenu = props => {
   const [expandStarred, setExpandStarred] = useState(true);
   const [expandPersonal, setExpandPersonal] = useState(false);
   const [searchRes, setSearchRes] = useState([]);
-
-  useEffect(() => {
-    if (props.show) {
-      setQuery('');
-      setExpandStarred(true);
-      setExpandPersonal(false);
-      setSearchRes([]);
-    }
-  }, [props.show]);
+  const [expandedTeams, setExpandedTeams] = useState([]);
 
   useEffect(() => {
     const search = queryVal => {
@@ -34,15 +26,23 @@ const SearchBoardMenu = props => {
     if (query !== '') { search(query); }
   }, [query, props.boards]);
 
-  useModalToggle(props.show, modalRef, props.close);
+  useModalToggle(true, modalRef, props.close);
 
   const navHandler = boardID => {
     history.push(`/board/${boardID}`);
     props.close();
   };
 
+  const expandTeamHandler = teamID => {
+    const teams = [...expandedTeams];
+    let idx = teams.indexOf(teamID);
+    if (idx === -1) { teams.push(teamID); }
+    else { teams.splice(idx, 1); }
+    setExpandedTeams(teams);
+  };
+
   return (
-    <div ref={modalRef} className={props.show ? classes.ShowModal : classes.HideModal}>
+    <div ref={modalRef} className={classes.Modal}>
       <div className={classes.SearchDiv}>
         <input className={classes.Input} value={query} onChange={e => setQuery(e.target.value)}
         placeholder="Search boards by title" />
@@ -55,9 +55,23 @@ const SearchBoardMenu = props => {
         <BoardRect {...board} key={board.boardID} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} nav={navHandler} />
       ))}
       <div className={classes.Title}><span>{personIcon} PERSONAL BOARDS</span><ExpandBtn clicked={() => setExpandPersonal(prev => !prev)} expanded={expandPersonal} /></div>
-      {expandPersonal && props.boards.map(board => (
+      {expandPersonal && props.boards.filter(board => !board.teamID).map(board => (
         <BoardRect {...board} key={board.boardID} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} nav={navHandler} />
       ))}
+      {props.teams.map(team => {
+        let expanded = expandedTeams.includes(team.teamID);
+        return (
+          <React.Fragment key={team.teamID}>
+            <div className={classes.Title}>
+              <span>{teamIcon} <div className={classes.TeamTitle}>{team.title}</div></span>
+              <ExpandBtn clicked={() => expandTeamHandler(team.teamID)} expanded={expanded} />
+            </div>
+            {expanded && props.boards.filter(board => board.teamID === team.teamID).map(board => (
+              <BoardRect {...board} key={board.boardID} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} nav={navHandler} />
+            ))}
+          </React.Fragment>
+        );
+      })}
       </> :
       searchRes.map(board => (
         <BoardRect key={board.boardID} {...board} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} nav={navHandler} />
@@ -67,14 +81,15 @@ const SearchBoardMenu = props => {
 };
 
 SearchBoardMenu.propTypes = {
-  show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   boards: PropTypes.array.isRequired,
-  toggleIsStarred: PropTypes.func.isRequired
+  toggleIsStarred: PropTypes.func.isRequired,
+  teams: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
-  boards: state.auth.boards
+  boards: state.auth.boards,
+  teams: state.auth.teams
 });
 
 const mapDispatchToProps = dispatch => ({

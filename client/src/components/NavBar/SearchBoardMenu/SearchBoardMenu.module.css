@@ -1,4 +1,4 @@
-.ShowModal, .HideModal {
+.Modal {
   position: fixed;
   left: 5px;
   top: 45px;
@@ -8,13 +8,8 @@
   overflow-x: hidden;
   background: white;
   box-shadow: var(--box-shadow4);
-  transition: 250ms;
   padding: 5px;
   box-sizing: border-box;
-}
-.HideModal {
-  opacity: 0;
-  visibility: hidden;
 }
 .SearchDiv {
   display: flex;
@@ -47,8 +42,17 @@
 .Title span {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
+}
+.TeamTitle {
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 .Title span svg {
   margin-right: 10px;
   font-size: 18px;
+  min-width: 18px;
 }
