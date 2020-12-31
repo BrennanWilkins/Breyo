@@ -7,7 +7,7 @@ const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsMember = require('../middleware/useIsMember');
 const useIsAdmin = require('../middleware/useIsAdmin');
-const { addActivity, addActivities } = require('./activity');
+const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 
 // authorization: member
@@ -131,7 +131,8 @@ router.post('/copy', auth, validate([
           fullName: req.fullName
         }));
       }
-      const results = await Promise.all([addActivities(actions, boardID), newList.save()]);
+
+      const results = await Promise.all([Activity.insertMany(actions), newList.save()]);
       const activities = results[0];
 
       res.status(200).json({ newList, activities });
@@ -247,7 +248,7 @@ router.put('/archive/allCards', auth, validate([
       list.archivedCards = list.archivedCards.concat(list.cards);
       list.cards = [];
 
-      const results = await Promise.all([addActivities(actionData, boardID), list.save()]);
+      const results = await Promise.all([Activity.insertMany(actionData), list.save()]);
       const activities = results[0];
 
       res.status(200).json({ activities });
