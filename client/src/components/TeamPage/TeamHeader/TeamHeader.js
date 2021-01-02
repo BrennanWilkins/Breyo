@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { ActionBtn } from '../../UI/Buttons/Buttons';
 import { teamIcon, editIcon } from '../../UI/icons';
+import EditTeam from '../EditTeam/EditTeam';
 
 const TeamHeader = props => {
   const [showEditTeam, setShowEditTeam] = useState(false);
@@ -15,11 +16,15 @@ const TeamHeader = props => {
         {teamIcon}
         <div className={classes.ChangeLogo}>Change</div>
         </button>
-        <div className={classes.TeamInfo}>
-          <div className={classes.Title}>{props.title}</div>
-          <div className={classes.Desc}>{props.desc}</div>
-          <ActionBtn clicked={() => setShowEditTeam(true)}>{editIcon} Edit team details</ActionBtn>
-        </div>
+        {showEditTeam ? <EditTeam close={() => setShowEditTeam(false)} desc={props.desc}
+        title={props.title} teamID={props.teamID} url={props.url} />
+          : <>
+          <div className={classes.TeamInfo}>
+            <div className={classes.Title}>{props.title}</div>
+            <div className={classes.Desc}>{props.desc}</div>
+            <ActionBtn clicked={() => setShowEditTeam(true)}>{editIcon} Edit team details</ActionBtn>
+          </div></>
+        }
       </div>
     </div>
   );
