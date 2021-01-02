@@ -36,3 +36,8 @@
   font-weight: 400;
   margin-left: 5px;
 }
+.UrlTakenMsg {
+  color: red;
+  font-size: 13px;
+  margin-top: 10px;
+}

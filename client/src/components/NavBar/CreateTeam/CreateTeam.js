@@ -32,7 +32,7 @@ const CreateTeam = props => {
       const urlIsValid = checkURL(url);
       if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
       axios.get('/team/checkURL/' + url).then(res => {
-        if (res.data.urlTaken) { setUrlErrMsg('That URL is already taken.'); }
+        if (res.data.isTaken) { setUrlErrMsg('That URL is already taken.'); }
       });
     }, 1000);
   }, [url]);

@@ -1,17 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import classes from './EditTeam.module.css';
 import PropTypes from 'prop-types';
 import SubmitBtns from '../../UI/SubmitBtns/SubmitBtns';
+import { useDidUpdate } from '../../../utils/customHooks';
+import { checkURL } from '../../../utils/teamValidation';
+import { instance as axios } from '../../../axios';
 
 const EditTeam = props => {
   const [title, setTitle] = useState(props.title);
   const [desc, setDesc] = useState(props.desc);
-  const [url, setUrl] = useState(props.url === props.teamID ? '' : props.url);
+  const [url, setUrl] = useState(props.url);
   const [urlErrMsg, setUrlErrMsg] = useState(false);
+  const timer = useRef();
+
+  useDidUpdate(() => {
+    setUrlErrMsg('');
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      if (url === '' || url === props.url) { return; }
+      const urlIsValid = checkURL(url);
+      if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
+      axios.get('/team/checkURL/' + url).then(res => {
+        if (res.data.isTaken) { setUrlErrMsg('That URL is already taken.'); }
+      });
+    }, 1000);
+  }, [url]);
 
   const submitHandler = e => {
     e.preventDefault();
-    
+
   };
 
   return (
