@@ -12,9 +12,9 @@ const TeamNavBar = props => {
     <div className={classes.Container}>
       <div className={classes.Title}>{teamIcon}<div>{props.title}</div></div>
       <div className={classes.Btns}>
-        <ActionBtn>{boardIcon} Boards</ActionBtn>
-        <ActionBtn>{personIcon} Members</ActionBtn>
-        <ActionBtn>{settingsIcon} Settings</ActionBtn>
+        <ActionBtn clicked={() => history.push(`/team/${props.url}/boards`)}>{boardIcon} Boards</ActionBtn>
+        <ActionBtn clicked={() => history.push(`/team/${props.url}/members`)}>{personIcon} Members</ActionBtn>
+        <ActionBtn clicked={() => history.push(`/team/${props.url}/settings`)}>{settingsIcon} Settings</ActionBtn>
       </div>
     </div>
   );

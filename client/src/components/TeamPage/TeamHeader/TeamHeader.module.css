@@ -1,0 +1,61 @@
+.Header {
+  width: 100%;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  background: rgb(250, 250, 250);
+}
+.HeaderContent {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+}
+.LogoBtn {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  border-radius: 4px;
+  border: 0;
+  background: rgb(220,220,220);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-width: 80px;
+}
+.LogoBtn:hover {
+  background: rgb(205,205,205);
+}
+.LogoBtn:hover .ChangeLogo {
+  visibility: visible;
+}
+.ChangeLogo {
+  position: absolute;
+  background: rgba(0,0,0,0.45);
+  color: white;
+  bottom: 0;
+  height: 35px;
+  width: 100%;
+  font-size: 15px;
+  line-height: 35px;
+  text-decoration: underline;
+  visibility: hidden;
+}
+.TeamInfo {
+  padding-left: 20px;
+}
+.Title {
+  margin: 0 0 10px;
+  font-size: 25px;
+  font-weight: 500;
+  word-break: break-all;
+}
+.Desc {
+  margin: 0 0 10px;
+  font-size: 15px;
+  word-break: break-all;
+}
+.TeamInfo button svg {
+  margin-right: 7px;
+}
