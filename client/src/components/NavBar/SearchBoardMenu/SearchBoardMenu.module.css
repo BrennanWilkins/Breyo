@@ -50,6 +50,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+  text-decoration: underline;
+}
+.TeamTitle a {
+  color: rgb(82,82,82);
 }
 .Title span svg {
   margin-right: 10px;

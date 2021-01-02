@@ -8,6 +8,7 @@ import { starIcon, personIcon, teamIcon } from '../../UI/icons';
 import BoardRect from './BoardRect/BoardRect';
 import { toggleIsStarred } from '../../../store/actions';
 import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const SearchBoardMenu = props => {
   let history = useHistory();
@@ -63,7 +64,7 @@ const SearchBoardMenu = props => {
         return (
           <React.Fragment key={team.teamID}>
             <div className={classes.Title}>
-              <span>{teamIcon} <div className={classes.TeamTitle}>{team.title}</div></span>
+              <span>{teamIcon} <div className={classes.TeamTitle} onClick={props.close}><Link to={`/team/${team.url}`}>{team.title}</Link></div></span>
               <ExpandBtn clicked={() => expandTeamHandler(team.teamID)} expanded={expanded} />
             </div>
             {expanded && props.boards.filter(board => board.teamID === team.teamID).map(board => (
