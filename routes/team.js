@@ -11,11 +11,10 @@ const { signNewToken } = require('./board');
 const useIsTeamMember = require('../middleware/useIsTeamMember');
 
 // authorization: team member
-router.get('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTeamMember,
+router.get('/:teamID', auth, validate([param('teamID').not().isEmpty()]), useIsTeamMember,
   async (req, res) => {
     try {
-      const teamID = req.params.teamID;
-      const team = await Team.findById(teamID).populate('members', 'email fullName avatar');
+      const team = await Team.findOne({ url: req.params.teamID }).populate('members', 'email fullName avatar').lean();
       if (!team) { throw 'Team not found'; }
       res.status(200).json({ team });
     } catch (err) { res.sendStatus(500); }
@@ -51,6 +50,7 @@ router.post('/', auth, validate(
       }
 
       const team = new Team({ title, desc, url, logo: null, members: [req.userID], boards: [] });
+      team.url = team.url === '' ? team._id : team.url;
 
       const user = await User.updateOne({ _id: req.userID }, { $push: { teams: team._id } });
 
