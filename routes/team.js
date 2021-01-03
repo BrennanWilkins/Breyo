@@ -260,7 +260,7 @@ router.put('/invites/reject', auth, validate([body('teamID').isMongoId()]),
 );
 
 // leave a team
-router.put('/leaveTeam', auth, validate([body('teamID').isMongoId()]), useIsTeamMember,
+router.put('/leave', auth, validate([body('teamID').isMongoId()]), useIsTeamMember,
   async (req, res) => {
     try {
       const teamID = req.body.teamID;
@@ -269,49 +269,12 @@ router.put('/leaveTeam', auth, validate([body('teamID').isMongoId()]), useIsTeam
 
       if (team.members.length === 1) { return res.status(400).json({ msg: 'You cannot leave a team if you are the only member.' }); }
 
-      const actions = [];
-      const boards = [];
-
-      for (let boardID of team.boards) {
-        // remove user from all boards in team
-        const board = await Board.findById(boardID);
-        board.members = board.members.filter(id => String(id) !== req.userID);
-        board.admins = board.admins.filter(id => id !== req.userID);
-        if (!board.admins.length) {
-          return res.status(400).json({ msg: `Please assign another user as an admin of the board ${board.title} before leaving the team.` });
-        }
-        boards.push(board);
-        actions.push(new Activity({ msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName, date: new Date() }));
-      }
-
       team.members = team.members.filter(id => String(id) !== req.userID);
       user.teams = user.teams.filter(id => String(id) !== teamID);
-      const teamBoards = team.boards.map(String);
-      user.boards = user.boards.filter(id => !teamBoards.includes(String(id)));
-      user.adminBoards = user.adminBoards.filter(id => !teamBoards.includes(id));
-      user.starredBoards = user.starredBoards.filter(id => !teamBoards.includes(id));
-
-      for (let boardID of team.boards) {
-        // remove user from cards they are a member of
-        const lists = await List.find({ boardID });
-        for (let list of lists) {
-          let shouldUpdate = false;
-          for (let card of list.cards) {
-            for (let i = card.members.length - 1; i >= 0; i--) {
-              if (card.members[i].email === req.email) { card.members.splice(i, 1); }
-              shouldUpdate = true;
-            }
-          }
-          // only need to update list if member changed
-          if (shouldUpdate) { await list.save(); }
-        }
-      }
 
       await Promise.all([
         team.save(),
-        user.save(),
-        Activity.insertMany(actions),
-        ...boards.map(board => board.save())
+        user.save()
       ]);
 
       res.sendStatus(200);

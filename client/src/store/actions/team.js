@@ -89,3 +89,13 @@ export const rejectTeamInvite = teamID => async dispatch => {
     await axios.put('/team/invites/reject', { teamID });
   } catch (err) { dispatch(serverErr()); }
 };
+
+export const leaveTeam = push => async (dispatch, getState) => {
+  try {
+    const teamID = getState().team.teamID;
+    const res = await axios.put('/team/leave', { teamID });
+    push('/');
+  } catch (err) {
+    dispatch(addNotif('There was an error while leaving the team.'));
+  }
+};
