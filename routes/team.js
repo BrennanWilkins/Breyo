@@ -151,21 +151,21 @@ router.put('/logo', auth, validate([body('teamID').isMongoId(), body('logo').not
       const logo = await resizeImg(req.body.logo);
 
       const data = await cloudinary.upload(logo);
-      const url = data.secure_url;
-      const team = await Team.findByIdAndUpdate(req.body.teamID, { logo: url }).select('avatar').lean();
+      const logoURL = data.secure_url;
+      const team = await Team.findByIdAndUpdate(req.body.teamID, { logo: logoURL }).select('logo').lean();
       if (team.logo) {
         // delete old logo
         await cloudinary.destroy(team.logo.slice(team.logo.lastIndexOf('/') + 1, team.logo.lastIndexOf('.')));
       }
 
-      res.status(200).json({ url });
+      res.status(200).json({ logoURL });
     } catch (err) { res.sendStatus(500); }
   }
 );
 
 // authorization: team member
 // delete a team's logo
-router.delete('/logo:teamID', auth, validate([param('teamID').isMongoId()]), useIsTeamMember,
+router.delete('/logo/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTeamMember,
   async (req, res) => {
     try {
       const team = await Team.findByIdAndUpdate(req.params.teamID, { logo: null }).select('logo').lean();

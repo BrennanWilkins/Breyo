@@ -48,6 +48,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 app.use(cors());
 app.use(logger('dev'));
 app.use('/api/auth/avatar', express.json({ limit: '3mb' }));
+app.use('/api/team/logo', express.json({ limit: '3mb' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
