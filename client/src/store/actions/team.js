@@ -1,6 +1,6 @@
 import * as actionTypes from './actionTypes';
 import { instance as axios } from '../../axios';
-import { addNotif } from './notifications';
+import { addNotif, serverErr } from './notifications';
 
 export const createTeam = payload => dispatch => {
   const { title, teamID, url, token, push } = payload;
@@ -68,4 +68,24 @@ export const inviteTeamMembers = members => async (dispatch, getState) => {
     if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
     dispatch(addNotif('There was an error while inviting users to the team.'));
   }
+};
+
+export const acceptTeamInvite = (teamID, push) => async dispatch => {
+  try {
+    const res = await axios.put('/team/invites/accept', { teamID });
+    const { token, team } = res.data;
+    axios.defaults.headers.common['x-auth-token'] = token;
+    localStorage['token'] = token;
+    dispatch({ type: actionTypes.JOIN_TEAM, team });
+    push('/team/' + team.url);
+  } catch (err) {
+    dispatch(addNotif('There was an error while joining the team.'));
+  }
+};
+
+export const rejectTeamInvite = teamID => async dispatch => {
+  try {
+    dispatch({ type: actionTypes.REJECT_TEAM_INVITE, teamID });
+    await axios.put('/team/invites/reject', { teamID });
+  } catch (err) { dispatch(serverErr()); }
 };

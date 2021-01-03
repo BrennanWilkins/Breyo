@@ -20,18 +20,20 @@ const AccountModal = props => {
   useModalToggle(props.show, modalRef, closeHandler);
   const [showInvites, setShowInvites] = useState(false);
 
+  const totInvites = props.invites.length + props.teamInvites.length;
+
   return (
-    <div ref={modalRef} className={props.show ? classes.ShowModal : classes.HideModal}>
+    <div ref={modalRef} className={props.show ? classes.Modal : `${classes.Modal} ${classes.HideModal}`}>
       <div className={classes.Title}>
         <span className={showInvites ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={() => setShowInvites(false)} /></span>
         {showInvites ? 'Invites' : 'Account'}
         <CloseBtn close={props.close} color="rgb(112, 112, 112)" />
       </div>
-      {showInvites ? <Invites close={closeHandler} email={props.email} fullName={props.fullName} invites={props.invites} /> :
+      {showInvites ? <Invites close={closeHandler} invites={props.invites} teamInvites={props.teamInvites} /> :
       <><AccountInfo fullName={props.fullName} email={props.email} givePadding avatar={props.avatar} />
       <div className={classes.Options}>
         <div className={classes.Option} onClick={() => setShowInvites(true)}>Invites
-          {props.invites.length > 0 && <span className={classes.InviteNotifIcon}>{props.invites.length}</span>}
+          {totInvites > 0 && <span className={classes.InviteNotifIcon}>{totInvites}</span>}
         </div>
         <div className={classes.Link} onClick={props.close}><Link to="/my-account?view=activity">Activity</Link></div>
         <div className={classes.Link} onClick={props.close}><Link to="/my-account?view=settings">Settings</Link></div>
@@ -50,6 +52,7 @@ AccountModal.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   invites: PropTypes.array.isRequired,
+  teamInvites: PropTypes.array.isRequired,
   avatar: PropTypes.string
 };
 
@@ -57,6 +60,7 @@ const mapStateToProps = state => ({
   fullName: state.auth.fullName,
   email: state.auth.email,
   invites: state.auth.invites,
+  teamInvites: state.auth.teamInvites,
   avatar: state.auth.avatar
 });
 

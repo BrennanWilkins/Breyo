@@ -108,3 +108,5 @@ export const EDIT_TEAM = 'EDIT_TEAM';
 export const CHANGE_TEAM_LOGO = 'CHANGE_TEAM_LOGO';
 export const REMOVE_TEAM_LOGO = 'REMOVE_TEAM_LOGO';
 export const DELETE_TEAM = 'DELETE_TEAM';
+export const JOIN_TEAM = 'JOIN_TEAM';
+export const REJECT_TEAM_INVITE = 'REJECT_TEAM_INVITE';

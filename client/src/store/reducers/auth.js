@@ -43,6 +43,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DELETE_AVATAR: return { ...state, avatar: null };
     case actionTypes.CREATE_TEAM: return { ...state, teams: [...state.teams, action.team] };
     case actionTypes.EDIT_TEAM: return editTeam(state, action);
+    case actionTypes.JOIN_TEAM: return joinTeam(state, action);
+    case actionTypes.REJECT_TEAM_INVITE: return rejectTeamInvite(state, action);
     case actionTypes.JOIN_BOARD: return joinBoard(state, action);
     default: return state;
   }
@@ -149,6 +151,16 @@ const editTeam = (state, action) => {
   return { ...state, teams };
 };
 
+const joinTeam = (state, action) => {
+  const teamInvites = state.teamInvites.filter(invite => invite.teamID !== action.team.teamID);
+  const teams = [...state.teams, action.team];
+  return { ...state, teamInvites, teams };
+};
+
+const rejectTeamInvite = (state, action) => {
+  const teamInvites = state.teamInvites.filter(invite => invite.teamID !== action.teamID);
+  return { ...state, teamInvites };
+};
 
 const joinBoard = (state, action) => {
   const invites = state.invites.filter(invite => invite.boardID !== action.board.boardID);

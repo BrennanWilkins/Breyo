@@ -64,13 +64,6 @@ router.post('/', auth, validate(
       const user = await User.findById(req.userID);
       user.teams.push(team._id);
 
-      const results = await Promise.all([
-        team.save(),
-        user.save(),
-        signNewToken(user, req.header('x-auth-token'), true)
-      ]);
-
-      const token = results[2];
 
       if (members !== '') {
         // members sent as emails separated by space, if user found then send invite
@@ -83,8 +76,15 @@ router.post('/', auth, validate(
           user.teamInvites.push({ inviterEmail: req.email, inviterName: req.fullName, title, teamID: team._id });
           users.push(user);
         }
-        await Promise.all([...users.map(user => user.save())]);
       }
+
+      const results = await Promise.all([
+        signNewToken(user, req.header('x-auth-token'), true),
+        team.save(),
+        user.save(),
+        ...users.map(user => user.save())
+      ]);
+      const token = results[0];
 
       res.status(200).json({ teamID: team._id, url: team.url, token });
     } catch (err) { res.sendStatus(500); }
@@ -180,17 +180,31 @@ router.delete('/logo/:teamID', auth, validate([param('teamID').isMongoId()]), us
 );
 
 // authorization: team member
-// invite a user to join team
-router.post('/invites', auth, validate([body('email').isEmail(), body('teamID').isMongoId()]), useIsTeamMember,
+// invite users to join team
+router.post('/invites', auth, validate([body('members').not().isEmpty(), body('teamID').isMongoId()]), useIsTeamMember,
   async (req, res) => {
     try {
-      const { email, teamID } = req.body;
-      const user = await User.findOne({ email });
-      if (!user) { return res.status(400).json({ msg: 'No user was found for that email.' }); }
+      const { members, teamID } = req.body;
       const team = await Team.findById(teamID).select('title').lean();
-
-      user.teamInvites.push({ teamID, inviterEmail: req.email, inviterName: req.fullName, title: team.title });
-      await user.save();
+      // members sent as emails separated by space, if user found then send invite
+      const emails = members.trim().split(' ');
+      const users = [];
+      for (let email of emails) {
+        if (email === req.email) { continue; }
+        const user = await User.findOne({ email });
+        if (!user) { return res.status(400).json({ msg: `There is no user for the email '${email}' that you provided.` }); }
+        // user already invited
+        if (user.teamInvites.find(invite => String(invite.teamID) === teamID)) {
+          return res.status(400).json({ msg: `You have already invited '${email}' to this team.` });
+        }
+        // user already member
+        if (user.teams.find(teamID => String(teamID) === teamID)) {
+          return res.status(400).json({ msg: `The user '${email}' is already a member of this team.` });
+        }
+        user.teamInvites.push({ inviterEmail: req.email, inviterName: req.fullName, title: team.title, teamID: team._id });
+        users.push(user);
+      }
+      await Promise.all([...users.map(user => user.save())]);
 
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
@@ -205,7 +219,7 @@ router.put('/invites/accept', auth, validate([body('teamID').isMongoId()]),
       const [team, user] = await Promise.all([Team.findById(teamID), User.findById(req.userID)]);
       if (!user) { throw 'User data not found'; }
 
-      user.teamInvites = user.teamInvites.filter(invite => invite.teamID !== teamID);
+      user.teamInvites = user.teamInvites.filter(invite => String(invite.teamID) !== teamID);
 
       if (!team) {
         // team no longer exists
@@ -215,9 +229,16 @@ router.put('/invites/accept', auth, validate([body('teamID').isMongoId()]),
 
       team.members.push(req.userID);
       user.teams.push(teamID);
-      await Promise.all([team.save(), user.save()]);
 
-      res.sendStatus(200);
+      const results = await Promise.all([
+        signNewToken(user, req.header('x-auth-token'), true),
+        team.save(),
+        user.save()
+      ]);
+      const token = results[0];
+      const teamData = { teamID: team._id, url: team.url, title: team.title };
+
+      res.status(200).json({ token, team: teamData });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -294,48 +315,6 @@ router.put('/leaveTeam', auth, validate([body('teamID').isMongoId()]), useIsTeam
       ]);
 
       res.sendStatus(200);
-    } catch (err) { res.sendStatus(500); }
-  }
-);
-
-// authorization: team member
-// join a board of a team user is a member of
-router.put('/joinBoard', auth, validate([body('boardID').isMongoId(), body('teamID').isMongoId()]), useIsTeamMember,
-  async (req, res) => {
-    try {
-      const { teamID, boardID } = req.body;
-      const [board, team, user] = await Promise.all([Board.findById(boardID), Team.findById(teamID).select('boards').lean(), User.findById(req.userID)]);
-      if (!board || !team || !user) { throw 'No board, team, or user data found'; }
-
-      if (!team.boards.find(id => String(id) === boardID)) { throw 'Board must be one of teams boards to join'; }
-      if (board.members.find(id => String(id) === req.userID)) { throw 'User already a member of this board'; }
-
-      // add board to user model & user to board's members
-      board.members.push(req.userID);
-      user.boards.push(boardID);
-
-      const actionData = { msg: null, boardMsg: 'joined this board', cardID: null, listID: null, boardID };
-
-      const results = await Promise.all([
-        board.save(),
-        user.save(),
-        addActivity(actionData, req),
-        signNewToken(user, req.header('x-auth-token'), true)
-      ]);
-
-      const token = results[3];
-
-      const updatedUser = await User.findById(req.userID).populate('boards', 'title color').lean();
-      updatedUser.boards = updatedUser.boards.map(board => ({
-        boardID: board._id,
-        title: board.title,
-        color: board.color,
-        isStarred: user.starredBoards.includes(boardID),
-        isAdmin: user.adminBoards.includes(boardID),
-        teamID: board.teamID
-      }));
-
-      res.status(200).json({ token, boards: updatedUser.boards, invites: updatedUser.invites });
     } catch (err) { res.sendStatus(500); }
   }
 );
