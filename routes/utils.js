@@ -32,4 +32,7 @@ cloudinary.config({
   api_secret: config.get('CLOUDINARY_API_SECRET')
 });
 
-module.exports = { COLORS, PHOTO_IDS, LABEL_COLORS, resizeImg, cloudinary: cloudinary.uploader };
+const { customAlphabet } = require('nanoid');
+const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 12);
+
+module.exports = { COLORS, PHOTO_IDS, LABEL_COLORS, resizeImg, cloudinary: cloudinary.uploader, nanoid };

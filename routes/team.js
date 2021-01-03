@@ -4,17 +4,29 @@ const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const { param, body } = require('express-validator');
 const User = require('../models/user');
-const { cloudinary, resizeImg } = require('./utils');
+const { cloudinary, resizeImg, nanoid } = require('./utils');
 const Activity = require('../models/activity');
 const Board = require('../models/board');
 const { signNewToken } = require('./board');
 const useIsTeamMember = require('../middleware/useIsTeamMember');
 
+const validateURL = async url => {
+  try {
+    // validate URL
+    const urlTest = /^[a-zA-Z0-9]*$/;
+    const checkURL = urlTest.test(url);
+    // check if URL is already taken
+    if (!checkURL) { return `Your team's URL can only contain letters or numbers.`; }
+    const isTaken = await Team.exists({ url });
+    if (isTaken) { return 'That URL is already taken.'; }
+  } catch (err) { return err; }
+};
+
 // authorization: team member
 router.get('/:teamID', auth, validate([param('teamID').not().isEmpty()]), useIsTeamMember,
   async (req, res) => {
     try {
-      const team = await Team.findOne({ url: req.params.teamID }).populate('members', 'email fullName avatar').lean();
+      const team = await Team.findById(req.params.teamID).populate('members', 'email fullName avatar').lean();
       if (!team) { throw 'Team not found'; }
       res.status(200).json({ team });
     } catch (err) { res.sendStatus(500); }
@@ -26,7 +38,7 @@ router.get('/checkURL/:url', auth, validate([param('url').isLength({ min: 1, max
   async (req, res) => {
     try {
       const isTaken = await Team.exists({ url: req.params.url });
-      return res.status(200).json({ isTaken });
+      res.status(200).json({ isTaken });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -42,19 +54,26 @@ router.post('/', auth, validate(
       const { title, desc, url, members } = req.body;
 
       if (url !== '') {
-        const urlTest = /^[a-zA-Z0-9]*$/;
-        const checkURL = urlTest.test(url);
-        if (!checkURL) { return res.status(400).json({ msg: `Your team's URL can only contain letters or numbers.` }); }
-        const isTaken = await Team.exists({ url });
-        if (isTaken) { return res.status(400).json({ msg: 'That URL is already taken.' }); }
+        const urlIsValid = validateURL(url);
+        if (urlIsValid !== '') { return res.status(400).json({ msg: urlIsValid }); }
       }
 
       const team = new Team({ title, desc, url, logo: null, members: [req.userID], boards: [] });
-      team.url = team.url === '' ? team._id : team.url;
+      team.url = team.url === '' ? nanoid() : team.url;
 
-      const user = await User.updateOne({ _id: req.userID }, { $push: { teams: team._id } });
+      const user = await User.findById(req.userID);
+      user.teams.push(team._id);
+
+      const results = await Promise.all([
+        team.save(),
+        user.save(),
+        signNewToken(user, req.header('x-auth-token'), true)
+      ]);
+
+      const token = results[2];
 
       if (members !== '') {
+        // members sent as emails separated by space, if user found then send invite
         const emails = members.trim().split(' ');
         const users = [];
         for (let email of emails) {
@@ -64,10 +83,39 @@ router.post('/', auth, validate(
           user.teamInvites.push({ inviterEmail: req.email, inviterName: req.fullName, title, teamID: team._id });
           users.push(user);
         }
-        await Promise.all([...users.map(user => user.save()), team.save()]);
-      } else { await team.save(); }
+        await Promise.all([...users.map(user => user.save())]);
+      }
 
-      res.status(200).json({ teamID: team._id });
+      res.status(200).json({ teamID: team._id, url: team.url, token });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: team member
+// edit a teams info
+router.put('/', auth, validate(
+  [body('title').isLength({ min: 1, max: 100 }),
+  body('desc').isLength({ min: 0, max: 400 }),
+  body('url').isLength({ min: 0, max: 50 }),
+  body('teamID').isMongoId()]), useIsTeamMember,
+  async (req, res) => {
+    try {
+      const { title, desc, url, teamID } = req.body;
+      const team = await Team.findById(teamID);
+      if (!team) { throw 'Team not found'; }
+
+      if (url !== '' && url !== team.url) {
+        const urlIsValid = validateURL(url);
+        if (urlIsValid !== '') { return res.status(400).json({ msg: urlIsValid }); }
+      }
+
+      team.title = title;
+      team.desc = desc;
+      if (url !== '' && url !== team.url) { team.url = url; }
+
+      await team.save();
+
+      res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -90,28 +138,6 @@ router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTe
 
       await Promise.all([team.remove(), User.updateMany({ _id: { $in: team.members }}, { $pull: { teams: team._id }})]);
 
-      res.sendStatus(200);
-    } catch (err) { res.sendStatus(500); }
-  }
-);
-
-// authorization: team member
-// change team's title
-router.put('/title', auth, validate([body('title').isLength({ min: 1, max: 100 }), body('teamID').isMongoId()]), useIsTeamMember,
-  async (req, res) => {
-    try {
-      await Team.updateOne({ _id: req.body.teamID }, { title: req.body.title });
-      res.sendStatus(200);
-    } catch (err) { res.sendStatus(500); }
-  }
-);
-
-// authorization: team member
-// change team's description
-router.put('/desc', auth, validate([body('desc').isLength({ min: 0, max: 400 }), body('teamID').isMongoId()]), useIsTeamMember,
-  async (req, res) => {
-    try {
-      await Team.updateOne({ _id: req.body.teamID }, { desc: req.body.desc });
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
@@ -144,21 +170,6 @@ router.delete('/logo:teamID', auth, validate([param('teamID').isMongoId()]), use
     try {
       const team = await Team.findByIdAndUpdate(req.params.teamID, { logo: null }).select('logo').lean();
       await cloudinary.destroy(team.logo.slice(team.logo.lastIndexOf('/') + 1, team.logo.lastIndexOf('.')));
-      res.sendStatus(200);
-    } catch (err) { res.sendStatus(500); }
-  }
-);
-
-// authorization: team member
-// change team's page url
-router.put('/url', auth, validate([body('url').isLength({ min: 0, max: 50 }), body('teamID').isMongoId()]), useIsTeamMember,
-  async (req, res) => {
-    try {
-      const { url, teamID } = req.body;
-      const isTaken = await Team.exists({ url });
-      if (isTaken) { return res.status(400).json({ msg: 'That url is already taken.' }); }
-
-      await Team.updateOne({ _id: teamID }, { url });
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }
