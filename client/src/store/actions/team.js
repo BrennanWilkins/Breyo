@@ -23,3 +23,25 @@ export const getActiveTeam = (url, push) => async (dispatch, getState) => {
 };
 
 export const editTeam = payload => ({ type: actionTypes.EDIT_TEAM, payload });
+
+export const changeTeamLogo = (img, teamID) => async dispatch => {
+  const errHandler = () => dispatch(addNotif('There was an error while uploading your logo.'));
+  const reader = new FileReader();
+  reader.readAsDataURL(img);
+
+  reader.onloadend = () => {
+    axios.put('/team/logo', { logo: reader.result, teamID }).then(res => {
+      dispatch({ type: actionTypes.CHANGE_TEAM_LOGO, logo: res.data.logoURL, teamID });
+    }).catch(err => errHandler());
+  };
+  reader.onerror = () => errHandler();
+};
+
+export const removeTeamLogo = teamID => async dispatch => {
+  try {
+    await axios.delete('/team/logo/' + teamID);
+    dispatch({ type: actionTypes.REMOVE_TEAM_LOGO, teamID });
+  } catch (err) {
+    dispatch(addNotif('There was an error while removing the logo.'));
+  }
+};

@@ -5,17 +5,20 @@ import { connect } from 'react-redux';
 import { ActionBtn } from '../../UI/Buttons/Buttons';
 import { teamIcon, editIcon } from '../../UI/icons';
 import EditTeam from '../EditTeam/EditTeam';
+import EditLogo from '../EditLogo/EditLogo';
 
 const TeamHeader = props => {
   const [showEditTeam, setShowEditTeam] = useState(false);
+  const [showEditLogo, setShowEditLogo] = useState(false);
 
   return (
     <div className={classes.Header}>
       <div className={classes.HeaderContent}>
         <button className={classes.LogoBtn}>
-        {teamIcon}
-        <div className={classes.ChangeLogo}>Change</div>
+          {props.logo ? <img src={props.logo} alt="" /> : teamIcon}
+          <div className={classes.ChangeLogo} onClick={() => setShowEditLogo(true)}>Change</div>
         </button>
+        {showEditLogo && <EditLogo teamID={props.teamID} logo={props.logo} close={() => setShowEditLogo(false)} />}
         {showEditTeam ? <EditTeam close={() => setShowEditTeam(false)} desc={props.desc}
         title={props.title} teamID={props.teamID} url={props.url} />
           : <>

@@ -8,6 +8,7 @@
   max-width: 700px;
   margin: 0 auto;
   display: flex;
+  position: relative;
 }
 .LogoBtn {
   width: 80px;
@@ -23,6 +24,12 @@
   position: relative;
   overflow: hidden;
   min-width: 80px;
+  outline: none;
+  padding: 0;
+}
+.LogoBtn img {
+  width: 100%;
+  height: 100%;
 }
 .LogoBtn:hover {
   background: rgb(205,205,205);

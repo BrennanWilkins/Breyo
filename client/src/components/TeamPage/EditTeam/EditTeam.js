@@ -83,7 +83,8 @@ EditTeam.propTypes = {
   title: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  teamID: PropTypes.string.isRequired
+  teamID: PropTypes.string.isRequired,
+  editTeam: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
