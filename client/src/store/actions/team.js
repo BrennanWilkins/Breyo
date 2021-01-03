@@ -59,3 +59,13 @@ export const deleteTeam = push => async (dispatch, getState) => {
     dispatch(addNotif('There was an error while deleting your team.'));
   }
 };
+
+export const inviteTeamMembers = members => async (dispatch, getState) => {
+  try {
+    const teamID = getState().team.teamID;
+    await axios.post('/team/invites', { members, teamID });
+  } catch (err) {
+    if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
+    dispatch(addNotif('There was an error while inviting users to the team.'));
+  }
+};

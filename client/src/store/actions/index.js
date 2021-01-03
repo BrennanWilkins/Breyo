@@ -20,4 +20,4 @@ setAllBoardActivityShown, resetAllBoardActivity } from './activity';
 export { addTitleSearchQuery, addDueDateSearchQuery, addMemberSearchQuery, addLabelSearchQuery,
 resetSearchQuery } from './cardSearchQueries';
 export { createTeam, getActiveTeam, editTeam, changeTeamLogo, removeTeamLogo,
-deleteTeam } from './team';
+deleteTeam, inviteTeamMembers } from './team';
