@@ -6,10 +6,10 @@ import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 import { checkIcon, uploadIcon } from '../../../UI/icons';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
 import Spinner from '../../../UI/AuthSpinner/AuthSpinner';
+import { FileInput } from '../../../UI/Inputs/Inputs';
 
 const ChangeAvatarModal = props => {
   const modalRef = useRef();
-  const fileInput = useRef();
   useModalToggle(true, modalRef, props.close);
 
   return (
@@ -25,10 +25,7 @@ const ChangeAvatarModal = props => {
       {props.picSelected && <div className={`${classes.Option} ${classes.Selected}`}>
         <AccountBtn avatar={props.selectedPic}></AccountBtn> Selected picture {checkIcon}
       </div>}
-      <div className={classes.FileBtn}>
-        <input ref={fileInput} type="file" accept="image/*" tabIndex="-1" onChange={e => props.setPic(e.target.files[0])} />
-        <div onClick={() => fileInput.current.click()}>{uploadIcon} Upload a picture</div>
-      </div>
+      <FileInput change={pic => props.setPic(pic)} title="Upload a picture" />
       {props.loading && <div className={classes.Spinner}><Spinner /></div>}
       {props.err && <div className={classes.ErrMsg}>There was an error while uploading your picture.</div>}
     </div>

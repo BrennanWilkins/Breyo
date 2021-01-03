@@ -25,3 +25,25 @@
   opacity: 0;
   visibility: hidden;
 }
+.FileBtn input {
+  display: none;
+}
+.FileBtn div {
+  background: rgb(235,235,235);
+  border-radius: 4px;
+  padding: 7px 0;
+  box-sizing: border-box;
+  margin: 10px 3px;
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.FileBtn div:hover {
+  background: rgb(225,225,225);
+}
+.FileBtn svg {
+  margin-right: 10px;
+  font-size: 16px;
+}
