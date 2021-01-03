@@ -42,8 +42,12 @@
   font-size: 13px;
   margin-top: 10px;
 }
-.ErrMsg {
-  font-size: 15px;
-  margin: 10px 0;
+.ErrMsg, .HideErrMsg {
+  height: 30px;
+  line-height: 30px;
+  font-size: 14px;
   color: red;
+}
+.HideErrMsg {
+  visibility: hidden;
 }

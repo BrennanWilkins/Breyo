@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import classes from './EditTeam.module.css';
 import PropTypes from 'prop-types';
 import SubmitBtns from '../../UI/SubmitBtns/SubmitBtns';
@@ -30,6 +30,8 @@ const EditTeam = props => {
     }, 1000);
   }, [url]);
 
+  useEffect(() => setErrMsg(''), [url, desc, title]);
+
   const submitHandler = async e => {
     e.preventDefault();
     const urlIsValid = checkURL(url);
@@ -45,7 +47,7 @@ const EditTeam = props => {
     } catch (err) {
       setLoading(false);
       if (err.response && err.response.data && err.response.data.msg) { setErrMsg(err.response.data.msg); }
-      else { setErrMsg('There was an error connecting to the server.'); }
+      else { setErrMsg('There was an error while connecting to the server.'); }
     }
   };
 
@@ -54,24 +56,24 @@ const EditTeam = props => {
       <div className={classes.Section}>
         <label>
           <div>Team name</div>
-          <input value={title} onChange={e => setTitle(e.target.value)} />
+          <input value={title} onChange={e => setTitle(e.target.value)} disabled={loading} />
         </label>
       </div>
       <div className={classes.Section}>
         <label>
           <div>Team URL<span>Optional</span></div>
-          <input value={url} onChange={e => setUrl(e.target.value)} />
+          <input value={url} onChange={e => setUrl(e.target.value)} disabled={loading} />
         </label>
         {urlErrMsg !== '' && <div className={classes.UrlTakenMsg}>{urlErrMsg}</div>}
       </div>
       <div className={classes.Section}>
         <label>
           <div>Team Description<span>Optional</span></div>
-          <textarea value={desc} onChange={e => setDesc(e.target.value)} rows="4" />
+          <textarea value={desc} onChange={e => setDesc(e.target.value)} rows="4" disabled={loading} />
         </label>
       </div>
-      <SubmitBtns close={props.close} text="Save" disabled={title === '' || urlErrMsg || errMsg !== '' || loading} />
-      {errMsg !== '' && <div className={classes.ErrMsg}>{errMsg}</div>}
+      <SubmitBtns close={props.close} text="Save" disabled={title === '' || urlErrMsg || loading} />
+      <div className={errMsg !== '' ? classes.ErrMsg : classes.HideErrMsg}>{errMsg}</div>
     </form>
   );
 };
