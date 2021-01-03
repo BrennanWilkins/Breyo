@@ -99,7 +99,7 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
       user.boards.push(boardID);
       user.adminBoards.push(boardID);
 
-      const newBoard = { boardID, title, isStarred: false, isAdmin: true, color };
+      const newBoard = { boardID, title, isStarred: false, isAdmin: true, color, teamID: null };
 
       // add default lists to board (to do, doing, done)
       const list1 = { boardID, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false };

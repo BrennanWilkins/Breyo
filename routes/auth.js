@@ -47,7 +47,7 @@ const getLeanJWTPayload = user => {
 router.get('/userData', auth,
   async (req, res) => {
     try {
-      const user = await User.findById(req.userID).populate('boards', 'title color teamID').populate('teams', 'title boards url').lean();
+      const user = await User.findById(req.userID).populate('boards', 'title color teamID').populate('teams', 'title url').lean();
       if (!user) { throw 'user data not found'; }
 
       user.boards = user.boards.map(board => ({
@@ -71,7 +71,7 @@ router.post('/login', validate(
   async (req, res) => {
     try {
       const { email, password } = req.body;
-      const user = await User.findOne({ email }).populate('boards', 'title color teamID').populate('teams', 'title boards url').lean();
+      const user = await User.findOne({ email }).populate('boards', 'title color teamID').populate('teams', 'title url').lean();
 
       // return 400 error if no user found
       if (!user) { return res.status(400).json({ msg: 'Incorrect username or password.' }); }
@@ -143,7 +143,7 @@ router.post('/signup', validate(
 router.post('/autoLogin', auth,
   async (req, res) => {
     try {
-      const user = await User.findById(req.userID).populate('boards', 'title color teamID').populate('teams', 'title boards url').lean();
+      const user = await User.findById(req.userID).populate('boards', 'title color teamID').populate('teams', 'title url').lean();
       if (!user) { throw 'User data not found'; }
 
       user.boards = user.boards.map(board => ({

@@ -29,7 +29,6 @@ const reducer = (state = initialState, action) => {
     case actionTypes.AUTH_RESET: return { ...initialState };
     case actionTypes.LOGOUT: return { ...initialState };
     case actionTypes.CREATE_BOARD: return { ...state, boards: [...state.boards, action.board] };
-    case actionTypes.CREATE_TEAM_BOARD: return createTeamBoard(state, action);
     case actionTypes.TOGGLE_IS_STARRED: return toggleIsStarred(state, action);
     case actionTypes.UPDATE_USER_DATA: return updateUserData(state, action);
     case actionTypes.DEMOTE_SELF: return demoteSelf(state, action);
@@ -62,7 +61,7 @@ const login = (state, action) => ({
   signupErr: false,
   signupErrMsg: '',
   avatar: action.payload.avatar,
-  teams: action.payload.teams.map(team => ({ teamID: team._id, title: team.title, boards: team.boards, url: team.url })),
+  teams: action.payload.teams.map(team => ({ teamID: team._id, title: team.title, url: team.url })),
 });
 
 const loginLoading = (state, action) => ({
@@ -102,7 +101,7 @@ const updateUserData = (state, action) => ({
   ...state,
   boards: action.boards,
   invites: action.invites,
-  teams: action.teams.map(team => ({ teamID: team._id, title: team.title, boards: team.boards, url: team.url })),
+  teams: action.teams.map(team => ({ teamID: team._id, title: team.title, url: team.url })),
   teamInvites: action.teamInvites
 });
 
@@ -139,16 +138,6 @@ const updateBoardTitle = (state, action) => {
 const updateColor = (state, action) => {
   const boards = findAndReplace(state.boards, 'boardID', action.boardID, 'color', action.color);
   return { ...state, boards };
-};
-
-const createTeamBoard = (state, action) => {
-  const teams = [...state.teams];
-  const teamIndex = teams.findIndex(team => team.teamID === action.board.teamID);
-  const team = { ...teams[teamIndex] };
-  team.boards = [...team.boards, action.board.boardID];
-  teams[teamIndex] = team;
-  const boards = [...state.boards, action.board];
-  return { ...state, teams, boards };
 };
 
 const editTeam = (state, action) => {

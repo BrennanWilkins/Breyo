@@ -23,7 +23,7 @@ export const createTeamBoard = (title, color, teamID) => async dispatch => {
     const { token, board } = res.data;
     axios.defaults.headers.common['x-auth-token'] = token;
     localStorage['token'] = token;
-    dispatch({ type: actionTypes.CREATE_TEAM_BOARD, board });
+    dispatch({ type: actionTypes.CREATE_BOARD, board });
   } catch (err) {
     dispatch(addNotif('Your board could not be created.'));
   }
