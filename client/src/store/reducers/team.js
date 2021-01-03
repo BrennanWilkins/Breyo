@@ -15,6 +15,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.EDIT_TEAM: return editTeam(state, action);
     case actionTypes.CHANGE_TEAM_LOGO: return { ...state, logo: action.logo };
     case actionTypes.REMOVE_TEAM_LOGO: return { ...state, logo: null };
+    case actionTypes.DELETE_TEAM: return { ...initialState };
+    case actionTypes.LOGOUT: return { ...initialState };
     default: return state;
   }
 };

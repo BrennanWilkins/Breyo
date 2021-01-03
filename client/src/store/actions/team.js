@@ -45,3 +45,14 @@ export const removeTeamLogo = teamID => async dispatch => {
     dispatch(addNotif('There was an error while removing the logo.'));
   }
 };
+
+export const deleteTeam = push => async (dispatch, getState) => {
+  try {
+    const teamID = getState().team.teamID;
+    await axios.delete('/team/' + teamID);
+    dispatch({ type: actionTypes.DELETE_TEAM, teamID });
+    push('/');
+  } catch (err) {
+    dispatch(addNotif('There was an error while deleting your team.'));
+  }
+};
