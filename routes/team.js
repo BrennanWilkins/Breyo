@@ -136,7 +136,11 @@ router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTe
         ]);
       }
 
-      await Promise.all([team.remove(), User.updateMany({ _id: { $in: team.members }}, { $pull: { teams: team._id }})]);
+      await Promise.all([
+        team.remove(),
+        User.updateMany({ _id: { $in: team.members }}, { $pull: { teams: team._id }}),
+        cloudinary.destroy(team.logo.slice(team.logo.lastIndexOf('/') + 1, team.logo.lastIndexOf('.')))
+      ]);
 
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
