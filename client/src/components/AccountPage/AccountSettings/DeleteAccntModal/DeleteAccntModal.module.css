@@ -9,6 +9,7 @@
   left: calc(50% - 200px);
   padding: 5px;
   box-sizing: border-box;
+  z-index: 2;
 }
 .Info {
   font-size: 15px;

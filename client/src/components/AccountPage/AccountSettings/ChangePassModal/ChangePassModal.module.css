@@ -9,6 +9,7 @@
   left: calc(50% - 150px);
   padding: 5px;
   box-sizing: border-box;
+  z-index: 2;
 }
 .Label {
   font-size: 13px;
