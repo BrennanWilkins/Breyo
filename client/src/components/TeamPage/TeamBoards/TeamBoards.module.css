@@ -1,0 +1,6 @@
+.Container {
+  max-width: 720px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 20px auto;
+}
