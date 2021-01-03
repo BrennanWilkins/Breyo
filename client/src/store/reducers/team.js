@@ -6,8 +6,7 @@ const initialState = {
   desc: '',
   members: [],
   title: '',
-  logo: null,
-  boards: []
+  logo: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -27,8 +26,7 @@ const setActiveTeam = (state, action) => ({
   desc: action.team.desc,
   members: action.team.members,
   title: action.team.title,
-  logo: action.team.logo,
-  boards: action.team.boards
+  logo: action.team.logo
 });
 
 const editTeam = (state, action) => {

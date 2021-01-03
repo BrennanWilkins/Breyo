@@ -26,7 +26,7 @@ const validateURL = async url => {
 router.get('/:teamID', auth, validate([param('teamID').not().isEmpty()]), useIsTeamMember,
   async (req, res) => {
     try {
-      const team = await Team.findById(req.params.teamID).populate('members', 'email fullName avatar').lean();
+      const team = await Team.findById(req.params.teamID).populate('members', 'email fullName avatar').select('-boards').lean();
       if (!team) { throw 'Team not found'; }
       res.status(200).json({ team });
     } catch (err) { res.sendStatus(500); }
