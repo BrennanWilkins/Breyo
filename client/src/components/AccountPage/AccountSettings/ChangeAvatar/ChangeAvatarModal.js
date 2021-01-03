@@ -3,7 +3,7 @@ import classes from './ChangeAvatar.module.css';
 import PropTypes from 'prop-types';
 import { useModalToggle } from '../../../../utils/customHooks';
 import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
-import { checkIcon, uploadIcon } from '../../../UI/icons';
+import { checkIcon } from '../../../UI/icons';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
 import Spinner from '../../../UI/AuthSpinner/AuthSpinner';
 import { FileInput } from '../../../UI/Inputs/Inputs';

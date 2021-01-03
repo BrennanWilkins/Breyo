@@ -1,4 +1,4 @@
-.ShowModal, .HideModal {
+.Modal {
   position: fixed;
   top: 45px;
   right: 5px;
@@ -10,12 +10,27 @@
   padding: 10px 0 15px;
   box-sizing: border-box;
   font-size: 15px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100% - 55px);
 }
 .HideModal {
   transform: translateX(100%);
   opacity: 0;
   visibility: hidden;
+}
+.Modal::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Modal::-webkit-scrollbar {
+  width: 8px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Modal::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
 }
 .Title {
   position: relative;

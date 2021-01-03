@@ -14,6 +14,7 @@ const InviteTeamMembers = props => {
   const inviteHandler = () => {
     if (!membersInput.length) { return; }
     props.sendInvite(membersInput);
+    props.close();
   };
 
   return (

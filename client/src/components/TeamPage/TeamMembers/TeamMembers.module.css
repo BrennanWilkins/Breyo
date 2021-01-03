@@ -1,6 +1,6 @@
 .Container {
   width: 100%;
-  margin: 20px auto;
+  margin: 10px auto 20px;
   display: flex;
   padding: 0 20px;
   box-sizing: border-box;
@@ -10,7 +10,7 @@
   width: 30%;
   max-width: 300px;
   min-width: 200px;
-  padding: 10px 20px 0 0;
+  padding: 20px 20px 0 0;
   box-sizing: border-box;
 }
 .FilterInput {
@@ -36,6 +36,9 @@
 .Members {
   flex-grow: 1;
   max-width: 1000px;
+}
+.Member {
+  margin-top: 20px;
 }
 .InviteBtn {
   outline: none;

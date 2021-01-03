@@ -381,17 +381,9 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
       const newActivity = results[2];
       const token = results[3];
 
-      const updatedUser = await User.findById(req.userID).populate('boards', 'title color').lean();
-      updatedUser.boards = updatedUser.boards.map(board => ({
-        boardID: board._id,
-        title: board.title,
-        color: board.color,
-        isStarred: user.starredBoards.includes(boardID),
-        isAdmin: user.adminBoards.includes(boardID),
-        teamID: board.teamID
-      }));
+      const newBoard = { boardID, title: board.title, color: board.color, isStarred: false, isAdmin: false, teamID: board.teamID };
 
-      res.status(200).json({ token, newActivity, boards: updatedUser.boards, invites: updatedUser.invites });
+      res.status(200).json({ token, newActivity, board: newBoard });
     } catch(err) { res.sendStatus(500); }
   }
 );

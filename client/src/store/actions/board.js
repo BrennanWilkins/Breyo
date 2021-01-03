@@ -198,10 +198,13 @@ export const deleteBoard = push => async (dispatch, getState) => {
   }
 };
 
-export const acceptInvite = (boardID, email, fullName, push) => async (dispatch, getState) => {
+export const acceptInvite = (boardID, push) => async (dispatch, getState) => {
   try {
+    const state = getState();
+    const email = state.auth.email;
+    const fullName = state.auth.fullName;
     const res = await axios.put('/board/invites/accept', { boardID });
-    const { token, invites, boards, newActivity } = res.data;
+    const { token, board, newActivity } = res.data;
     axios.defaults.headers.common['x-auth-token'] = token;
     localStorage['token'] = token;
     // manually connect socket
@@ -209,7 +212,7 @@ export const acceptInvite = (boardID, email, fullName, push) => async (dispatch,
     connectSocket();
     // automatically send user to the board
     push(`/board/${boardID}`);
-    dispatch({ type: actionTypes.UPDATE_USER_DATA, invites, boards });
+    dispatch({ type: actionTypes.JOIN_BOARD, board });
     addRecentActivity(newActivity);
     sendUpdate('post/board/newMember', JSON.stringify({ email, fullName }));
   } catch (err) {

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import classes from './TeamSettings.module.css';
-import PropTypes from 'prop-types';
 import DeleteTeamModal from './DeleteTeamModal/DeleteTeamModal';
 
 const TeamSettings = props => {
