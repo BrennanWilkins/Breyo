@@ -5,12 +5,16 @@ import SubmitBtns from '../../UI/SubmitBtns/SubmitBtns';
 import { useDidUpdate } from '../../../utils/customHooks';
 import { checkURL } from '../../../utils/teamValidation';
 import { instance as axios } from '../../../axios';
+import { connect } from 'react-redux';
+import { editTeam } from '../../../store/actions';
 
 const EditTeam = props => {
   const [title, setTitle] = useState(props.title);
   const [desc, setDesc] = useState(props.desc);
   const [url, setUrl] = useState(props.url);
   const [urlErrMsg, setUrlErrMsg] = useState(false);
+  const [errMsg, setErrMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   const timer = useRef();
 
   useDidUpdate(() => {
@@ -26,9 +30,23 @@ const EditTeam = props => {
     }, 1000);
   }, [url]);
 
-  const submitHandler = e => {
+  const submitHandler = async e => {
     e.preventDefault();
-
+    const urlIsValid = checkURL(url);
+    if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
+    if (title.length > 100) { return setErrMsg('Your team name cannot be over 100 characters.'); }
+    if (desc.length > 400) { return setErrMsg('Your team description cannot be over 400 characters.'); }
+    setLoading(true);
+    try {
+      await axios.put('/team', { title, desc, url, teamID: props.teamID });
+      const payload = { title, desc, url, teamID: props.teamID };
+      props.editTeam(payload);
+      props.close();
+    } catch (err) {
+      setLoading(false);
+      if (err.response && err.response.data && err.response.data.msg) { setErrMsg(err.response.data.msg); }
+      else { setErrMsg('There was an error connecting to the server.'); }
+    }
   };
 
   return (
@@ -52,7 +70,8 @@ const EditTeam = props => {
           <textarea value={desc} onChange={e => setDesc(e.target.value)} rows="4" />
         </label>
       </div>
-      <SubmitBtns close={props.close} text="Save" disabled={title === ''} />
+      <SubmitBtns close={props.close} text="Save" disabled={title === '' || urlErrMsg || errMsg !== '' || loading} />
+      {errMsg !== '' && <div className={classes.ErrMsg}>{errMsg}</div>}
     </form>
   );
 };
@@ -65,4 +84,8 @@ EditTeam.propTypes = {
   teamID: PropTypes.string.isRequired
 };
 
-export default EditTeam;
+const mapDispatchToProps = dispatch => ({
+  editTeam: payload => dispatch(editTeam(payload))
+});
+
+export default connect(null, mapDispatchToProps)(EditTeam);

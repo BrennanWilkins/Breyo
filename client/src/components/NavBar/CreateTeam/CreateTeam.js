@@ -45,12 +45,13 @@ const CreateTeam = props => {
     setLoading(true);
     axios.post('/team', { title, url, desc, members }).then(res => {
       setLoading(false);
-      const team = { teamID: res.data.teamID, title, url };
-      props.createTeam(team, history.push);
+      const payload = { teamID: res.data.teamID, url: res.data.url, title, push: history.push, token: res.data.token };
+      props.createTeam(payload);
+      props.close();
     }).catch(err => {
       setLoading(false);
       setErr(true);
-      if (err.response && err.response.data) { setErrMsg(err.response.data.msg); }
+      if (err.response && err.response.data && err.response.data.msg) { setErrMsg(err.response.data.msg); }
       else { setErrMsg('There was an error connecting to the server.'); }
     });
   };
@@ -98,7 +99,7 @@ CreateTeam.propTypes = {
 };
 
 const mapDispatchToProps = dispatch => ({
-  createTeam: (team, push) => dispatch(createTeam(team, push))
+  createTeam: payload => dispatch(createTeam(payload))
 });
 
 export default connect(null, mapDispatchToProps)(CreateTeam);
