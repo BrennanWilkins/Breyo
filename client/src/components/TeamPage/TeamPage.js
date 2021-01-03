@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import TeamHeader from './TeamHeader/TeamHeader';
 import { getActiveTeam } from '../../store/actions';
 import TeamBoards from './TeamBoards/TeamBoards';
+import TeamMembers from './TeamMembers/TeamMembers';
 import TeamSettings from './TeamSettings/TeamSettings';
 
 const TeamPage = props => {
@@ -31,7 +32,7 @@ const TeamPage = props => {
         <Link to={`/team/${props.match.params.url}/?view=members`} className={mode === 'members' ? classes.Active : classes.Btn}>Members</Link>
         <Link to={`/team/${props.match.params.url}/?view=settings`} className={mode === 'settings' ? classes.Active : classes.Btn}>Settings</Link>
       </div>
-      {mode === 'boards' ? <TeamBoards /> : <TeamSettings />}
+      {mode === 'boards' ? <TeamBoards /> : mode === 'members' ? <TeamMembers /> : <TeamSettings />}
     </div>
   );
 };
