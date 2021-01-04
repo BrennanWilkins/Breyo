@@ -121,26 +121,22 @@ router.put('/', auth, validate(
 );
 
 // authorization: team member
-// delete a team, deletes all of team's boards
+// delete a team, does not delete team's boards
 router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTeamMember,
   async (req, res) => {
     try {
-      const team = await Team.findById(req.params.teamID);
-      for (let boardID of team.boards) {
-        const board = await Board.findById(boardID);
-        await Promise.all([
-          board.remove(),
-          User.updateMany({ _id: { $in: board.members }}, { $pull: { boards: boardID, adminBoards: boardID, starredBoards: boardID } }),
-          List.deleteMany({ boardID }),
-          Activity.deleteMany({ boardID })
-        ]);
-      }
+      const teamID = req.params.teamID;
+      const team = await Team.findById(teamID);
 
       await Promise.all([
         team.remove(),
-        User.updateMany({ _id: { $in: team.members }}, { $pull: { teams: team._id }}),
-        cloudinary.destroy(team.logo.slice(team.logo.lastIndexOf('/') + 1, team.logo.lastIndexOf('.')))
+        Board.updateMany({ teamID }, { teamID: null }),
+        User.updateMany({ _id: { $in: team.members }}, { $pull: { teams: team._id }})
       ]);
+
+      if (team.logo) {
+        await cloudinary.destroy(team.logo.slice(team.logo.lastIndexOf('/') + 1, team.logo.lastIndexOf('.')));
+      }
 
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }

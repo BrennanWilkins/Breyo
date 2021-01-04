@@ -16,10 +16,7 @@ const DeleteTeamModal = props => {
   return (
     <div ref={modalRef} className={classes.Modal}>
       <ModalTitle title="Delete this team?" close={props.close} />
-      <p>
-        Deleting a team will also permanently delete all of this team's boards. If you are sure,
-        please type 'DELETE THIS TEAM' below.
-      </p>
+      <p>Deleting a team will not delete the team's boards. To confirm, please type 'DELETE THIS TEAM' below.</p>
       <input className={classes.Input} value={inputVal} onChange={e => setInputVal(e.target.value)} />
       <button className={classes.DeleteBtn} disabled={inputVal !== 'DELETE THIS TEAM'} onClick={() => props.deleteTeam(history.push)}>Delete Team</button>
     </div>
