@@ -1,6 +1,7 @@
 import * as actionTypes from './actionTypes';
 import { instance as axios } from '../../axios';
 import { addNotif, serverErr } from './notifications';
+import { sendUpdate } from './socket';
 
 export const createTeam = payload => dispatch => {
   const { title, teamID, url, token, push } = payload;
@@ -100,5 +101,18 @@ export const leaveTeam = push => async (dispatch, getState) => {
     push('/');
   } catch (err) {
     dispatch(addNotif('There was an error while leaving the team.'));
+  }
+};
+
+export const changeBoardTeam = (oldTeamID, newTeamID) => async (dispatch, getState) => {
+  try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    await axios.put('/board/changeTeam', { boardID, teamID: oldTeamID, newTeamID });
+    const team = state.auth.teams.find(team => team.teamID === newTeamID);
+    dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team });
+    sendUpdate('put/board/changeTeam', JSON.stringify({ team }));
+  } catch (err) {
+    dispatch(addNotif('There was an error while moving the board.'));
   }
 };

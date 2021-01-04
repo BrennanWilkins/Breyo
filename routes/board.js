@@ -499,5 +499,42 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
   }
 );
 
+// authorization: admin, team member
+// move board to another team
+router.put('/changeTeam', auth, validate([
+  body('boardID').isMongoId(),
+  body('teamID').isMongoId(),
+  body('newTeamID').isMongoId()]),
+  useIsAdmin, useIsTeamMember,
+  async (req, res) => {
+    try {
+      const { boardID, teamID, newTeamID } = req.body;
+      const [board, oldTeam, newTeam] = await Promise.all([
+        Board.findById(boardID),
+        Team.findById(teamID),
+        Team.findById(newTeamID)
+      ]);
+      if (!board || !oldTeam || !newTeam) {
+        throw 'Board or team data not found';
+      }
+      if (!newTeam.members.find(member => String(member) === req.userID)) {
+        throw 'User must be member of team board is moving to';
+      }
+
+      board.teamID = newTeamID;
+      oldTeam.boards = oldTeam.boards.filter(boardID => String(boardID) !== boardID);
+      newTeam.boards = [...newTeam.boards, boardID];
+
+      await Promise.all([
+        board.save(),
+        oldTeam.save(),
+        newTeam.save()
+      ]);
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;
 module.exports.signNewToken = signNewToken;

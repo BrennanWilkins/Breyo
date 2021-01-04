@@ -13,17 +13,61 @@
 .Options {
   margin-top: 5px;
 }
-.Options a {
+.Options a, .Options div {
   display: block;
   padding: 8px 10px;
   cursor: pointer;
   color: rgb(50,50,50);
 }
-.Options a:hover {
+.Options a:hover, .Options div:hover {
   background: rgb(245, 245, 245);
 }
 .Container p {
   text-align: center;
   color: rgb(100,100,100);
   padding: 0 10px;
+}
+.Select {
+  padding: 10px 10px 0;
+}
+.Label {
+  font-weight: 500;
+  font-size: 13px;
+}
+.Select select {
+  margin-top: 3px;
+  width: 100%;
+  padding: 3px 0;
+}
+.ChangeBtn {
+  outline: none;
+  padding: 8px 13px;
+  font-size: 14.5px;
+  background: rgb(var(--green));
+  border: 0;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  transition: background 250ms;
+  margin: 15px 0 0;
+}
+.ChangeBtn:hover {
+  background: rgba(var(--green), 0.85);
+}
+.ChangeBtn:active {
+  background: rgb(21, 145, 27);
+}
+.ChangeBtn:disabled {
+  cursor: not-allowed;
+  background: rgb(220,220,220);
+}
+.BackBtn {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+}
+.ErrMsg {
+  text-align: center;
+  font-size: 14px;
+  margin: 10px 0 5px;
 }

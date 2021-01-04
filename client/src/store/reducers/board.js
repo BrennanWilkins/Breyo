@@ -16,7 +16,7 @@ const initialState = {
   createBoardTeamID: null,
   createBoardTeamTitle: null,
   avatars: {},
-  team: { teamID: null, title: '', url: '' }
+  team: { teamID: null, title: '', url: null }
 };
 
 const reducer = (state = initialState, action) => {
@@ -40,6 +40,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.CLOSE_ROADMAP: return { ...state, roadmapShown: false };
     case actionTypes.TOGGLE_CREATE_BOARD: return toggleCreateBoard(state, action);
     case actionTypes.SET_BOARD_AVATARS: return { ...state, avatars: action.avatars };
+    case actionTypes.CHANGE_BOARD_TEAM: return changeBoardTeam(state, action);
     default: return state;
   }
 };
@@ -82,6 +83,15 @@ const toggleCreateBoard = (state, action) => {
   const createBoardTeamID = action.teamID || null;
   const createBoardTeamTitle = action.teamTitle || null;
   return { ...state, createBoardTeamID, createBoardTeamTitle, showCreateBoard: !state.showCreateBoard };
+};
+
+const changeBoardTeam = (state, action) => {
+  const team = {
+    teamID: action.team.teamID,
+    title: action.team.title,
+    url: !state.team.url ? null : action.team.url
+  };
+  return { ...state, team };
 };
 
 export default reducer;
