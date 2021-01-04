@@ -28,7 +28,7 @@ const ChangeAvatar = props => {
         setErr(false);
         setSelectedPic(null);
         setPicSelected(false);
-        await axios.delete('/auth/avatar');
+        await axios.delete('/user/avatar');
         return props.deleteAvatar();
       }
 
@@ -40,7 +40,7 @@ const ChangeAvatar = props => {
       reader.readAsDataURL(img);
 
       reader.onloadend = () => {
-        axios.post('/auth/avatar', { avatar: reader.result }).then(res => {
+        axios.post('/user/avatar', { avatar: reader.result }).then(res => {
           props.changeAvatar(res.data.url);
           setLoading(false);
         }).catch(err => { return errHandler(); });

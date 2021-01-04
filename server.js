@@ -4,6 +4,7 @@ const logger = require('morgan');
 const cors = require('cors');
 const config = require('config');
 const authRouter = require('./routes/auth');
+const userRouter = require('./routes/user');
 const boardRouter = require('./routes/board');
 const listRouter = require('./routes/list');
 const cardRouter = require('./routes/card');
@@ -47,7 +48,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.use(cors());
 app.use(logger('dev'));
-app.use('/api/auth/avatar', express.json({ limit: '5mb' }));
+app.use('/api/user/avatar', express.json({ limit: '5mb' }));
 app.use('/api/team/logo', express.json({ limit: '5mb' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -59,6 +60,7 @@ app.use('/api/list', listRouter);
 app.use('/api/card', cardRouter);
 app.use('/api/activity', activityRouter);
 app.use('/api/team', teamRouter);
+app.use('/api/user', userRouter);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'));

@@ -12,7 +12,7 @@ export const authReset = () => ({ type: actionTypes.AUTH_RESET });
 
 export const getUserData = () => async dispatch => {
   try {
-    const res = await axios.get('/auth/userData');
+    const res = await axios.get('/user');
     dispatch({ type: actionTypes.UPDATE_USER_DATA, ...res.data });
   } catch (err) {
     dispatch(addNotif('There was an error while retrieving your data.'));
@@ -69,7 +69,7 @@ export const autoLogin = () => async dispatch => {
 
 export const deleteAccount = pass => async dispatch => {
   try {
-    await axios.delete(`auth/deleteAccount/${pass}`);
+    await axios.delete(`/user/deleteAccount/${pass}`);
     dispatch(logout());
   } catch (err) {
     if (err.response && err.response.status === 400) {
