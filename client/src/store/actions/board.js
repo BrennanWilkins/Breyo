@@ -68,11 +68,13 @@ export const updateActiveBoard = data => (dispatch, getState) => {
   let { isStarred, isAdmin: userIsAdmin } = activeBoard;
   const { isAdmin, ...creator} = data.members.find(member => member.email === creatorEmail);
 
-  let team = { teamID, title: '', url: '' };
-  if (teamID) {
+  let team = { teamID, title: '', url: null };
+  if (teamID && !data.team) {
     const teamData = state.auth.teams.find(team => team.teamID === teamID);
     team.title = teamData.title;
     team.url = teamData.url;
+  } else if (teamID && data.team) {
+    team.title = data.team.title;
   }
 
   if (data.invites && data.boards) {

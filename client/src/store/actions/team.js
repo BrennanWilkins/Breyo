@@ -94,6 +94,9 @@ export const leaveTeam = push => async (dispatch, getState) => {
   try {
     const teamID = getState().team.teamID;
     const res = await axios.put('/team/leave', { teamID });
+    const token = res.data.token;
+    axios.defaults.headers.common['x-auth-token'] = token;
+    localStorage['token'] = token;
     push('/');
   } catch (err) {
     dispatch(addNotif('There was an error while leaving the team.'));

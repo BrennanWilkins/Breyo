@@ -51,6 +51,12 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
       const { admins, ...boardData } = board;
       const data = { ...boardData, lists, activity };
 
+      // if user not a member of team but member of board then get team title
+      if (board.teamID && !req.userTeams[board.teamID]) {
+        const team = await Team.findById(board.teamID).select('title').lean();
+        data.team = { teamID: board.teamID, title: team.title };
+      }
+
       const isAdminInToken = req.userAdmins[boardID];
       const isAdminInBoard = admins.includes(req.userID);
       // if user's token is not up to date, send new token

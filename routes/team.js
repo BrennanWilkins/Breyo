@@ -272,12 +272,14 @@ router.put('/leave', auth, validate([body('teamID').isMongoId()]), useIsTeamMemb
       team.members = team.members.filter(id => String(id) !== req.userID);
       user.teams = user.teams.filter(id => String(id) !== teamID);
 
-      await Promise.all([
+      const results = await Promise.all([
+        signNewToken(user, req.header('x-auth-token'), true),
         team.save(),
         user.save()
       ]);
+      const token = results[0];
 
-      res.sendStatus(200);
+      res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }
   }
 );

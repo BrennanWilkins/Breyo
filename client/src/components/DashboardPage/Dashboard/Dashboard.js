@@ -12,13 +12,15 @@ const Dashboard = props => {
 
   const starredBoards = props.boards.filter(board => board.isStarred);
 
+  const personalBoards = props.boards.filter(board => !props.teams.find(team => team.teamID === board.teamID));
+
   return (
     <div className={classes.Container}>
       {starredBoards.length > 0 && <>
       <div className={classes.Title}>{starIcon} Starred Boards</div>
       <BoardList boards={starredBoards} /></>}
       <div className={classes.Title}>{personIcon} My Boards</div>
-      <BoardList boards={props.boards.filter(board => !board.teamID)} createPersonal />
+      <BoardList boards={personalBoards} createPersonal />
       {props.teams.map(team => (
         <div key={team.teamID}>
           <TeamNavBar title={team.title} url={team.url} teamID={team.teamID} />
