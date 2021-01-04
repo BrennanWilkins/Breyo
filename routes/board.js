@@ -141,8 +141,8 @@ router.post('/teamBoard', auth, validate([
       let { color, title, teamID } = req.body;
       // if invalid background then default to red
       if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { color = COLORS[0]; }
-      const [user, team] = await Promise.all([User.findById(req.userID), Team.findById(teamID)]);
-      if (!user || !team) { throw 'No user or team data found'; }
+      const [user, teamExists] = await Promise.all([User.findById(req.userID), Team.exists({ _id: teamID })]);
+      if (!user || !teamExists) { throw 'No user or team data found'; }
 
       // user is admin of new board by default
       const board = new Board({ title, members: [req.userID], admins: [req.userID], color, creatorEmail: user.email, desc: '', teamID });
@@ -151,8 +151,6 @@ router.post('/teamBoard', auth, validate([
       // add board to user's boards
       user.boards.push(boardID);
       user.adminBoards.push(boardID);
-      // add board to team's boards
-      team.boards.push(boardID);
 
       const newBoard = { boardID, title, isStarred: false, isAdmin: true, color, teamID };
 
@@ -162,7 +160,6 @@ router.post('/teamBoard', auth, validate([
         signNewToken(user, req.header('x-auth-token'), true),
         board.save(),
         user.save(),
-        team.save(),
         addActivity(actionData, req)
       ]);
 
@@ -442,8 +439,6 @@ router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIs
       const board = await Board.findByIdAndDelete(boardID).select('members');
       if (!board) { throw 'No board data found'; }
 
-      if (board.teamID) { await Team.updateOne({ _id: board.teamID }, { $pull: { boards: board._id } }); }
-
       await Promise.all([
         User.updateMany({ _id: { $in: board.members }}, { $pull: { boards: board._id, adminBoards: boardID, starredBoards: boardID } }),
         List.deleteMany({ boardID }),
@@ -509,12 +504,8 @@ router.put('/changeTeam', auth, validate([
   async (req, res) => {
     try {
       const { boardID, teamID, newTeamID } = req.body;
-      const [board, oldTeam, newTeam] = await Promise.all([
-        Board.findById(boardID),
-        Team.findById(teamID),
-        Team.findById(newTeamID)
-      ]);
-      if (!board || !oldTeam || !newTeam) {
+      const [board, newTeam] = await Promise.all([Board.findById(boardID), Team.findById(newTeamID)]);
+      if (!board || !newTeam) {
         throw 'Board or team data not found';
       }
       if (!newTeam.members.find(member => String(member) === req.userID)) {
@@ -522,14 +513,8 @@ router.put('/changeTeam', auth, validate([
       }
 
       board.teamID = newTeamID;
-      oldTeam.boards = oldTeam.boards.filter(boardID => String(boardID) !== boardID);
-      newTeam.boards = [...newTeam.boards, boardID];
 
-      await Promise.all([
-        board.save(),
-        oldTeam.save(),
-        newTeam.save()
-      ]);
+      await Promise.all([board.save(), newTeam.save()]);
 
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }

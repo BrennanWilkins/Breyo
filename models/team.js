@@ -6,8 +6,7 @@ const TeamSchema = new Schema({
   desc: String,
   logo: String,
   url: String,
-  members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  boards: [{ type: Schema.Types.ObjectId, ref: 'Board' }]
+  members: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
 module.exports = mongoose.model('Team', TeamSchema);

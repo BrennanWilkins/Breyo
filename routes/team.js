@@ -26,7 +26,7 @@ const validateURL = async url => {
 router.get('/:teamID', auth, validate([param('teamID').not().isEmpty()]), useIsTeamMember,
   async (req, res) => {
     try {
-      const team = await Team.findById(req.params.teamID).populate('members', 'email fullName avatar').select('-boards').lean();
+      const team = await Team.findById(req.params.teamID).populate('members', 'email fullName avatar').lean();
       if (!team) { throw 'Team not found'; }
       res.status(200).json({ team });
     } catch (err) { res.sendStatus(500); }
@@ -58,7 +58,7 @@ router.post('/', auth, validate(
         if (urlIsValid !== '') { return res.status(400).json({ msg: urlIsValid }); }
       }
 
-      const team = new Team({ title, desc, url, logo: null, members: [req.userID], boards: [] });
+      const team = new Team({ title, desc, url, logo: null, members: [req.userID] });
       team.url = team.url === '' ? nanoid() : team.url;
 
       const user = await User.findById(req.userID);
@@ -104,6 +104,7 @@ router.put('/', auth, validate(
       const team = await Team.findById(teamID);
       if (!team) { throw 'Team not found'; }
 
+      // only check url if its different
       if (url !== '' && url !== team.url) {
         const urlIsValid = validateURL(url);
         if (urlIsValid !== '') { return res.status(400).json({ msg: urlIsValid }); }

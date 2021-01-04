@@ -80,6 +80,7 @@ export const acceptTeamInvite = (teamID, push) => async dispatch => {
     dispatch({ type: actionTypes.JOIN_TEAM, team });
     push('/team/' + team.url);
   } catch (err) {
+    if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
     dispatch(addNotif('There was an error while joining the team.'));
   }
 };
@@ -100,6 +101,7 @@ export const leaveTeam = push => async (dispatch, getState) => {
     localStorage['token'] = token;
     push('/');
   } catch (err) {
+    if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
     dispatch(addNotif('There was an error while leaving the team.'));
   }
 };
