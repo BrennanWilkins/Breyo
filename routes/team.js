@@ -251,7 +251,7 @@ router.put('/invites/reject', auth, validate([body('teamID').isMongoId()]),
       const user = await User.findById(req.userID);
       if (!user) { throw 'User data not found'; }
 
-      user.teamInvites = user.teamInvites.filter(invite => invite.teamID !== teamID);
+      user.teamInvites = user.teamInvites.filter(invite => String(invite.teamID) !== teamID);
       await user.save();
 
       res.sendStatus(200);

@@ -56,6 +56,7 @@ const login = (state, action) => ({
   fullName: action.payload.fullName,
   email: action.payload.email,
   invites: action.payload.invites,
+  teamInvites: action.payload.teamInvites,
   boards: action.payload.boards,
   loginLoading: false,
   loginErr: false,
