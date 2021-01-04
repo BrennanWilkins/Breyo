@@ -65,7 +65,7 @@ CardActivity.propTypes = {
 
 const mapStateToProps = state => ({
   comments: state.lists.currentCard.comments,
-  userEmail: state.auth.email,
+  userEmail: state.user.email,
   activity: state.activity.cardActivity,
   isLoading: state.activity.cardActivityLoading,
   avatars: state.board.avatars

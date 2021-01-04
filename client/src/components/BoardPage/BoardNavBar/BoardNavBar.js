@@ -125,7 +125,7 @@ const mapStateToProps = state => ({
   members: state.board.members,
   boardID: state.board.boardID,
   isStarred: state.board.isStarred,
-  userEmail: state.auth.email,
+  userEmail: state.user.email,
   userIsAdmin: state.board.userIsAdmin,
   roadmapShown: state.board.roadmapShown,
   color: state.board.color,

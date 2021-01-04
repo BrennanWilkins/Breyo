@@ -330,7 +330,7 @@ export const addComment = msg => async (dispatch, getState) => {
     const { boardID, listID, cardID, state } = getCardState(getState);
     const date = String(new Date());
     const res = await axios.post('/card/comments', { msg, cardID, listID, date, boardID });
-    const payload = { msg, commentID: res.data.commentID, cardID, date, listID, email: state.auth.email, fullName: state.auth.fullName };
+    const payload = { msg, commentID: res.data.commentID, cardID, date, listID, email: state.user.email, fullName: state.user.fullName };
     dispatch({ type: actionTypes.ADD_COMMENT, payload, cardTitle: res.data.cardTitle });
     sendUpdate('post/card/comments', JSON.stringify({ payload, cardTitle: res.data.cardTitle }));
   } catch (err) {

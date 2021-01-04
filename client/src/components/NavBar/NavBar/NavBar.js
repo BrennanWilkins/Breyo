@@ -50,9 +50,9 @@ NavBar.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  fullName: state.auth.fullName,
+  fullName: state.user.fullName,
   showCreateBoard: state.board.showCreateBoard,
-  avatar: state.auth.avatar
+  avatar: state.user.avatar
 });
 
 const mapDispatchToProps = dispatch => ({

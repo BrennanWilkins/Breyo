@@ -64,13 +64,13 @@ const formatCardData = card => {
 export const updateActiveBoard = data => (dispatch, getState) => {
   const { _id: boardID, members, desc, creatorEmail, color, title, activity, teamID } = data;
   const state = getState();
-  const activeBoard = state.auth.boards.find(board => board.boardID === boardID);
+  const activeBoard = state.user.boards.find(board => board.boardID === boardID);
   let { isStarred, isAdmin: userIsAdmin } = activeBoard;
   const { isAdmin, ...creator} = data.members.find(member => member.email === creatorEmail);
 
   let team = { teamID, title: '', url: null };
   if (teamID && !data.team) {
-    const teamData = state.auth.teams.find(team => team.teamID === teamID);
+    const teamData = state.user.teams.find(team => team.teamID === teamID);
     team.title = teamData.title;
     team.url = teamData.url;
   } else if (teamID && data.team) {
@@ -78,7 +78,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
   }
 
   if (data.invites && data.boards) {
-    const userEmail = state.auth.email;
+    const userEmail = state.user.email;
     userIsAdmin = members.find(member => member.email === userEmail).isAdmin;
     dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: data.invites, boards: data.boards });
   }
@@ -203,8 +203,8 @@ export const deleteBoard = push => async (dispatch, getState) => {
 export const acceptInvite = (boardID, push) => async (dispatch, getState) => {
   try {
     const state = getState();
-    const email = state.auth.email;
-    const fullName = state.auth.fullName;
+    const email = state.user.email;
+    const fullName = state.user.fullName;
     const res = await axios.put('/board/invites/accept', { boardID });
     const { token, board, newActivity } = res.data;
     axios.defaults.headers.common['x-auth-token'] = token;
@@ -239,7 +239,7 @@ export const leaveBoard = push => async (dispatch, getState) => {
   try {
     const state = getState();
     const boardID = state.board.boardID;
-    const email = state.auth.email;
+    const email = state.user.email;
     const res = await axios.put('/board/leave', { boardID });
     addRecentActivity(res.data.newActivity);
     sendUpdate('put/board/memberLeft', JSON.stringify({ email }));

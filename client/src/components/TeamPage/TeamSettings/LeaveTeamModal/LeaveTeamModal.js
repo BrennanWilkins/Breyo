@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import classes from './LeaveTeamModal.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import ModalTitle from '../../../UI/ModalTitle/ModalTitle';

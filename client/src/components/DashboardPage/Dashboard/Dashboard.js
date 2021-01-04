@@ -38,8 +38,8 @@ Dashboard.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  boards: state.auth.boards,
-  teams: state.auth.teams
+  boards: state.user.boards,
+  teams: state.user.teams
 });
 
 const mapDispatchToProps = dispatch => ({

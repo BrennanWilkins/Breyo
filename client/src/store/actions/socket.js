@@ -44,7 +44,7 @@ export const initSocket = boardID => {
     try {
       store.dispatch({ type: actionTypes.ADD_ADMIN, email });
       const state = store.getState();
-      const userEmail = state.auth.email;
+      const userEmail = state.user.email;
       if (email === userEmail) {
         // user was added as admin, fetch new token
         const res = await axios.put('/board/admins/promoteUser', { boardID: state.board.boardID });
@@ -58,7 +58,7 @@ export const initSocket = boardID => {
     try {
       store.dispatch({ type: actionTypes.REMOVE_ADMIN, email });
       const state = store.getState();
-      const userEmail = state.auth.email;
+      const userEmail = state.user.email;
       if (email === userEmail) {
         // user was demoted as admin, fetch new token
         const res = await axios.put('/board/admins/demoteUser', { boardID: state.board.boardID });

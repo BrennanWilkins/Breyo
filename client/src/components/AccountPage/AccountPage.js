@@ -35,9 +35,9 @@ AccountPage.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  email: state.auth.email,
-  fullName: state.auth.fullName,
-  avatar: state.auth.avatar
+  email: state.user.email,
+  fullName: state.user.fullName,
+  avatar: state.user.avatar
 });
 
 export default connect(mapStateToProps)(withRouter(AccountPage));

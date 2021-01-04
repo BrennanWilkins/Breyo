@@ -19,7 +19,7 @@ TeamBoards.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  boards: state.auth.boards,
+  boards: state.user.boards,
   teamID: state.team.teamID,
   teamTitle: state.team.title
 });

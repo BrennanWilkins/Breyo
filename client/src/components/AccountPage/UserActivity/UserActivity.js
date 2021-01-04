@@ -61,8 +61,8 @@ UserActivity.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  boards: state.auth.boards,
-  avatar: state.auth.avatar
+  boards: state.user.boards,
+  avatar: state.user.avatar
 });
 
 export default connect(mapStateToProps)(UserActivity);

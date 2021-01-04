@@ -1,6 +1,5 @@
 import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
-import { addNotif } from './notifications';
 
 const loginDispatch = payload => ({ type: actionTypes.LOGIN, payload });
 
@@ -9,15 +8,6 @@ export const loginErr = msg => ({ type: actionTypes.LOGIN_ERR, msg });
 export const signupErr = msg => ({ type: actionTypes.SIGNUP_ERR, msg });
 
 export const authReset = () => ({ type: actionTypes.AUTH_RESET });
-
-export const getUserData = () => async dispatch => {
-  try {
-    const res = await axios.get('/user');
-    dispatch({ type: actionTypes.UPDATE_USER_DATA, ...res.data });
-  } catch (err) {
-    dispatch(addNotif('There was an error while retrieving your data.'));
-  }
-};
 
 export const login = (email, password) => async dispatch => {
   try {
@@ -66,19 +56,3 @@ export const autoLogin = () => async dispatch => {
     dispatch({ type: actionTypes.AUTO_LOGIN_LOADING, bool: false });
   } catch (err) { dispatch(logout()); }
 };
-
-export const deleteAccount = pass => async dispatch => {
-  try {
-    await axios.delete(`/user/deleteAccount/${pass}`);
-    dispatch(logout());
-  } catch (err) {
-    if (err.response && err.response.status === 400) {
-      return dispatch(addNotif('Incorrect password.'));
-    }
-    dispatch(addNotif('There was an error while deleting your account.'));
-  }
-};
-
-export const changeAvatar = url => ({ type: actionTypes.CHANGE_AVATAR, url });
-
-export const deleteAvatar = () => ({ type: actionTypes.DELETE_AVATAR });

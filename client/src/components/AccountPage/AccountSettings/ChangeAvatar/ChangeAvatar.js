@@ -68,8 +68,8 @@ ChangeAvatar.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  fullName: state.auth.fullName,
-  avatar: state.auth.avatar
+  fullName: state.user.fullName,
+  avatar: state.user.avatar
 });
 
 const mapDispatchToProps = dispatch => ({

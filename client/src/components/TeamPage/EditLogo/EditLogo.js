@@ -1,9 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import classes from './EditLogo.module.css';
 import { useModalToggle } from '../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import ModalTitle from '../../UI/ModalTitle/ModalTitle';
-import { uploadIcon } from '../../UI/icons';
 import { FileInput } from '../../UI/Inputs/Inputs';
 import { ActionBtn } from '../../UI/Buttons/Buttons';
 import { changeTeamLogo, removeTeamLogo } from '../../../store/actions';

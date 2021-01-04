@@ -6,6 +6,7 @@ import boardReducer from './store/reducers/board';
 import listsReducer from './store/reducers/lists';
 import activityReducer from './store/reducers/activity';
 import teamReducer from './store/reducers/team';
+import userReducer from './store/reducers/user';
 
 const composeEnhancers = process.env.NODE_ENV === 'development' ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null || compose;
 
@@ -15,7 +16,8 @@ const rootReducer = combineReducers({
   board: boardReducer,
   lists: listsReducer,
   activity: activityReducer,
-  team: teamReducer
+  team: teamReducer,
+  user: userReducer
 });
 
 const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)));

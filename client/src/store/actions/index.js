@@ -1,5 +1,4 @@
-export { login, logout, loginErr, signupErr, signup, authReset, autoLogin, getUserData,
-deleteAccount, deleteAvatar, changeAvatar } from './auth';
+export { login, logout, loginErr, signupErr, signup, authReset, autoLogin } from './auth';
 export { createBoard, toggleIsStarred, updateActiveBoard, updateBoardTitle, sendInvite,
 addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc, deleteBoard, acceptInvite,
 rejectInvite, leaveBoard, openRoadmap, setShownRoadmapList, closeRoadmap, openRoadmapList,
@@ -22,3 +21,4 @@ resetSearchQuery } from './cardSearchQueries';
 export { createTeam, getActiveTeam, editTeam, changeTeamLogo, removeTeamLogo,
 deleteTeam, inviteTeamMembers, acceptTeamInvite, rejectTeamInvite, leaveTeam,
 changeBoardTeam } from './team';
+export { getUserData, deleteAccount, deleteAvatar, changeAvatar } from './user';

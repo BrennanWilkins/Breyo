@@ -14,7 +14,7 @@ export const createTeam = payload => dispatch => {
 
 export const getActiveTeam = (url, push) => async (dispatch, getState) => {
   try {
-    const teamID = getState().auth.teams.find(team => team.url === url).teamID;
+    const teamID = getState().user.teams.find(team => team.url === url).teamID;
     const res = await axios.get('/team/' + teamID);
     dispatch({ type: actionTypes.SET_ACTIVE_TEAM, team: res.data.team });
   } catch (err) {
@@ -111,7 +111,7 @@ export const changeBoardTeam = (oldTeamID, newTeamID) => async (dispatch, getSta
     const state = getState();
     const boardID = state.board.boardID;
     await axios.put('/board/changeTeam', { boardID, teamID: oldTeamID, newTeamID });
-    const team = state.auth.teams.find(team => team.teamID === newTeamID);
+    const team = state.user.teams.find(team => team.teamID === newTeamID);
     dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team });
     sendUpdate('put/board/changeTeam', JSON.stringify({ team }));
   } catch (err) {

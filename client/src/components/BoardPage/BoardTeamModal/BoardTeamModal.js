@@ -55,7 +55,7 @@ BoardTeamModal.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  teams: state.auth.teams,
+  teams: state.user.teams,
   userIsAdmin: state.board.userIsAdmin
 });
 

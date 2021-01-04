@@ -57,11 +57,11 @@ AccountModal.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  fullName: state.auth.fullName,
-  email: state.auth.email,
-  invites: state.auth.invites,
-  teamInvites: state.auth.teamInvites,
-  avatar: state.auth.avatar
+  fullName: state.user.fullName,
+  email: state.user.email,
+  invites: state.user.invites,
+  teamInvites: state.user.teamInvites,
+  avatar: state.user.avatar
 });
 
 const mapDispatchToProps = dispatch => ({
