@@ -252,7 +252,7 @@ export const leaveBoard = push => async (dispatch, getState) => {
 
 export const openRoadmap = () => (dispatch, getState) => {
   const state = getState();
-  if (!state.board.shownRoadmapListID) {
+  if (!state.board.shownRoadmapListID && state.lists.lists.length) {
     const listID = state.lists.lists[0].listID;
     dispatch({ type: actionTypes.SET_SHOWN_ROADMAP_LIST, listID });
   }

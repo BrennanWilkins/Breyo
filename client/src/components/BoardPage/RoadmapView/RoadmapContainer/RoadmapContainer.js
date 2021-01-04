@@ -32,7 +32,7 @@ const RoadmapContainer = props => {
 
   return (
     <div className={classes.Container} style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
-      <Roadmap cardsShown={showCards} listsShown={showLists} cards={assignedCards} showDetails={showCardDetailsHandler} />
+      <Roadmap cardsShown={showCards} listsShown={showLists} cards={assignedCards} showDetails={showCardDetailsHandler} noLists={props.shownRoadmapListID === null} />
       <RoadmapListsMenu show={showLists} toggle={() => setShowLists(prev => !prev)} lists={props.lists} shownRoadmapListID={props.shownRoadmapListID} />
       <RoadmapCardsMenu show={showCards} toggle={() => setShowCards(prev => !prev)} cards={unassignedCards} showDetails={showCardDetailsHandler} />
     </div>

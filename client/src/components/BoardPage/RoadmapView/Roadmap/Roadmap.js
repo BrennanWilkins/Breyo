@@ -84,8 +84,10 @@ const Roadmap = props => {
           ))}
         </div>
         <div className={classes.CardsContainer}>{cards}</div>
-        {!props.cards.length && <div className={classes.NoCards}>There aren't any cards added to this list's roadmap yet.
-        To add a card, add a start date or due date to the card.</div>}
+        {!props.cards.length && <div className={classes.NoCards}>
+          {props.noLists ? `You don't have any lists added to this board yet to show.` :
+          `There aren't any cards added to this list's roadmap yet. To add a card, add a start date or due date to the card.`}
+        </div>}
         {monthRange.map((month, i) => (
           <div key={i} style={{ marginLeft: `${defaultDayWidth * 30 * i - 1.2}px`, width: `${defaultDayWidth * 30}px` }} className={classes.MonthSeparator}></div>
         ))}
@@ -104,7 +106,8 @@ Roadmap.propTypes = {
   cardsShown: PropTypes.bool.isRequired,
   listsShown: PropTypes.bool.isRequired,
   cards: PropTypes.array.isRequired,
-  showDetails: PropTypes.func.isRequired
+  showDetails: PropTypes.func.isRequired,
+  noLists: PropTypes.bool.isRequired
 };
 
 export default Roadmap;
