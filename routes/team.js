@@ -76,13 +76,13 @@ router.post('/', auth, validate(
           user.teamInvites.push({ inviterEmail: req.email, inviterName: req.fullName, title, teamID: team._id });
           users.push(user);
         }
+        await Promise.all([...users.map(user => user.save())]);
       }
 
       const results = await Promise.all([
         signNewToken(user, req.header('x-auth-token'), true),
         team.save(),
-        user.save(),
-        ...users.map(user => user.save())
+        user.save()
       ]);
       const token = results[0];
 
