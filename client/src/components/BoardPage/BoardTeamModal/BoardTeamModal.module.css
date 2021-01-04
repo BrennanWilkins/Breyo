@@ -1,0 +1,29 @@
+.Container {
+  position: fixed;
+  width: 300px;
+  background: white;
+  transition: 250ms;
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  padding: 10px 0;
+  box-sizing: border-box;
+  font-size: 15px;
+  margin: 3px 0 0 3px;
+}
+.Options {
+  margin-top: 5px;
+}
+.Options a {
+  display: block;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: rgb(50,50,50);
+}
+.Options a:hover {
+  background: rgb(245, 245, 245);
+}
+.Container p {
+  text-align: center;
+  color: rgb(100,100,100);
+  padding: 0 10px;
+}

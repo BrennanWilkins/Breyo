@@ -11,6 +11,7 @@ import BoardMenu from '../BoardMenu/BoardMenu';
 import MemberModal from '../MemberModal/MemberModal';
 import { LIGHT_PHOTO_IDS } from '../../../utils/backgrounds';
 import QueryCountBtn from '../../UI/QueryCountBtn/QueryCountBtn';
+import BoardTeamModal from '../BoardTeamModal/BoardTeamModal';
 
 const BoardNavBar = props => {
   const [inputTitle, setInputTitle] = useState(props.title);
@@ -20,6 +21,7 @@ const BoardNavBar = props => {
   const [darkenBtns, setDarkenBtns] = useState(false);
   const [darkenBtns2, setDarkenBtns2] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showBoardTeamModal, setShowBoardTeamModal] = useState(false);
 
   useEffect(() => setAdminCount(props.members.filter(member => member.isAdmin).length), [props.members]);
 
@@ -56,7 +58,8 @@ const BoardNavBar = props => {
   };
 
   return (
-    <div className={`${classes.NavBar} ${darkenBtns2 ? classes.DarkenBtns2 : darkenBtns ? classes.DarkenBtns : ''}`} style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
+    <div className={`${classes.NavBar} ${darkenBtns2 ? classes.DarkenBtns2 : darkenBtns ? classes.DarkenBtns : ''}`}
+    style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
       <BoardMenu show={props.showMenu} close={props.closeMenu} showSearch={showSearch} setShowSearch={bool => setShowSearch(bool)} />
       <span className={props.showMenu ? `${classes.Input} ${classes.InputContracted}` : classes.Input}>
         <AutosizeInput value={inputTitle} onChange={inputTitleHandler} onBlur={checkTitle} />
@@ -80,7 +83,12 @@ const BoardNavBar = props => {
         <span className={classes.Btn}><Button clicked={() => setShowInviteModal(true)}>Invite</Button></span>
         {showInviteModal && <InviteModal boardID={props.boardID} close={() => setShowInviteModal(false)} />}
       </span>
-      {props.team.teamID && <span className={`${classes.Btn} ${classes.TeamBtn}`}><Button>{teamIcon}<div>{props.team.title}</div></Button></span>}
+      <span className={classes.Container}>
+        {props.team.teamID && <span className={`${classes.Btn} ${classes.TeamBtn}`}>
+          <Button clicked={() => setShowBoardTeamModal(true)}>{teamIcon}<div>{props.team.title}</div></Button>
+        </span>}
+        {showBoardTeamModal && <BoardTeamModal team={props.team} close={() => setShowBoardTeamModal(false)} />}
+      </span>
       <span className={classes.MenuBtns}>
         {props.cardsAreFiltered && <QueryCountBtn openMenu={openSearchHandler} />}
         <span className={`${classes.Btn} ${classes.RoadBtn} ${props.roadmapShown ? classes.RoadBtn2 : ''}`}>
