@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { updateBoardTitle, toggleIsStarred, openRoadmap, closeRoadmap } from '../../../store/actions';
 import AutosizeInput from 'react-input-autosize';
 import Button, { AccountBtn } from '../../UI/Buttons/Buttons';
-import { starIcon, dotsIcon, roadmapIcon, boardIcon, adminIcon, teamIcon } from '../../UI/icons';
+import { starIcon, dotsIcon, roadmapIcon, boardIcon, teamIcon } from '../../UI/icons';
 import InviteModal from '../InviteModal/InviteModal';
 import BoardMenu from '../BoardMenu/BoardMenu';
 import MemberModal from '../MemberModal/MemberModal';
@@ -71,8 +71,9 @@ const BoardNavBar = props => {
       {props.members.map(member => (
         <span key={member.email} className={classes.Container}>
           <span className={classes.AccountBtn}>
-            <AccountBtn avatar={member.avatar} clicked={() => setShowMember(member.email)} title={member.fullName}>{member.fullName[0]}</AccountBtn>
-            {member.isAdmin && <div className={classes.AdminIcon}>{adminIcon}</div>}
+            <AccountBtn isAdmin={member.isAdmin} avatar={member.avatar} clicked={() => setShowMember(member.email)} title={member.fullName}>
+              {member.fullName[0]}
+            </AccountBtn>
           </span>
           {showMember === member.email &&
             <MemberModal close={() => setShowMember('')} fullName={member.fullName} email={member.email} userEmail={props.userEmail}

@@ -1,14 +1,15 @@
 import React from 'react';
 import classes from './Buttons.module.css';
-import { xIcon, caretIcon, backIcon } from '../icons';
+import { xIcon, caretIcon, backIcon, adminIcon } from '../icons';
 
 const Button = props => (
   <button className={classes.Button} onClick={props.clicked} disabled={props.disabled}>{props.children}</button>
 );
 
 export const AccountBtn = props => (
-  <button className={props.avatar ? classes.AccountBtnImg : classes.AccountBtn} onClick={props.clicked} title={props.title}>
+  <button className={props.avatar ? classes.AvatarBtn : classes.AccountBtn} onClick={props.clicked} title={props.title}>
     {props.avatar ? <img src={props.avatar} alt="" /> : props.children}
+    {props.isAdmin && <div className={classes.AdminIcon}>{adminIcon}</div>}
   </button>
 );
 

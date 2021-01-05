@@ -64,6 +64,11 @@
   width: 29px;
   height: 29px;
   font-size: 15px;
+  position: relative;
+  overflow: visible;
+}
+.AccountBtn button img {
+  border-radius: 25px;
 }
 .Btn button {
   height: 33px;
@@ -107,13 +112,6 @@
 }
 .DarkenBtns2 .StarBtn button:hover, .DarkenBtns2 .Btn button:hover {
   background: rgba(0,0,0,0.4);
-}
-.AdminIcon {
-  font-size: 20px;
-  position: absolute;
-  color: black;
-  bottom: -7px;
-  right: 0;
 }
 .TeamBtn svg {
   margin: 0 5px 0 2px;

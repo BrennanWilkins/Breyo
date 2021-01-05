@@ -112,7 +112,7 @@
   width: 30px !important;
   height: 30px !important;
 }
-.AccountBtnImg {
+.AvatarBtn {
   border-radius: 25px;
   display: inline-block;
   width: 32px;
@@ -125,10 +125,20 @@
   padding: 0;
   overflow: hidden;
 }
-.AccountBtnImg:hover {
+.AvatarBtn:hover {
   filter: brightness(1.1);
 }
-.AccountBtnImg img {
+.AvatarBtn img {
   width: 100%;
   height: 100%;
+}
+.AdminIcon {
+  font-size: 20px;
+  position: absolute;
+  color: black;
+  bottom: -7px;
+  right: -3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
