@@ -10,23 +10,6 @@
   font-size: 15px;
   margin: 3px 0 0 3px;
 }
-.Options {
-  margin-top: 5px;
-}
-.Options a, .Options div {
-  display: block;
-  padding: 8px 10px;
-  cursor: pointer;
-  color: rgb(50,50,50);
-}
-.Options a:hover, .Options div:hover {
-  background: rgb(245, 245, 245);
-}
-.Container p {
-  text-align: center;
-  color: rgb(100,100,100);
-  padding: 0 5px;
-}
 .Select {
   padding: 10px 10px 0;
 }
@@ -39,7 +22,7 @@
   width: 100%;
   padding: 3px 0;
 }
-.ChangeBtn {
+.AddBtn {
   outline: none;
   padding: 8px 13px;
   font-size: 14.5px;
@@ -51,23 +34,19 @@
   transition: background 250ms;
   margin: 15px 0 0;
 }
-.ChangeBtn:hover {
+.AddBtn:hover {
   background: rgba(var(--green), 0.85);
 }
-.ChangeBtn:active {
+.AddBtn:active {
   background: rgb(21, 145, 27);
 }
-.ChangeBtn:disabled {
+.AddBtn:disabled {
   cursor: not-allowed;
   background: rgb(220,220,220);
-}
-.BackBtn {
-  position: absolute;
-  top: 5px;
-  left: 5px;
 }
 .ErrMsg {
   text-align: center;
   font-size: 14px;
   margin: 10px 0 5px;
+  padding: 0 10px;
 }

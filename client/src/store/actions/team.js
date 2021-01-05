@@ -118,3 +118,16 @@ export const changeBoardTeam = (oldTeamID, newTeamID) => async (dispatch, getSta
     dispatch(addNotif('There was an error while moving the board.'));
   }
 };
+
+export const addToTeam = teamID => async (dispatch, getState) => {
+  try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    const team = state.user.teams.find(team => team.teamID === teamID);
+    await axios.put('/board/addToTeam', { boardID, teamID });
+    dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team });
+    sendUpdate('put/board/changeTeam', JSON.stringify({ team }));
+  } catch (err) {
+    dispatch(addNotif('There was an error while adding the board to the team.'));
+  }
+}

@@ -12,12 +12,14 @@ import BoardTeamModal from '../BoardTeamModal/BoardTeamModal';
 import BoardTitle from './BoardTitle';
 import BoardMembers from './BoardMembers';
 import MenuBtns from './BoardNavBarMenuBtns';
+import AddToTeamModal from '../AddToTeamModal/AddToTeamModal';
 
 const BoardNavBar = props => {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [darkMode, setDarkMode] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showBoardTeamModal, setShowBoardTeamModal] = useState(false);
+  const [showAddToTeam, setShowAddToTeam] = useState(false);
 
   useEffect(() => {
     // if board background causes btns to be hard to see, add darken class
@@ -43,9 +45,16 @@ const BoardNavBar = props => {
         {showInviteModal && <InviteModal boardID={props.boardID} close={() => setShowInviteModal(false)} />}
       </span>
       <span className={classes.Container}>
-        {props.team.teamID && <span className={`${classes.Btn} ${classes.TeamBtn}`}>
-          <Button clicked={() => setShowBoardTeamModal(true)}>{teamIcon}<div>{props.team.title}</div></Button>
-        </span>}
+        {props.team.teamID ?
+          <span className={`${classes.Btn} ${classes.TeamBtn}`}>
+            <Button clicked={() => setShowBoardTeamModal(true)}>{teamIcon}<div>{props.team.title}</div></Button>
+          </span>
+          :
+          <span className={classes.Btn}>
+            <Button clicked={() => setShowAddToTeam(true)}>Personal</Button>
+          </span>
+        }
+        {showAddToTeam && <AddToTeamModal close={() => setShowAddToTeam(false)} />}
         {showBoardTeamModal && <BoardTeamModal team={props.team} close={() => setShowBoardTeamModal(false)} />}
       </span>
       <MenuBtns showMenu={props.showMenu} openMenu={props.openMenu} openSearch={() => setShowSearch(true)} />

@@ -521,5 +521,25 @@ router.put('/changeTeam', auth, validate([
   }
 );
 
+// authorization: admin, team member
+// move a personal board to a team
+router.put('/addToTeam', auth, validate([body('boardID').isMongoId(), body('teamID').isMongoId()]),
+useIsAdmin, useIsTeamMember,
+  async (req, res) => {
+    try {
+      const { boardID, teamID } = req.body;
+      const [board, team] = await Promise.all([Board.findById(boardID), Team.findById(teamID)]);
+      if (!board || !team) { throw 'Board or team data not found'; }
+
+      if (board.teamID) { return res.status(400).json({ msg: 'This board is already part of a team.' }); }
+
+      board.teamID = teamID;
+      await board.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;
 module.exports.signNewToken = signNewToken;
