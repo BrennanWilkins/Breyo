@@ -81,3 +81,12 @@
 .Title {
   word-wrap: break-word;
 }
+.PastDue, .DueSoon {
+  border-radius: 3px;
+  padding: 3px 5px;
+  background: rgb(242, 121, 104);
+  color: white;
+}
+.DueSoon {
+  background: rgb(241, 222, 80);
+}

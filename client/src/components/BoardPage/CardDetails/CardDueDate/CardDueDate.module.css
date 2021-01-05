@@ -27,3 +27,17 @@
 .DateContainer {
   margin-bottom: 10px;
 }
+.DueSoon, .OverDue {
+  margin-left: 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  padding: 2.5px;
+  line-height: 100%;
+  background: rgb(242, 121, 104);
+  color: white;
+  box-sizing: border-box;
+}
+.DueSoon {
+  color: inherit;
+  background: rgb(241, 222, 80);
+}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import classes from './Card.module.css';
 import PropTypes from 'prop-types';
 import { clockIcon, checklistIcon, commentIcon, descIcon } from '../../../UI/icons';
-import { format } from 'date-fns';
+import { format, isPast, isToday } from 'date-fns';
 import formatDate from '../../../../utils/formatDate';
 
 const CardBtns = props => {
@@ -20,11 +20,14 @@ const CardBtns = props => {
     }).length);
   }, [props.checklists]);
 
+  const date = props.dueDate ? new Date(props.dueDate.dueDate) : null;
+
   return (
     <div className={classes.Btns}>
       {props.dueDate &&
-        <div title={'Due ' + formatDate(new Date(props.dueDate.dueDate))} className={props.dueDate.isComplete ? `${classes.Btn} ${classes.BtnComplete}` : classes.Btn}>
-          {clockIcon}{format(new Date(props.dueDate.dueDate), 'MMM d')}
+        <div title={'Due ' + formatDate(date)}
+        className={`${classes.Btn} ${props.dueDate.isComplete ? classes.BtnComplete : isPast(date) ? classes.PastDue : isToday(date) ? classes.DueSoon : ''}`}>
+          {clockIcon}{format(date, 'MMM d')}
         </div>}
       {props.hasDesc && <div className={classes.Btn}>{descIcon}</div>}
       {totalChecklists > 0 &&

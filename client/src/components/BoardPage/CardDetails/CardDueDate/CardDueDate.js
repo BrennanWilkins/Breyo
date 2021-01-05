@@ -7,9 +7,11 @@ import { Checkbox } from '../../../UI/Inputs/Inputs';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import DueDateModal from '../DueDateModal/DueDateModal';
 import formatDate from '../../../../utils/formatDate';
+import { isPast, isToday } from 'date-fns';
 
 const CardDueDate = props => {
   const [showModal, setShowModal] = useState(false);
+  const dueDate = new Date(props.currentDueDate.dueDate);
 
   return (
     <div className={classes.Container}>
@@ -24,7 +26,10 @@ const CardDueDate = props => {
         <div className={classes.Input}>
           <Checkbox checked={props.currentDueDate.isComplete} clicked={props.toggleIsComplete} />
           <span className={classes.Btn}>
-            <ActionBtn clicked={() => setShowModal(true)}>{formatDate(props.currentDueDate.dueDate)}</ActionBtn>
+            <ActionBtn clicked={() => setShowModal(true)}>
+              {formatDate(props.currentDueDate.dueDate)}
+              {isPast(dueDate) ? <div className={classes.OverDue}>OVERDUE</div> : isToday(dueDate) ? <div className={classes.DueSoon}>DUE SOON</div> : null}
+            </ActionBtn>
           </span>
         </div>
       </div>
