@@ -20,3 +20,7 @@
 .react-datepicker__day--keyboard-selected {
   background: rgb(var(--red), 0.6) !important;
 }
+.react-datepicker {
+  max-height: 235.2px;
+  overflow: hidden;
+}
