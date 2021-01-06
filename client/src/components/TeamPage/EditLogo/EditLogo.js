@@ -15,10 +15,14 @@ const EditLogo = props => {
   return (
     <div ref={modalRef} className={classes.Container}>
       <ModalTitle close={props.close} title="Change Logo" />
-      <FileInput title="Upload a new logo" change={img => { props.changeLogo(img, props.teamID); props.close(); }} />
-      {!!props.logo && <div className={classes.RemoveBtn}>
-        <ActionBtn clicked={() => { props.removeLogo(props.teamID); props.close(); }}>Remove logo</ActionBtn>
-      </div>}
+      {props.userIsAdmin ?
+        <>
+          <FileInput title="Upload a new logo" change={img => { props.changeLogo(img, props.teamID); props.close(); }} />
+          {!!props.logo && <div className={classes.RemoveBtn}>
+          <ActionBtn clicked={() => { props.removeLogo(props.teamID); props.close(); }}>Remove logo</ActionBtn>
+          </div>}
+        </>
+        : <div className={classes.NotAdmin}>You must be an admin of this team to change the logo.</div>}
     </div>
   );
 };
@@ -28,7 +32,8 @@ EditLogo.propTypes = {
   logo: PropTypes.string,
   close: PropTypes.func.isRequired,
   changeLogo: PropTypes.func.isRequired,
-  removeLogo: PropTypes.func.isRequired
+  removeLogo: PropTypes.func.isRequired,
+  userIsAdmin: PropTypes.bool.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({

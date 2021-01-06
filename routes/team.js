@@ -9,6 +9,7 @@ const Activity = require('../models/activity');
 const Board = require('../models/board');
 const { signNewToken } = require('./board');
 const useIsTeamMember = require('../middleware/useIsTeamMember');
+const useIsTeamAdmin = require('../middleware/useIsTeamAdmin');
 
 const validateURL = async url => {
   try {
@@ -26,9 +27,23 @@ const validateURL = async url => {
 router.get('/:teamID', auth, validate([param('teamID').not().isEmpty()]), useIsTeamMember,
   async (req, res) => {
     try {
-      const team = await Team.findById(req.params.teamID).populate('members', 'email fullName avatar').lean();
+      const teamID = req.params.teamID;
+      const team = await Team.findById(teamID).populate('members', 'email fullName avatar').lean();
       if (!team) { throw 'Team not found'; }
-      res.status(200).json({ team });
+
+      const data = { team };
+      const isAdminInToken = req.userAdminTeams[teamID];
+      const isAdminInTeam = team.admins.includes(req.userID);
+      // if user's token is not up to date, send new token
+      if ((!isAdminInToken && isAdminInTeam) || (isAdminInToken && !isAdminInTeam)) {
+        const user = await User.findById(req.userID).lean();
+        const token = await signNewToken(user, req.header('x-auth-token'), true);
+        data.token = token;
+        data.teams = user.teams;
+        data.adminTeams = user.adminTeams;
+      }
+
+      res.status(200).json({ data });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -58,12 +73,13 @@ router.post('/', auth, validate(
         if (urlIsValid !== '') { return res.status(400).json({ msg: urlIsValid }); }
       }
 
-      const team = new Team({ title, desc, url, logo: null, members: [req.userID] });
+      const team = new Team({ title, desc, url, logo: null, members: [req.userID], admins: [req.userID] });
       team.url = team.url === '' ? nanoid() : team.url;
 
       const user = await User.findById(req.userID);
       user.teams.push(team._id);
-
+      // user is admin of team by default
+      user.adminTeams.push(team._id);
 
       if (members !== '') {
         // members sent as emails separated by space, if user found then send invite
@@ -91,13 +107,13 @@ router.post('/', auth, validate(
   }
 );
 
-// authorization: team member
+// authorization: team admin
 // edit a teams info
 router.put('/', auth, validate(
   [body('title').isLength({ min: 1, max: 100 }),
   body('desc').isLength({ min: 0, max: 400 }),
   body('url').isLength({ min: 0, max: 50 }),
-  body('teamID').isMongoId()]), useIsTeamMember,
+  body('teamID').isMongoId()]), useIsTeamAdmin,
   async (req, res) => {
     try {
       const { title, desc, url, teamID } = req.body;
@@ -121,9 +137,9 @@ router.put('/', auth, validate(
   }
 );
 
-// authorization: team member
+// authorization: team admin
 // delete a team, does not delete team's boards
-router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTeamMember,
+router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTeamAdmin,
   async (req, res) => {
     try {
       const teamID = req.params.teamID;
@@ -144,9 +160,9 @@ router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTe
   }
 );
 
-// authorization: team member
+// authorization: team admin
 // change team's logo
-router.put('/logo', auth, validate([body('teamID').isMongoId(), body('logo').not().isEmpty()]), useIsTeamMember,
+router.put('/logo', auth, validate([body('teamID').isMongoId(), body('logo').not().isEmpty()]), useIsTeamAdmin,
   async (req, res) => {
     try {
       const logo = await resizeImg(req.body.logo);
@@ -164,9 +180,9 @@ router.put('/logo', auth, validate([body('teamID').isMongoId(), body('logo').not
   }
 );
 
-// authorization: team member
+// authorization: team admin
 // delete a team's logo
-router.delete('/logo/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTeamMember,
+router.delete('/logo/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTeamAdmin,
   async (req, res) => {
     try {
       const team = await Team.findByIdAndUpdate(req.params.teamID, { logo: null }).select('logo').lean();
@@ -267,6 +283,7 @@ router.put('/leave', auth, validate([body('teamID').isMongoId()]), useIsTeamMemb
       if (team.members.length === 1) { return res.status(400).json({ msg: 'You cannot leave a team if you are the only member.' }); }
 
       team.members = team.members.filter(id => String(id) !== req.userID);
+      team.admins = team.admins.filter(id => id !== req.userID);
       user.teams = user.teams.filter(id => String(id) !== teamID);
 
       const results = await Promise.all([

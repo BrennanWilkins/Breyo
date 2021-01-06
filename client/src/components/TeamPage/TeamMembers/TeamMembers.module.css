@@ -39,6 +39,7 @@
 }
 .Member {
   margin-top: 20px;
+  position: relative;
 }
 .InviteBtn {
   outline: none;
@@ -65,4 +66,18 @@
 .InviteBtn svg {
   margin-right: 5px;
   min-width: 16px;
+}
+.MembershipBtn {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+}
+.MembershipBtn button {
+  width: 90px;
+  justify-content: flex-start;
+  padding: 6px 8px;
+}
+.MembershipBtn svg {
+  min-width: 16px;
+  margin-left: auto;
 }

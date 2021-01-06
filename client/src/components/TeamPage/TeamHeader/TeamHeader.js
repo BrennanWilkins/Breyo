@@ -18,9 +18,9 @@ const TeamHeader = props => {
           {props.logo ? <img src={props.logo} alt="" /> : teamIcon}
           <div className={classes.ChangeLogo} onClick={() => setShowEditLogo(true)}>Change</div>
         </button>
-        {showEditLogo && <EditLogo teamID={props.teamID} logo={props.logo} close={() => setShowEditLogo(false)} />}
+        {showEditLogo && <EditLogo teamID={props.teamID} logo={props.logo} close={() => setShowEditLogo(false)} userIsAdmin={props.userIsAdmin} />}
         {showEditTeam ? <EditTeam close={() => setShowEditTeam(false)} desc={props.desc}
-        title={props.title} teamID={props.teamID} url={props.url} />
+        title={props.title} teamID={props.teamID} url={props.url} userIsAdmin={props.userIsAdmin} />
           : <>
           <div className={classes.TeamInfo}>
             <div className={classes.Title}>{props.title}</div>
@@ -38,7 +38,8 @@ TeamHeader.propTypes = {
   title: PropTypes.string.isRequired,
   logo: PropTypes.string,
   teamID: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired
+  url: PropTypes.string.isRequired,
+  userIsAdmin: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -46,7 +47,8 @@ const mapStateToProps = state => ({
   title: state.team.title,
   logo: state.team.logo,
   teamID: state.team.teamID,
-  url: state.team.url
+  url: state.team.url,
+  userIsAdmin: state.team.userIsAdmin
 });
 
 export default connect(mapStateToProps)(TeamHeader);

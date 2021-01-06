@@ -1,26 +1,25 @@
 .Container {
-  position: fixed;
-  width: 300px;
-  height: 200px;
+  position: absolute;
+  max-width: 350px;
+  width: 96%;
   background: white;
   box-shadow: var(--box-shadow4);
-  border-radius: 4px;
-  padding: 10px 0;
+  border-radius: 3px;
+  top: 35px;
+  right: 10px;
+  border: 1px solid #ddd;
+  padding: 5px 5px 10px;
   box-sizing: border-box;
+  z-index: 2;
   font-size: 15px;
-  margin: 5px 0 0 3px;
-  overflow: hidden;
 }
-.CloseBtn, .BackBtn {
+.Container::after {
+  content: "";
   position: absolute;
-  right: 0;
-  top: 0;
-  margin: 2.5px;
-}
-.BackBtn {
-  left: 0;
-  right: auto;
-  width: auto;
+  height: 20px;
+  width: 1px;
+  visibility: hidden;
+  bottom: -20px;
 }
 .Options div {
   font-size: 14px;
@@ -31,7 +30,7 @@
   background: rgb(241, 241, 241);
 }
 .Disabled, .Disabled span {
-  color: rgb(196, 196, 196) !important;
+  color: rgb(180,180,180) !important;
   cursor: default !important;
 }
 .Disabled:hover {
@@ -49,17 +48,8 @@
   left: 4px;
   top: 2px;
 }
-.Title {
-  text-align: center;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #ddd;
-  color: rgb(112, 112, 112);
-  font-size: 15px;
-  line-height: 29px;
-  margin: 0 10px;
-}
 .CannotChange {
-  margin: 10px 10px 0 10px;
+  margin: 10px 0;
   font-size: 14px;
   text-align: center;
   padding-top: 15px;

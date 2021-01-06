@@ -51,3 +51,7 @@
 .HideErrMsg {
   visibility: hidden;
 }
+.NotAdmin {
+  margin-top: -20px;
+  font-size: 15px;
+}

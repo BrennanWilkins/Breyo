@@ -14,9 +14,18 @@ export const createTeam = payload => dispatch => {
 
 export const getActiveTeam = (url, push) => async (dispatch, getState) => {
   try {
-    const teamID = getState().user.teams.find(team => team.url === url).teamID;
-    const res = await axios.get('/team/' + teamID);
-    dispatch({ type: actionTypes.SET_ACTIVE_TEAM, team: res.data.team });
+    const team = getState().user.teams.find(team => team.url === url);
+    const res = await axios.get('/team/' + team.teamID);
+    const { data } = res.data;
+    data.team.userIsAdmin = team.isAdmin;
+
+    if (data.token) {
+      axios.defaults.headers.common['x-auth-token'] = data.token;
+      localStorage['token'] = data.token;
+      dispatch({ type: actionTypes.UPDATE_USER_TEAMS, teams: data.teams, teamAdmins: data.teamAdmins });
+    }
+
+    dispatch({ type: actionTypes.SET_ACTIVE_TEAM, team: data.team });
   } catch (err) {
     push('/');
     dispatch(addNotif('There was an error while loading the team page.'));

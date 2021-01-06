@@ -6,7 +6,8 @@ const initialState = {
   desc: '',
   members: [],
   title: '',
-  logo: null
+  logo: null,
+  userIsAdmin: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -26,9 +27,15 @@ const setActiveTeam = (state, action) => ({
   teamID: action.team._id,
   url: action.team.url,
   desc: action.team.desc,
-  members: action.team.members,
+  members: action.team.members.map(member => ({
+    email: member.email,
+    fullName: member.fullName,
+    avatar: member.avatar,
+    isAdmin: action.team.admins.includes(member._id)
+  })),
   title: action.team.title,
-  logo: action.team.logo
+  logo: action.team.logo,
+  userIsAdmin: action.team.userIsAdmin
 });
 
 const editTeam = (state, action) => {

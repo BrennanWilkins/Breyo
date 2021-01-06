@@ -83,7 +83,10 @@ export const updateActiveBoard = data => (dispatch, getState) => {
     dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: data.invites, boards: data.boards });
   }
 
-  if (data.token) { axios.defaults.headers.common['x-auth-token'] = data.token; }
+  if (data.token) {
+    localStorage['token'] = data.token;
+    axios.defaults.headers.common['x-auth-token'] = data.token;
+  }
 
   const boardPayload = { isStarred, creator, userIsAdmin, title, members, color, boardID, desc, team };
   dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload: boardPayload });

@@ -25,7 +25,7 @@ router.get('/', auth,
         teamID: board.teamID
       }));
 
-      res.status(200).json({ boards: user.boards, invites: user.invites, teams: user.teams, teamInvites: user.teamInvites });
+      res.status(200).json({ boards: user.boards, invites: user.invites, teams: user.teams, teamInvites: user.teamInvites, adminTeams: user.adminTeams });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -72,7 +72,7 @@ router.delete('/deleteAccount/:password', auth, validate([param('password').not(
           }
         }
       }
-      await Team.updateMany({ _id: { $in: user.teams }}, { $pull: { members: user._id }});
+      await Team.updateMany({ _id: { $in: user.teams }}, { $pull: { members: user._id, admins: req.userID }});
 
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }

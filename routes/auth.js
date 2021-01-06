@@ -21,7 +21,10 @@ const getJWTPayload = user => {
     if (team._id) { userTeams[team._id] = true; }
     else { userTeams[team] = true; }
   }
-  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins, userTeams };
+  const userAdminTeams = {};
+  for (let teamID of user.adminTeams) { userAdminTeams[teamID] = true; }
+
+  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins, userTeams, userAdminTeams };
 };
 
 const getLeanJWTPayload = user => {
@@ -35,7 +38,10 @@ const getLeanJWTPayload = user => {
     if (team._id) { userTeams[team._id] = true; }
     else { userTeams[team] = true; }
   }
-  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins, userTeams };
+  const userAdminTeams = {};
+  for (let teamID of user.adminTeams) { userAdminTeams[teamID] = true; }
+
+  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins, userTeams, userAdminTeams };
 };
 
 router.post('/login', validate(
@@ -69,9 +75,9 @@ router.post('/login', validate(
 
       if (user.recoverPassID) { await User.updateOne({ _id: req.userID }, { recoverPassID: null }); }
 
-      const { fullName, invites, boards, avatar, teams, teamInvites } = user;
+      const { fullName, invites, boards, avatar, teams, teamInvites, adminTeams } = user;
 
-      res.status(200).json({ token, fullName, email, invites, boards, avatar, teams, teamInvites });
+      res.status(200).json({ token, fullName, email, invites, boards, avatar, teams, teamInvites, adminTeams });
     } catch(err) { return res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
 );
@@ -100,7 +106,7 @@ router.post('/signup', validate(
       const hashedPassword = await bcryptjs.hash(password, 10);
 
       const user = new User({ email, password: hashedPassword, fullName, invites: [], boards: [],
-        adminBoards: [], starredBoards: [], recoverPassID: null, avatar: null, teams: [] });
+        adminBoards: [], starredBoards: [], recoverPassID: null, avatar: null, teams: [], adminTeams: [] });
       await user.save();
 
       // signup was successful, login
@@ -108,7 +114,7 @@ router.post('/signup', validate(
       const jwtPayload = getJWTPayload(user);
       const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
 
-      res.status(200).json({ token, email, fullName, invites: [], boards: [], teams: [], teamInvites: [] });
+      res.status(200).json({ token, email, fullName, invites: [], boards: [], teams: [], teamInvites: [], adminTeams: [] });
     } catch(err) { res.status(500).json({ msg: 'There was an error while logging in.' }); }
   }
 );
@@ -131,9 +137,9 @@ router.post('/autoLogin', auth,
 
       if (user.recoverPassID) { await User.updateOne({ _id: req.userID }, { recoverPassID: null }); }
 
-      const { email, fullName, invites, boards, avatar, teams, teamInvites } = user;
+      const { email, fullName, invites, boards, avatar, teams, teamInvites, adminTeams } = user;
 
-      res.status(200).json({ email, fullName, invites, boards, avatar, teams, teamInvites });
+      res.status(200).json({ email, fullName, invites, boards, avatar, teams, teamInvites, adminTeams });
     } catch(err) { res.sendStatus(500); }
   }
 );

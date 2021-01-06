@@ -12,7 +12,8 @@ const UserSchema = new Schema({
   starredBoards: [String],
   recoverPassID: String,
   avatar: String,
-  teams: [{ type: Schema.Types.ObjectId, ref: 'Team' }]
+  teams: [{ type: Schema.Types.ObjectId, ref: 'Team' }],
+  adminTeams: [String]
 });
 
 UserSchema.index({ email: 1 });

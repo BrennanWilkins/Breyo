@@ -33,6 +33,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.JOIN_TEAM: return joinTeam(state, action);
     case actionTypes.REJECT_TEAM_INVITE: return rejectTeamInvite(state, action);
     case actionTypes.JOIN_BOARD: return joinBoard(state, action);
+    case actionTypes.UPDATE_USER_TEAMS: return updateUserTeams(state, action);
     default: return state;
   }
 };
@@ -45,7 +46,7 @@ const login = (state, action) => ({
   teamInvites: action.payload.teamInvites,
   boards: action.payload.boards,
   avatar: action.payload.avatar,
-  teams: action.payload.teams.map(team => ({ teamID: team._id, title: team.title, url: team.url })),
+  teams: action.payload.teams.map(team => ({ teamID: team._id, title: team.title, url: team.url, isAdmin: action.payload.adminTeams.includes(team._id) })),
 });
 
 const toggleIsStarred = (state, action) => {
@@ -57,7 +58,7 @@ const updateUserData = (state, action) => ({
   ...state,
   boards: action.boards,
   invites: action.invites,
-  teams: action.teams.map(team => ({ teamID: team._id, title: team.title, url: team.url })),
+  teams: action.teams.map(team => ({ teamID: team._id, title: team.title, url: team.url, isAdmin: action.adminTeams.includes(team._id) })),
   teamInvites: action.teamInvites
 });
 
@@ -120,5 +121,10 @@ const joinBoard = (state, action) => {
   const boards = [...state.boards, action.board];
   return { ...state, invites, boards };
 };
+
+const updateUserTeams = (state, action) => ({
+  ...state,
+  teams: action.payload.teams.map(team => ({ teamID: team._id, title: team.title, url: team.url, isAdmin: action.payload.adminTeams.includes(team._id) }))
+});
 
 export default reducer;
