@@ -280,11 +280,17 @@ router.put('/leave', auth, validate([body('teamID').isMongoId()]), useIsTeamMemb
       const [team, user] = await Promise.all([Team.findById(teamID), User.findById(req.userID)]);
       if (!team || !user) { throw 'No team or user data found'; }
 
-      if (team.members.length === 1) { return res.status(400).json({ msg: 'You cannot leave a team if you are the only member.' }); }
+      if (team.members.length === 1) {
+        return res.status(400).json({ msg: 'You cannot leave a team if you are the only member.' });
+      }
+      if (user.adminTeams.includes(teamID) && team.admins.length === 1) {
+        return res.status(400).json({ msg: 'There must be at least one other admin to leave this team.' });
+      }
 
       team.members = team.members.filter(id => String(id) !== req.userID);
       team.admins = team.admins.filter(id => id !== req.userID);
       user.teams = user.teams.filter(id => String(id) !== teamID);
+      user.adminTeams = user.adminTeams.filter(id => id !== teamID);
 
       const results = await Promise.all([
         signNewToken(user, req.header('x-auth-token'), true),

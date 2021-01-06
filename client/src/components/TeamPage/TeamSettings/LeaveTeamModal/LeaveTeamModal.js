@@ -12,6 +12,8 @@ const LeaveTeamModal = props => {
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
 
+  const isOnlyAdmin = props.adminCount === 1 && props.userIsAdmin;
+
   const leaveHandler = () => {
     props.leaveTeam(history.push);
     props.close();
@@ -20,19 +22,30 @@ const LeaveTeamModal = props => {
   return (
     <div ref={modalRef} className={classes.Container}>
       <ModalTitle close={props.close} title="Leave this team" />
-      <p>Leaving a team will not cause you to be removed from any of the team's boards.</p>
-      <button className={classes.LeaveBtn} onClick={leaveHandler}>Leave team</button>
+      {isOnlyAdmin ?
+      <div className={classes.CannotLeave}>There must be at least one other admin to leave this team.</div>
+      : <>
+        <p>Leaving a team will not cause you to be removed from any of the team's boards.</p>
+        <button className={classes.LeaveBtn} onClick={leaveHandler}>Leave team</button>
+      </>}
     </div>
   );
 };
 
 LeaveTeamModal.propTypes = {
   close: PropTypes.func.isRequired,
-  leaveTeam: PropTypes.func.isRequired
+  leaveTeam: PropTypes.func.isRequired,
+  adminCount: PropTypes.number.isRequired,
+  userIsAdmin: PropTypes.bool.isRequired
 };
+
+const mapStateToProps = state => ({
+  adminCount: state.team.members.filter(member => member.isAdmin).length,
+  userIsAdmin: state.team.userIsAdmin
+});
 
 const mapDispatchToProps = dispatch => ({
   leaveTeam: push => dispatch(leaveTeam(push))
 });
 
-export default connect(null, mapDispatchToProps)(LeaveTeamModal);
+export default connect(mapStateToProps, mapDispatchToProps)(LeaveTeamModal);

@@ -41,3 +41,7 @@
 .LeaveBtn:hover {
   background: rgb(207, 4, 4);
 }
+.CannotLeave {
+  margin: 20px 0;
+  text-align: center;
+}
