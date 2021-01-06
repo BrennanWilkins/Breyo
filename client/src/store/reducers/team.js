@@ -18,6 +18,9 @@ const reducer = (state = initialState, action) => {
     case actionTypes.REMOVE_TEAM_LOGO: return { ...state, logo: null };
     case actionTypes.DELETE_TEAM: return { ...initialState };
     case actionTypes.LOGOUT: return { ...initialState };
+    case actionTypes.PROMOTE_TEAM_MEMBER: return promoteTeamMember(state, action);
+    case actionTypes.DEMOTE_TEAM_MEMBER: return demoteTeamMember(state, action);
+    case actionTypes.DEMOTE_SELF_TEAM_MEMBER: return { ...state, userIsAdmin: false };
     default: return state;
   }
 };
@@ -46,6 +49,22 @@ const editTeam = (state, action) => {
     desc: action.payload.desc,
     title: action.payload.title
   };
+};
+
+const promoteTeamMember = (state, action) => {
+  const members = [...state.members];
+  const index = members.findIndex(member => member.email === action.email);
+  const member = { ...members[index], isAdmin: true };
+  members[index] = member;
+  return { ...state, members };
+};
+
+const demoteTeamMember = (state, action) => {
+  const members = [...state.members];
+  const index = members.findIndex(member => member.email === action.email);
+  const member = { ...members[index], isAdmin: false };
+  members[index] = member;
+  return { ...state, members };
 };
 
 export default reducer;

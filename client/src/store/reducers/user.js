@@ -34,6 +34,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.REJECT_TEAM_INVITE: return rejectTeamInvite(state, action);
     case actionTypes.JOIN_BOARD: return joinBoard(state, action);
     case actionTypes.UPDATE_USER_TEAMS: return updateUserTeams(state, action);
+    case actionTypes.DEMOTE_SELF_TEAM_MEMBER: return demoteSelfTeamMember(state, action);
     default: return state;
   }
 };
@@ -124,7 +125,15 @@ const joinBoard = (state, action) => {
 
 const updateUserTeams = (state, action) => ({
   ...state,
-  teams: action.payload.teams.map(team => ({ teamID: team._id, title: team.title, url: team.url, isAdmin: action.payload.adminTeams.includes(team._id) }))
+  teams: action.teams.map(team => ({ teamID: team._id, title: team.title, url: team.url, isAdmin: action.adminTeams.includes(team._id) }))
 });
+
+const demoteSelfTeamMember = (state, action) => {
+  const teams = [...state.teams];
+  const index = teams.findIndex(team => team.teamID === action.teamID);
+  const team = { ...teams[index], isAdmin: false };
+  teams[index] = team;
+  return { ...state, teams };
+};
 
 export default reducer;

@@ -22,7 +22,7 @@ export const getActiveTeam = (url, push) => async (dispatch, getState) => {
     if (data.token) {
       axios.defaults.headers.common['x-auth-token'] = data.token;
       localStorage['token'] = data.token;
-      dispatch({ type: actionTypes.UPDATE_USER_TEAMS, teams: data.teams, teamAdmins: data.teamAdmins });
+      dispatch({ type: actionTypes.UPDATE_USER_TEAMS, teams: data.teams, adminTeams: data.adminTeams });
     }
 
     dispatch({ type: actionTypes.SET_ACTIVE_TEAM, team: data.team });
@@ -139,4 +139,34 @@ export const addToTeam = teamID => async (dispatch, getState) => {
   } catch (err) {
     dispatch(addNotif('There was an error while adding the board to the team.'));
   }
-}
+};
+
+export const promoteTeamMember = email => async (dispatch, getState) => {
+  try {
+    const state = getState();
+    const teamID = state.team.teamID;
+    await axios.put('/team/admins/add', { teamID, email });
+    dispatch({ type: actionTypes.PROMOTE_TEAM_MEMBER, teamID, email });
+  } catch (err) {
+    if (err.response && err.response.status === 401) { return dispatch(addNotif('You must be an admin to change member permissions.')); }
+    if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
+    dispatch(addNotif('There was an error while promoting the team member.'));
+  }
+};
+
+export const demoteTeamMember = email => async (dispatch, getState) => {
+  try {
+    const state = getState();
+    const teamID = state.team.teamID;
+    const userEmail = state.user.email;
+    await axios.put('/team/admins/remove', { teamID, email });
+    if (userEmail === email) {
+      dispatch({ type: actionTypes.DEMOTE_SELF_TEAM_MEMBER, teamID });
+    }
+    dispatch({ type: actionTypes.DEMOTE_TEAM_MEMBER, teamID, email });
+  } catch (err) {
+    if (err.response && err.response.status === 401) { return dispatch(addNotif('You must be an admin to change member permissions.')); }
+    if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
+    dispatch(addNotif('There was an error while demoting the team member.'));
+  }
+};

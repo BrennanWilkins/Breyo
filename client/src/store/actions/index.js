@@ -20,5 +20,5 @@ export { addTitleSearchQuery, addDueDateSearchQuery, addMemberSearchQuery, addLa
 resetSearchQuery } from './cardSearchQueries';
 export { createTeam, getActiveTeam, editTeam, changeTeamLogo, removeTeamLogo,
 deleteTeam, inviteTeamMembers, acceptTeamInvite, rejectTeamInvite, leaveTeam,
-changeBoardTeam, addToTeam } from './team';
+changeBoardTeam, addToTeam, promoteTeamMember, demoteTeamMember } from './team';
 export { getUserData, deleteAccount, deleteAvatar, changeAvatar } from './user';

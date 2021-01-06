@@ -46,7 +46,10 @@ const EditTeam = props => {
       props.close();
     } catch (err) {
       setLoading(false);
-      if (err.response && err.response.data && err.response.data.msg && err.response.status === 400) { setErrMsg(err.response.data.msg); }
+      if (err.response && err.response.data && err.response.data.msg) {
+        if (err.response.status === 400) { setErrMsg(err.response.data.msg); }
+        else if (err.response.status === 401) { setErrMsg('You must be an admin to edit the team details.'); }
+      }
       else { setErrMsg('There was an error while connecting to the server.'); }
     }
   };

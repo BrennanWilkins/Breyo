@@ -5,13 +5,15 @@ import PropTypes from 'prop-types';
 import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 import { checkIcon } from '../../../UI/icons';
 import { connect } from 'react-redux';
+import { promoteTeamMember, demoteTeamMember } from '../../../../store/actions';
 
 const PermissionModal = props => {
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
 
-  const changeHandler = permission => {
-
+  const changeHandler = changeToAdmin => {
+    if (changeToAdmin) { props.promoteTeamMember(props.email); }
+    else { props.demoteTeamMember(props.email); }
   };
 
   const isUser = props.email === props.userEmail;
@@ -26,11 +28,11 @@ const PermissionModal = props => {
     <div ref={modalRef} className={classes.Container}>
       <ModalTitle close={props.close} title="Change Permissions" />
       <div className={classes.Options}>
-        <div onClick={() => changeHandler('admin')} className={adminDisabled ? classes.Disabled : null}>
+        <div onClick={() => changeHandler(true)} className={adminDisabled ? classes.Disabled : null}>
           Admin{props.isAdmin && checkIcon}
           <span>Admins can create and edit team boards, add or remove other team admins, and change team settings.</span>
         </div>
-        <div onClick={() => changeHandler('member')} className={memberDisabled ? classes.Disabled : null}>
+        <div onClick={() => changeHandler(false)} className={memberDisabled ? classes.Disabled : null}>
           Member{!props.isAdmin && checkIcon}
           <span>Admins can create and edit team boards, but not add other admins or change settings.</span>
         </div>
@@ -47,7 +49,9 @@ PermissionModal.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   adminCount: PropTypes.number.isRequired,
   userIsAdmin: PropTypes.bool.isRequired,
-  userEmail: PropTypes.string.isRequired
+  userEmail: PropTypes.string.isRequired,
+  promoteTeamMember: PropTypes.func.isRequired,
+  demoteTeamMember: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -55,4 +59,9 @@ const mapStateToProps = state => ({
   userEmail: state.user.email
 });
 
-export default connect(mapStateToProps)(PermissionModal);
+const mapDispatchToProps = dispatch => ({
+  promoteTeamMember: email => dispatch(promoteTeamMember(email)),
+  demoteTeamMember: email => dispatch(demoteTeamMember(email))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(PermissionModal);

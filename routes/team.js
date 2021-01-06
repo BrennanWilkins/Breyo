@@ -298,4 +298,57 @@ router.put('/leave', auth, validate([body('teamID').isMongoId()]), useIsTeamMemb
   }
 );
 
+// authorization: team admin
+// promote a team member to admin
+router.put('/admins/add', auth, validate([body('teamID').isMongoId(), body('email').isEmail()]), useIsTeamAdmin,
+  async (req, res) => {
+    try {
+      const { teamID, email } = req.body;
+      const [team, user] = await Promise.all([Team.findById(teamID), User.findOne({ email })]);
+      if (!team || !user) { throw 'No team or user data found'; }
+
+      if (team.admins.includes(String(user._id))) {
+        return res.status(400).json({ msg: 'This user is already an admin.' });
+      }
+      if (!team.members.find(id => String(id) === String(user._id))) {
+        return res.status(400).json({ msg: `This user was not found in the team's members.` });
+      }
+
+      team.admins.push(user._id);
+      user.adminTeams.push(team._id);
+      await Promise.all([team.save(), user.save()]);
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: team admin
+// demote a team member from admin to member
+router.put('/admins/remove', auth, validate([body('teamID').isMongoId(), body('email').isEmail()]), useIsTeamAdmin,
+  async (req, res) => {
+    try {
+      const { teamID, email } = req.body;
+      const [team, user] = await Promise.all([Team.findById(teamID), User.findOne({ email })]);
+      if (!team || !user) { throw 'No team or user data found'; }
+
+      if (!team.admins.includes(String(user._id))) {
+        return res.status(400).json({ msg: 'This user is already a member.' });
+      }
+      if (!team.members.find(id => String(id) === String(user._id))) {
+        return res.status(400).json({ msg: `This user was not found in the team's members.` });
+      }
+      if (team.admins.length === 1) {
+        return res.status(400).json({ msg: `There must be at least one team admin at all times.` });
+      }
+
+      team.admins = team.admins.filter(id => id !== String(user._id));
+      user.adminTeams = user.adminTeams.filter(id => id !== String(team._id));
+      await Promise.all([team.save(), user.save()]);
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;
