@@ -9,6 +9,7 @@ import { createTeam } from '../../../store/actions';
 import { useHistory } from 'react-router';
 import { scrumBoard } from '../../UI/illustrations';
 import { checkURL } from '../../../utils/teamValidation';
+import { EmailChipInput } from '../../UI/Inputs/Inputs';
 
 const CreateTeam = props => {
   const history = useHistory();
@@ -17,7 +18,7 @@ const CreateTeam = props => {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   const [desc, setDesc] = useState('');
-  const [members, setMembers] = useState('');
+  const [emails, setEmails] = useState([]);
   const [urlErrMsg, setUrlErrMsg] = useState('');
   const timer = useRef();
   const [errMsg, setErrMsg] = useState('');
@@ -43,7 +44,7 @@ const CreateTeam = props => {
     if (title.length > 100) { return setErrMsg('Your team name cannot be over 100 characters.'); }
     if (desc.length > 400) { return setErrMsg('Your team description cannot be over 400 characters.'); }
     setLoading(true);
-    axios.post('/team', { title, url, desc, members }).then(res => {
+    axios.post('/team', { title, url, desc, emails }).then(res => {
       setLoading(false);
       const payload = { teamID: res.data.teamID, url: res.data.url, title, push: history.push, token: res.data.token };
       props.createTeam(payload);
@@ -79,12 +80,9 @@ const CreateTeam = props => {
           <textarea value={desc} onChange={e => setDesc(e.target.value)} rows="4" />
         </label>
       </div>
-      <div className={classes.Section}>
-        <label>
-          <div>Invite users by email to join this team</div>
-          <input value={members} onChange={e => setMembers(e.target.value)} />
-        </label>
-        <div>To invite multiple users, separate each email by a single space</div>
+      <div className={classes.InviteSection}>
+        <EmailChipInput emails={emails} setEmails={arr => setEmails(arr)} fromCreateTeam
+        label="Invite users by email to join this team" subText="To invite multiple users, type or paste emails below and press enter." />
       </div>
       <button className={classes.CreateBtn} disabled={title === '' || loading || urlErrMsg !== ''} onClick={submitHandler}>Create Team</button>
       <div className={(err && !loading) ? classes.ErrMsg : classes.HideErrMsg}>{errMsg}</div>

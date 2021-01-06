@@ -20,6 +20,7 @@ const validateURL = async url => {
     if (!checkURL) { return `Your team's URL can only contain letters or numbers.`; }
     const isTaken = await Team.exists({ url });
     if (isTaken) { return 'That URL is already taken.'; }
+    return '';
   } catch (err) { return err; }
 };
 
@@ -63,27 +64,25 @@ router.post('/', auth, validate(
   [body('title').isLength({ min: 1, max: 100 }),
   body('desc').isLength({ min: 0, max: 400 }),
   body('url').isLength({ min: 0, max: 50 }),
-  body('members').exists()]),
+  body('emails').exists()]),
   async (req, res) => {
     try {
-      const { title, desc, url, members } = req.body;
+      const { title, desc, url, emails } = req.body;
 
       if (url !== '') {
-        const urlIsValid = validateURL(url);
+        const urlIsValid = await validateURL(url);
         if (urlIsValid !== '') { return res.status(400).json({ msg: urlIsValid }); }
       }
 
-      const team = new Team({ title, desc, url, logo: null, members: [req.userID], admins: [req.userID] });
-      team.url = team.url === '' ? nanoid() : team.url;
+      const team = new Team({ title, desc, url: url || nanoid(), logo: null, members: [req.userID], admins: [req.userID] });
 
       const user = await User.findById(req.userID);
       user.teams.push(team._id);
       // user is admin of team by default
       user.adminTeams.push(team._id);
 
-      if (members !== '') {
+      if (emails.length) {
         // members sent as emails separated by space, if user found then send invite
-        const emails = members.trim().split(' ');
         const users = [];
         for (let email of emails) {
           if (email === req.email) { continue; }
@@ -194,13 +193,12 @@ router.delete('/logo/:teamID', auth, validate([param('teamID').isMongoId()]), us
 
 // authorization: team member
 // invite users to join team
-router.post('/invites', auth, validate([body('members').not().isEmpty(), body('teamID').isMongoId()]), useIsTeamMember,
+router.post('/invites', auth, validate([body('emails').not().isEmpty(), body('teamID').isMongoId()]), useIsTeamMember,
   async (req, res) => {
     try {
-      const { members, teamID } = req.body;
+      const { emails, teamID } = req.body;
       const team = await Team.findById(teamID).select('title').lean();
-      // members sent as emails separated by space, if user found then send invite
-      const emails = members.trim().split(' ');
+      // for each email in emails array if user found then send invite
       const users = [];
       for (let email of emails) {
         if (email === req.email) { continue; }

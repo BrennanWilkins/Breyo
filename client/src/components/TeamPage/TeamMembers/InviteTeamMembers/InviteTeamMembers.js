@@ -5,23 +5,26 @@ import PropTypes from 'prop-types';
 import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 import { inviteTeamMembers } from '../../../../store/actions';
 import { connect } from 'react-redux';
+import { EmailChipInput } from '../../../UI/Inputs/Inputs';
 
 const InviteTeamMembers = props => {
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
-  const [membersInput, setMembersInput] = useState('');
+  const [emails, setEmails] = useState([]);
 
   const inviteHandler = () => {
-    if (!membersInput.length) { return; }
-    props.sendInvite(membersInput);
+    if (!emails.length) { return; }
+    props.sendInvite(emails);
     props.close();
   };
 
   return (
     <div ref={modalRef} className={classes.Container}>
       <ModalTitle title="Invite team members" close={props.close} />
-      <p>To invite multiple users, separate each email by a single space.</p>
-      <input className={classes.Input} value={membersInput} onChange={e => setMembersInput(e.target.value)} />
+      <p>To invite multiple users, type or paste emails below and press enter.</p>
+      <div className={classes.EmailChipInput}>
+        <EmailChipInput emails={emails} setEmails={arr => setEmails(arr)} />
+      </div>
       <button className={classes.InviteBtn} onClick={inviteHandler}>Invite to team</button>
     </div>
   );
@@ -33,7 +36,7 @@ InviteTeamMembers.propTypes = {
 };
 
 const mapDispatchToProps = dispatch => ({
-  sendInvite: members => dispatch(inviteTeamMembers(members))
+  sendInvite: emails => dispatch(inviteTeamMembers(emails))
 });
 
 export default connect(null, mapDispatchToProps)(InviteTeamMembers);

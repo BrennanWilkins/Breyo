@@ -5,7 +5,7 @@ import { sendUpdate } from './socket';
 
 export const createTeam = payload => dispatch => {
   const { title, teamID, url, token, push } = payload;
-  const team = { title, teamID, url, boards: [] };
+  const team = { title, teamID, url, boards: [], isAdmin: true };
   axios.defaults.headers.common['x-auth-token'] = token;
   localStorage['token'] = token;
   dispatch({ type: actionTypes.CREATE_TEAM, team });
@@ -70,10 +70,10 @@ export const deleteTeam = push => async (dispatch, getState) => {
   }
 };
 
-export const inviteTeamMembers = members => async (dispatch, getState) => {
+export const inviteTeamMembers = emails => async (dispatch, getState) => {
   try {
     const teamID = getState().team.teamID;
-    await axios.post('/team/invites', { members, teamID });
+    await axios.post('/team/invites', { emails, teamID });
   } catch (err) {
     if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
     dispatch(addNotif('There was an error while inviting users to the team.'));
@@ -86,6 +86,7 @@ export const acceptTeamInvite = (teamID, push) => async dispatch => {
     const { token, team } = res.data;
     axios.defaults.headers.common['x-auth-token'] = token;
     localStorage['token'] = token;
+    team.isAdmin = false;
     dispatch({ type: actionTypes.JOIN_TEAM, team });
     push('/team/' + team.url);
   } catch (err) {

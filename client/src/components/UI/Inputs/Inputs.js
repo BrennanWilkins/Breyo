@@ -1,6 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import classes from './Inputs.module.css';
-import { checkIcon, uploadIcon } from '../icons';
+import { checkIcon, uploadIcon, xIcon } from '../icons';
+import PropTypes from 'prop-types';
 
 export const Checkbox = props => (
   <div className={props.checked ? classes.CheckboxCheck : classes.Checkbox} onClick={props.clicked}>{checkIcon}</div>
@@ -15,4 +16,87 @@ export const FileInput = props => {
       <div onClick={() => fileInput.current.click()}>{uploadIcon} {props.title}</div>
     </div>
   );
+};
+
+const isEmail = email => (
+  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+).test(email);
+
+export const EmailChipInput = props => {
+  const [inputVal, setInputVal] = useState('');
+  const [errMsg, setErrMsg] = useState(null);
+
+  const isValid = email => {
+    let error = null;
+    if (props.emails.includes(email)) {
+      error = `'${email}' has already been added.`;
+    }
+    if (!isEmail(email)) {
+      error = `'${email}' is not a valid email address.`;
+    }
+    if (error) {
+      setErrMsg(error);
+      return false;
+    }
+    return true;
+  };
+
+  const changeHandler = e => {
+    setErrMsg(null);
+    setInputVal(e.target.value);
+  };
+
+  const keyDownHandler = e => {
+    if (['Enter', 'Tab', ','].includes(e.key)) {
+      e.preventDefault();
+      const val = inputVal.trim();
+      if (val && isValid(val)) {
+        props.setEmails([...props.emails, val]);
+        setInputVal('');
+      }
+    }
+  };
+
+  const deleteHandler = email => {
+    props.setEmails(props.emails.filter(e => e !== email));
+  };
+
+  const pasteHandler = e => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData('text');
+    const pastedEmails = pasteData.match(/[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/g);
+    if (pastedEmails) {
+      const newEmails = pastedEmails.filter(email => props.emails.includes(email));
+      props.setEmails([...props.emails, ...newEmails]);
+    }
+  };
+
+  return (
+    <>
+      {props.label ?
+        <label>
+          <div>{props.label}</div>
+          <input className={classes.EmailInput} value={inputVal} onKeyDown={keyDownHandler} onChange={changeHandler} onPaste={pasteHandler} />
+        </label>
+        : <input className={classes.EmailInput} value={inputVal} onKeyDown={keyDownHandler} onChange={changeHandler} onPaste={pasteHandler} />}
+      {props.subText && <div className={classes.SubText}>{props.subText}</div>}
+      <div className={props.fromCreateTeam ? classes.Emails : null}>
+        {props.emails.map(email => (
+          <div className={classes.EmailChip} key={email}>
+            {email}
+            <button className={classes.ChipDeleteBtn} onClick={() => deleteHandler(email)}>{xIcon}</button>
+          </div>
+        ))}
+      </div>
+      {errMsg && <div className={props.fromCreateTeam ? classes.ErrMsgTeam : classes.ErrMsg}>{errMsg}</div>}
+    </>
+  );
+};
+
+EmailChipInput.propTypes = {
+  emails: PropTypes.array.isRequired,
+  setEmails: PropTypes.func.isRequired,
+  label: PropTypes.string,
+  subText: PropTypes.string,
+  fromCreateTeam: PropTypes.bool
 };
