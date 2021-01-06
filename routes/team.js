@@ -148,7 +148,7 @@ router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTe
       await Promise.all([
         team.remove(),
         Board.updateMany({ teamID }, { teamID: null }),
-        User.updateMany({ _id: { $in: team.members }}, { $pull: { teams: team._id }})
+        User.updateMany({ _id: { $in: team.members }}, { $pull: { teams: team._id, adminTeams: team._id }})
       ]);
 
       if (team.logo) {

@@ -41,4 +41,4 @@ const mapDispatchToProps = dispatch => ({
   deleteTeam: push => dispatch(deleteTeam(push))
 });
 
-export default connect(null, mapDispatchToProps)(DeleteTeamModal);
+export default connect(mapStateToProps, mapDispatchToProps)(DeleteTeamModal);
