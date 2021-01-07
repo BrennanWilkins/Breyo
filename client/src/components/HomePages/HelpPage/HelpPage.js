@@ -10,6 +10,7 @@ const HelpPage = () => {
   const ref5 = useRef();
   const ref6 = useRef();
   const ref7 = useRef();
+  const ref8 = useRef();
 
   const navigate = ref => {
     window.scrollTo({ top: ref.current.getBoundingClientRect().top + window.pageYOffset - 90, behavior: 'smooth' });
@@ -24,6 +25,7 @@ const HelpPage = () => {
       case 5: return navigate(ref5);
       case 6: return navigate(ref6);
       case 7: return navigate(ref7);
+      case 8: return navigate(ref8);
       default: return;
     }
   };
@@ -78,6 +80,13 @@ const HelpPage = () => {
           <p>You can add a description to the card with links, code segments, and other formatted text. To see how to write a formatted description, click on 'Formatting help'.</p>
           <h3>Comments</h3>
           <p>You can add, edit, or delete a comment at the bottom of the card details modal.</p>
+        </div>
+        <div ref={ref8}>
+          <h2>Teams</h2>
+          <p>Teams allow you to organize your project or organization across a collection of boards and team members.</p>
+          <p>To create a team, click on the plus icon button at the top right of the navigation menu.
+          You can add a custom URL, title, description, and invite users to the team from there.</p>
+          <p>On the team page, you can see the boards belonging to the team, the team admins and members, and team settings.</p>
         </div>
       </div>
     </div>
