@@ -6,6 +6,7 @@ import { changePassValidation } from '../../../../utils/authValidation';
 import { instance as axios } from '../../../../axios';
 import { eyeIcon, eyeHideIcon, checkIcon } from '../../../UI/icons';
 import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
+import { Input } from '../../../UI/Inputs/Inputs';
 
 const ChangePassModal = props => {
   const modalRef = useRef();
@@ -47,14 +48,14 @@ const ChangePassModal = props => {
     <div className={classes.Container} ref={modalRef}>
       <ModalTitle close={props.close} title="Change my password" />
       <div className={classes.Label}>Old password</div>
-      <input type="password" value={oldPass} onChange={e => setOldPass(e.target.value)} />
+      <Input type="password" value={oldPass} onChange={e => setOldPass(e.target.value)} />
       <div className={classes.Label}>New password</div>
       <div className={classes.NewPassContainer}>
-        <input type={showNewPass ? 'text' : 'password'} value={newPass} onChange={e => setNewPass(e.target.value)} />
+        <Input type={showNewPass ? 'text' : 'password'} value={newPass} onChange={e => setNewPass(e.target.value)} />
         <div onClick={() => setShowNewPass(prev => !prev)} className={classes.EyeIcon}>{showNewPass ? eyeHideIcon : eyeIcon}</div>
       </div>
       <div className={classes.Label}>Confirm password</div>
-      <input type="password" value={confirmPass} onChange={e => setConfirmPass(e.target.value)} />
+      <Input type="password" value={confirmPass} onChange={e => setConfirmPass(e.target.value)} />
       <button disabled={err || loading || changeSuccess} className={classes.SaveBtn} onClick={saveHandler}>Save</button>
       <div className={err ? classes.ErrMsg : classes.HideErrMsg}>{errMsg}</div>
       {changeSuccess && <div className={classes.SuccessMsg}>{checkIcon} Password successfully changed</div>}

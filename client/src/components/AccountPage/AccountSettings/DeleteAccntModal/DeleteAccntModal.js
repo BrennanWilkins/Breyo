@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { deleteAccount } from '../../../../store/actions';
 import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
+import { Input } from '../../../UI/Inputs/Inputs';
 
 const DeleteAccntModal = props => {
   const modalRef = useRef();
@@ -24,7 +25,7 @@ const DeleteAccntModal = props => {
         admin will result in all other members being promoted to admin.
       </div>
       <p>To confirm, please enter your password below.</p>
-      <input className={classes.Input} type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <Input className={classes.Input} type="password" value={password} onChange={e => setPassword(e.target.value)} />
       <button className={classes.DeleteBtn} onClick={deleteHandler}>DELETE MY ACCOUNT</button>
     </div>
   );

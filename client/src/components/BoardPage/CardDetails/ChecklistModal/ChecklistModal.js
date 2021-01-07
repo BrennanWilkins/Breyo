@@ -6,6 +6,7 @@ import Button from '../../../UI/Buttons/Buttons';
 import { connect } from 'react-redux';
 import { addChecklist } from '../../../../store/actions';
 import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
+import { Input } from '../../../UI/Inputs/Inputs';
 
 const ChecklistModal = props => {
   const modalRef = useRef();
@@ -21,7 +22,7 @@ const ChecklistModal = props => {
   return (
     <div ref={modalRef} className={classes.Container}>
       <ModalTitle close={props.close} title="Add a checklist" />
-      <input className={classes.Input} autoFocus value={title} onChange={e => setTitle(e.target.value)}
+      <Input className={classes.Input} autoFocus value={title} onChange={e => setTitle(e.target.value)}
       placeholder="Enter a title for the checklist" />
       <span className={classes.AddBtn}><Button disabled={title === ''} clicked={addHandler}>Add</Button></span>
     </div>

@@ -11,22 +11,12 @@
   margin: 3px 0 0 3px;
 }
 .Input input {
-  display: block;
   margin: 15px auto;
   width: 230px;
-  box-sizing: border-box;
-  border: 2px solid #eee;
-  border-radius: 4px;
-  padding: 6px;
-  transition: all 250ms;
-  outline: none;
   font-size: 15px;
 }
-.Input input:focus {
-  border: 2px solid rgb(var(--red), 0.8);
-}
 .Input input::placeholder {
-  color: rgb(180, 180, 180);
+  color: rgb(170,170,170);
 }
 .Input button {
   display: flex;

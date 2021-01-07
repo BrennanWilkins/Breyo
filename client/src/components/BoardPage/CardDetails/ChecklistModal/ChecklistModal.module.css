@@ -20,18 +20,8 @@
   }
 }
 .Input {
-  border: 2px solid rgb(var(--lightGray));
-  border-radius: 4px;
-  padding: 7px;
-  background: rgb(244, 244, 244);
-  outline: none;
   width: 80%;
   margin: auto;
-  display: block;
-}
-.Input:focus {
-  border: 2px solid rgb(var(--red));
-  background: white;
 }
 .AddBtn button {
   background: rgba(var(--green), 0.8);

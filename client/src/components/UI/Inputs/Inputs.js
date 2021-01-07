@@ -100,3 +100,18 @@ EmailChipInput.propTypes = {
   subText: PropTypes.string,
   fromCreateTeam: PropTypes.bool
 };
+
+export const Input = props => (
+  <input value={props.value} type={props.type || 'text'} onChange={props.onChange}
+  className={`${classes.Input} ${props.className || ''}`} placeholder={props.placeholder || ''}
+  autoFocus={props.autoFocus} />
+);
+
+Input.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  className: PropTypes.string,
+  type: PropTypes.string,
+  placeholder: PropTypes.string,
+  autoFocus: PropTypes.bool
+};

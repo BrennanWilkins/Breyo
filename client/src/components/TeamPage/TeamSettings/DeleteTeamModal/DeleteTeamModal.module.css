@@ -26,23 +26,9 @@
   text-align: center;
 }
 .Input {
-  display: block;
   max-width: 300px;
   width: 96%;
   margin: 10px auto;
-  padding: 6px 7px;
-  box-sizing: border-box;
-  border-radius: 4px;
-  border: 2px solid #ddd;
-  outline: none;
-  background: rgb(250,250,250);
-}
-.Input:hover {
-  background: rgb(240,240,240);
-}
-.Input:focus {
-  border: 2px solid rgb(var(--red));
-  background: white;
 }
 .DeleteBtn {
   display: block;

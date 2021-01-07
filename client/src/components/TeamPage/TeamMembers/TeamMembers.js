@@ -8,6 +8,7 @@ import { useDidUpdate } from '../../../utils/customHooks';
 import InviteTeamMembers from './InviteTeamMembers/InviteTeamMembers';
 import { ActionBtn } from '../../UI/Buttons/Buttons';
 import PermissionModal from './PermissionModal/PermissionModal';
+import { Input } from '../../UI/Inputs/Inputs';
 
 const TeamMembers = props => {
   const [filter, setFilter] = useState('');
@@ -25,7 +26,7 @@ const TeamMembers = props => {
   return (
     <div className={classes.Container}>
       <div className={classes.MemberMenu}>
-        <input className={classes.FilterInput} placeholder="Filter members by name" value={filter} onChange={e => setFilter(e.target.value)} />
+        <Input className={classes.FilterInput} placeholder="Filter members by name" value={filter} onChange={e => setFilter(e.target.value)} />
         <button className={classes.InviteBtn} onClick={() => setShowInviteModal(true)}>{addMemberIcon} Invite Team Members</button>
       </div>
       <div className={classes.Members}>

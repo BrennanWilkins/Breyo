@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { deleteTeam } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router';
+import { Input } from '../../../UI/Inputs/Inputs';
 
 const DeleteTeamModal = props => {
   const history = useHistory();
@@ -19,7 +20,7 @@ const DeleteTeamModal = props => {
       {props.userIsAdmin ?
       <>
         <p>Deleting a team will not delete the team's boards. To confirm, please type 'DELETE THIS TEAM' below.</p>
-        <input className={classes.Input} value={inputVal} onChange={e => setInputVal(e.target.value)} />
+        <Input className={classes.Input} value={inputVal} onChange={e => setInputVal(e.target.value)} />
         <button className={classes.DeleteBtn} disabled={inputVal !== 'DELETE THIS TEAM'} onClick={() => props.deleteTeam(history.push)}>Delete Team</button>
       </>
       : <p>You must be an admin to delete this team.</p>}

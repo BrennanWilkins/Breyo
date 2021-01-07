@@ -6,6 +6,7 @@ import { useModalToggle, useModalPos } from '../../../utils/customHooks';
 import { connect } from 'react-redux';
 import { sendInvite } from '../../../store/actions';
 import ModalTitle from '../../UI/ModalTitle/ModalTitle';
+import { Input } from '../../UI/Inputs/Inputs';
 
 const InviteModal = props => {
   const [email, setEmail] = useState('');
@@ -15,9 +16,9 @@ const InviteModal = props => {
 
   return (
     <div className={classes.Container} ref={modalRef}>
-      <ModalTitle close={props.close} title="Add a new member" light />
+      <ModalTitle close={props.close} title="Invite to board" light />
       <div className={classes.Input}>
-        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter user's email" />
+        <Input value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter user's email" />
         <Button disabled={email === '' || !props.isAdmin} clicked={() => { props.sendInvite(email, props.boardID); props.close(); }}>Send Invite</Button>
       </div>
       {!props.isAdmin && <div className={classes.ErrMsg}>You must be an admin of this board to invite other members.</div>}
