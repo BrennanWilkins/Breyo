@@ -10,12 +10,16 @@ import { addTitleSearchQuery, addLabelSearchQuery, addDueDateSearchQuery,
 import { useDidUpdate } from '../../../../utils/customHooks';
 
 const SearchCardsMenu = props => {
-  const { memberQuery, labels, dueDateQuery } = props.searchQueries;
-  const [titleQuery, setTitleQuery] = useState('');
+  const { titleQuery, memberQuery, labels, dueDateQuery } = props.searchQueries;
+  const [titleInput, setTitleInput] = useState('');
 
   useDidUpdate(() => {
-    props.addTitleSearchQuery(titleQuery);
+    if (titleInput !== titleQuery && !titleQuery) { setTitleInput(''); }
   }, [titleQuery]);
+
+  useDidUpdate(() => {
+    props.addTitleSearchQuery(titleInput);
+  }, [titleInput]);
 
   const memberHandler = email => {
     if (email === memberQuery) { props.addMemberSearchQuery(''); }
@@ -27,20 +31,15 @@ const SearchCardsMenu = props => {
     else { props.addDueDateSearchQuery(mode); }
   };
 
-  const resetHandler = () => {
-    setTitleQuery('');
-    props.resetSearchQuery();
-  };
-
   return (
     <>
     <div className={classes.Input}>
       <label className={classes.Label}>
         Search by card title
-        <input value={titleQuery} className={classes.Input} onChange={e => setTitleQuery(e.target.value)} />
+        <input value={titleInput} className={classes.Input} onChange={e => setTitleInput(e.target.value)} />
       </label>
     </div>
-    <div onClick={resetHandler} className={classes.ClearSearch}>Clear Search</div>
+    <div onClick={props.resetSearchQuery} className={classes.ClearSearch}>Clear Search</div>
     <div className={classes.Label}>Filter by card label</div>
     <div className={classes.CardLabels}>
       {LABEL_COLORS.map(color => (

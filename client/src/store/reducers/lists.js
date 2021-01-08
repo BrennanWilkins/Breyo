@@ -704,8 +704,8 @@ const deleteBoardMember = (state, action) => {
 
 const checkForQuery = searchQueries => {
   // return false if no queries, else true
-  if (searchQueries.titleQuery === '' && searchQueries.dueDateQuery === '' &&
-  searchQueries.memberQuery === '' && !searchQueries.labels.length) { return false; }
+  if (!searchQueries.titleQuery && !searchQueries.dueDateQuery &&
+  !searchQueries.memberQuery && !searchQueries.labels.length) { return false; }
   return true;
 };
 
@@ -714,15 +714,15 @@ const filterListsHelper = (searchQueries, lists) => {
   const { titleQuery, dueDateQuery, memberQuery, labels } = searchQueries;
   lists = lists.map(list => {
     let cards = [...list.cards];
-    if (titleQuery !== '') { cards = cards.filter(card => card.title.includes(titleQuery)); }
-    if (memberQuery !== '') { cards = cards.filter(card => card.members.find(member => member.email === memberQuery)); }
+    if (titleQuery) { cards = cards.filter(card => card.title.includes(titleQuery)); }
+    if (memberQuery) { cards = cards.filter(card => card.members.find(member => member.email === memberQuery)); }
     if (labels.length) {
       cards = cards.filter(card => {
         if (!card.labels.length) { return false; }
         return labels.every(label => card.labels.includes(label));
       });
     }
-    if (dueDateQuery !== '') {
+    if (dueDateQuery) {
       cards = cards.filter(card => {
         if (!card.dueDate) { return false; }
         return filterByDueDate(dueDateQuery, card.dueDate);
@@ -736,13 +736,13 @@ const filterListsHelper = (searchQueries, lists) => {
 const filterCardHelper = (searchQueries, card) => {
   // returns true if card passes all search queries else returns false
   const { titleQuery, dueDateQuery, memberQuery, labels } = searchQueries;
-  if (titleQuery !== '' && !card.title.includes(titleQuery)) { return false; }
-  if (memberQuery !== '' && !card.members.find(member => member.email === memberQuery)) { return false; }
+  if (titleQuery && !card.title.includes(titleQuery)) { return false; }
+  if (memberQuery && !card.members.find(member => member.email === memberQuery)) { return false; }
   if (labels.length) {
     if (!card.labels.length) { return false; }
     if (!labels.every(label => card.labels.includes(label))) { return false; }
   }
-  if (dueDateQuery !== '') {
+  if (dueDateQuery) {
     if (!card.dueDate) { return false; }
     if (!filterByDueDate(dueDateQuery, card.dueDate)) { return false; }
   }
@@ -752,7 +752,7 @@ const filterCardHelper = (searchQueries, card) => {
 const addTitleSearchQuery = (state, action) => {
   const searchQueries = { ...state.searchQueries };
   searchQueries.titleQuery = action.title;
-  if (action.title === '') {
+  if (!action.title) {
     if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
   }
   const filteredLists = filterListsHelper(searchQueries, state.lists);
@@ -776,7 +776,7 @@ const addLabelSearchQuery = (state, action) => {
 const addMemberSearchQuery = (state, action) => {
   const searchQueries = { ...state.searchQueries };
   searchQueries.memberQuery = action.email;
-  if (action.email === '') {
+  if (!action.email) {
     if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
   }
   const filteredLists = filterListsHelper(searchQueries, state.lists);
@@ -786,7 +786,7 @@ const addMemberSearchQuery = (state, action) => {
 const addDueDateSearchQuery = (state, action) => {
   const searchQueries = { ...state.searchQueries };
   searchQueries.dueDateQuery = action.query;
-  if (action.query === '') {
+  if (!action.query) {
     if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
   }
   const filteredLists = filterListsHelper(searchQueries, state.lists);
