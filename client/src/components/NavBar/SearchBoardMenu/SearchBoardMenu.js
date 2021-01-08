@@ -24,7 +24,7 @@ const SearchBoardMenu = props => {
       setSearchRes(props.boards.filter(board => board.title.toLowerCase().includes(queryVal.toLowerCase())));
     };
 
-    if (query !== '') { search(query); }
+    if (query) { search(query); }
   }, [query, props.boards]);
 
   useModalToggle(true, modalRef, props.close);
@@ -49,14 +49,14 @@ const SearchBoardMenu = props => {
         placeholder="Search boards by title" />
         <CloseBtn close={props.close} />
       </div>
-      {query.length === 0 ?
+      {!query.length ?
       <>
       <div className={classes.Title}><span>{starIcon} STARRED BOARDS</span><ExpandBtn clicked={() => setExpandStarred(prev => !prev)} expanded={expandStarred} /></div>
       {expandStarred && props.boards.filter(board => board.isStarred).map(board => (
         <BoardRect {...board} key={board.boardID} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} nav={navHandler} />
       ))}
       <div className={classes.Title}><span>{personIcon} PERSONAL BOARDS</span><ExpandBtn clicked={() => setExpandPersonal(prev => !prev)} expanded={expandPersonal} /></div>
-      {expandPersonal && props.boards.filter(board => !board.teamID).map(board => (
+      {expandPersonal && props.boards.filter(board => !props.teams.find(team => team.teamID === board.teamID)).map(board => (
         <BoardRect {...board} key={board.boardID} toggleIsStarred={() => props.toggleIsStarred(board.boardID)} nav={navHandler} />
       ))}
       {props.teams.map(team => {
