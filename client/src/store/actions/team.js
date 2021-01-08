@@ -43,7 +43,7 @@ export const changeTeamLogo = (img, teamID) => async dispatch => {
     axios.put('/team/logo', { logo: reader.result, teamID }).then(res => {
       dispatch({ type: actionTypes.CHANGE_TEAM_LOGO, logo: res.data.logoURL, teamID });
     }).catch(err => {
-      if (err.response && err.response.status === 413) { return errHandler('That image is too large to upload.'); }
+      if (err?.response?.status === 413) { return errHandler('That image is too large to upload.'); }
       errHandler('There was an error while uploading your logo.');
     });
   };
@@ -75,8 +75,8 @@ export const inviteTeamMembers = emails => async (dispatch, getState) => {
     const teamID = getState().team.teamID;
     await axios.post('/team/invites', { emails, teamID });
   } catch (err) {
-    if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
-    dispatch(addNotif('There was an error while inviting users to the team.'));
+    const errMsg = err?.response?.data?.msg || 'There was an error while inviting users to the team.';
+    dispatch(addNotif(errMsg));
   }
 };
 
@@ -90,8 +90,8 @@ export const acceptTeamInvite = (teamID, push) => async dispatch => {
     dispatch({ type: actionTypes.JOIN_TEAM, team });
     push('/team/' + team.url);
   } catch (err) {
-    if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
-    dispatch(addNotif('There was an error while joining the team.'));
+    const errMsg = err?.response?.data?.msg || 'There was an error while joining the team.';
+    dispatch(addNotif(errMsg));
   }
 };
 
@@ -111,8 +111,8 @@ export const leaveTeam = push => async (dispatch, getState) => {
     localStorage['token'] = token;
     push('/');
   } catch (err) {
-    if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
-    dispatch(addNotif('There was an error while leaving the team.'));
+    const errMsg = err?.response?.data?.msg || 'There was an error while leaving the team.';
+    dispatch(addNotif(errMsg));
   }
 };
 
@@ -149,9 +149,9 @@ export const promoteTeamMember = email => async (dispatch, getState) => {
     await axios.put('/team/admins/add', { teamID, email });
     dispatch({ type: actionTypes.PROMOTE_TEAM_MEMBER, teamID, email });
   } catch (err) {
-    if (err.response && err.response.status === 401) { return dispatch(addNotif('You must be an admin to change member permissions.')); }
-    if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
-    dispatch(addNotif('There was an error while promoting the team member.'));
+    if (err?.response?.status === 401) { return dispatch(addNotif('You must be an admin to change member permissions.')); }
+    const errMsg = err?.response?.data?.msg || 'There was an error while promoting the team member.';
+    dispatch(addNotif(errMsg));
   }
 };
 
@@ -166,8 +166,8 @@ export const demoteTeamMember = email => async (dispatch, getState) => {
     }
     dispatch({ type: actionTypes.DEMOTE_TEAM_MEMBER, teamID, email });
   } catch (err) {
-    if (err.response && err.response.status === 401) { return dispatch(addNotif('You must be an admin to change member permissions.')); }
-    if (err.response && err.response.data && err.response.data.msg) { return dispatch(addNotif(err.response.data.msg)); }
-    dispatch(addNotif('There was an error while demoting the team member.'));
+    if (err?.response?.status === 401) { return dispatch(addNotif('You must be an admin to change member permissions.')); }
+    const errMsg = err?.response?.data?.msg || 'There was an error while demoting the team member.';
+    dispatch(addNotif(errMsg));
   }
 };

@@ -15,8 +15,7 @@ export const login = (email, password) => async dispatch => {
     const res = await axios.post('/auth/login', { email, password });
     dispatch(authSuccess(res.data));
   } catch (err) {
-    let msg = err.response ? err.response.data.msg :
-    'There was an error connecting to the server.';
+    const msg = err?.response?.data?.msg || 'There was an error connecting to the server.';
     dispatch(loginErr(msg));
   }
 };
@@ -27,8 +26,7 @@ export const signup = payload => async dispatch => {
     const res = await axios.post('/auth/signup', { ...payload });
     dispatch(authSuccess(res.data));
   } catch(err) {
-    let msg = err.response ? err.response.data.msg :
-    'There was an error connecting to the server.';
+    const msg = err?.response?.data?.msg || 'There was an error connecting to the server.';
     dispatch(signupErr(msg));
   }
 };

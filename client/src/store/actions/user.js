@@ -17,9 +17,7 @@ export const deleteAccount = pass => async dispatch => {
     await axios.delete(`/user/deleteAccount/${pass}`);
     dispatch(logout());
   } catch (err) {
-    if (err.response && err.response.status === 400) {
-      return dispatch(addNotif('Incorrect password.'));
-    }
+    if (err?.response?.status === 400) { return dispatch(addNotif('Incorrect password.')); }
     dispatch(addNotif('There was an error while deleting your account.'));
   }
 };

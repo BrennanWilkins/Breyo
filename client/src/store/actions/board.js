@@ -12,8 +12,8 @@ export const createBoard = (title, color) => async dispatch => {
     localStorage['token'] = token;
     dispatch({ type: actionTypes.CREATE_BOARD, board });
   } catch (err) {
-    let msg = err.response && err.response.data.msg ? err.response.data.msg : 'Your board could not be created.';
-    dispatch(addNotif(msg));
+    const errMsg = err?.response?.data?.msg || 'Your board could not be created.';
+    dispatch(addNotif(errMsg));
   }
 };
 
@@ -139,8 +139,8 @@ export const sendInvite = (email, boardID) => async dispatch => {
   try {
     await axios.post('/board/invites', { email, boardID });
   } catch (err) {
-    let msg = err.response && err.response.data.msg ? err.response.data.msg : 'There was an error while sending your invite.';
-    dispatch(addNotif(msg));
+    const errMsg = err?.response?.data?.msg || 'There was an error while sending your invite.';
+    dispatch(addNotif(errMsg));
   }
 }
 
@@ -221,7 +221,7 @@ export const acceptInvite = (boardID, push) => async (dispatch, getState) => {
     addRecentActivity(newActivity);
     sendUpdate('post/board/newMember', JSON.stringify({ email, fullName }));
   } catch (err) {
-    if (err.response && err.response.status === 400) {
+    if (err?.response?.status === 400) {
       dispatch({ type: actionTypes.REMOVE_INVITE, boardID });
       return dispatch(addNotif('This board no longer exists.'));
     }
