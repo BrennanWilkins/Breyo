@@ -29,13 +29,13 @@
 }
 .Input button:disabled {
   background: rgba(0,0,0,0.1);
+  cursor: default;
 }
 .ErrMsg {
   font-size: 14px;
   font-weight: 300;
   width: 100%;
-  padding: 10px;
+  padding: 20px 10px 0;
   box-sizing: border-box;
   text-align: center;
-  margin-top: 10px;
 }
