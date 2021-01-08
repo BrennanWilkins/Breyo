@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
+import React, { useRef, useState, useLayoutEffect } from 'react';
 import classes from './ListActions.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
@@ -6,15 +6,13 @@ import { BackBtn, CloseBtn } from '../../../UI/Buttons/Buttons';
 import { copyList, archiveList, archiveAllCards, addNotif, openRoadmapList } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import MoveCards from './MoveCards';
-import TextArea from 'react-textarea-autosize';
 import { roadmapIcon } from '../../../UI/icons';
+import CopyList from './CopyList';
 
 const ListActions = props => {
   const modalRef = useRef();
-  const inputRef = useRef();
   useModalToggle(true, modalRef, props.close);
   const [showCopyList, setShowCopyList] = useState(false);
-  const [copyListTitle, setCopyListTitle] = useState(props.title);
   const [showMoveCards, setShowMoveCards] = useState(false);
   const [top, setTop] = useState(0);
   const [left, setLeft] = useState(0);
@@ -25,19 +23,9 @@ const ListActions = props => {
     setLeft(props.left);
   }, [props.top, props.left]);
 
-  useEffect(() => { if (showCopyList) { setTimeout(() => inputRef.current.select(), 200); }}, [showCopyList]);
-
   const resetState = () => {
     setShowCopyList(false);
-    setCopyListTitle(props.title);
     setShowMoveCards(false);
-  };
-
-  const copyHandler = e => {
-    e.preventDefault();
-    if (copyListTitle === '' || copyListTitle.length > 200) { return; }
-    props.copyList(copyListTitle, props.listID, props.boardID);
-    props.close();
   };
 
   const archiveAllHandler = () => {
@@ -60,16 +48,6 @@ const ListActions = props => {
     </>
   );
 
-  const copyListContent = (
-    <div className={classes.CopyContainer}>
-      <form onSubmit={copyHandler}>
-        <TextArea className={classes.Input} value={copyListTitle} onChange={e => setCopyListTitle(e.target.value)}
-        placeholder="Enter list title" ref={inputRef} minRows="2" maxRows="4" />
-        <button type="submit" disabled={copyListTitle === ''} className={classes.SubmitBtn}>Create List</button>
-      </form>
-    </div>
-  );
-
   return (
     <div ref={modalRef} className={classes.Container} style={{ left: `${left}px`, top: `${top}px` }}>
       <div className={classes.Title}>
@@ -77,7 +55,10 @@ const ListActions = props => {
         {showCopyList ? 'Copy List' : showMoveCards ? 'Move all cards in this list' : 'List Actions'}
         <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
       </div>
-      {showCopyList ? copyListContent : showMoveCards ? <MoveCards listID={props.listID} boardID={props.boardID} close={props.close} /> : defaultContent}
+      {showCopyList ?
+        <CopyList title={props.title} close={props.close} copyList={title => props.copyList(title, props.listID, props.boardID)} /> :
+        showMoveCards ? <MoveCards listID={props.listID} boardID={props.boardID} close={props.close} />
+        : defaultContent}
     </div>
   );
 };
