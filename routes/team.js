@@ -77,6 +77,7 @@ router.post('/', auth, validate(
       const team = new Team({ title, desc, url: url || nanoid(), logo: null, members: [req.userID], admins: [req.userID] });
 
       const user = await User.findById(req.userID);
+      if (!user) { throw 'User data not found'; }
       user.teams.push(team._id);
       // user is admin of team by default
       user.adminTeams.push(team._id);
@@ -143,6 +144,7 @@ router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTe
     try {
       const teamID = req.params.teamID;
       const team = await Team.findById(teamID);
+      if (!team) { throw 'Team data not found'; }
 
       await Promise.all([
         team.remove(),
@@ -164,15 +166,20 @@ router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTe
 router.put('/logo', auth, validate([body('teamID').isMongoId(), body('logo').not().isEmpty()]), useIsTeamAdmin,
   async (req, res) => {
     try {
-      const logo = await resizeImg(req.body.logo);
+      const team = await Team.findById(req.body.teamID);
+      if (!team) { throw 'Team data not found'; }
 
+      const logo = await resizeImg(req.body.logo);
       const data = await cloudinary.upload(logo);
       const logoURL = data.secure_url;
-      const team = await Team.findByIdAndUpdate(req.body.teamID, { logo: logoURL }).select('logo').lean();
+
       if (team.logo) {
         // delete old logo
         await cloudinary.destroy(team.logo.slice(team.logo.lastIndexOf('/') + 1, team.logo.lastIndexOf('.')));
       }
+
+      team.logo = logoURL;
+      await team.save();
 
       res.status(200).json({ logoURL });
     } catch (err) { res.sendStatus(500); }
@@ -185,6 +192,9 @@ router.delete('/logo/:teamID', auth, validate([param('teamID').isMongoId()]), us
   async (req, res) => {
     try {
       const team = await Team.findByIdAndUpdate(req.params.teamID, { logo: null }).select('logo').lean();
+      if (!team) { throw 'Team not found'; }
+      if (!team.logo) { throw 'Team logo not found'; }
+
       await cloudinary.destroy(team.logo.slice(team.logo.lastIndexOf('/') + 1, team.logo.lastIndexOf('.')));
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
@@ -198,6 +208,8 @@ router.post('/invites', auth, validate([body('emails').not().isEmpty(), body('te
     try {
       const { emails, teamID } = req.body;
       const team = await Team.findById(teamID).select('title').lean();
+      if (!team) { throw 'Team data not found'; }
+
       // for each email in emails array if user found then send invite
       const users = [];
       for (let email of emails) {
