@@ -12,7 +12,7 @@ const ForgotPage = () => {
 
   const submitHandler = async e => {
     e.preventDefault();
-    if (email === '') { return; }
+    if (!email) { return; }
     try {
       setLoading(true);
       await axios.get('/auth/forgotPassword/' + email);
@@ -20,8 +20,8 @@ const ForgotPage = () => {
       setLoading(false);
     } catch (err) {
       setLoading(false);
-      if (err.response && err.response.data.msg) { setMsg(err.response.data.msg); }
-      else { setMsg('There was an error connecting to the server.'); }
+      const errMsg = err?.response?.data?.msg || 'There was an error connecting to the server.';
+      setMsg(errMsg);
     }
   };
 

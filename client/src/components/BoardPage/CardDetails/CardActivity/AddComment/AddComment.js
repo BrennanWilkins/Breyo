@@ -15,7 +15,7 @@ const AddComment = props => {
   useModalToggleMultiple(showCommentOptions, [commentRef, accntRef], () => setShowCommentOptions(false));
 
   const addCommentHandler = () => {
-    if (commentInput === '' || commentInput.length > 400) { return; }
+    if (!commentInput || commentInput.length > 400) { return; }
     props.addComment(commentInput);
     setShowCommentOptions(false);
     setCommentInput('');
@@ -29,7 +29,7 @@ const AddComment = props => {
       <div ref={commentRef} className={showCommentOptions ? classes.CommentInputShow : classes.CommentInputHide}>
         <TextArea maxRows="20" className={showCommentOptions ? classes.FocusInput : classes.Input} value={commentInput} onChange={e => setCommentInput(e.target.value)}
         placeholder="Write a comment" onFocus={() => setShowCommentOptions(true)} />
-        <div className={classes.SaveBtn}><Button disabled={commentInput === ''} clicked={addCommentHandler}>Save</Button></div>
+        <div className={classes.SaveBtn}><Button disabled={!commentInput} clicked={addCommentHandler}>Save</Button></div>
       </div>
     </div>
   );

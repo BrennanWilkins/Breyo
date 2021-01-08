@@ -13,7 +13,7 @@ const DeleteAccntModal = props => {
   const [password, setPassword] = useState('');
 
   const deleteHandler = () => {
-    if (password === '') { return; }
+    if (!password) { return; }
     props.deleteAccount(password);
   };
 
@@ -32,7 +32,8 @@ const DeleteAccntModal = props => {
 };
 
 DeleteAccntModal.propTypes = {
-  close: PropTypes.func.isRequired
+  close: PropTypes.func.isRequired,
+  deleteAccount: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({

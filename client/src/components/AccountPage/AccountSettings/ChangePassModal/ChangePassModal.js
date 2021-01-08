@@ -21,13 +21,13 @@ const ChangePassModal = props => {
   const [changeSuccess, setChangeSuccess] = useState(false);
 
   const saveHandler = async () => {
-    const validation = changePassValidation(oldPass, newPass, confirmPass);
-    if (validation === '') {
+    const isInvalid = changePassValidation(oldPass, newPass, confirmPass);
+    if (!isInvalid) {
       setErr(false);
       setErrMsg('');
     } else {
       setErr(true);
-      return setErrMsg(validation);
+      return setErrMsg(isInvalid);
     }
     try {
       setLoading(true);
@@ -37,8 +37,8 @@ const ChangePassModal = props => {
     } catch (err) {
       setLoading(false);
       setErr(true);
-      if (err.response && err.response.data.msg) { setErrMsg(err.response.data.msg); }
-      else { setErrMsg('There was an error while changing your password.'); }
+      const msg = err?.response?.data?.msg || 'There was an error while changing your password.';
+      setErrMsg(msg);
     }
   };
 

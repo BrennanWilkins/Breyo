@@ -10,7 +10,7 @@ const BoardTitle = props => {
   useEffect(() => setInputTitle(props.title), [props.title]);
 
   const checkTitle = () => {
-    if (inputTitle === props.title || inputTitle.length > 100 || inputTitle === '') { return setInputTitle(props.title); }
+    if (inputTitle === props.title || inputTitle.length > 100 || !inputTitle) { return setInputTitle(props.title); }
     props.updateTitle(inputTitle, props.boardID);
   };
 

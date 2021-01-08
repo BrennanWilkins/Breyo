@@ -21,7 +21,7 @@ const AddList = props => {
 
   const submitHandler = e => {
     e.preventDefault();
-    if (newListTitle === '' || newListTitle.length > 200) { return resetState(); }
+    if (!newListTitle || newListTitle.length > 200) { return resetState(); }
     props.addList(newListTitle, props.boardID);
     resetState();
   };

@@ -17,7 +17,7 @@ const AddCard = props => {
 
   const submitHandler = e => {
     e.preventDefault();
-    if (cardTitle === '' || cardTitle.length > 200) { return; }
+    if (!cardTitle || cardTitle.length > 200) { return; }
     props.addCard(cardTitle, props.boardID, props.listID);
     setCardTitle('');
   };

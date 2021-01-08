@@ -14,7 +14,7 @@ const AddItem = props => {
 
   const addHandler = e => {
     e.preventDefault();
-    if (itemTitle === '' || itemTitle.length > 300) { return; }
+    if (!itemTitle || itemTitle.length > 300) { return; }
     setItemTitle('');
     props.addItem(itemTitle, props.checklistID);
   };
@@ -26,7 +26,7 @@ const AddItem = props => {
       <form onSubmit={addHandler}>
         <TextArea maxRows="5" value={itemTitle} onChange={e => setItemTitle(e.target.value)} className={classes.Input}
         onKeyPress={keyPressHandler} autoFocus placeholder="Add an item" />
-        <SubmitBtns disabled={itemTitle === ''} close={props.close} text="Add" />
+        <SubmitBtns disabled={!itemTitle} close={props.close} text="Add" />
       </form>
     </div>
   );

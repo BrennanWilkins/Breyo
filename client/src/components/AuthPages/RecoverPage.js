@@ -15,7 +15,7 @@ const ForgotPage = () => {
 
   const submitHandler = async e => {
     e.preventDefault();
-    if (pass === '' || confirmPass === '') { return; }
+    if (!pass || !confirmPass) { return; }
     if (pass.length < 8) { return setMsg('Your password must be at least 8 characters.'); }
     if (pass !== confirmPass) { return setMsg('Your password must be equal to confirm password.'); }
     try {
@@ -28,8 +28,8 @@ const ForgotPage = () => {
       setTimeout(() => history.push('/login'), 400);
     } catch (err) {
       setLoading(false);
-      if (err.response && err.response.data.msg) { setMsg(err.response.data.msg); }
-      else { setMsg('There was an error while connecting to the server.'); }
+      const errMsg = err?.response?.data?.msg || 'There was an error while connecting to the server.';
+      setMsg(errMsg);
     }
   };
 

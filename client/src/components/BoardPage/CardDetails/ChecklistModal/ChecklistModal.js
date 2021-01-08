@@ -14,7 +14,7 @@ const ChecklistModal = props => {
   const [title, setTitle] = useState('');
 
   const addHandler = () => {
-    if (title === '' || title.length > 200) { return; }
+    if (!title || title.length > 200) { return; }
     props.close();
     props.addChecklist(title);
   };
@@ -24,7 +24,7 @@ const ChecklistModal = props => {
       <ModalTitle close={props.close} title="Add a checklist" />
       <Input className={classes.Input} autoFocus value={title} onChange={e => setTitle(e.target.value)}
       placeholder="Enter a title for the checklist" />
-      <span className={classes.AddBtn}><Button disabled={title === ''} clicked={addHandler}>Add</Button></span>
+      <span className={classes.AddBtn}><Button disabled={!title} clicked={addHandler}>Add</Button></span>
     </div>
   );
 };

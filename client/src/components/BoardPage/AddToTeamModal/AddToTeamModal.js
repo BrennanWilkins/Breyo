@@ -13,7 +13,7 @@ const AddToTeamModal = props => {
   const [selectedTeam, setSelectedTeam] = useState('');
 
   const addToTeamHandler = () => {
-    if (selectedTeam === '') { return; }
+    if (!selectedTeam) { return; }
     props.addToTeam(selectedTeam);
     props.close();
   };
@@ -24,12 +24,12 @@ const AddToTeamModal = props => {
       <div className={classes.Select}>
         <div className={classes.Label}>Your teams</div>
         <select value={selectedTeam} onChange={e => setSelectedTeam(e.target.value)} disabled={!props.userIsAdmin}>
-          {selectedTeam === '' && <option value="">Choose a team</option>}
+          {!selectedTeam && <option value="">Choose a team</option>}
           {props.teams.map(team => (
             <option key={team.teamID} value={team.teamID}>{team.title}</option>
           ))}
         </select>
-        <button className={classes.AddBtn} disabled={selectedTeam === '' || !props.userIsAdmin} onClick={addToTeamHandler}>Add to team</button>
+        <button className={classes.AddBtn} disabled={!selectedTeam || !props.userIsAdmin} onClick={addToTeamHandler}>Add to team</button>
       </div>
       {!props.userIsAdmin && <div className={classes.ErrMsg}>You must be an admin of this board to add it to a team.</div>}
     </div>

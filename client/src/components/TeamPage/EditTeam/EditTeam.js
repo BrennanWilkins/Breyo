@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import classes from './EditTeam.module.css';
 import PropTypes from 'prop-types';
 import SubmitBtns from '../../UI/SubmitBtns/SubmitBtns';
-import { useDidUpdate } from '../../../utils/customHooks';
 import { checkURL } from '../../../utils/teamValidation';
 import { instance as axios } from '../../../axios';
 import { connect } from 'react-redux';
@@ -15,27 +14,27 @@ const EditTeam = props => {
   const [urlErrMsg, setUrlErrMsg] = useState(false);
   const [errMsg, setErrMsg] = useState('');
   const [loading, setLoading] = useState(false);
-  const timer = useRef();
 
-  useDidUpdate(() => {
+  useEffect(() => {
     setUrlErrMsg('');
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => {
-      if (url === '' || url === props.url) { return; }
-      const urlIsValid = checkURL(url);
-      if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
+    const timer = setTimeout(() => {
+      if (!url || url === props.url) { return; }
+      const urlIsInvalid = checkURL(url);
+      if (urlIsInvalid) { return setUrlErrMsg(urlIsInvalid); }
       axios.get('/team/checkURL/' + url).then(res => {
         if (res.data.isTaken) { setUrlErrMsg('That URL is already taken.'); }
       });
     }, 1000);
+
+    return () => clearTimeout(timer);
   }, [url]);
 
   useEffect(() => setErrMsg(''), [url, desc, title]);
 
   const submitHandler = async e => {
     e.preventDefault();
-    const urlIsValid = checkURL(url);
-    if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
+    const urlIsInvalid = checkURL(url);
+    if (urlIsInvalid) { return setUrlErrMsg(urlIsInvalid); }
     if (title.length > 100) { return setErrMsg('Your team name cannot be over 100 characters.'); }
     if (desc.length > 400) { return setErrMsg('Your team description cannot be over 400 characters.'); }
     setLoading(true);
@@ -46,9 +45,11 @@ const EditTeam = props => {
       props.close();
     } catch (err) {
       setLoading(false);
-      if (err.response && err.response.data && err.response.data.msg) {
-        if (err.response.status === 400) { setErrMsg(err.response.data.msg); }
-        else if (err.response.status === 401) { setErrMsg('You must be an admin to edit the team details.'); }
+      const msg = err?.response?.data?.msg;
+      if (msg) {
+        const status = err.response?.status;
+        if (status === 400) { setErrMsg(msg); }
+        else if (status === 401) { setErrMsg('You must be an admin to edit the team details.'); }
       }
       else { setErrMsg('There was an error while connecting to the server.'); }
     }
@@ -76,8 +77,8 @@ const EditTeam = props => {
           <textarea value={desc} onChange={e => setDesc(e.target.value)} rows="4" disabled={loading || !props.userIsAdmin} />
         </label>
       </div>
-      <SubmitBtns close={props.close} text="Save" disabled={title === '' || urlErrMsg || loading || !props.userIsAdmin} />
-      <div className={errMsg !== '' ? classes.ErrMsg : classes.HideErrMsg}>{errMsg}</div>
+      <SubmitBtns close={props.close} text="Save" disabled={!title || !!urlErrMsg || loading || !props.userIsAdmin} />
+      <div className={errMsg ? classes.ErrMsg : classes.HideErrMsg}>{errMsg}</div>
       {!props.userIsAdmin && <div className={classes.NotAdmin}>You must be an admin of this team to edit the team's details.</div>}
     </form>
     </>

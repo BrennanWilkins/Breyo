@@ -14,12 +14,17 @@ const InviteModal = props => {
   useModalToggle(true, modalRef, props.close);
   useModalPos(true, modalRef);
 
+  const inviteHandler = () => {
+    props.sendInvite(email, props.boardID);
+    props.close();
+  };
+
   return (
     <div className={classes.Container} ref={modalRef}>
       <ModalTitle close={props.close} title="Invite to board" light />
       <div className={classes.Input}>
         <Input value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter user's email" />
-        <Button disabled={email === '' || !props.isAdmin} clicked={() => { props.sendInvite(email, props.boardID); props.close(); }}>Send Invite</Button>
+        <Button disabled={!email || !props.isAdmin} clicked={inviteHandler}>Send Invite</Button>
       </div>
       {!props.isAdmin && <div className={classes.ErrMsg}>You must be an admin of this board to invite other members.</div>}
     </div>

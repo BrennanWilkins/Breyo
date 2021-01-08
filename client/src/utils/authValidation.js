@@ -1,8 +1,11 @@
+const emailTest = (
+  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+);
+
+export const isEmail = email => emailTest.test(email);
+
 // validate the signup form inputs
 export const signupValidation = (email, fullName,  pass, confPass) => {
-  const emailTest = (
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  );
   const nameTest = /^[ a-zA-Z]+$/;
   if (email.length === 0) {
     return 'Please enter your email.';
@@ -16,7 +19,7 @@ export const signupValidation = (email, fullName,  pass, confPass) => {
   if (fullName.length > 100) {
     return 'Your full name must be less than 100 characters.';
   }
-  if (!emailTest.test(email)) {
+  if (!isEmail(email)) {
     return 'Please enter a valid email.';
   }
   if (pass.length < 8) {

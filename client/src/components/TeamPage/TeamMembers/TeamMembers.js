@@ -17,10 +17,10 @@ const TeamMembers = props => {
   const [shownPermissionModal, setShownPermissionModal] = useState('');
 
   useDidUpdate(() => {
-    setFilteredMembers(props.members.filter(member => member.fullName.includes(filter)));
+    if (filter) { setFilteredMembers(props.members.filter(member => member.fullName.toLowerCase().includes(filter.toLowerCase()))); }
   }, [filter]);
 
-  const members = filter !== '' ? filteredMembers : props.members;
+  const members = filter ? filteredMembers : props.members;
   const adminCount = props.members.filter(member => member.isAdmin).length;
 
   return (

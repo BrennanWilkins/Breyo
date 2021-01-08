@@ -16,7 +16,7 @@ const EditChecklistTitle = props => {
   const submitHandler = e => {
     e.preventDefault();
     props.close();
-    if (titleInput === '' || titleInput.length > 200) { return; }
+    if (!titleInput || titleInput.length > 200) { return; }
     props.edit(titleInput, props.checklistID);
   };
 
@@ -27,7 +27,7 @@ const EditChecklistTitle = props => {
       <form onSubmit={submitHandler}>
         <TextArea maxRows="5" ref={inputRef} value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.Input}
         onKeyPress={e => { if (e.key === 'Enter') { submitHandler(e); }}} />
-        <SubmitBtns disabled={titleInput === ''} text="Save" close={props.close} />
+        <SubmitBtns disabled={!titleInput} text="Save" close={props.close} />
       </form>
     </div>
   );

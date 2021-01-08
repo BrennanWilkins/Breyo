@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import classes from './CreateTeam.module.css';
-import { useModalToggle, useDidUpdate } from '../../../utils/customHooks';
+import { useModalToggle } from '../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { CloseBtnCircle } from '../../UI/Buttons/Buttons';
 import { instance as axios } from '../../../axios';
@@ -20,27 +20,27 @@ const CreateTeam = props => {
   const [desc, setDesc] = useState('');
   const [emails, setEmails] = useState([]);
   const [urlErrMsg, setUrlErrMsg] = useState('');
-  const timer = useRef();
   const [errMsg, setErrMsg] = useState('');
   const [err, setErr] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useDidUpdate(() => {
+  useEffect(() => {
     setUrlErrMsg('');
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => {
-      if (url === '') { return; }
-      const urlIsValid = checkURL(url);
-      if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
+    const timer = setTimeout(() => {
+      if (!url) { return; }
+      const urlIsInvalid = checkURL(url);
+      if (urlIsInvalid) { return setUrlErrMsg(urlIsInvalid); }
       axios.get('/team/checkURL/' + url).then(res => {
         if (res.data.isTaken) { setUrlErrMsg('That URL is already taken.'); }
       });
     }, 1000);
+
+    return () => clearTimeout(timer);
   }, [url]);
 
   const submitHandler = () => {
     const urlIsValid = checkURL(url);
-    if (urlIsValid !== '') { return setUrlErrMsg(urlIsValid); }
+    if (urlIsValid) { return setUrlErrMsg(urlIsValid); }
     if (title.length > 100) { return setErrMsg('Your team name cannot be over 100 characters.'); }
     if (desc.length > 400) { return setErrMsg('Your team description cannot be over 400 characters.'); }
     setLoading(true);
@@ -52,8 +52,8 @@ const CreateTeam = props => {
     }).catch(err => {
       setLoading(false);
       setErr(true);
-      if (err.response && err.response.data && err.response.data.msg) { setErrMsg(err.response.data.msg); }
-      else { setErrMsg('There was an error connecting to the server.'); }
+      const msg = err?.response?.data?.msg || 'There was an error connecting to the server.';
+      setErrMsg(msg);
     });
   };
 
@@ -84,7 +84,7 @@ const CreateTeam = props => {
         <EmailChipInput emails={emails} setEmails={arr => setEmails(arr)} fromCreateTeam
         label="Invite users by email to join this team" subText="To invite multiple users, type or paste emails below and press enter." />
       </div>
-      <button className={classes.CreateBtn} disabled={title === '' || loading || urlErrMsg !== ''} onClick={submitHandler}>Create Team</button>
+      <button className={classes.CreateBtn} disabled={!title || loading || urlErrMsg} onClick={submitHandler}>Create Team</button>
       <div className={(err && !loading) ? classes.ErrMsg : classes.HideErrMsg}>{errMsg}</div>
       <div className={classes.Illustration}>{scrumBoard}</div>
     </div>

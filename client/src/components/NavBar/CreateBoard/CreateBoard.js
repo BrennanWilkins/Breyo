@@ -26,7 +26,7 @@ const CreateBoard = props => {
   }, [props.show]);
 
   const submitHandler = () => {
-    if (boardTitle === '' || boardTitle.length > 100) { return; }
+    if (!boardTitle || boardTitle.length > 100) { return; }
     props.close();
     props.teamID ? props.createTeamBoard(boardTitle, boardBackground, props.teamID) :
     props.createBoard(boardTitle, boardBackground);
@@ -69,7 +69,7 @@ const CreateBoard = props => {
           </div>
         </div>
       </div>
-      <div className={classes.ConfirmBtn}><Button disabled={boardTitle === ''} clicked={submitHandler}>Create board</Button></div>
+      <div className={classes.ConfirmBtn}><Button disabled={!boardTitle} clicked={submitHandler}>Create board</Button></div>
       {showMore && <BackgroundModal close={() => setShowMore(false)} selected={boardBackground} change={backgroundChangeHandler} />}
     </div>
   );
