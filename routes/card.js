@@ -743,7 +743,7 @@ router.post('/comments', auth, validate([
 
       const card = list.cards.id(cardID);
       if (!card) { throw 'Card data not found'; }
-      card.comments.push({ email: req.email, fullName: req.fullName, date, msg, cardID, listID });
+      card.comments.push({ email: req.email, fullName: req.fullName, date, msg, cardID, listID, likes: [] });
       const commentID = card.comments[card.comments.length - 1]._id;
 
       const actionData = { msg, boardMsg: msg, cardID, listID, boardID, commentID, cardTitle: card.title };
@@ -823,6 +823,33 @@ router.put('/checklist/moveItem', auth, validate(
       if (!checklist) { throw 'Checklist not found'; }
       const item = checklist.items.splice(sourceIndex, 1)[0];
       checklist.items.splice(destIndex, 0, item);
+
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: member
+// add/remove like from a card comment
+router.put('/comments/like', auth, validate(
+  [body('boardID').isMongoId(),
+  body('listID').isMongoId(),
+  body('cardID').isMongoId(),
+  body('commentID').isMongoId()]), useIsMember,
+  async (req, res) => {
+    try {
+      const { commentID, cardID, listID } = req.body;
+      const list = await getListAndValidate(listID);
+
+      const comment = list.cards.id(cardID).comments.id(commentID);
+      if (!comment) { throw 'Comment not found'; }
+
+      if (comment.likes.includes(req.email)) {
+        comment.likes = comment.likes.filter(like => like !== req.email);
+      } else {
+        comment.likes = [...comment.likes, req.email];
+      }
 
       await list.save();
       res.sendStatus(200);

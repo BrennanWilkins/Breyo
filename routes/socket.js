@@ -49,7 +49,8 @@ const routes = [
   'post/card/roadmapLabel',
   'delete/board',
   'put/card/checklist/moveItem',
-  'put/board/changeTeam'
+  'put/board/changeTeam',
+  'put/card/comments/like'
 ];
 
 module.exports = routes;

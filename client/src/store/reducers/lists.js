@@ -70,6 +70,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ADD_DUE_DATE_SEARCH_QUERY: return addDueDateSearchQuery(state, action);
     case actionTypes.RESET_SEARCH_QUERY: return resetSearchQuery(state, action);
     case actionTypes.MOVE_CHECKLIST_ITEM: return moveChecklistItem(state, action);
+    case actionTypes.TOGGLE_COMMENT_LIKE: return toggleCommentLike(state, action);
     default: return state;
   }
 };
@@ -647,7 +648,7 @@ const removeCardMember = (state, action) => {
 const addComment = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.payload.listID, action.payload.cardID);
   const comments = [...card.comments];
-  comments.unshift({ ...action.payload });
+  comments.unshift({ ...action.payload, likes: [] });
   card.comments = comments;
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
@@ -668,6 +669,21 @@ const deleteComment = (state, action) => {
   const comments = [...card.comments];
   const commentIndex = comments.findIndex(comment => comment.commentID === action.commentID);
   comments.splice(commentIndex, 1);
+  card.comments = comments;
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const toggleCommentLike = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  const comments = [...card.comments];
+  const commentIndex = comments.findIndex(comment => comment.commentID === action.commentID);
+  const comment = { ...comments[commentIndex] };
+  if (comment.likes.includes(action.email)) {
+    comment.likes = comment.likes.filter(like => like !== action.email);
+  } else {
+    comment.likes = [...comment.likes, action.email];
+  }
+  comments[commentIndex] = comment;
   card.comments = comments;
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };

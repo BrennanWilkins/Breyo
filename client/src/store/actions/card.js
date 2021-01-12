@@ -359,3 +359,15 @@ export const deleteComment = commentID => async (dispatch, getState) => {
     dispatch(serverErr());
   }
 };
+
+export const toggleCommentLike = commentID => async (dispatch, getState) => {
+  try {
+    const { boardID, listID, cardID, state } = getCardState(getState);
+    const email = state.user.email;
+    dispatch({ type: actionTypes.TOGGLE_COMMENT_LIKE, commentID, cardID, listID, email });
+    await axios.put('/card/comments/like', { commentID, cardID, listID, boardID });
+    sendUpdate('put/card/comments/like', JSON.stringify({ commentID, cardID, listID, email }));
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};

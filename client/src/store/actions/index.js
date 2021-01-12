@@ -11,7 +11,7 @@ removeCardLabel, toggleDueDateIsComplete, addDueDate, removeDueDate, addChecklis
 deleteChecklist, addChecklistItem, toggleChecklistItemIsComplete, editChecklistItem,
 deleteChecklistItem, copyCard, archiveCard, recoverCard, deleteCard, addCardMember,
 removeCardMember, removeCardMemberCurrentCard, addComment, updateComment, deleteComment,
-editChecklistTitle, setCardDetailsInitial, changeRoadmapLabel } from './card';
+editChecklistTitle, setCardDetailsInitial, changeRoadmapLabel, toggleCommentLike } from './card';
 export { dndHandler, manualMoveCardHandler, checklistDndHandler } from './dndActions';
 export { getRecentCardActivity, resetCardActivity, setShownMemberActivity, deleteBoardActivity,
 getAllCardActivity, fetchFirstPageBoardActivity, fetchAllBoardActivity,

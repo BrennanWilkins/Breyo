@@ -45,7 +45,9 @@ const CardActivity = props => {
           if (action.commentID) { return <Comment key={action.commentID} {...action} userComment={props.userEmail === action.email} avatar={props.avatars[action.email]} />; }
           else { return <Action key={action._id} email={action.email} fullName={action.fullName} msg={action.msg} date={action.date} avatar={props.avatars[action.email]} />; }
         }) :
-        props.comments.map(comment => <Comment key={comment.commentID} {...comment} userComment={props.userEmail === comment.email} avatar={props.avatars[comment.email]} />)}
+        props.comments.map(comment => (
+          <Comment key={comment.commentID} {...comment} userEmail={props.userEmail} userComment={props.userEmail === comment.email} avatar={props.avatars[comment.email]} />
+        ))}
       {props.isLoading && <div className={classes.Spinner}><AuthSpinner /></div>}
       {!props.isLoading && showDetails && !allShown && <div className={classes.ViewAll} onClick={showAllHandler}>Show all actions...</div>}
     </div>

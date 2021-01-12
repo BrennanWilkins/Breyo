@@ -17,7 +17,8 @@ const CommentSchema = new Schema({
   msg: String,
   date: String,
   cardID: String,
-  listID: String
+  listID: String,
+  likes: [String]
 });
 
 const CardSchema = new Schema({

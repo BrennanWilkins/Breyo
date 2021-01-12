@@ -53,3 +53,22 @@
 .Btn:hover {
   color: rgb(50,50,50);
 }
+.LikeBtn {
+  margin: 0 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.LikeBtn span {
+  margin-left: 3px;
+}
+.LikeBtnFilled {
+  background: white;
+  padding: 3px 5px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid rgba(var(--red), 0.7);
+}
+.LikeBtnActive {
+  background: rgba(var(--red), 0.05);
+  border: 1px solid rgb(var(--red));
+}
