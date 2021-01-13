@@ -30,8 +30,8 @@ const BoardTeamModal = props => {
           <div className={classes.Select}>
             <div className={classes.Label}>This board is part of</div>
             <select value={currTeam} onChange={e => setCurrTeam(e.target.value)}>
-              {props.teams.map(team => (
-                <option key={team.teamID} value={team.teamID}>{team.title}</option>
+              {props.teams.allIDs.map(teamID => (
+                <option key={teamID} value={teamID}>{props.teams.byID[teamID].title}</option>
               ))}
             </select>
             <button className={classes.ChangeBtn} disabled={!props.userIsAdmin} onClick={changeTeamHandler}>Change</button>
@@ -51,7 +51,8 @@ BoardTeamModal.propTypes = {
   close: PropTypes.func.isRequired,
   team: PropTypes.object.isRequired,
   changeTeam: PropTypes.func.isRequired,
-  userIsAdmin: PropTypes.bool.isRequired
+  userIsAdmin: PropTypes.bool.isRequired,
+  teams: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({

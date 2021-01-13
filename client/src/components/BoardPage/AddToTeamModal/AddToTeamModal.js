@@ -25,8 +25,8 @@ const AddToTeamModal = props => {
         <div className={classes.Label}>Your teams</div>
         <select value={selectedTeam} onChange={e => setSelectedTeam(e.target.value)} disabled={!props.userIsAdmin}>
           {!selectedTeam && <option value="">Choose a team</option>}
-          {props.teams.map(team => (
-            <option key={team.teamID} value={team.teamID}>{team.title}</option>
+          {props.teams.allIDs.map(teamID => (
+            <option key={teamID} value={teamID}>{props.teams.byID[teamID].title}</option>
           ))}
         </select>
         <button className={classes.AddBtn} disabled={!selectedTeam || !props.userIsAdmin} onClick={addToTeamHandler}>Add to team</button>
@@ -39,7 +39,7 @@ const AddToTeamModal = props => {
 AddToTeamModal.propTypes = {
   close: PropTypes.func.isRequired,
   addToTeam: PropTypes.func.isRequired,
-  teams: PropTypes.array.isRequired,
+  teams: PropTypes.object.isRequired,
   userIsAdmin: PropTypes.bool.isRequired
 };
 

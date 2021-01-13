@@ -14,10 +14,12 @@ export const createTeam = payload => dispatch => {
 
 export const getActiveTeam = (url, push) => async (dispatch, getState) => {
   try {
-    const team = getState().user.teams.find(team => team.url === url);
-    const res = await axios.get('/team/' + team.teamID);
+    const state = getState();
+    const teamID = state.user.teams.allIDs.find(teamID => state.user.teams.byID[teamID].url === url);
+    const isAdmin = state.user.teams.byID[teamID].isAdmin;
+    const res = await axios.get('/team/' + teamID);
     const { data } = res.data;
-    data.team.userIsAdmin = team.isAdmin;
+    data.team.userIsAdmin = isAdmin;
 
     if (data.token) {
       axios.defaults.headers.common['x-auth-token'] = data.token;
@@ -121,7 +123,7 @@ export const changeBoardTeam = (oldTeamID, newTeamID) => async (dispatch, getSta
     const state = getState();
     const boardID = state.board.boardID;
     await axios.put('/board/changeTeam', { boardID, teamID: oldTeamID, newTeamID });
-    const team = state.user.teams.find(team => team.teamID === newTeamID);
+    const team = state.user.teams.byID[newTeamID];
     dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team });
     sendUpdate('put/board/changeTeam', JSON.stringify({ team }));
   } catch (err) {
@@ -133,7 +135,7 @@ export const addToTeam = teamID => async (dispatch, getState) => {
   try {
     const state = getState();
     const boardID = state.board.boardID;
-    const team = state.user.teams.find(team => team.teamID === teamID);
+    const team = state.user.teams.byID[teamID];
     await axios.put('/board/addToTeam', { boardID, teamID });
     dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team });
     sendUpdate('put/board/changeTeam', JSON.stringify({ team }));

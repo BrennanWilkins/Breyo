@@ -7,13 +7,14 @@ import { connect } from 'react-redux';
 const TeamBoards = props => {
   return (
     <div className={classes.Container}>
-      <BoardList boards={props.boards.filter(board => board.teamID === props.teamID)} teamID={props.teamID} teamTitle={props.teamTitle} />
+      <BoardList boards={props.boards.allIDs.filter(boardID => props.boards.byID[boardID].teamID === props.teamID).map(boardID => props.boards.byID[boardID])} 
+      teamID={props.teamID} teamTitle={props.teamTitle} />
     </div>
   );
 };
 
 TeamBoards.propTypes = {
-  boards: PropTypes.array.isRequired,
+  boards: PropTypes.object.isRequired,
   teamID: PropTypes.string.isRequired,
   teamTitle: PropTypes.string.isRequired
 };

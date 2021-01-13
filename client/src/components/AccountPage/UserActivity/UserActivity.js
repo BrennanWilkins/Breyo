@@ -16,16 +16,12 @@ const UserActivity = props => {
   const [allLoaded, setAllLoaded] = useState(false);
 
   useEffect(() => {
-    // cache all board titles for faster board title lookup when fetching activities
-    const boardTitles = {};
-    for (let board of props.boards) { boardTitles[board.boardID] = board.title; }
-
     const fetchActivity = async page => {
       try {
         setLoading(true);
         const res = await axios.get(`/activity/myActivity/${page}`);
         setLoading(false);
-        const data = res.data.activity.map(action => ({ ...action, boardTitle: boardTitles[action.boardID] }));
+        const data = res.data.activity.map(action => ({ ...action, boardTitle: props.boards[action.boardID].title }));
         setUserActivity(userActivity.concat(data));
         if (res.data.activity.length < 100) { setAllLoaded(true); }
       } catch (err) {
@@ -56,12 +52,12 @@ const UserActivity = props => {
 };
 
 UserActivity.propTypes = {
-  boards: PropTypes.array.isRequired,
+  boards: PropTypes.object.isRequired,
   avatar: PropTypes.string
 };
 
 const mapStateToProps = state => ({
-  boards: state.user.boards,
+  boards: state.user.boards.byID,
   avatar: state.user.avatar
 });
 

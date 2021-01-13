@@ -10,9 +10,9 @@ import TeamNavBar from '../TeamNavBar/TeamNavBar';
 const Dashboard = props => {
   useEffect(() => props.getUserData(), []);
 
-  const starredBoards = props.boards.filter(board => board.isStarred);
+  const starredBoards = props.boards.allIDs.filter(boardID => props.boards.byID[boardID].isStarred).map(boardID => props.boards.byID[boardID]);
 
-  const personalBoards = props.boards.filter(board => !props.teams.find(team => team.teamID === board.teamID));
+  const personalBoards = props.boards.allIDs.filter(boardID => !props.teams.byID[props.boards.byID[boardID].teamID]).map(boardID => props.boards.byID[boardID]);
 
   return (
     <div className={classes.Container}>
@@ -21,20 +21,24 @@ const Dashboard = props => {
       <BoardList boards={starredBoards} /></>}
       <div className={classes.Title}>{personIcon} My Boards</div>
       <BoardList boards={personalBoards} createPersonal />
-      {props.teams.map(team => (
-        <div key={team.teamID}>
-          <TeamNavBar title={team.title} url={team.url} teamID={team.teamID} />
-          <BoardList boards={props.boards.filter(board => board.teamID === team.teamID)} teamID={team.teamID} teamTitle={team.title} />
-        </div>
-      ))}
+      {props.teams.allIDs.map(teamID => {
+        const team = props.teams.byID[teamID];
+        return (
+          <div key={teamID}>
+            <TeamNavBar title={team.title} url={team.url} teamID={teamID} />
+            <BoardList boards={props.boards.allIDs.filter(boardID => props.boards.byID[boardID].teamID === teamID).map(boardID => props.boards.byID[boardID])}
+            teamID={teamID} teamTitle={team.title} />
+          </div>
+        );
+      })}
     </div>
   );
 };
 
 Dashboard.propTypes = {
   getUserData: PropTypes.func.isRequired,
-  boards: PropTypes.array.isRequired,
-  teams: PropTypes.array.isRequired
+  boards: PropTypes.object.isRequired,
+  teams: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({

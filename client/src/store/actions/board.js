@@ -64,13 +64,13 @@ const formatCardData = card => {
 export const updateActiveBoard = data => (dispatch, getState) => {
   const { _id: boardID, members, desc, creatorEmail, color, title, activity, teamID } = data;
   const state = getState();
-  const activeBoard = state.user.boards.find(board => board.boardID === boardID);
+  const activeBoard = state.user.boards.byID[boardID];
   let { isStarred, isAdmin: userIsAdmin } = activeBoard;
   const { isAdmin, ...creator} = data.members.find(member => member.email === creatorEmail);
 
   let team = { teamID, title: '', url: null };
   if (teamID && !data.team) {
-    const teamData = state.user.teams.find(team => team.teamID === teamID);
+    const teamData = state.user.teams.byID[teamID];
     team.title = teamData.title;
     team.url = teamData.url;
   } else if (teamID && data.team) {

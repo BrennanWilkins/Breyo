@@ -25,17 +25,6 @@ export const findAndReplace = (arr, field, actionField, fieldToChange, newVal) =
   return newArr;
 };
 
-// finds index in state array where a given field is equal to given action field
-// & toggles fieldToChange to opposite of its boolean value
-export const findAndToggle = (arr, field, actionField, fieldToChange) => {
-  const newArr = [...arr];
-  const index = newArr.findIndex(entry => entry[field] === actionField);
-  const newEntry = { ...newArr[index] };
-  newEntry[fieldToChange] = !newEntry[fieldToChange];
-  newArr[index] = newEntry;
-  return newArr;
-};
-
 // filter cards by search query mode & its dueDate
 export const filterByDueDate = (mode, dueDate) => {
   const date = new Date(dueDate.dueDate);

@@ -6,7 +6,7 @@ import { logout } from './auth';
 export const getUserData = () => async dispatch => {
   try {
     const res = await axios.get('/user');
-    dispatch({ type: actionTypes.UPDATE_USER_DATA, ...res.data });
+    dispatch({ type: actionTypes.UPDATE_USER_DATA, payload: res.data });
   } catch (err) {
     dispatch(addNotif('There was an error while retrieving your data.'));
   }
