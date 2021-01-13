@@ -7,15 +7,26 @@ import { connect } from 'react-redux';
 import { checkIcon } from '../../../UI/icons';
 import { addCardMember, removeCardMemberCurrentCard } from '../../../../store/actions';
 import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
+import { Input } from '../../../UI/Inputs/Inputs';
 
 const AddCardMember = props => {
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
   const [boardMembers, setBoardMembers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredMembers, setFilteredMembers] = useState([]);
+
+  useEffect(() => {
+    setFilteredMembers(boardMembers.filter(member => member.fullName.toLowerCase().includes(searchQuery.toLowerCase())));
+  }, [searchQuery]);
 
   useEffect(() => {
     // add isMember property to props.members before syncing state
-    setBoardMembers(props.members.map(member => ({ ...member, isMember: !!props.cardMembers.find(cardMember => cardMember.email === member.email) })));
+    const members = props.members.map(member => ({ ...member, isMember: !!props.cardMembers.find(cardMember => cardMember.email === member.email) }));
+    setBoardMembers(members);
+    if (searchQuery) {
+      setFilteredMembers(members.filter(member => member.fullName.toLowerCase().includes(searchQuery.toLowerCase())));
+    }
   }, [props.members, props.cardMembers]);
 
   useLayoutEffect(() => {
@@ -36,11 +47,14 @@ const AddCardMember = props => {
     }
   };
 
+  const shownMembers = searchQuery ? filteredMembers : boardMembers;
+
   return (
-    <div ref={modalRef} className={props.fromList ? classes.FromListContainer : classes.Container}>
+    <div ref={modalRef} className={`${classes.Modal} ${props.fromList ? classes.FromListContainer : classes.Container}`}>
       <ModalTitle close={props.close} title="Members" />
+      <Input className={classes.Input} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search board members by name" />
       <div className={classes.SubTitle}>BOARD MEMBERS</div>
-      {boardMembers.map((member, i) => (
+      {shownMembers.map((member, i) => (
         <div key={member.email} className={classes.Member} onClick={() => memberHandler(i)}>
           <AccountBtn avatar={member.avatar}>{member.fullName[0]}</AccountBtn>
           {member.fullName}{member.isMember && checkIcon}
