@@ -1,0 +1,41 @@
+.Container {
+  position: fixed;
+  width: 300px;
+  background: white;
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  padding: 5px 5px 15px;
+  box-sizing: border-box;
+  font-size: 15px;
+  margin: 3px 0 0 3px;
+  max-height: 400px;
+  overflow: auto;
+}
+.Container::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Container::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Container::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}
+.Input {
+  width: 96%;
+  margin: 0 auto 10px;
+}
+.Members {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0 10px;
+}
+.BackBtn {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+}
