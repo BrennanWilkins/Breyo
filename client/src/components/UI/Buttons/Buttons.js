@@ -3,7 +3,7 @@ import classes from './Buttons.module.css';
 import { xIcon, caretIcon, backIcon, adminIcon } from '../icons';
 
 const Button = props => (
-  <button className={classes.Button} onClick={props.clicked} disabled={props.disabled}>{props.children}</button>
+  <button className={props.className ? `${classes.Button} ${props.className}` : classes.Button} onClick={props.clicked} disabled={props.disabled}>{props.children}</button>
 );
 
 export const AccountBtn = props => (
@@ -14,7 +14,7 @@ export const AccountBtn = props => (
 );
 
 export const CloseBtn = props => (
-  <button style={{color: props.color}} className={classes.CloseBtn} onClick={props.close}>{xIcon}</button>
+  <button style={{color: props.color}} className={props.className ? `${classes.CloseBtn} ${props.className}` : classes.CloseBtn} onClick={props.close}>{xIcon}</button>
 );
 
 export const CloseBtnCircle = props => (
@@ -30,7 +30,7 @@ export const BackBtn = props => (
 );
 
 export const ActionBtn = props => (
-  <button className={classes.ActionBtn} onClick={props.clicked}>{props.children}</button>
+  <button className={props.className ? `${classes.ActionBtn} ${props.className}` : classes.ActionBtn} onClick={props.clicked}>{props.children}</button>
 );
 
 export default Button;

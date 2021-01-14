@@ -10,7 +10,7 @@
   font-size: 25px;
   margin-right: 8px;
 }
-.EditBtn button {
+.EditBtn {
   margin: 0 0 0 20px;
   font-size: 16px;
 }
@@ -28,21 +28,21 @@
   justify-content: flex-start;
   align-items: center;
 }
-.SaveBtn button {
+.SaveBtn {
   background: rgba(var(--green), 0.8);
   padding: 15px;
 }
-.SaveBtn button:hover, .SaveBtn button:active {
+.SaveBtn:hover, .SaveBtn:active {
   background: rgb(var(--green));
 }
-.SaveBtn button:disabled {
+.SaveBtn:disabled {
   background: rgba(0,0,0,0.1);
 }
 .CloseBtn svg {
   width: 30px !important;
   height: 30px !important;
 }
-.FormatBtn button {
+.FormatBtn {
   margin: 0 0 0 80px;
 }
 .NoDesc {

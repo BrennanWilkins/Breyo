@@ -53,7 +53,7 @@ const ListActions = props => {
       <div className={classes.Title}>
         <span className={showCopyList || showMoveCards ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
         {showCopyList ? 'Copy List' : showMoveCards ? 'Move all cards in this list' : 'List Actions'}
-        <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
+        <CloseBtn className={classes.CloseBtn} close={props.close} />
       </div>
       {showCopyList ?
         <CopyList title={props.title} close={props.close} copyList={title => props.copyList(title, props.listID, props.boardID)} /> :

@@ -28,12 +28,12 @@ const DeleteModal = props => {
 
   return (
     <div ref={modalRef} className={classes.DeleteModal} style={props.mode === 'list' ? {left: 'calc(50% - 150px)'} : null}>
-      <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
+      <CloseBtn className={classes.CloseBtn} close={props.close} />
       {canDelete ?
         <>
           <div>{text}Type "{props.confirmText}" below to confirm.</div>
           <input className={classes.Input} value={confirmInput} onChange={e => setConfirmInput(e.target.value)} />
-          <span className={classes.DeleteBtn}><ActionBtn clicked={deleteHandler}>{props.mode === 'leave' ? 'LEAVE' : 'DELETE'}</ActionBtn></span>
+          <ActionBtn className={classes.DeleteBtn} clicked={deleteHandler}>{props.mode === 'leave' ? 'LEAVE' : 'DELETE'}</ActionBtn>
         </>
         :
         <div>{disabledText}</div>

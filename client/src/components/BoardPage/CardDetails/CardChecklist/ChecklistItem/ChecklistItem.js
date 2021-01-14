@@ -25,7 +25,7 @@ const ChecklistItem = props => {
           <span className={props.isComplete ? classes.TitleCompleted : classes.Title}>{props.title}</span>
           <div className={classes.Btns}>
             <span className={classes.EditBtn} onClick={() => setShowEdit(true)}>{editIcon}</span>
-            <span className={classes.CloseBtn}><CloseBtn close={props.deleteItem} /></span>
+            <CloseBtn className={classes.CloseBtn} close={props.deleteItem} />
           </div></> :
           <EditChecklistItem close={() => setShowEdit(false)} editItem={props.editItem} title={props.title} />}
         </div>

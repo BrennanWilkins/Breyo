@@ -29,8 +29,8 @@ const Invites = props => {
             <div>{invite.inviterName}<span className={classes.Email}> ({invite.inviterEmail}) </span>
             invited you to the board <span className={classes.Title}>{invite.title}</span>.</div>
             <div className={classes.Btns}>
-              <span className={classes.AcceptBtn}><Button clicked={() => acceptHandler(invite.boardID)}>Accept</Button></span>
-              <span className={classes.RejectBtn}><Button clicked={() => props.rejectInvite(invite.boardID)}>Reject</Button></span>
+              <Button className={classes.AcceptBtn} clicked={() => acceptHandler(invite.boardID)}>Accept</Button>
+              <Button className={classes.RejectBtn} clicked={() => props.rejectInvite(invite.boardID)}>Reject</Button>
             </div>
           </div>
         ))}
@@ -39,8 +39,8 @@ const Invites = props => {
             <div>{invite.inviterName}<span className={classes.Email}> ({invite.inviterEmail}) </span>
             invited you to the team <span className={classes.Title}>{invite.title}</span>.</div>
             <div className={classes.Btns}>
-              <span className={classes.AcceptBtn}><Button clicked={() => acceptTeamHandler(invite.teamID)}>Accept</Button></span>
-              <span className={classes.RejectBtn}><Button clicked={() => props.rejectTeamInvite(invite.teamID)}>Reject</Button></span>
+              <Button className={classes.AcceptBtn} clicked={() => acceptTeamHandler(invite.teamID)}>Accept</Button>
+              <Button className={classes.RejectBtn} clicked={() => props.rejectTeamInvite(invite.teamID)}>Reject</Button>
             </div>
           </div>
         ))}

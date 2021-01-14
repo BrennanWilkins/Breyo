@@ -46,8 +46,8 @@ const Archive = props => {
       <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className={classes.SearchInput}
       placeholder={showCards ? 'Search archived cards' : 'Search archived lists'} />
       <div className={classes.Btns}>
-        <span className={showCards ? classes.Active : null}><ActionBtn clicked={() => setShowCards(true)}>Archived cards</ActionBtn></span>
-        <span className={!showCards ? classes.Active : null}><ActionBtn clicked={() => setShowCards(false)}>Archived lists</ActionBtn></span>
+        <ActionBtn className={showCards ? classes.Active : null} clicked={() => setShowCards(true)}>Archived cards</ActionBtn>
+        <ActionBtn className={!showCards ? classes.Active : null} clicked={() => setShowCards(false)}>Archived lists</ActionBtn>
       </div>
       {showCards ? archivedCards.map(card => (
         <div className={classes.CardContainer} key={card.cardID}>

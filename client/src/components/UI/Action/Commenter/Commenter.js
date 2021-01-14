@@ -11,7 +11,7 @@ const Commenter = props => {
 
   return (
     <div className={classes.Container} ref={modalRef}>
-      <div className={classes.CloseBtn}><CloseBtn close={props.close} /></div>
+      <CloseBtn className={classes.CloseBtn} close={props.close} />
       <AccountInfo fullName={props.fullName} email={props.email} noBorder avatar={props.avatar} />
     </div>
   );

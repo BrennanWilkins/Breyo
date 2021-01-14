@@ -33,9 +33,9 @@ const TeamMembers = props => {
         {members.map(member => (
           <div className={classes.Member} key={member.email}>
             <AccountInfo longerDetails {...member} />
-            <div className={classes.MembershipBtn} onClick={() => setShownPermissionModal(member.email)}>
-              <ActionBtn>{member.isAdmin ? 'Admin' : 'Member'}{dotsIcon}</ActionBtn>
-            </div>
+            <ActionBtn className={classes.MembershipBtn} clicked={() => setShownPermissionModal(member.email)}>
+              {member.isAdmin ? 'Admin' : 'Member'}{dotsIcon}
+            </ActionBtn>
             {shownPermissionModal === member.email &&
               <PermissionModal adminCount={adminCount} email={member.email} isAdmin={member.isAdmin} close={() => setShownPermissionModal('')} />}
           </div>

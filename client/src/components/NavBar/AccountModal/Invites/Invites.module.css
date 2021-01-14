@@ -45,15 +45,15 @@
   font-size: 14px;
   margin: 0 5px;
 }
-.AcceptBtn button {
+.AcceptBtn {
   background: rgba(var(--green), 0.8);
 }
-.AcceptBtn button:hover, .AcceptBtn button:active {
+.AcceptBtn:hover, .AcceptBtn:active {
   background: rgb(var(--green));
 }
-.RejectBtn button {
+.RejectBtn {
   background: rgb(219, 55, 29);
 }
-.RejectBtn button:hover, .RejectBtn button:active {
+.RejectBtn:hover, .RejectBtn:active {
   background: rgb(213, 5, 5);
 }

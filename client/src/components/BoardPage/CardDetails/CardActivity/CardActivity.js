@@ -35,9 +35,7 @@ const CardActivity = props => {
     <div>
       <div className={classes.Title}>
         <div>{activityIcon}Activity</div>
-        <span className={classes.ShowDetailBtn}>
-          <ActionBtn clicked={showDetailsHandler}>{showDetails ? 'Hide Details' : 'Show Details'}</ActionBtn>
-        </span>
+        <ActionBtn clicked={showDetailsHandler}>{showDetails ? 'Hide Details' : 'Show Details'}</ActionBtn>
       </div>
       <AddComment />
       {showDetails ?

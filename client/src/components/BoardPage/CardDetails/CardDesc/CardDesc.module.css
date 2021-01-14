@@ -46,7 +46,7 @@
   width: calc(100% - 60px);
   border: 2px solid rgb(var(--red));
 }
-.EditBtn button {
+.EditBtn {
   margin: 0 0 0 20px;
   font-size: 16px;
 }
@@ -64,13 +64,13 @@
   display: flex;
   align-items: center;
 }
-.SaveBtn button {
+.SaveBtn {
   background: rgba(var(--green), 0.8);
   padding: 15px;
 }
-.SaveBtn button:hover, .SaveBtn button:active {
+.SaveBtn:hover, .SaveBtn:active {
   background: rgb(var(--green));
 }
-.SaveBtn button:disabled {
+.SaveBtn:disabled {
   background: rgba(0,0,0,0.1);
 }

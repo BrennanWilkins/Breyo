@@ -21,12 +21,10 @@
 }
 .CloseBtn {
   display: none;
-}
-.CloseBtn button {
   margin: 0;
   color: rgb(var(--darkGray));
 }
-.CloseBtn button:hover {
+.CloseBtn:hover {
   color: black;
 }
 .Container:hover .CloseBtn, .Container:hover .EditBtn {

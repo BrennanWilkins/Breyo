@@ -10,7 +10,7 @@ const DeleteModal = props => {
 
   return (
     <div ref={modalRef} className={classes.Container}>
-      <div className={classes.CloseBtn}><CloseBtn close={props.close} /></div>
+      <CloseBtn className={classes.CloseBtn} close={props.close} />
       <div className={classes.Title}>Are you sure you want to delete this comment?</div>
       <button className={classes.DeleteBtn} onClick={props.delete}>Delete Comment</button>
     </div>

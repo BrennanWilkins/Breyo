@@ -17,18 +17,18 @@
     left: auto;
   }
 }
-.Body {
-  margin: 30px 20px 15px;
+.Text {
+  margin: 30px 10px 15px;
   text-align: center;
   font-size: 15px;
 }
-.CloseBtn button {
+.CloseBtn {
   position: absolute;
   right: 0;
   top: 0;
   margin: 5px;
 }
-.DeleteBtn button {
+.DeleteBtn {
   background: rgb(219, 55, 29);
   font-weight: 400;
   font-size: 15px;
@@ -36,6 +36,6 @@
   display: flex;
   margin: 0 auto 10px;
 }
-.DeleteBtn button:hover, .DeleteBtn button:active {
+.DeleteBtn:hover, .DeleteBtn:active {
   background: rgb(213, 5, 5);
 }

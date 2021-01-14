@@ -10,9 +10,9 @@ const DeleteModal = props => {
 
   return (
     <div ref={modalRef} className={classes.Container}>
-      <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
-      <div className={classes.Body}>Are you sure you want to delete the checklist '{props.title}'?</div>
-      <span className={classes.DeleteBtn}><Button clicked={() => { props.delete(); props.close(); }}>Delete Checklist</Button></span>
+      <CloseBtn className={classes.CloseBtn} close={props.close} />
+      <div className={classes.Text}>Are you sure you want to delete the checklist '{props.title}'?</div>
+      <Button className={classes.DeleteBtn} clicked={() => { props.delete(); props.close(); }}>Delete Checklist</Button>
     </div>
   );
 };

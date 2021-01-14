@@ -70,7 +70,7 @@ const BoardMenu = props => {
       <div className={classes.Title}>
         <span className={showBackBtn ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
         {title}
-        <span className={classes.CloseBtn}><CloseBtn close={props.close} /></span>
+        <CloseBtn className={classes.CloseBtn} close={props.close} />
       </div>
       <div className={title === 'Menu' ? null : classes.Content}>{content}</div>
     </div>

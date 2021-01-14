@@ -20,7 +20,7 @@ const CardMemberModal = props => {
   return (
     <div ref={modalRef} style={props.inCard ? {top: props.top + 'px', left: props.left + 'px'} : null}
     className={props.inCard ? classes.FixedContainer : classes.Container}>
-      <div className={classes.CloseBtn}><CloseBtn close={props.close} /></div>
+      <CloseBtn className={classes.CloseBtn} close={props.close} />
       <AccountInfo fullName={props.fullName} email={props.email} noBorder avatar={props.avatars[props.email]} />
       <div className={classes.RemoveBtn} onClick={removeHandler}>Remove from card</div>
     </div>

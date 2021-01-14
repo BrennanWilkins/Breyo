@@ -15,7 +15,7 @@ const CardLabels = props => {
       <div className={classes.Labels}>
         {LABEL_COLORS.filter(color => props.labels.includes(color)).map(color => <div key={color} className={classes.Label} style={{background: color}}></div>)}
         <div className={classes.Btn}>
-          <span className={classes.AddBtn}><ActionBtn clicked={() => setShowLabelModal(true)}>{plusIcon}</ActionBtn></span>
+          <ActionBtn className={classes.AddBtn} clicked={() => setShowLabelModal(true)}>{plusIcon}</ActionBtn>
           {showLabelModal && <LabelModal openFromMiddle close={() => setShowLabelModal(false)} />}
         </div>
       </div>

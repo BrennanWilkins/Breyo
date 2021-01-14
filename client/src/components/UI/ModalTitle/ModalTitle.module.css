@@ -22,7 +22,7 @@
 .LightTitle {
   color: rgb(112, 112, 112);
 }
-.CloseBtn button {
+.CloseBtn {
   position: absolute;
   right: 0;
   top: 0;

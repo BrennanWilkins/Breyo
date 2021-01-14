@@ -13,7 +13,7 @@ const MemberModal = props => {
 
   return (
     <div ref={modalRef} className={classes.Container} style={showPermission ? {width: '350px', height: '270px'} : null}>
-      <div className={classes.CloseBtn}><CloseBtn close={props.close} /></div>
+      <CloseBtn className={classes.CloseBtn} close={props.close} />
       {showPermission &&
         <>
           <div className={classes.BackBtn}><BackBtn back={() => setShowPermission(false)} /></div>

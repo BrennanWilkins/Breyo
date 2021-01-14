@@ -11,12 +11,12 @@
 .Title2 {
   margin-top: 20px;
 }
-.Btn button {
+.Btn {
   width: 100%;
   justify-content: flex-start;
   margin: 5px 0;
 }
-.Btn button svg {
+.Btn svg {
   margin: 0 10px 0 3px;
   font-size: 15px;
 }
@@ -38,8 +38,11 @@
   .Btn, .RoadmapBtnContainer {
     width: 48%;
   }
+  .RoadmapBtn {
+    width: 100%;
+  }
 }
-.RoadmapBtn button {
+.RoadmapBtn {
   text-align: left;
 }
 .RoadmapBtn svg {

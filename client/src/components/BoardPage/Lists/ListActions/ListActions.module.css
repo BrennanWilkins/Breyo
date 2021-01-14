@@ -24,7 +24,7 @@
   font-weight: 500;
   margin-bottom: 10px;
 }
-.CloseBtn button {
+.CloseBtn {
   position: absolute;
   right: 0;
   top: 0;

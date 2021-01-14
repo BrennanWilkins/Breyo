@@ -31,21 +31,27 @@ const CardDesc = props => {
 
   return (
     <div>
-      <div className={classes.Title}>{descIcon}Description{!showEdit && props.currentDesc.length > 0 &&
-      <span className={classes.EditBtn}><ActionBtn clicked={() => setShowEdit(true)}>Edit</ActionBtn></span>}</div>
-      {showEdit ? <>
-        <TextArea className={classes.Input} minRows="2" maxRows="50" value={descInput} onChange={e => setDescInput(e.target.value)}
-        ref={descRef} placeholder="Add a description for this card" />
-        <div className={classes.Btns}>
-          <div className={classes.LeftBtns}>
-            <span className={classes.SaveBtn}><Button clicked={saveDescHandler} disabled={descInput === props.currentDesc}>Save</Button></span>
-            <span className={classes.CloseBtn}><CloseBtn close={() => { setShowEdit(false); setDescInput(props.currentDesc); }} /></span>
+      <div className={classes.Title}>
+        {descIcon}Description
+        {!showEdit && props.currentDesc.length > 0 && <ActionBtn className={classes.EditBtn} clicked={() => setShowEdit(true)}>Edit</ActionBtn>}
+      </div>
+      {showEdit ?
+        <>
+          <TextArea className={classes.Input} minRows="2" maxRows="50" value={descInput} onChange={e => setDescInput(e.target.value)}
+          ref={descRef} placeholder="Add a description for this card" />
+          <div className={classes.Btns}>
+            <div className={classes.LeftBtns}>
+              <Button className={classes.SaveBtn} clicked={saveDescHandler} disabled={descInput === props.currentDesc}>Save</Button>
+              <CloseBtn className={classes.CloseBtn} close={() => { setShowEdit(false); setDescInput(props.currentDesc); }} />
+            </div>
+            <ActionBtn clicked={() => setShowFormattingHelp(true)}>Formatting help</ActionBtn>
           </div>
-          <span className={classes.FormatBtn}><ActionBtn clicked={() => setShowFormattingHelp(true)}>Formatting help</ActionBtn></span>
-        </div>
-      </> : props.currentDesc.length === 0 ?
+        </>
+        : props.currentDesc.length === 0 ?
         <div className={classes.NoDesc} onClick={() => setShowEdit(true)}>Add a description for this card</div>
-        : <div className={classes.DescText}>{formattedDesc}</div>}
+        :
+        <div className={classes.DescText}>{formattedDesc}</div>
+      }
       {showFormattingHelp && <FormattingModal close={() => setShowFormattingHelp(false)} />}
     </div>
   );

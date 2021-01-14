@@ -17,20 +17,18 @@ const CardDueDate = props => {
     <div className={classes.Container}>
       {props.currentDueDate.startDate && <div className={classes.DateContainer}>
         <div className={classes.Title}>START DATE</div>
-        <span className={classes.StartBtn}>
-          <ActionBtn clicked={() => setShowModal(true)}>{formatDate(props.currentDueDate.startDate)}</ActionBtn>
-        </span>
+        <ActionBtn className={classes.StartBtn} clicked={() => setShowModal(true)}>
+          {formatDate(props.currentDueDate.startDate)}
+        </ActionBtn>
       </div>}
       <div className={classes.DateContainer}>
         <div className={classes.Title}>DUE DATE</div>
         <div className={classes.Input}>
           <Checkbox checked={props.currentDueDate.isComplete} clicked={props.toggleIsComplete} />
-          <span className={classes.Btn}>
-            <ActionBtn clicked={() => setShowModal(true)}>
-              {formatDate(props.currentDueDate.dueDate)}
-              {isPast(dueDate) ? <div className={classes.OverDue}>OVERDUE</div> : isToday(dueDate) ? <div className={classes.DueSoon}>DUE SOON</div> : null}
-            </ActionBtn>
-          </span>
+          <ActionBtn className={classes.Btn} clicked={() => setShowModal(true)}>
+            {formatDate(props.currentDueDate.dueDate)}
+            {isPast(dueDate) ? <div className={classes.OverDue}>OVERDUE</div> : isToday(dueDate) ? <div className={classes.DueSoon}>DUE SOON</div> : null}
+          </ActionBtn>
         </div>
       </div>
       {showModal && <DueDateModal close={() => setShowModal(false)} fromDueDate />}

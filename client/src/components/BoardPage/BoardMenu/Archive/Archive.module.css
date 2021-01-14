@@ -7,10 +7,10 @@
   margin: 0 8px;
   width: 120px;
 }
-.Active button {
+.Active {
   background: rgb(205,205,205);
 }
-.Active button:hover {
+.Active:hover {
   background: rgb(205,205,205);
 }
 .CardContainer, .ListContainer {

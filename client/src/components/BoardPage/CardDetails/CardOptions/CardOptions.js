@@ -25,23 +25,23 @@ const CardOptions = props => {
     <div className={classes.Container}>
       <div className={classes.Title}>ADD TO CARD</div>
       <span className={classes.BtnContainer}>
-        <span className={classes.Btn}><ActionBtn clicked={() => setShowLabelModal(true)}>{labelIcon}Labels</ActionBtn></span>
+        <ActionBtn className={classes.Btn} clicked={() => setShowLabelModal(true)}>{labelIcon}Labels</ActionBtn>
         {showLabelModal && <LabelModal close={() => setShowLabelModal(false)} />}
-        <span className={classes.Btn}><ActionBtn clicked={() => setShowChecklistModal(true)}>{checklistIcon}Checklist</ActionBtn></span>
+        <ActionBtn className={classes.Btn} clicked={() => setShowChecklistModal(true)}>{checklistIcon}Checklist</ActionBtn>
         {showChecklistModal && <ChecklistModal close={() => setShowChecklistModal(false)} />}
-        <span className={classes.Btn}><ActionBtn clicked={() => setShowAddMemberModal(true)}>{personIcon}Member</ActionBtn></span>
+        <ActionBtn className={classes.Btn} clicked={() => setShowAddMemberModal(true)}>{personIcon}Member</ActionBtn>
         {showAddMemberModal && <AddCardMember close={() => setShowAddMemberModal(false)} />}
-        <span className={classes.Btn}><ActionBtn clicked={() => setShowDueDateModal(true)}>{clockIcon}Due Date</ActionBtn></span>
+        <ActionBtn className={classes.Btn} clicked={() => setShowDueDateModal(true)}>{clockIcon}Due Date</ActionBtn>
         <span className={classes.RoadmapBtnContainer}>
-          <span className={`${classes.Btn} ${classes.RoadmapBtn}`}><ActionBtn clicked={() => setShowRoadmapLabelModal(true)}>{roadmapIcon}Roadmap Label</ActionBtn></span>
+          <ActionBtn className={`${classes.Btn} ${classes.RoadmapBtn}`} clicked={() => setShowRoadmapLabelModal(true)}>{roadmapIcon}Roadmap Label</ActionBtn>
           {showRoadmapLabelModal && <RoadmapLabelModal close={() => setShowRoadmapLabelModal(false)} />}
         </span>
       </span>
       <div className={classes.Title2}>ACTIONS</div>
       <span className={classes.BtnContainer2}>
-        <span className={classes.Btn}><ActionBtn clicked={() => setShowManualMoveModal(true)}>{arrowIcon} Move</ActionBtn></span>
-        <span className={classes.Btn}><ActionBtn clicked={() => setShowCopyModal(true)}>{copyIcon} Copy</ActionBtn></span>
-        <span className={classes.Btn}><ActionBtn clicked={props.archiveCard}>{archiveIcon} Archive</ActionBtn></span>
+        <ActionBtn className={classes.Btn} clicked={() => setShowManualMoveModal(true)}>{arrowIcon} Move</ActionBtn>
+        <ActionBtn className={classes.Btn} clicked={() => setShowCopyModal(true)}>{copyIcon} Copy</ActionBtn>
+        <ActionBtn className={classes.Btn} clicked={props.archiveCard}>{archiveIcon} Archive</ActionBtn>
       </span>
       {showCopyModal && <CopyCardModal close={() => setShowCopyModal(false)} />}
       {showDueDateModal && <DueDateModal close={() => setShowDueDateModal(false)} />}

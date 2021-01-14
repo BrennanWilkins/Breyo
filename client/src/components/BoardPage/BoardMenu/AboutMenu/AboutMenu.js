@@ -32,14 +32,14 @@ const AboutMenu = props => {
       <AccountInfo fullName={props.creator.fullName} email={props.creator.email} avatar={props.creator.avatar} givePadding noBorder />
       <div className={classes.Title}>{descIcon}Description
         {!showEditDesc && props.desc.length > 0 &&
-          <span className={classes.EditBtn}><ActionBtn clicked={() => setShowEditDesc(true)}>Edit</ActionBtn></span>}
+          <ActionBtn className={classes.EditBtn} clicked={() => setShowEditDesc(true)}>Edit</ActionBtn>}
       </div>
       {showEditDesc ? <>
         <TextArea className={classes.DescInput} minRows="3" maxRows="50" value={descInput} onChange={e => setDescInput(e.target.value)} autoFocus />
         <div className={classes.Btns}>
-          <span className={classes.SaveBtn}><Button clicked={saveDescHandler} disabled={descInput === props.desc}>Save</Button></span>
-          <span className={classes.CloseBtn}><CloseBtn close={() => { setShowEditDesc(false); setDescInput(props.desc); }} /></span>
-          <span className={classes.FormatBtn}><ActionBtn clicked={() => setShowFormattingHelp(true)}>Formatting help</ActionBtn></span>
+          <Button className={classes.SaveBtn} clicked={saveDescHandler} disabled={descInput === props.desc}>Save</Button>
+          <CloseBtn className={classes.CloseBtn} close={() => { setShowEditDesc(false); setDescInput(props.desc); }} />
+          <ActionBtn className={classes.FormatBtn} clicked={() => setShowFormattingHelp(true)}>Formatting help</ActionBtn>
         </div>
       </> : props.desc.length === 0 ?
         <div className={classes.NoDesc} onClick={() => setShowEditDesc(true)}>
