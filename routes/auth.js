@@ -192,7 +192,8 @@ router.get('/forgotPassword/:email', validate([param('email').isEmail()]),
         tls: { rejectUnauthorized: false },
         auth: { user: config.get('BREYO_EMAIL'), pass: config.get('BREYO_PASS') }
       });
-      const hRef = `http://localhost:3000/recover-password/${recoverPassID}`;
+      // const hRef = `http://localhost:3000/recover-password/${recoverPassID}`;
+      const hRef = `https://breyo.herokuapp.com/recover-password/${recoverPassID}`;
       const mailOptions = {
         from: config.get('BREYO_EMAIL'),
         to: email,

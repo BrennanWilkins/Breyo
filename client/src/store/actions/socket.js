@@ -9,7 +9,9 @@ let socket = null;
 
 export const initSocket = boardID => {
   if (socket) { return; }
-  const newSocket = io('http://localhost:9000/', {
+  // const url = 'http://localhost:9000/';
+  const url = 'https://breyo.herokuapp.com';
+  const newSocket = io(url, {
     query: { token: axios.defaults.headers.common['x-auth-token'] }
   });
 
@@ -17,23 +19,13 @@ export const initSocket = boardID => {
     newSocket.emit('join', boardID);
   });
 
-  // newSocket.on('joined', () => {
-  //   console.log('connected');
-  // });
-
-  // newSocket.on('unauthorized', () => {
-  //   console.log('Not a member');
-  // });
-
   newSocket.on('connect_error', error => {
     if (error.message === 'Unauthorized') {
-      // console.log('Unauthorized');
       newSocket.close();
     }
   });
 
   newSocket.on('disconnect', reason => {
-    // console.log('disconnected:', reason);
     if (reason === 'io server disconnect') {
       store.dispatch(addNotif('Connection to server lost, attempting to re-establish...'));
       newSocket.connect();
