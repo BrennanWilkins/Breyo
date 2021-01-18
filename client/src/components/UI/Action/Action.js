@@ -20,9 +20,7 @@ const Action = props => {
   return (
     <div className={classes.Action}>
       <span className={classes.AccountInfo}>
-        <span className={classes.AccountBtn}>
-          <AccountBtn clicked={() => setShowUser(true)} avatar={props.avatar}>{props.fullName[0]}</AccountBtn>
-        </span>
+        <AccountBtn className={classes.AccountBtn} clicked={() => setShowUser(true)} avatar={props.avatar}>{props.fullName[0]}</AccountBtn>
         {showUser && <Commenter close={() => setShowUser(false)} email={props.email} fullName={props.fullName} avatar={props.avatar} />}
       </span>
       <div className={classes.Detail}>

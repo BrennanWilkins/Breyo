@@ -8,11 +8,10 @@ const CardMembers = props => (
   <div className={classes.Members}>
     {props.members.map(member => (
       <div key={member.email} className={classes.Member}>
-        <span className={classes.AccountBtn}>
-          <AccountBtn avatar={props.avatars[member.email]} title={member.fullName} clicked={e => props.clickHandler(e, member.email, member.fullName)}>
-            {member.fullName[0]}
-          </AccountBtn>
-        </span>
+        <AccountBtn className={classes.AccountBtn} avatar={props.avatars[member.email]} title={member.fullName}
+        clicked={e => props.clickHandler(e, member.email, member.fullName)}>
+          {member.fullName[0]}
+        </AccountBtn>
       </div>
     ))}
   </div>

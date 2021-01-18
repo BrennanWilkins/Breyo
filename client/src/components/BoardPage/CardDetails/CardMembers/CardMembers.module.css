@@ -16,11 +16,11 @@
   vertical-align: top;
   position: relative;
 }
-.AccountBtn button, .AddBtn button {
+.AccountBtn, .AddBtn {
   margin: 5px 5px 0 0;
   background: rgb(230,230,230);
 }
-.AccountBtn button:hover, .AddBtn button:hover {
+.AccountBtn:hover, .AddBtn:hover {
   background: rgb(220,220,220);
 }
 .AddContainer {

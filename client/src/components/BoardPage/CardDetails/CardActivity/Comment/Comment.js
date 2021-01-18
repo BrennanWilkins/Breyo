@@ -32,9 +32,7 @@ const Comment = props => {
   return (
     <><div className={classes.Comment}>
       <span className={classes.AccountInfo}>
-        <span className={classes.AccountBtn}>
-          <AccountBtn avatar={props.avatar} clicked={() => setShowCommenter(true)}>{props.fullName[0]}</AccountBtn>
-        </span>
+        <AccountBtn className={classes.AccountBtn} avatar={props.avatar} clicked={() => setShowCommenter(true)}>{props.fullName[0]}</AccountBtn>
         {showCommenter && <Commenter close={() => setShowCommenter(false)} email={props.email} fullName={props.fullName} avatar={props.avatar} />}
       </span>
       <div className={classes.CommentDetail}>

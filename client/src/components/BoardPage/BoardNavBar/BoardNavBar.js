@@ -35,24 +35,18 @@ const BoardNavBar = props => {
       <span className={props.showMenu ? `${classes.Input} ${classes.InputContracted}` : classes.Input}>
         <BoardTitle boardID={props.boardID} />
       </span>
-      <span className={`${classes.StarBtn} ${props.isStarred ? classes.Highlight : ''}`}>
-        <Button clicked={() => props.toggleIsStarred(props.boardID)}>{starIcon}</Button>
-      </span>
+      <Button className={`${classes.StarBtn} ${props.isStarred ? classes.Highlight : ''}`} clicked={() => props.toggleIsStarred(props.boardID)}>{starIcon}</Button>
       <span className={classes.Separator}></span>
       <BoardMembers boardID={props.boardID} />
       <span className={classes.Container}>
-        <span className={classes.Btn}><Button clicked={() => setShowInviteModal(true)}>Invite</Button></span>
+        <Button className={classes.Btn} clicked={() => setShowInviteModal(true)}>Invite</Button>
         {showInviteModal && <InviteModal boardID={props.boardID} close={() => setShowInviteModal(false)} />}
       </span>
       <span className={classes.Container}>
         {props.team.teamID ?
-          <span className={`${classes.Btn} ${classes.TeamBtn}`}>
-            <Button clicked={() => setShowBoardTeamModal(true)}>{teamIcon}<div>{props.team.title}</div></Button>
-          </span>
+          <Button className={`${classes.Btn} ${classes.TeamBtn}`} clicked={() => setShowBoardTeamModal(true)}>{teamIcon}<div>{props.team.title}</div></Button>
           :
-          <span className={classes.Btn}>
-            <Button clicked={() => setShowAddToTeam(true)}>Personal</Button>
-          </span>
+          <Button className={classes.Btn} clicked={() => setShowAddToTeam(true)}>Personal</Button>
         }
         {showAddToTeam && <AddToTeamModal close={() => setShowAddToTeam(false)} />}
         {showBoardTeamModal && <BoardTeamModal team={props.team} close={() => setShowBoardTeamModal(false)} />}

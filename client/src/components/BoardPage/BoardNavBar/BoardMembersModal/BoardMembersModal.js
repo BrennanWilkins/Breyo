@@ -41,11 +41,10 @@ const BoardMembersModal = props => {
           placeholder="Search members by name" />
           <div className={classes.Members}>
             {members.map(member => (
-              <span key={member.email} className={navClasses.AccountBtn}>
-                <AccountBtn isAdmin={member.isAdmin} avatar={member.avatar} title={member.fullName} clicked={() => setShownMember(member)}>
-                  {member.fullName[0]}
-                </AccountBtn>
-              </span>
+              <AccountBtn key={member.email} className={navClasses.AccountBtn} isAdmin={member.isAdmin} avatar={member.avatar}
+               title={member.fullName} clicked={() => setShownMember(member)}>
+                {member.fullName[0]}
+              </AccountBtn>
             ))}
           </div>
         </>

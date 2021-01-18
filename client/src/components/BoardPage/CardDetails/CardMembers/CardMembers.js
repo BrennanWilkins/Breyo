@@ -16,17 +16,15 @@ const CardMembers = props => {
       <div className={classes.Title}>MEMBERS</div>
       {props.members.map(member => (
         <div key={member.email} className={classes.Member}>
-          <span className={classes.AccountBtn}>
-            <AccountBtn title={member.fullName} clicked={() => setShownMember(member.email)} avatar={props.avatars[member.email]}>
-              {member.fullName[0]}
-            </AccountBtn>
-          </span>
+          <AccountBtn className={classes.AccountBtn} title={member.fullName} clicked={() => setShownMember(member.email)} avatar={props.avatars[member.email]}>
+            {member.fullName[0]}
+          </AccountBtn>
           {shownMember === member.email &&
             <CardMemberModal fullName={member.fullName} email={member.email} close={() => setShownMember('')} />}
         </div>
       ))}
       <span className={classes.AddContainer}>
-        <span className={classes.AddBtn}><AccountBtn clicked={() => setShowAddMember(true)}>{plusIcon}</AccountBtn></span>
+        <AccountBtn className={classes.AddBtn} clicked={() => setShowAddMember(true)}>{plusIcon}</AccountBtn>
         {showAddMember && <AddCardMember fromList close={() => setShowAddMember(false)} />}
       </span>
     </div>

@@ -24,19 +24,16 @@ const BoardMembers = props => {
     <>
       {members.map(member => (
         <span key={member.email} className={classes.Container}>
-          <span className={classes.AccountBtn}>
-            <AccountBtn isAdmin={member.isAdmin} avatar={member.avatar} clicked={() => setShownMember(member.email)} title={member.fullName}>
-              {member.fullName[0]}
-            </AccountBtn>
-          </span>
-          {shownMember === member.email &&
-            <MemberModal close={() => setShownMember('')} {...member} adminCount={adminCount} />}
+          <AccountBtn className={classes.AccountBtn} isAdmin={member.isAdmin} avatar={member.avatar} clicked={() => setShownMember(member.email)} title={member.fullName}>
+            {member.fullName[0]}
+          </AccountBtn>
+          {shownMember === member.email && <MemberModal close={() => setShownMember('')} {...member} adminCount={adminCount} />}
         </span>
       ))}
       <span className={classes.Container}>
-        {showExpandBtn && <span className={`${classes.Btn} ${classes.ExpandBtn}`}>
-          <Button clicked={() => setShowBoardMembers(true)}>+{props.members.length - 5}</Button>
-        </span>}
+        {showExpandBtn &&
+          <Button className={`${classes.Btn} ${classes.ExpandBtn}`} clicked={() => setShowBoardMembers(true)}>+{props.members.length - 5}</Button>
+        }
         {showBoardMembers && <BoardMembersModal members={props.members} close={() => setShowBoardMembers(false)} adminCount={adminCount} />}
       </span>
     </>

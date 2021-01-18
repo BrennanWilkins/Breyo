@@ -6,11 +6,11 @@
 .AccountInfo {
   position: relative;
 }
-.AccountBtn button {
+.AccountBtn {
   margin: 2px 5px 0 0;
   background: rgb(var(--lightGray));
 }
-.AccountBtn button:hover {
+.AccountBtn:hover {
   background: rgb(195, 195, 195);
 }
 .Detail {

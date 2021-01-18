@@ -3,18 +3,18 @@ import classes from './Buttons.module.css';
 import { xIcon, caretIcon, backIcon, adminIcon } from '../icons';
 
 const Button = props => (
-  <button className={props.className ? `${classes.Button} ${props.className}` : classes.Button} onClick={props.clicked} disabled={props.disabled}>{props.children}</button>
+  <button className={`${classes.Button} ${props.className || ''}`} onClick={props.clicked} disabled={props.disabled}>{props.children}</button>
 );
 
 export const AccountBtn = props => (
-  <button className={props.avatar ? classes.AvatarBtn : classes.AccountBtn} onClick={props.clicked} title={props.title}>
+  <button className={`${props.avatar ? classes.AvatarBtn : classes.AccountBtn} ${props.className || ''}`} onClick={props.clicked} title={props.title}>
     {props.avatar ? <img src={props.avatar} alt="" /> : props.children}
     {props.isAdmin && <div className={classes.AdminIcon}>{adminIcon}</div>}
   </button>
 );
 
 export const CloseBtn = props => (
-  <button style={{color: props.color}} className={props.className ? `${classes.CloseBtn} ${props.className}` : classes.CloseBtn} onClick={props.close}>{xIcon}</button>
+  <button style={{color: props.color}} className={`${classes.CloseBtn} ${props.className || ''}`} onClick={props.close}>{xIcon}</button>
 );
 
 export const CloseBtnCircle = props => (
@@ -30,7 +30,7 @@ export const BackBtn = props => (
 );
 
 export const ActionBtn = props => (
-  <button className={props.className ? `${classes.ActionBtn} ${props.className}` : classes.ActionBtn} onClick={props.clicked}>{props.children}</button>
+  <button className={`${classes.ActionBtn} ${props.className || ''}`} onClick={props.clicked}>{props.children}</button>
 );
 
 export default Button;

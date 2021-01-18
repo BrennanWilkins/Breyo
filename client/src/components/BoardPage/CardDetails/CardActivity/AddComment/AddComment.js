@@ -23,13 +23,13 @@ const AddComment = props => {
 
   return (
     <div className={classes.AddComment}>
-      <span ref={accntRef} className={classes.AccountBtn}>
-        <AccountBtn avatar={props.avatar} clicked={() => setShowCommentOptions(true)}>{props.fullName[0]}</AccountBtn>
+      <span ref={accntRef}>
+        <AccountBtn className={classes.AccountBtn} avatar={props.avatar} clicked={() => setShowCommentOptions(true)}>{props.fullName[0]}</AccountBtn>
       </span>
       <div ref={commentRef} className={showCommentOptions ? classes.CommentInputShow : classes.CommentInputHide}>
         <TextArea maxRows="20" className={showCommentOptions ? classes.FocusInput : classes.Input} value={commentInput} onChange={e => setCommentInput(e.target.value)}
         placeholder="Write a comment" onFocus={() => setShowCommentOptions(true)} />
-        <div className={classes.SaveBtn}><Button disabled={!commentInput} clicked={addCommentHandler}>Save</Button></div>
+        <Button className={classes.SaveBtn} disabled={!commentInput} clicked={addCommentHandler}>Save</Button>
       </div>
     </div>
   );

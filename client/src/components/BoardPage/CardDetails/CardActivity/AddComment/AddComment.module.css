@@ -31,22 +31,22 @@
   border: 1px solid transparent;
   box-shadow: none;
 }
-.AccountBtn button {
+.AccountBtn {
   margin: 2px 5px 0 0;
   background: rgb(var(--lightGray));
 }
-.AccountBtn button:hover {
+.AccountBtn:hover {
   background: rgb(195, 195, 195);
 }
-.SaveBtn button {
+.SaveBtn {
   background: rgba(var(--green), 0.8);
   padding: 8px 10px;
   margin: 5px 0 8px 10px;
   font-weight: 400;
 }
-.SaveBtn button:hover, .SaveBtn button:active {
+.SaveBtn:hover, .SaveBtn:active {
   background: rgb(var(--green));
 }
-.SaveBtn button:disabled {
+.SaveBtn:disabled {
   background: rgb(235, 235, 235);
 }
