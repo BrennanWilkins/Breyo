@@ -7,7 +7,7 @@ import { dotsIcon, roadmapIcon, boardIcon } from '../../UI/icons';
 import { openRoadmap, closeRoadmap } from '../../../store/actions';
 import Button from '../../UI/Buttons/Buttons';
 
-const BoardNavBarMenuBtns = props => {
+const RightMenuBtns = props => {
   const roadmapHandler = () => {
     if (props.roadmapShown) { props.closeRoadmap(); }
     else { props.openRoadmap(); }
@@ -29,7 +29,7 @@ const BoardNavBarMenuBtns = props => {
   );
 };
 
-BoardNavBarMenuBtns.propTypes = {
+RightMenuBtns.propTypes = {
   cardsAreFiltered: PropTypes.bool.isRequired,
   roadmapShown: PropTypes.bool.isRequired,
   openRoadmap: PropTypes.func.isRequired,
@@ -49,4 +49,4 @@ const mapDispatchToProps = dispatch => ({
   closeRoadmap: () => dispatch(closeRoadmap())
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(BoardNavBarMenuBtns);
+export default connect(mapStateToProps, mapDispatchToProps)(RightMenuBtns);

@@ -2,73 +2,37 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardMenu.module.css';
 import { CloseBtn, BackBtn } from '../../UI/Buttons/Buttons';
-import { connect } from 'react-redux';
-import { boardIcon, activityIcon, settingsIcon, archiveFillIcon, searchIcon } from '../../UI/icons';
 import Archive from './Archive/Archive';
-import Action from '../../UI/Action/Action';
-import CommentAction from '../../UI/Action/CommentAction';
 import AboutMenu from './AboutMenu/AboutMenu';
 import SettingsMenu from './SettingsMenu/SettingsMenu';
 import BackgroundMenu from './BackgroundMenu/BackgroundMenu';
 import ActivityMenu from './ActivityMenu/ActivityMenu';
-import { getPhotoURL } from '../../../utils/backgrounds';
 import SearchCardsMenu from './SearchCardsMenu/SearchCardsMenu';
+import MainMenu from './MainMenu/MainMenu';
 
 const BoardMenu = props => {
-  const [showBoardDesc, setShowBoardDesc] = useState(false);
-  const [showChangeBackground, setShowChangeBackground] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showAllActivity, setShowAllActivity] = useState(false);
-  const [showArchive, setShowArchive] = useState(false);
+  const [viewMode, setViewMode] = useState('');
 
   const resetState = () => {
-    setShowChangeBackground(false);
-    setShowBoardDesc(false);
-    setShowAllActivity(false);
-    setShowSettings(false);
-    setShowArchive(false);
-    props.setShowSearch(false);
+    setViewMode('');
+    if (props.showSearch) { props.setShowSearch(false); }
   };
 
-  useEffect(() => resetState(), [props.show]);
+  useEffect(() => {
+    if (props.show) { resetState(); }
+  }, [props.show]);
 
-  const showBackBtn = showChangeBackground || showBoardDesc || showAllActivity || showSettings || showArchive || props.showSearch;
+  const title = viewMode === 'about' ? 'About this board' : viewMode === 'background' ? 'Change Background' :
+  viewMode === 'activity' ? 'Activity' : viewMode === 'settings' ? 'Board Settings' : viewMode === 'archive' ? 'Archive' : props.showSearch ? 'Search Cards' : 'Menu';
 
-  const title = showBoardDesc ? 'About this board' : showChangeBackground ? 'Change Background' :
-  showAllActivity ? 'Activity' : showSettings ? 'Board Settings' : showArchive ? 'Archive' : props.showSearch ? 'Search Cards' : 'Menu';
-
-  const defaultContent = (
-    <div>
-      <div className={classes.Options}>
-        <div onClick={() => setShowBoardDesc(true)} className={classes.Option}>{boardIcon}About this board</div>
-        <div onClick={() => setShowChangeBackground(true)} className={classes.Option}>
-          <span style={props.color[0] === '#' ? { background: props.color } : {backgroundImage: getPhotoURL(props.color, 20) }}
-          className={classes.SmallColor}></span>
-          Change background
-        </div>
-        <div onClick={() => props.setShowSearch(true)} className={classes.Option}><span className={classes.SettingsIcon}>{searchIcon}</span>Search Cards</div>
-        <div onClick={() => setShowSettings(true)} className={classes.Option}><span className={classes.SettingsIcon}>{settingsIcon}</span>Settings</div>
-        <div onClick={() => setShowArchive(true)} className={classes.Option}><span className={classes.ArchiveIcon}>{archiveFillIcon}</span>Archive</div>
-      </div>
-      <div className={classes.Activities}>
-        <div onClick={() => setShowAllActivity(true)} className={`${classes.Option} ${classes.ActivityTitle}`}>{activityIcon}Activity</div>
-        {props.activity.map(action => {
-          if (action.commentID) { return <CommentAction key={action.commentID} {...action} boardID={props.boardID} avatar={props.avatars[action.email]} />; }
-          return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
-          msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} avatar={props.avatars[action.email]} />;
-        })}
-        <div className={classes.ViewAll} onClick={() => setShowAllActivity(true)}>View all activity...</div>
-      </div>
-    </div>
-  );
-
-  const content = showBoardDesc ? <AboutMenu /> : showChangeBackground ? <BackgroundMenu /> : props.showSearch ? <SearchCardsMenu /> :
-  showSettings ? <SettingsMenu /> : showArchive ? <Archive /> : showAllActivity ? <ActivityMenu /> : defaultContent;
+  const content = viewMode === 'about' ? <AboutMenu /> : viewMode === 'background' ? <BackgroundMenu /> : props.showSearch ? <SearchCardsMenu /> :
+  viewMode === 'settings' ? <SettingsMenu /> : viewMode === 'archive' ? <Archive /> : viewMode === 'activity' ? <ActivityMenu /> :
+  <MainMenu showSearch={() => props.setShowSearch(true)} setViewMode={mode => setViewMode(mode)} />;
 
   return (
     <div className={props.show ? classes.Menu : `${classes.Menu} ${classes.HideMenu}`}>
       <div className={classes.Title}>
-        <span className={showBackBtn ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
+        <span className={(viewMode || props.showSearch) ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
         {title}
         <CloseBtn className={classes.CloseBtn} close={props.close} />
       </div>
@@ -80,18 +44,8 @@ const BoardMenu = props => {
 BoardMenu.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
-  color: PropTypes.string.isRequired,
-  activity: PropTypes.array.isRequired,
-  boardID: PropTypes.string.isRequired,
   showSearch: PropTypes.bool.isRequired,
   setShowSearch: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => ({
-  color: state.board.color,
-  activity: state.activity.boardActivity,
-  boardID: state.board.boardID,
-  avatars: state.board.avatars
-});
-
-export default connect(mapStateToProps)(BoardMenu);
+export default BoardMenu;

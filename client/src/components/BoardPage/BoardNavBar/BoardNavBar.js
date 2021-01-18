@@ -11,7 +11,7 @@ import { LIGHT_PHOTO_IDS } from '../../../utils/backgrounds';
 import BoardTeamModal from '../BoardTeamModal/BoardTeamModal';
 import BoardTitle from './BoardTitle';
 import BoardMembers from './BoardMembers';
-import MenuBtns from './BoardNavBarMenuBtns';
+import RightMenuBtns from './RightMenuBtns';
 import AddToTeamModal from '../AddToTeamModal/AddToTeamModal';
 
 const BoardNavBar = props => {
@@ -51,7 +51,7 @@ const BoardNavBar = props => {
         {showAddToTeam && <AddToTeamModal close={() => setShowAddToTeam(false)} />}
         {showBoardTeamModal && <BoardTeamModal team={props.team} close={() => setShowBoardTeamModal(false)} />}
       </span>
-      <MenuBtns showMenu={props.showMenu} openMenu={props.openMenu} openSearch={() => setShowSearch(true)} />
+      <RightMenuBtns showMenu={props.showMenu} openMenu={props.openMenu} openSearch={() => setShowSearch(true)} />
     </div>
   );
 };
