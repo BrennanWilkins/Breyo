@@ -35,7 +35,7 @@ const NavBar = props => {
       {showCreateMenu && <CreateMenu close={() => setShowCreateMenu(false)} openCreateBoard={props.toggleCreateBoard} openCreateTeam={() => setShowCreateTeam(true)} />}
       <CreateBoard show={props.showCreateBoard} close={props.toggleCreateBoard} />
       {showCreateTeam && <CreateTeam close={() => setShowCreateTeam(false)} />}
-      <AccountModal show={showAccountModal} close={() => setShowAccountModal(false)} />
+      {showAccountModal && <AccountModal close={() => setShowAccountModal(false)} />}
       {showBoardMenu && <SearchBoardMenu close={() => setShowBoardMenu(false)} />}
       {(props.showCreateBoard || showCreateTeam) && <div className={classes.Backdrop}></div>}
     </div>

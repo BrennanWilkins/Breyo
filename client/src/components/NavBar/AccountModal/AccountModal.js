@@ -11,25 +11,19 @@ import { Link } from 'react-router-dom';
 
 const AccountModal = props => {
   const modalRef = useRef();
-
-  const closeHandler = () => {
-    props.close();
-    setTimeout(() => setShowInvites(false), 250);
-  };
-
-  useModalToggle(props.show, modalRef, closeHandler);
+  useModalToggle(true, modalRef, props.close);
   const [showInvites, setShowInvites] = useState(false);
 
   const totInvites = props.invites.length + props.teamInvites.length;
 
   return (
-    <div ref={modalRef} className={props.show ? classes.Modal : `${classes.Modal} ${classes.HideModal}`}>
+    <div ref={modalRef} className={classes.Modal}>
       <div className={classes.Title}>
         <span className={showInvites ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={() => setShowInvites(false)} /></span>
         {showInvites ? 'Invites' : 'Account'}
         <CloseBtn close={props.close} color="rgb(112, 112, 112)" />
       </div>
-      {showInvites ? <Invites close={closeHandler} invites={props.invites} teamInvites={props.teamInvites} /> :
+      {showInvites ? <Invites close={props.close} invites={props.invites} teamInvites={props.teamInvites} /> :
       <><AccountInfo fullName={props.fullName} email={props.email} givePadding avatar={props.avatar} />
       <div className={classes.Options}>
         <div className={classes.Option} onClick={() => setShowInvites(true)}>Invites
@@ -49,7 +43,6 @@ AccountModal.propTypes = {
   fullName: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
   logout: PropTypes.func.isRequired,
-  show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   invites: PropTypes.array.isRequired,
   teamInvites: PropTypes.array.isRequired,

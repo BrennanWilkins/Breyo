@@ -4,7 +4,7 @@
   right: 5px;
   width: 300px;
   background: white;
-  transition: 250ms;
+  animation: fadeIn 250ms forwards;
   box-shadow: var(--box-shadow4);
   border-radius: 4px;
   padding: 10px 0 15px;
@@ -14,10 +14,15 @@
   overflow-x: hidden;
   max-height: calc(100% - 55px);
 }
-.HideModal {
-  transform: translateX(100%);
-  opacity: 0;
-  visibility: hidden;
+@keyframes fadeIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 .Modal::-webkit-scrollbar-track {
   border-radius: 15px;
