@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import classes from './BoardPage.module.css';
 import { withRouter } from 'react-router-dom';
@@ -80,6 +80,8 @@ const BoardPage = props => {
 
   useDidUpdate(() => cardDetailsHandler(), [props.location.pathname]);
 
+  const showMenuHandler = useCallback(bool => setShowMenu(bool), [setShowMenu]);
+
   const fallback = <div className={classes.Fallback}><Spinner /></div>;
 
   return (
@@ -87,7 +89,7 @@ const BoardPage = props => {
     <>
     <div className={classes.Container} style={props.color[0] === '#' ? { background: props.color } :
     { backgroundImage: getPhotoURL(props.color, 1280, 1280) }}>
-      <BoardNavBar showMenu={showMenu} closeMenu={() => setShowMenu(false)} openMenu={() => setShowMenu(true)} />
+      <BoardNavBar showMenu={showMenu} toggleMenu={showMenuHandler} />
       {props.roadmapShown ? <Suspense fallback=""><RoadmapContainer showMenu={showMenu} /></Suspense> : <ListContainer showMenu={showMenu} />}
     </div>
     {props.shownCardID !== null && props.shownListID !== null &&
