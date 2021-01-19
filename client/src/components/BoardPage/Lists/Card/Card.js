@@ -9,20 +9,23 @@ import CardBtns from './CardBtns';
 
 const Card = props => {
   const accountBtnClickHandler = (e, email, fullName) => {
+    // set modal position based on AccountBtn position
     const rect = e.target.getBoundingClientRect();
     // stop event propagation to card so card details not opened
     e.stopPropagation();
-    props.setEmail(email);
-    props.setFullName(fullName);
-    // set modal pos based on AccountBtn position
-    props.setTop(rect.top + 30);
-    props.setLeft(rect.left);
+    props.setShownMember({
+      email,
+      fullName,
+      top: rect.top + 30,
+      left: rect.left,
+      cardID: props.cardID
+    });
   };
 
   return (
     <Draggable draggableId={props.cardID} index={props.index}>
       {(provided, snapshot) => (
-        <div className={classes.Card} onClick={props.showDetails} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+        <div className={classes.Card} onClick={() => props.showDetails(props.cardID)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
           {props.labels.length > 0 && <div className={classes.Labels}>
             {LABEL_COLORS.filter(color => props.labels.includes(color)).map(color => <div key={color} style={{background: color}}></div>)}
           </div>}
@@ -47,11 +50,8 @@ Card.propTypes = {
   members: PropTypes.array.isRequired,
   listID: PropTypes.string.isRequired,
   comments: PropTypes.array.isRequired,
-  setEmail: PropTypes.func.isRequired,
-  setFullName: PropTypes.func.isRequired,
-  setTop: PropTypes.func.isRequired,
-  setLeft: PropTypes.func.isRequired,
+  setShownMember: PropTypes.func.isRequired,
   desc: PropTypes.string.isRequired
 };
 
-export default Card;
+export default React.memo(Card);

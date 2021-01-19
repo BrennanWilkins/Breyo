@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import classes from './List.module.css';
 import { plusIcon } from '../../../UI/icons';
@@ -11,18 +11,14 @@ import { useHistory } from 'react-router';
 import ListTitle from './ListTitle';
 
 const List = props => {
-  let history = useHistory();
+  const history = useHistory();
   const [showAddCard, setShowAddCard] = useState(false);
   const [showListActions, setShowListActions] = useState(false);
   const inputRef = useRef();
   const actionsRef = useRef();
   const [actionsTop, setActionsTop] = useState(0);
   const [actionsLeft, setActionsLeft] = useState(0);
-  const [shownMemberEmail, setShownMemberEmail] = useState('');
-  const [shownMemberFullName, setShownMemberFullName] = useState('');
-  const [memberModalTop, setMemberModalTop] = useState(0);
-  const [memberModalLeft, setMemberModalLeft] = useState(0);
-  const [shownModalCardID, setShownModalCardID] = useState('');
+  const [shownMember, setShownMember] = useState(null);
 
   useEffect(() => {
     // set list actions based on list button position
@@ -31,9 +27,11 @@ const List = props => {
     setActionsLeft(rect.left);
   }, [showListActions]);
 
-  const setCardDetailsHandler = cardID => {
-    history.push(`/board/${props.boardID}/l/${props.listID}/c/${cardID}`);
-  };
+  const setCardDetailsHandler = useCallback(cardID => (
+    history.push(`/board/${props.boardID}/l/${props.listID}/c/${cardID}`)
+  ), [props.boardID, props.listID]);
+
+  const shownMemberHandler = useCallback(member => setShownMember(member), [setShownMember]);
 
   const blurInputHandler = e => {
     if (inputRef.current && !inputRef.current.contains(e.target)) { inputRef.current.blur(); }
@@ -49,9 +47,7 @@ const List = props => {
             {(provided, snapshot) => (
               <div className={classes.CardContainer} ref={provided.innerRef}>
                 {props.cards.map((card, i) => (
-                  <Card key={card.cardID} index={i} {...card} listID={props.listID} showDetails={() => setCardDetailsHandler(card.cardID)}
-                  setEmail={email => { setShownMemberEmail(email); setShownModalCardID(card.cardID); }} setFullName={fullName => setShownMemberFullName(fullName)}
-                  setTop={top => setMemberModalTop(top)} setLeft={left => setMemberModalLeft(left)} />
+                  <Card key={card.cardID} index={i} {...card} listID={props.listID} showDetails={setCardDetailsHandler} setShownMember={shownMemberHandler} />
                 ))}
                 {showAddCard && <AddCard close={() => setShowAddCard(false)} boardID={props.boardID} listID={props.listID} />}
                 {provided.placeholder}
@@ -66,10 +62,7 @@ const List = props => {
     </Draggable>
     {showListActions && <ListActions left={actionsLeft} top={actionsTop} close={() => setShowListActions(false)}
     title={props.title} listID={props.listID} boardID={props.boardID} />}
-    {shownMemberEmail !== '' &&
-    <CardMemberModal top={memberModalTop} left={memberModalLeft} listID={props.listID}
-    cardID={shownModalCardID} inCard email={shownMemberEmail} fullName={shownMemberFullName}
-    close={() => { setShownMemberEmail(''); setShownMemberFullName(''); }} />}
+    {shownMember && <CardMemberModal {...shownMember} listID={props.listID} inCard close={() => setShownMember(null)} />}
     </>
   );
 };
@@ -82,4 +75,4 @@ List.propTypes = {
   boardID: PropTypes.string.isRequired
 };
 
-export default List;
+export default React.memo(List);
