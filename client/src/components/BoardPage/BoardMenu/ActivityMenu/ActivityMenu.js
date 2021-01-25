@@ -37,8 +37,7 @@ const ActivityMenu = props => {
       {showAll ?
         props.allBoardActivity.map(action => {
           if (action.commentID) { return <CommentAction key={action._id} {...action} avatar={props.avatars[action.email]} />; }
-          return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
-          msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} avatar={props.avatars[action.email]} />;
+          return <Action key={action._id} isBoard {...action} msg={action.boardMsg} avatar={props.avatars[action.email]} />;
         }) :
         props.allComments.map(comment => <CommentAction key={comment.commentID} {...comment} boardID={props.boardID} avatar={props.avatars[comment.email]} />)}
       {!props.isLoading && !moreLoaded && showAll && <div className={classes.LoadMore} onClick={loadMoreHandler}>Load more activity</div>}

@@ -49,8 +49,7 @@ const MemberActivity = props => {
           {loading ? <div className={classes.Spinner}><AuthSpinner /></div> : !err ?
             userActivity.map(action => {
               if (action.commentID) { return <CommentAction key={action.commentID} {...action} avatar={props.avatars[action.email]} />; }
-              return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date}
-              msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} avatar={props.avatars[action.email]} />;
+              return <Action key={action._id} isBoard {...action} msg={action.boardMsg} avatar={props.avatars[action.email]} />;
             }) :
             <div className={classes.ErrMsg}>This user's activity could not be retrieved.</div>}
         </div>

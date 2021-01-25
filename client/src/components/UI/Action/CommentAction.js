@@ -43,4 +43,4 @@ CommentAction.propTypes = {
   boardTitle: PropTypes.string
 };
 
-export default CommentAction;
+export default React.memo(CommentAction);

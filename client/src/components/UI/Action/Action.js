@@ -50,4 +50,4 @@ Action.propTypes = {
   avatar: PropTypes.string
 };
 
-export default Action;
+export default React.memo(Action);

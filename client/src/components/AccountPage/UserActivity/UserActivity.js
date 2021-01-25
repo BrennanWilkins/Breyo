@@ -40,8 +40,7 @@ const UserActivity = props => {
           {err ? <div className={classes.ErrMsg}>Your activity could not be retrieved.</div> :
             userActivity.map(action => {
               if (action.commentID) { return <CommentAction key={action._id} {...action} avatar={props.avatar} />; }
-              return <Action key={action._id} isBoard email={action.email} fullName={action.fullName} date={action.date} avatar={props.avatar}
-              msg={action.boardMsg} cardID={action.cardID} listID={action.listID} boardID={action.boardID} boardTitle={action.boardTitle} />;
+              return <Action key={action._id} isBoard {...action} avatar={props.avatar} msg={action.boardMsg} />;
             })
           }
           {(!allLoaded && userActivity.length > 0) && <div className={classes.LoadMore} onClick={() => setPage(currPage => currPage + 1)}>Load more activity</div>}
