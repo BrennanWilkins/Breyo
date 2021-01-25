@@ -14,7 +14,6 @@
 }
 .Notif {
   min-height: 30px;
-  background: rgb(219, 147, 147);
   margin-top: 10px;
   border-radius: 3px;
   box-shadow: 0.5px 1px 3px 0.5px rgba(0, 0, 0, 0.25);
@@ -22,18 +21,19 @@
   align-items: center;
   justify-content: space-between;
   font-size: 15px;
-}
-.Enter {
   opacity: 0;
+  animation: fadeIn 500ms ease-in forwards;
+  background: rgb(190, 6, 6);
+  color: white;
 }
-.EnterActive {
-  opacity: 1;
-  transition: opacity 500ms ease-in;
+.Notif button {
+  color: white;
 }
-.Exit {
-  opacity: 1;
-}
-.ExitActive {
-  opacity: 0;
-  transition: opacity 500ms ease-in;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
