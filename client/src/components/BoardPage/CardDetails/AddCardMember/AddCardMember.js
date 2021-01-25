@@ -32,10 +32,10 @@ const AddCardMember = props => {
   useLayoutEffect(() => {
     if (!props.fromList) { return; }
     // if modal is toggled from the card members list then make sure it doesn't overflow screen
-    if (modalRef.current.getBoundingClientRect().right + 5 >= window.innerWidth) {
-      modalRef.current.style.right = '0';
-    } else {
-      modalRef.current.style.left = '0';
+    modalRef.current.style.right = 'auto';
+    const rect = modalRef.current.getBoundingClientRect();
+    if (rect.right + 5 > window.innerWidth) {
+      modalRef.current.style.left = 'auto';
     }
   }, [props.fromList]);
 
