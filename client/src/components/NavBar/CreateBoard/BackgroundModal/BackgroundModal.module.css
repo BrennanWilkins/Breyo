@@ -1,12 +1,9 @@
 .Container {
-  position: absolute;
   width: 300px;
   top: 0;
   left: 265px;
-  border-radius: 4px;
   background: rgb(252,252,252);
   padding: 5px;
-  box-sizing: border-box;
   max-height: calc(100vh - 70px);
   overflow: hidden;
   display: flex;

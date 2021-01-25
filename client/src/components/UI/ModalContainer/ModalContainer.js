@@ -10,7 +10,7 @@ const ModalContainer = props => {
 
   return (
     <div ref={modalRef} className={`${classes.Container} ${props.className}`}>
-      <ModalTitle close={props.close} title={props.title} />
+      <ModalTitle close={props.close} title={props.title} light={props.light} lighter={props.lighter} />
       {props.children}
     </div>
   );
@@ -19,7 +19,9 @@ const ModalContainer = props => {
 ModalContainer.propTypes = {
   className: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  close: PropTypes.func.isRequired
+  close: PropTypes.func.isRequired,
+  light: PropTypes.bool,
+  lighter: PropTypes.bool
 };
 
 export default ModalContainer;
