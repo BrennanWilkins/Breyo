@@ -1,16 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import classes from './ManualMoveModal.module.css';
-import { useModalToggle } from '../../../../utils/customHooks';
-import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Button from '../../../UI/Buttons/Buttons';
 import { manualMoveCardHandler } from '../../../../store/actions';
 import Select from '../../../UI/Select/Select';
+import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 
 const ManualMoveModal = props => {
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
   const [listTitle, setListTitle] = useState(props.currentListTitle);
   const [cardPosition, setCardPosition] = useState(0);
   const [positionArr, setPositionArr] = useState([]);
@@ -34,8 +31,7 @@ const ManualMoveModal = props => {
   };
 
   return (
-    <div className={classes.Container} ref={modalRef}>
-      <ModalTitle title="Move Card" close={props.close} />
+    <ModalContainer className={classes.Container} title="Move Card" close={props.close}>
       <div className={classes.Selects}>
         <Select title="Destination List" currentValue={listTitle} classNames={[classes.ListSelect]}>
           {props.lists.map(list => (
@@ -51,7 +47,7 @@ const ManualMoveModal = props => {
         </Select>
       </div>
       <div className={classes.MoveBtn}><Button clicked={moveHandler}>Move</Button></div>
-    </div>
+    </ModalContainer>
   );
 };
 

@@ -1,33 +1,24 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import classes from './DeleteAccntModal.module.css';
-import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { deleteAccount } from '../../../../store/actions';
-import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 import { Input } from '../../../UI/Inputs/Inputs';
+import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 
 const DeleteAccntModal = props => {
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
   const [password, setPassword] = useState('');
 
-  const deleteHandler = () => {
-    if (!password) { return; }
-    props.deleteAccount(password);
-  };
-
   return (
-    <div className={classes.Container} ref={modalRef}>
-      <ModalTitle close={props.close} title="Delete my account" />
+    <ModalContainer className={classes.Container} close={props.close} title="Delete my account">
       <div className={classes.Info}>
         Deleting your account cannot be undone. Any boards in which you are the only member will be deleted, and any boards in which you are the only
         admin will result in all other members being promoted to admin.
       </div>
       <p>To confirm, please enter your password below.</p>
       <Input className={classes.Input} type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      <button className={classes.DeleteBtn} onClick={deleteHandler}>DELETE MY ACCOUNT</button>
-    </div>
+      <button className={classes.DeleteBtn} onClick={() => props.deleteAccount(password)} disabled={!password}>DELETE MY ACCOUNT</button>
+    </ModalContainer>
   );
 };
 

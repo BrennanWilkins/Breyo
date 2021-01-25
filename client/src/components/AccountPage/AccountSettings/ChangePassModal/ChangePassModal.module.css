@@ -1,15 +1,8 @@
 .Container {
-  position: absolute;
   width: 300px;
-  background: white;
-  box-shadow: var(--box-shadow4);
-  border-radius: 3px;
   top: -125px;
-  border: 1px solid #ddd;
   left: calc(50% - 150px);
   padding: 5px;
-  box-sizing: border-box;
-  z-index: 2;
 }
 .Label {
   font-size: 13px;

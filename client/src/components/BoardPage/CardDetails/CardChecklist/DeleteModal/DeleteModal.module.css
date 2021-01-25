@@ -1,15 +1,10 @@
 .Container {
-  box-shadow: var(--box-shadow4);
-  border-radius: 4px;
-  border: 1px solid rgb(227, 227, 227);
-  background: white;
-  position: absolute;
   top: 30px;
   left: 0;
-  padding: 10px;
-  box-sizing: border-box;
+  padding: 5px 5px 10px;
   width: 300px;
-  z-index: 2;
+  text-align: center;
+  font-size: 15px;
 }
 @media (max-width: 900px) {
   .Container {
@@ -17,24 +12,14 @@
     left: auto;
   }
 }
-.Text {
-  margin: 30px 10px 15px;
-  text-align: center;
-  font-size: 15px;
-}
-.CloseBtn {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin: 5px;
-}
 .DeleteBtn {
   background: rgb(219, 55, 29);
   font-weight: 400;
   font-size: 15px;
   padding: 5px 10px;
   display: flex;
-  margin: 0 auto 10px;
+  width: calc(100% - 20px);
+  margin: 0 auto;
 }
 .DeleteBtn:hover, .DeleteBtn:active {
   background: rgb(213, 5, 5);

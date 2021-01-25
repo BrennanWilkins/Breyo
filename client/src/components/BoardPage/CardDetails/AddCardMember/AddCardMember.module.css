@@ -4,11 +4,10 @@
   border: 1px solid rgb(227, 227, 227);
   background: white;
   position: absolute;
-  padding: 5px 5px 10px 5px;
+  padding: 5px 5px 10px;
   box-sizing: border-box;
   width: 275px;
   z-index: 2;
-
   max-height: 300px;
   overflow: auto;
 }
@@ -39,6 +38,7 @@
 }
 .FromListContainer {
   top: 23px;
+  left: 0;
 }
 .SubTitle {
   color: rgb(var(--darkGray));

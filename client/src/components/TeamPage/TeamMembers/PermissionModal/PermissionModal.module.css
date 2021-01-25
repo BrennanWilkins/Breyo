@@ -1,16 +1,9 @@
 .Container {
-  position: absolute;
   max-width: 350px;
   width: 96%;
-  background: white;
-  box-shadow: var(--box-shadow4);
-  border-radius: 3px;
   top: 35px;
   right: 10px;
-  border: 1px solid #ddd;
   padding: 5px 5px 10px;
-  box-sizing: border-box;
-  z-index: 2;
   font-size: 15px;
 }
 .Container::after {

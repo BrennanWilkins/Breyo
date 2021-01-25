@@ -1,18 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import classes from './CopyCardModal.module.css';
-import { useModalToggle } from '../../../../utils/customHooks';
 import Button from '../../../UI/Buttons/Buttons';
 import TextArea from 'react-textarea-autosize';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Checkbox } from '../../../UI/Inputs/Inputs';
 import { copyCard } from '../../../../store/actions';
-import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 import Select from '../../../UI/Select/Select';
+import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 
 const CopyCardModal = props => {
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
   const [cardTitle, setCardTitle] = useState(props.currentCardTitle);
   const [keepChecklists, setKeepChecklists] = useState(true);
   const [keepLabels, setKeepLabels] = useState(true);
@@ -35,8 +32,7 @@ const CopyCardModal = props => {
   };
 
   return (
-    <div ref={modalRef} className={classes.Container}>
-      <ModalTitle title="Copy Card" close={props.close} />
+    <ModalContainer close={props.close} className={classes.Container} title="Copy Card">
       <TextArea className={classes.Input} value={cardTitle} onChange={e => setCardTitle(e.target.value)}
       minRows="3" maxRows="3" placeholder="Enter a title for this card" onKeyPress={e => e.key === 'Enter' ? e.target.blur() : null} />
       <div className={classes.Keeps}>
@@ -59,7 +55,7 @@ const CopyCardModal = props => {
         </Select>
       </div>
       <div className={classes.CopyBtn}><Button clicked={copyHandler}>Copy Card</Button></div>
-    </div>
+    </ModalContainer>
   );
 };
 

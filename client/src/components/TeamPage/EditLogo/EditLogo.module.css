@@ -1,14 +1,8 @@
 .Container {
-  position: absolute;
   width: 300px;
-  background: white;
-  box-shadow: var(--box-shadow4);
-  border-radius: 3px;
   top: 90px;
-  border: 1px solid #ddd;
   left: 0;
   padding: 5px;
-  box-sizing: border-box;
   z-index: 3;
 }
 .RemoveBtn {

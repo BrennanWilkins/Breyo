@@ -1,16 +1,13 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import classes from './LeaveTeamModal.module.css';
-import { useModalToggle } from '../../../../utils/customHooks';
-import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 import PropTypes from 'prop-types';
 import { leaveTeam } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router';
+import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 
 const LeaveTeamModal = props => {
   const history = useHistory();
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
 
   const isOnlyAdmin = props.adminCount === 1 && props.userIsAdmin;
 
@@ -20,15 +17,14 @@ const LeaveTeamModal = props => {
   };
 
   return (
-    <div ref={modalRef} className={classes.Container}>
-      <ModalTitle close={props.close} title="Leave this team" />
+    <ModalContainer className={classes.Container} close={props.close} title="Leave this team">
       {isOnlyAdmin ?
       <div className={classes.CannotLeave}>There must be at least one other admin to leave this team.</div>
       : <>
         <p>Leaving a team will not cause you to be removed from any of the team's boards.</p>
         <button className={classes.LeaveBtn} onClick={leaveHandler}>Leave team</button>
       </>}
-    </div>
+    </ModalContainer>
   );
 };
 

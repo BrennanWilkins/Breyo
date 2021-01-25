@@ -1,16 +1,12 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import classes from './PermissionModal.module.css';
-import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
-import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 import { checkIcon } from '../../../UI/icons';
 import { connect } from 'react-redux';
 import { promoteTeamMember, demoteTeamMember } from '../../../../store/actions';
+import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 
 const PermissionModal = props => {
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
-
   const changeHandler = changeToAdmin => {
     if (changeToAdmin) { props.promoteTeamMember(props.email); }
     else { props.demoteTeamMember(props.email); }
@@ -25,8 +21,7 @@ const PermissionModal = props => {
   const memberDisabled = !props.isAdmin || (props.isAdmin && oneAdmin) || !props.userIsAdmin;
 
   return (
-    <div ref={modalRef} className={classes.Container}>
-      <ModalTitle close={props.close} title="Change Permissions" />
+    <ModalContainer className={classes.Container} close={props.close} title="Change Permissions">
       <div className={classes.Options}>
         <div onClick={() => changeHandler(true)} className={adminDisabled ? classes.Disabled : null}>
           Admin{props.isAdmin && checkIcon}
@@ -39,7 +34,7 @@ const PermissionModal = props => {
       </div>
       {!props.userIsAdmin && <div className={classes.CannotChange}>You must be an admin to change member permissions.</div>}
       {(isUser && props.userIsAdmin && oneAdmin) && <div className={classes.CannotChange}>You cannot change roles if you are the only admin.</div>}
-    </div>
+    </ModalContainer>
   );
 };
 

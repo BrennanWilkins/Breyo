@@ -1,16 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import classes from './ChecklistModal.module.css';
 import PropTypes from 'prop-types';
-import { useModalToggle } from '../../../../utils/customHooks';
 import Button from '../../../UI/Buttons/Buttons';
 import { connect } from 'react-redux';
 import { addChecklist } from '../../../../store/actions';
-import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 import { Input } from '../../../UI/Inputs/Inputs';
+import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 
 const ChecklistModal = props => {
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
   const [title, setTitle] = useState('');
 
   const addHandler = () => {
@@ -20,12 +17,11 @@ const ChecklistModal = props => {
   };
 
   return (
-    <div ref={modalRef} className={classes.Container}>
-      <ModalTitle close={props.close} title="Add a checklist" />
+    <ModalContainer className={classes.Container} title="Add a checklist" close={props.close}>
       <Input className={classes.Input} autoFocus value={title} onChange={e => setTitle(e.target.value)}
       placeholder="Enter a title for the checklist" />
       <span className={classes.AddBtn}><Button disabled={!title} clicked={addHandler}>Add</Button></span>
-    </div>
+    </ModalContainer>
   );
 };
 

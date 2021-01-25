@@ -1,18 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import classes from './DueDateModal.module.css';
 import PropTypes from 'prop-types';
-import { useModalToggle } from '../../../../utils/customHooks';
 import Button, { CloseBtn } from '../../../UI/Buttons/Buttons';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './calendarStyles.css';
 import { connect } from 'react-redux';
 import { addDueDate, removeDueDate } from '../../../../store/actions';
-import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
+import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 
 const DueDateModal = props => {
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
   const [showStartDatePicker, setShowStartDatePicker] = useState(props.dueDate && props.dueDate.startDate);
   const [selectedStartDate, setSelectedStartDate] = useState((props.dueDate && props.dueDate.startDate) ? new Date(props.dueDate.startDate) : null);
   const [selectedDueDate, setSelectedDueDate] = useState(props.dueDate ? new Date(props.dueDate.dueDate) : new Date());
@@ -39,8 +36,7 @@ const DueDateModal = props => {
   };
 
   return (
-    <div ref={modalRef} className={props.fromDueDate ? classes.DueDateContainer : classes.Container}>
-      <ModalTitle close={props.close} title="Due Date" />
+    <ModalContainer className={props.fromDueDate ? classes.DueDateContainer : classes.Container} close={props.close} title="Due Date">
       <div className={classes.DatePicker}>
         {!showStartDatePicker && <div className={classes.AddStartDateBtn} onClick={startDatePickerHandler}>Add a start date</div>}
         {showStartDatePicker && <div className={classes.RemoveStartDateBtn}><CloseBtn close={startDatePickerHandler} /></div>}
@@ -59,7 +55,7 @@ const DueDateModal = props => {
         <span className={classes.SaveBtn}><Button clicked={saveHandler}>Save</Button></span>
         <span className={classes.RemoveBtn}><Button clicked={removeHandler}>Remove</Button></span>
       </div>
-    </div>
+    </ModalContainer>
   );
 };
 

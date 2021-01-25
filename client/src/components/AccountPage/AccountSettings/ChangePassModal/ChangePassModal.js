@@ -1,16 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import classes from './ChangePassModal.module.css';
-import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { changePassValidation } from '../../../../utils/authValidation';
 import { instance as axios } from '../../../../axios';
 import { eyeIcon, eyeHideIcon, checkIcon } from '../../../UI/icons';
-import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
 import { Input } from '../../../UI/Inputs/Inputs';
+import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 
 const ChangePassModal = props => {
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
   const [oldPass, setOldPass] = useState('');
   const [newPass, setNewPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
@@ -45,8 +42,7 @@ const ChangePassModal = props => {
   useEffect(() => { setErr(false); setChangeSuccess(false); }, [oldPass, newPass, confirmPass]);
 
   return (
-    <div className={classes.Container} ref={modalRef}>
-      <ModalTitle close={props.close} title="Change my password" />
+    <ModalContainer className={classes.Container} close={props.close} title="Change my password">
       <div className={classes.Label}>Old password</div>
       <Input type="password" value={oldPass} onChange={e => setOldPass(e.target.value)} />
       <div className={classes.Label}>New password</div>
@@ -59,7 +55,7 @@ const ChangePassModal = props => {
       <button disabled={err || loading || changeSuccess} className={classes.SaveBtn} onClick={saveHandler}>Save</button>
       <div className={err ? classes.ErrMsg : classes.HideErrMsg}>{errMsg}</div>
       {changeSuccess && <div className={classes.SuccessMsg}>{checkIcon} Password successfully changed</div>}
-    </div>
+    </ModalContainer>
   );
 };
 
