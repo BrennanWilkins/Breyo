@@ -16,15 +16,13 @@ const List = props => {
   const [showListActions, setShowListActions] = useState(false);
   const inputRef = useRef();
   const actionsRef = useRef();
-  const [actionsTop, setActionsTop] = useState(0);
-  const [actionsLeft, setActionsLeft] = useState(0);
+  const [actionsPos, setActionsPos] = useState({ top: 0, left: 0 });
   const [shownMember, setShownMember] = useState(null);
 
   useEffect(() => {
     // set list actions based on list button position
     const rect = actionsRef.current.getBoundingClientRect();
-    setActionsTop(rect.top);
-    setActionsLeft(rect.left);
+    setActionsPos({ top: rect.top, left: rect.left });
   }, [showListActions]);
 
   const setCardDetailsHandler = useCallback(cardID => (
@@ -60,7 +58,7 @@ const List = props => {
         </div>
       )}
     </Draggable>
-    {showListActions && <ListActions left={actionsLeft} top={actionsTop} close={() => setShowListActions(false)}
+    {showListActions && <ListActions {...actionsPos} close={() => setShowListActions(false)}
     title={props.title} listID={props.listID} boardID={props.boardID} />}
     {shownMember && <CardMemberModal {...shownMember} listID={props.listID} inCard close={() => setShownMember(null)} />}
     </>

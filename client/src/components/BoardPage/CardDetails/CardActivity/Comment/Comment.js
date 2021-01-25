@@ -46,7 +46,7 @@ const Comment = props => {
     </div>
     {!showEdit &&
       <div className={classes.Btns}>
-        {props.likes && <span onClick={() => props.toggleCommentLike(props.commentID)} title={userLiked ? 'Unlike this comment' : 'Like this comment'}
+        {props.likes && <span role="img" aria-label="Like Comment" onClick={() => props.toggleCommentLike(props.commentID)} title={userLiked ? 'Unlike this comment' : 'Like this comment'}
           className={`${classes.LikeBtn} ${likeLength ? classes.LikeBtnFilled : ''} ${userLiked ? classes.LikeBtnActive : ''}`}>
           &#128077;{!!likeLength && <span>{likeLength}</span>}
         </span>}

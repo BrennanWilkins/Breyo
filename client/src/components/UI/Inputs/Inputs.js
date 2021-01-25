@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import classes from './Inputs.module.css';
 import { checkIcon, uploadIcon, xIcon } from '../icons';
 import PropTypes from 'prop-types';
+import { isEmail, getEmails } from '../../../utils/authValidation';
 
 export const Checkbox = props => (
   <div className={props.checked ? classes.CheckboxCheck : classes.Checkbox} onClick={props.clicked}>{checkIcon}</div>
@@ -17,10 +18,6 @@ export const FileInput = props => {
     </div>
   );
 };
-
-const isEmail = email => (
-  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-).test(email);
 
 export const EmailChipInput = props => {
   const [inputVal, setInputVal] = useState('');
@@ -64,9 +61,9 @@ export const EmailChipInput = props => {
   const pasteHandler = e => {
     e.preventDefault();
     const pasteData = e.clipboardData.getData('text');
-    const pastedEmails = pasteData.match(/[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/g);
+    const pastedEmails = getEmails(pasteData);
     if (pastedEmails) {
-      const newEmails = pastedEmails.filter(email => props.emails.includes(email));
+      const newEmails = pastedEmails.filter(email => !props.emails.includes(email));
       props.setEmails([...props.emails, ...newEmails]);
     }
   };

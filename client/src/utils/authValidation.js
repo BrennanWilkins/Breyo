@@ -1,19 +1,23 @@
 const emailTest = (
-  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 );
+
+export const getEmails = emails => {
+  return emails.match(/(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/g);
+};
 
 export const isEmail = email => emailTest.test(email);
 
 // validate the signup form inputs
 export const signupValidation = (email, fullName,  pass, confPass) => {
   const nameTest = /^[ a-zA-Z]+$/;
-  if (email.length === 0) {
+  if (!email.length) {
     return 'Please enter your email.';
   }
-  if (pass.length === 0) {
+  if (!pass.length) {
     return 'Your password cannot be empty.';
   }
-  if (fullName.length === 0) {
+  if (!fullName.length) {
     return 'Please enter your name';
   }
   if (fullName.length > 100) {
@@ -38,10 +42,10 @@ export const signupValidation = (email, fullName,  pass, confPass) => {
 };
 
 export const loginValidation = (email, pass) => {
-  if (email.length === 0) {
+  if (!email.length) {
     return 'Please enter your email.';
   }
-  if (pass.length === 0) {
+  if (!pass.length) {
     return 'Please enter your password.';
   }
   return '';
