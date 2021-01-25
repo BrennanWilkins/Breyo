@@ -2,19 +2,16 @@ import React, { useState } from 'react';
 import classes from './TeamMembers.module.css';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import AccountInfo from '../../UI/AccountInfo/AccountInfo';
-import { addMemberIcon, dotsIcon } from '../../UI/icons';
+import { addMemberIcon } from '../../UI/icons';
 import { useDidUpdate } from '../../../utils/customHooks';
 import InviteTeamMembers from './InviteTeamMembers/InviteTeamMembers';
-import { ActionBtn } from '../../UI/Buttons/Buttons';
-import PermissionModal from './PermissionModal/PermissionModal';
 import { Input } from '../../UI/Inputs/Inputs';
+import TeamMemberList from './TeamMemberList';
 
 const TeamMembers = props => {
   const [filter, setFilter] = useState('');
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [shownPermissionModal, setShownPermissionModal] = useState('');
 
   useDidUpdate(() => {
     if (filter) { setFilteredMembers(props.members.filter(member => member.fullName.toLowerCase().includes(filter.toLowerCase()))); }
@@ -29,18 +26,7 @@ const TeamMembers = props => {
         <Input className={classes.FilterInput} placeholder="Filter members by name" value={filter} onChange={e => setFilter(e.target.value)} />
         <button className={classes.InviteBtn} onClick={() => setShowInviteModal(true)}>{addMemberIcon} Invite Team Members</button>
       </div>
-      <div className={classes.Members}>
-        {members.map(member => (
-          <div className={classes.Member} key={member.email}>
-            <AccountInfo longerDetails {...member} />
-            <ActionBtn className={classes.MembershipBtn} clicked={() => setShownPermissionModal(member.email)}>
-              {member.isAdmin ? 'Admin' : 'Member'}{dotsIcon}
-            </ActionBtn>
-            {shownPermissionModal === member.email &&
-              <PermissionModal adminCount={adminCount} email={member.email} isAdmin={member.isAdmin} close={() => setShownPermissionModal('')} />}
-          </div>
-        ))}
-      </div>
+      <TeamMemberList members={members} adminCount={adminCount} />
       {showInviteModal && <InviteTeamMembers close={() => setShowInviteModal(false)} />}
     </div>
   );
