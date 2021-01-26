@@ -15,16 +15,14 @@ const { areAllMongo } = require('../middleware/validate');
 router.use(auth);
 
 const getListAndValidate = async (listID, cardID) => {
-  try {
-    const list = await List.findById(listID);
-    if (!list) { throw 'List data not found'; }
-    if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
-    if (!cardID) { return list; }
+  const list = await List.findById(listID);
+  if (!list) { throw 'List data not found'; }
+  if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
+  if (!cardID) { return list; }
 
-    const card = list.cards.id(cardID);
-    if (!card) { throw 'Card data not found'; }
-    return [list, card];
-  } catch (err) { return err; }
+  const card = list.cards.id(cardID);
+  if (!card) { throw 'Card data not found'; }
+  return [list, card];
 };
 
 // authorization: member

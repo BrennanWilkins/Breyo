@@ -22,21 +22,19 @@ const formatUserBoards = user => {
 };
 
 const leaveAllCards = async (boardID, email) => {
-  try {
-    // remove user from all cards they are a member of for given board
-    const lists = await List.find({ boardID });
-    for (let list of lists) {
-      let shouldUpdate = false;
-      for (let card of list.cards) {
-        for (let i = card.members.length - 1; i >= 0; i--) {
-          if (card.members[i].email === email) { card.members.splice(i, 1); }
-          shouldUpdate = true;
-        }
+  // remove user from all cards they are a member of for given board
+  const lists = await List.find({ boardID });
+  for (let list of lists) {
+    let shouldUpdate = false;
+    for (let card of list.cards) {
+      for (let i = card.members.length - 1; i >= 0; i--) {
+        if (card.members[i].email === email) { card.members.splice(i, 1); }
+        shouldUpdate = true;
       }
-      // only need to update list if member changed
-      if (shouldUpdate) { await list.save(); }
     }
-  } catch (err) { return err; }
+    // only need to update list if member changed
+    if (shouldUpdate) { await list.save(); }
+  }
 };
 
 router.use(auth);

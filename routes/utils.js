@@ -10,17 +10,15 @@ const LABEL_COLORS = ['#60C44D', '#F5DD2A', '#FF8C00', '#F60000', '#3783FF', '#4
 const sharp = require('sharp');
 
 const resizeImg = async img => {
-  try {
-    // convert image to buffer, resize, & convert back to base64
-    let parts = img.split(';');
-    let mimType = parts[0].split(':')[1];
-    let imageData = parts[1].split(',')[1];
-    let bufferImg = Buffer(imageData, 'base64');
-    let resizedImageBuffer = await sharp(bufferImg).resize(150, 150).withMetadata().toBuffer();
-    let resizedImageData = resizedImageBuffer.toString('base64');
-    let image = `data:${mimType};base64,${resizedImageData}`;
-    return image;
-  } catch (err) { return new Error('Failed to resize image'); }
+  // convert image to buffer, resize, & convert back to base64
+  let parts = img.split(';');
+  let mimType = parts[0].split(':')[1];
+  let imageData = parts[1].split(',')[1];
+  let bufferImg = Buffer(imageData, 'base64');
+  let resizedImageBuffer = await sharp(bufferImg).resize(150, 150).withMetadata().toBuffer();
+  let resizedImageData = resizedImageBuffer.toString('base64');
+  let image = `data:${mimType};base64,${resizedImageData}`;
+  return image;
 };
 
 const cloudinary = require('cloudinary').v2;

@@ -21,13 +21,11 @@ router.use(auth);
 
 const signNewToken = async (user, oldToken, getLean) => {
   // used to update user's jwt token when new board created or joined, or user promoted/demoted to/from admin
-  try {
-    const decoded = jwt.decode(oldToken);
-    const jwtPayload = getLean ? getLeanJWTPayload(user) : getJWTPayload(user);
-    // token expires at same time as oldToken
-    const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
-    return token;
-  } catch (err) { return new Error('Error generating token'); }
+  const decoded = jwt.decode(oldToken);
+  const jwtPayload = getLean ? getLeanJWTPayload(user) : getJWTPayload(user);
+  // token expires at same time as oldToken
+  const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+  return token;
 };
 
 // returns all board & list data for a given board
