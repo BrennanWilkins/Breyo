@@ -11,15 +11,17 @@
   margin: 5px 0 0 3px;
   overflow: hidden;
 }
-.CloseBtn, .BackBtn {
+.CloseBtn {
   position: absolute;
   right: 0;
   top: 0;
-  margin: 2.5px;
+  margin: 7.5px;
 }
 .BackBtn {
+  position: absolute;
+  top: 0;
   left: 0;
-  right: auto;
+  margin: 2.5px;
   width: auto;
 }
 .Options div {
