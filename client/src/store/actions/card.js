@@ -328,11 +328,11 @@ export const removeCardMember = (email, cardID, listID) => async (dispatch, getS
 export const addComment = msg => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID, state } = getCardState(getState);
-    const date = String(new Date());
-    const res = await axios.post('/card/comments', { msg, cardID, listID, date, boardID });
-    const payload = { msg, commentID: res.data.commentID, cardID, date, listID, email: state.user.email, fullName: state.user.fullName };
-    dispatch({ type: actionTypes.ADD_COMMENT, payload, cardTitle: res.data.cardTitle });
-    sendUpdate('post/card/comments', JSON.stringify({ payload, cardTitle: res.data.cardTitle }));
+    const res = await axios.post('/card/comments', { msg, cardID, listID, boardID });
+    const { commentID, cardTitle, date } = res.data;
+    const payload = { msg, commentID, cardID, date, listID, email: state.user.email, fullName: state.user.fullName };
+    dispatch({ type: actionTypes.ADD_COMMENT, payload, cardTitle });
+    sendUpdate('post/card/comments', JSON.stringify({ payload, cardTitle }));
   } catch (err) {
     dispatch(serverErr());
   }

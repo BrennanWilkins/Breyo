@@ -683,15 +683,16 @@ router.delete('/members/:email/:cardID/:listID/:boardID',
 // authorization: member
 // add comment to card
 router.post('/comments',
-  validate([...areAllMongo(['boardID', 'listID', 'cardID'], 'body'), body('msg').isLength({ min: 1, max: 400 }), body('date').notEmpty()]),
+  validate([...areAllMongo(['boardID', 'listID', 'cardID'], 'body'), body('msg').isLength({ min: 1, max: 400 })]),
   useIsMember,
   async (req, res) => {
     try {
-      const { boardID, listID, cardID, msg, date } = req.body;
+      const { boardID, listID, cardID, msg } = req.body;
       const list = await getListAndValidate(listID);
 
       const card = list.cards.id(cardID);
       if (!card) { throw 'Card data not found'; }
+      const date = String(new Date());
       card.comments.push({ email: req.email, fullName: req.fullName, date, msg, cardID, listID, likes: [] });
       const commentID = card.comments[card.comments.length - 1]._id;
 
@@ -700,7 +701,7 @@ router.post('/comments',
       const results = await Promise.all([addActivity(actionData, req), list.save()]);
       const newActivity = results[0];
 
-      res.status(200).json({ commentID, cardTitle: card.title, newActivity });
+      res.status(200).json({ commentID, cardTitle: card.title, newActivity, date });
     } catch (err) { res.sendStatus(500); }
   }
 );
