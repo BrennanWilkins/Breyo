@@ -14,8 +14,8 @@ const { areAllMongo } = require('../middleware/validate');
 
 router.use(auth);
 
-const getListAndValidate = async (listID, cardID) => {
-  const list = await List.findById(listID);
+const getListAndValidate = async (boardID, listID, cardID) => {
+  const list = await List.findOne({ _id: listID, boardID });
   if (!list) { throw 'List data not found'; }
   if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
   if (!cardID) { return list; }
@@ -33,7 +33,7 @@ router.post('/',
   async (req, res) => {
     try {
       const { boardID, listID, title } = req.body;
-      const list = await getListAndValidate(listID);
+      const list = await getListAndValidate(boardID, listID);
 
       const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [], comments: [], roadmapLabel: null };
       list.cards.push(card);
@@ -57,7 +57,7 @@ router.put('/title',
   async (req, res) => {
     try {
       const { cardID, listID, boardID, title } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const oldTitle = card.title;
       card.title = title;
@@ -80,7 +80,7 @@ router.put('/desc',
   useIsMember,
   async (req, res) => {
     try {
-      const [list, card] = await getListAndValidate(req.body.listID, req.body.cardID);
+      const [list, card] = await getListAndValidate(req.body.boardID, req.body.listID, req.body.cardID);
 
       card.desc = req.body.desc;
       await list.save();
@@ -97,9 +97,9 @@ router.post('/label',
   useIsMember,
   async (req, res) => {
     try {
-      const { color, listID, cardID } = req.body;
+      const { color, listID, cardID, boardID } = req.body;
       if (!LABEL_COLORS.includes(color)) { throw 'Invalid label color'; }
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       card.labels = [...card.labels, color];
       await list.save();
@@ -116,9 +116,9 @@ router.put('/label/remove',
   useIsMember,
   async (req, res) => {
     try {
-      const { color, cardID, listID } = req.body;
+      const { color, cardID, listID, boardID } = req.body;
       if (!LABEL_COLORS.includes(color)) { throw 'Invalid label color'; }
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const labelIndex = card.labels.indexOf(color);
       if (labelIndex === -1) { throw 'Label not found in cards labels'; }
@@ -137,9 +137,9 @@ router.post('/roadmapLabel',
   useIsMember,
   async (req, res) => {
     try {
-      const { color, cardID, listID } = req.body;
+      const { color, cardID, listID, boardID } = req.body;
       if (!LABEL_COLORS.includes(color)) { throw 'Invalid label color'; }
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       card.roadmapLabel = color;
       await list.save();
@@ -156,8 +156,8 @@ router.delete('/roadmapLabel/:cardID/:listID/:boardID',
   useIsMember,
   async (req, res) => {
     try {
-      const { listID, cardID } = req.params;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const { listID, cardID, boardID } = req.params;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       card.roadmapLabel = null;
       await list.save();
@@ -175,7 +175,7 @@ router.put('/dueDate/isComplete',
   async (req, res) => {
     try {
       const { cardID, listID, boardID } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       if (!card.dueDate) { throw 'No due date found for card'; }
       card.dueDate = { ...card.dueDate, isComplete: !card.dueDate.isComplete};
@@ -200,7 +200,7 @@ router.post('/dueDate',
   async (req, res) => {
     try {
       const { listID, boardID, cardID, dueDate, startDate } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       if (isNaN(new Date(dueDate).getDate())) { throw 'Invalid due date format'; }
       if (startDate !== null && isNaN(new Date(startDate).getDate())) { throw 'Invalid start date format'; }
@@ -229,7 +229,7 @@ router.delete('/dueDate/:cardID/:listID/:boardID',
   async (req, res) => {
     try {
       const { listID, boardID, cardID } = req.params;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       card.dueDate = null;
 
@@ -252,7 +252,7 @@ router.post('/checklist',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, title } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       card.checklists.push({ title, items: [] });
       const checklistID = card.checklists[card.checklists.length - 1]._id;
@@ -276,7 +276,7 @@ router.delete('/checklist/:checklistID/:cardID/:listID/:boardID',
   async (req, res) => {
     try {
       const { listID, boardID, cardID, checklistID } = req.params;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const checklist = card.checklists.id(checklistID);
       checklist.remove();
@@ -300,7 +300,7 @@ router.put('/checklist/title',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, checklistID, title } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const checklist = card.checklists.id(checklistID);
       if (!checklist) { throw 'No checklist data found'; }
@@ -325,8 +325,8 @@ router.post('/checklist/item',
   useIsMember,
   async (req, res) => {
     try {
-      const { listID, cardID, checklistID, title } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const { listID, cardID, checklistID, boardID, title } = req.body;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const checklist = card.checklists.id(checklistID);
       if (!checklist) { throw 'No checklist data found'; }
@@ -348,7 +348,7 @@ router.put('/checklist/item/isComplete',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, checklistID, itemID } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const checklist = card.checklists.id(checklistID);
       if (!checklist) { throw 'Card checklist not found'; }
@@ -375,7 +375,7 @@ router.put('/checklist/item/title',
   useIsMember,
   async (req, res) => {
     try {
-      const [list, card] = await getListAndValidate(req.body.listID, req.body.cardID);
+      const [list, card] = await getListAndValidate(req.body.boardID, req.body.listID, req.body.cardID);
 
       const checklist = card.checklists.id(req.body.checklistID);
       if (!checklist) { throw 'Card checklist not found'; }
@@ -397,7 +397,7 @@ router.put('/checklist/item/delete',
   useIsMember,
   async (req, res) => {
     try {
-      const [list, card] = await getListAndValidate(req.body.listID, req.body.cardID);
+      const [list, card] = await getListAndValidate(req.body.boardID, req.body.listID, req.body.cardID);
 
       card.checklists.id(req.body.checklistID).items.id(req.body.itemID).remove();
 
@@ -414,7 +414,7 @@ router.put('/moveCard/sameList',
   useIsMember,
   async (req, res) => {
     try {
-      const list = await getListAndValidate(req.body.listID);
+      const list = await getListAndValidate(req.body.boardID, req.body.listID);
 
       // remove card from original index
       const card = list.cards.splice(req.body.sourceIndex, 1)[0];
@@ -436,8 +436,8 @@ router.put('/moveCard/diffList',
   useIsMember,
   async (req, res) => {
     try {
-      const { sourceID, targetID, sourceIndex, destIndex } = req.body;
-      const [sourceList, destList] = await Promise.all([getListAndValidate(sourceID), getListAndValidate(targetID)]);
+      const { boardID, sourceID, targetID, sourceIndex, destIndex } = req.body;
+      const [sourceList, destList] = await Promise.all([getListAndValidate(boardID, sourceID), getListAndValidate(boardID, targetID)]);
 
       // remove card from source list
       const card = sourceList.cards.splice(sourceIndex, 1)[0];
@@ -474,7 +474,10 @@ router.post('/copy',
   async (req, res) => {
     try {
       const { boardID, sourceListID, destListID, cardID, title, destIndex, keepLabels, keepChecklists } = req.body;
-      const [[sourceList, sourceCard], destList] = await Promise.all([getListAndValidate(sourceListID, cardID), getListAndValidate(destListID)]);
+      const [[sourceList, sourceCard], destList] = await Promise.all([
+        getListAndValidate(boardID, sourceListID, cardID),
+        getListAndValidate(boardID, destListID)
+      ]);
 
       // keep card labels in the copy if requested
       const labels = keepLabels ? sourceCard.labels : [];
@@ -513,7 +516,7 @@ router.post('/archive',
   async (req, res) => {
     try {
       const { boardID, listID, cardID } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       list.archivedCards.unshift(card);
       card.remove();
@@ -537,7 +540,7 @@ router.put('/archive/recover',
   async (req, res) => {
     try {
       const { boardID, listID, cardID } = req.body;
-      const list = await List.findById(listID);
+      const list = await List.findOne({ _id: listID, boardID });
       if (!list) { throw 'No list data found'; }
 
       const card = list.archivedCards.id(cardID);
@@ -563,7 +566,7 @@ router.delete('/archive/:cardID/:listID/:boardID',
   async (req, res) => {
     try {
       const { boardID, listID, cardID } = req.params;
-      const list = await List.findById(listID);
+      const list = await List.findOne({ _id: listID, boardID });
       if (!list) { throw 'No list data found'; }
 
       const card = list.archivedCards.id(cardID);
@@ -592,7 +595,10 @@ router.post('/members',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, email } = req.body;
-      const [[list, card], user] = await Promise.all([getListAndValidate(listID, cardID), User.findOne({ email }).select('fullName boards').lean()]);
+      const [[list, card], user] = await Promise.all([
+        getListAndValidate(boardID, listID, cardID),
+        User.findOne({ email }).select('fullName boards').lean()
+      ]);
       if (!user) { throw 'User data not found'; }
 
       if (!user.boards.map(String).includes(boardID)) { throw 'User must be member of board'; }
@@ -621,7 +627,10 @@ router.delete('/members/:email/:cardID/:listID/:boardID',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, email } = req.params;
-      const [[list, card], user] = await Promise.all([getListAndValidate(listID, cardID), User.findOne({ email }).select('fullName').lean()]);
+      const [[list, card], user] = await Promise.all([
+        getListAndValidate(boardID, listID, cardID),
+        User.findOne({ email }).select('fullName').lean()
+      ]);
       if (!user) { throw 'User data not found'; }
 
       card.members = card.members.filter(member => member.email !== email);
@@ -645,7 +654,7 @@ router.post('/comments',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, msg } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const date = String(new Date());
       card.comments.push({ email: req.email, fullName: req.fullName, date, msg, cardID, listID, likes: [] });
@@ -668,8 +677,8 @@ router.put('/comments',
   useIsMember,
   async (req, res) => {
     try {
-      const { listID, cardID, commentID, msg } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const { listID, cardID, commentID, msg, boardID } = req.body;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const comment = card.comments.id(commentID);
       if (!comment) { throw 'Comment not found'; }
@@ -690,8 +699,8 @@ router.delete('/comments/:commentID/:cardID/:listID/:boardID',
   useIsMember,
   async (req, res) => {
     try {
-      const { listID, cardID, commentID } = req.params;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const { boardID, listID, cardID, commentID } = req.params;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const comment = card.comments.id(commentID);
       if (!comment) { throw 'Comment not found'; }
@@ -712,8 +721,8 @@ router.put('/checklist/moveItem',
   useIsMember,
   async (req, res) => {
     try {
-      const { cardID, listID, checklistID, sourceIndex, destIndex } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const { boardID, cardID, listID, checklistID, sourceIndex, destIndex } = req.body;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const checklist = card.checklists.id(checklistID);
       if (!checklist) { throw 'Checklist not found'; }
@@ -733,8 +742,8 @@ router.put('/comments/like',
   useIsMember,
   async (req, res) => {
     try {
-      const { commentID, cardID, listID } = req.body;
-      const [list, card] = await getListAndValidate(listID, cardID);
+      const { commentID, cardID, listID, boardID } = req.body;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       const comment = card.comments.id(commentID);
       if (!comment) { throw 'Comment not found'; }

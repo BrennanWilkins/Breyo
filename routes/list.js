@@ -44,7 +44,7 @@ router.put('/title',
   async (req, res) => {
     try {
       const { boardID, listID, title } = req.body;
-      const list = await List.findByIdAndUpdate(listID, { title }).select('title').lean();
+      const list = await List.findOneAndUpdate({ _id: listID, boardID }, { title }).select('title').lean();
       if (!list) { throw 'List data not found'; }
       const oldTitle = list.title;
 
@@ -91,7 +91,7 @@ router.post('/copy',
   async (req, res) => {
     try {
       const { boardID, listID, title } = req.body;
-      const list = await List.findById(listID).select('cards desc title').lean();
+      const list = await List.findOne({ _id: listID, boardID }).select('cards desc title').lean();
       if (!list) { throw 'List data not found'; }
       // create deeply nested copy of all cards & all checklists/members/dueDate/etc of each card
       const cards = list.cards.map(card => ({
@@ -183,7 +183,7 @@ router.put('/archive/recover',
       const { boardID, listID } = req.body;
       const listsLength = await List.countDocuments({ boardID, isArchived: false });
       if (!listsLength) { throw 'Lists data not found'; }
-      const list = await List.findByIdAndUpdate(listID, { indexInBoard: listsLength, isArchived: false }).select('title').lean();
+      const list = await List.findOneAndUpdate({ _id: listID, boardID }, { indexInBoard: listsLength, isArchived: false }).select('title').lean();
       if (!list) { throw 'List not found'; }
 
       const actionData = { msg: null, boardMsg: `recovered list ${list.title}`, cardID: null, listID, boardID };
@@ -202,7 +202,7 @@ router.delete('/archive/:listID/:boardID',
   async (req, res) => {
     try {
       const { boardID, listID } = req.params;
-      const list = await List.findByIdAndDelete(listID).select('title');
+      const list = await List.findOneAndDelete({ _id: listID, boardID }).select('title');
       if (!list) { throw 'List not found'; }
 
       const actionData = { msg: null, boardMsg: `deleted list ${list.title}`, cardID: null, listID: null, boardID };
@@ -226,7 +226,7 @@ router.put('/archive/allCards',
   async (req, res) => {
     try {
       const { listID, boardID } = req.body;
-      const list = await List.findById(listID);
+      const list = await List.findOne({ _id: listID, boardID });
       if (!list) { throw 'List data not found'; }
 
       // set all cards to isArchived & add action for each card
@@ -262,12 +262,14 @@ router.put('/moveAllCards',
   async (req, res) => {
     try {
       const { oldListID, newListID } = req.body;
-      const [oldList, newList] = await Promise.all([List.findById(oldListID), List.findById(newListID)]);
+      const [oldList, newList] = await Promise.all([List.findOne({ _id: oldListID, boardID }), List.findOne({ _id: newListID, boardID })]);
       if (!oldList || !newList) { throw 'Old list or new list data not found'; }
+
       newList.cards = newList.cards.concat(oldList.cards);
       newList.archivedCards = newList.archivedCards.concat(oldList.archivedCards);
       oldList.cards = [];
       oldList.archivedCards = [];
+
       await Promise.all([
         oldList.save(),
         newList.save(),
