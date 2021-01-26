@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator');
+const { param, body, validationResult } = require('express-validator');
 
 // express-validator middleware for validating input for all routes
 const validate = (validations, msg) => {
@@ -14,4 +14,13 @@ const validate = (validations, msg) => {
   };
 };
 
+// helper for running multiple isMongoId validator
+const areAllMongo = (fields, type) => {
+  if (type === 'body') {
+    return fields.map(field => body(field).isMongoId());
+  }
+  return fields.map(field => param(field).isMongoId());
+};
+
 module.exports = validate;
+module.exports.areAllMongo = areAllMongo;

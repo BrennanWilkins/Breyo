@@ -1,11 +1,12 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const { param } = require('express-validator');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const useIsMember = require('../middleware/useIsMember');
 const useIsAdmin = require('../middleware/useIsAdmin');
 const Activity = require('../models/activity');
+
+router.use(auth);
 
 // for every action addActivity is called to create new doc in activity collection
 const addActivity = async (data, req) => {
@@ -21,7 +22,9 @@ const addActivity = async (data, req) => {
 
 // authorization: member
 // returns last 20 board actions
-router.get('/recent/board/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMember,
+router.get('/recent/board/:boardID',
+  validate([param('boardID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
       const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').limit(20).lean();
@@ -33,7 +36,9 @@ router.get('/recent/board/:boardID', auth, validate([param('boardID').isMongoId(
 
 // authorization: member
 // returns last 20 actions for given card
-router.get('/recent/card/:boardID/:cardID', auth, validate([param('*').isMongoId()]), useIsMember,
+router.get('/recent/card/:boardID/:cardID',
+  validate([param('boardID').isMongoId(), param('cardID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
       const activity = await Activity.find({ boardID: req.params.boardID, cardID: req.params.cardID }).sort('-date').limit(20).lean();
@@ -46,7 +51,9 @@ router.get('/recent/card/:boardID/:cardID', auth, validate([param('*').isMongoId
 // authorization: member
 // returns a given page of board activity sorted by most recent, each page returns 100 actions
 // use if want to support activity pagination/more than 200 activities
-// router.get('/all/board/:boardID/:page', auth, validate([param('boardID').isMongoId(), param('page').isInt()]), useIsMember,
+// router.get('/all/board/:boardID/:page',
+//   validate([param('boardID').isMongoId(), param('page').isInt()]),
+//   useIsMember,
 //   async (req, res) => {
 //     try {
 //       const skip = req.params.page * 100;
@@ -59,7 +66,9 @@ router.get('/recent/card/:boardID/:cardID', auth, validate([param('*').isMongoId
 
 // authorization: member
 // returns first 100 activities for a board sorted by most recent
-router.get('/all/board/:boardID/firstPage', auth, validate([param('boardID').isMongoId()]), useIsMember,
+router.get('/all/board/:boardID/firstPage',
+  validate([param('boardID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
       const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').limit(100).lean();
@@ -71,7 +80,9 @@ router.get('/all/board/:boardID/firstPage', auth, validate([param('boardID').isM
 
 // authorization: member
 // returns all activities for a board sorted by most recent
-router.get('/all/board/:boardID/allActions', auth, validate([param('boardID').isMongoId()]), useIsMember,
+router.get('/all/board/:boardID/allActions',
+  validate([param('boardID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
       const activity = await Activity.find({ boardID: req.params.boardID }).sort('-date').skip(100).lean();
@@ -83,7 +94,9 @@ router.get('/all/board/:boardID/allActions', auth, validate([param('boardID').is
 
 // authorization: member
 // returns all actions for given card
-router.get('/all/card/:boardID/:cardID', auth, validate([param('*').isMongoId()]), useIsMember,
+router.get('/all/card/:boardID/:cardID',
+  validate([param('boardID').isMongoId(), param('cardID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
       const activity = await Activity.find({ boardID: req.params.boardID, cardID: req.params.cardID }).sort('-date').lean();
@@ -95,7 +108,9 @@ router.get('/all/card/:boardID/:cardID', auth, validate([param('*').isMongoId()]
 
 // authorization: member
 // returns all activity for given board member
-router.get('/member/:email/:boardID', auth, validate([param('boardID').isMongoId(), param('email').isEmail()]), useIsMember,
+router.get('/member/:email/:boardID',
+  validate([param('boardID').isMongoId(), param('email').isEmail()]),
+  useIsMember,
   async (req, res) => {
     try {
       const activity = await Activity.find({ boardID: req.params.boardID, email: req.params.email }).sort('-date').lean();
@@ -107,7 +122,9 @@ router.get('/member/:email/:boardID', auth, validate([param('boardID').isMongoId
 
 // authorization: admin
 // deletes all board activity
-router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsAdmin,
+router.delete('/:boardID',
+  validate([param('boardID').isMongoId()]),
+  useIsAdmin,
   async (req, res) => {
     try {
       await Activity.deleteMany({ boardID: req.params.boardID });
@@ -117,7 +134,8 @@ router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIs
 );
 
 // returns all of user's activity sorted by page (each page returns 100 activity) & by date
-router.get('/myActivity/:page', auth, validate([param('page').isInt()]),
+router.get('/myActivity/:page',
+  validate([param('page').isInt()]),
   async (req, res) => {
     try {
       const skip = req.params.page * 100;

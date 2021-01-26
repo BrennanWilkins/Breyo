@@ -44,10 +44,8 @@ const getLeanJWTPayload = user => {
   return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins, userTeams, userAdminTeams };
 };
 
-router.post('/login', validate(
-  [body('email').not().isEmpty().isEmail(),
-  body('password').not().isEmpty().trim().escape()],
-  'Email and password cannot be empty.'),
+router.post('/login',
+  validate([body('email').isEmail(), body('password').notEmpty()], 'Email and password cannot be empty.'),
   async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -82,12 +80,14 @@ router.post('/login', validate(
   }
 );
 
-router.post('/signup', validate(
-  [body('email').isEmail(),
-  body('fullName').isLength({ min: 1, max: 100 }),
-  body('password').isLength({ min: 8, max: 100 }),
-  body('confirmPassword').isLength({ min: 8, max: 100 })],
-  'There was an error in one of the fields.'),
+router.post('/signup',
+  validate(
+    [body('email').isEmail(),
+    body('fullName').isLength({ min: 1, max: 100 }),
+    body('password').isLength({ min: 8, max: 100 }),
+    body('confirmPassword').isLength({ min: 8, max: 100 })],
+    'There was an error in one of the fields.'
+  ),
   async (req, res) => {
     try {
       const { fullName, password, confirmPassword, email } = req.body;
@@ -120,7 +120,8 @@ router.post('/signup', validate(
 );
 
 // retrieve user data if userID token already present
-router.post('/autoLogin', auth,
+router.post('/autoLogin',
+  auth,
   async (req, res) => {
     try {
       const user = await User.findById(req.userID).populate('boards', 'title color teamID').populate('teams', 'title url').lean();
@@ -144,11 +145,14 @@ router.post('/autoLogin', auth,
   }
 );
 
-router.post('/changePass', auth, validate(
-  [body('newPassword').isLength({ min: 8, max: 100 }),
-  body('confirmPassword').isLength({ min: 8, max: 100 }),
-  body('oldPassword').not().isEmpty()
-  ], 'There is an error in one of the fields.'),
+router.post('/changePass',
+  auth,
+  validate(
+    [body('newPassword').isLength({ min: 8, max: 100 }),
+    body('confirmPassword').isLength({ min: 8, max: 100 }),
+    body('oldPassword').notEmpty()],
+    'There is an error in one of the fields.'
+  ),
   async (req, res) => {
     try {
       const { newPassword, confirmPassword, oldPassword } = req.body;
@@ -170,7 +174,8 @@ router.post('/changePass', auth, validate(
   }
 );
 
-router.get('/forgotPassword/:email', validate([param('email').isEmail()]),
+router.get('/forgotPassword/:email',
+  validate([param('email').isEmail()]),
   async (req, res) => {
     try {
       const email = req.params.email;
@@ -207,7 +212,8 @@ router.get('/forgotPassword/:email', validate([param('email').isEmail()]),
   }
 );
 
-router.post('/forgotPassword', validate([body('recoverPassID').not().isEmpty(), body('newPassword').isLength({ min: 8, max: 100 })]),
+router.post('/forgotPassword',
+  validate([body('recoverPassID').notEmpty(), body('newPassword').isLength({ min: 8, max: 100 })]),
   async (req, res) => {
     try {
       const { recoverPassID, newPassword } = req.body;

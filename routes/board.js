@@ -1,5 +1,4 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const Board = require('../models/board');
 const User = require('../models/user');
 const { body, param } = require('express-validator');
@@ -17,6 +16,8 @@ const { getJWTPayload, getLeanJWTPayload } = require('./auth');
 const { COLORS, PHOTO_IDS } = require('./utils');
 const Team = require('../models/team');
 
+router.use(auth);
+
 const signNewToken = async (user, oldToken, getLean) => {
   // used to update user's jwt token when new board created or joined, or user promoted/demoted to/from admin
   try {
@@ -29,7 +30,9 @@ const signNewToken = async (user, oldToken, getLean) => {
 };
 
 // returns all board & list data for a given board
-router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMember,
+router.get('/:boardID',
+  validate([param('boardID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
       const boardID = req.params.boardID;
@@ -88,7 +91,8 @@ router.get('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsMem
 );
 
 // create a new personal board w given title/background
-router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 100 }), body('color').not().isEmpty()], 'Please enter a valid title.'),
+router.post('/',
+  validate([body('title').trim().isLength({ min: 1, max: 100 }), body('color').notEmpty()], 'Please enter a valid title.'),
   async (req, res) => {
     try {
       let { color, title } = req.body;
@@ -131,10 +135,8 @@ router.post('/', auth, validate([body('title').trim().isLength({ min: 1, max: 10
 
 // authorization: team member
 // create a new team board w given title/background
-router.post('/teamBoard', auth, validate([
-  body('title').trim().isLength({ min: 1, max: 100 }),
-  body('color').not().isEmpty(),
-  body('teamID').isMongoId()]),
+router.post('/teamBoard',
+  validate([body('title').trim().isLength({ min: 1, max: 100 }), body('color').notEmpty(), body('teamID').isMongoId()]),
   useIsTeamMember,
   async (req, res) => {
     try {
@@ -172,7 +174,9 @@ router.post('/teamBoard', auth, validate([
 
 // authorization: member
 // updates board color
-router.put('/color', auth, validate([body('boardID').isMongoId(), body('color').not().isEmpty()]), useIsMember,
+router.put('/color',
+  validate([body('boardID').isMongoId(), body('color').notEmpty()]),
+  useIsMember,
   async (req, res) => {
     try {
       const { boardID, color } = req.body;
@@ -187,7 +191,9 @@ router.put('/color', auth, validate([body('boardID').isMongoId(), body('color').
 
 // authorization: member
 // update board description
-router.put('/desc', auth, validate([body('boardID').isMongoId(), body('desc').isLength({ max: 600 })]), useIsMember,
+router.put('/desc',
+  validate([body('boardID').isMongoId(), body('desc').isLength({ max: 600 })]),
+  useIsMember,
   async (req, res) => {
     try {
       const { boardID, desc } = req.body;
@@ -203,9 +209,9 @@ router.put('/desc', auth, validate([body('boardID').isMongoId(), body('desc').is
 
 // authorization: member
 // update board title
-router.put('/title', auth, validate(
-  [body('title').trim().isLength({ min: 1, max: 100 }),
-  body('boardID').isMongoId()], 'Please enter a valid title.'), useIsMember,
+router.put('/title',
+  validate([body('title').trim().isLength({ min: 1, max: 100 }), body('boardID').isMongoId()], 'Please enter a valid title.'),
+  useIsMember,
   async (req, res) => {
     try {
       const { title, boardID } = req.body;
@@ -223,7 +229,8 @@ router.put('/title', auth, validate(
 );
 
 // toggle a board as starred/unstarred in user model
-router.put('/starred', auth, validate([body('boardID').isMongoId()]),
+router.put('/starred',
+  validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const { boardID } = req.body;
@@ -242,7 +249,9 @@ router.put('/starred', auth, validate([body('boardID').isMongoId()]),
 
 // authorization: admin
 // add another admin to the board
-router.post('/admins', auth, validate([body('email').isEmail(), body('boardID').isMongoId()]), useIsAdmin,
+router.post('/admins',
+  validate([body('email').isEmail(), body('boardID').isMongoId()]),
+  useIsAdmin,
   async (req, res) => {
     try {
       const { email, boardID } = req.body;
@@ -270,7 +279,8 @@ router.post('/admins', auth, validate([body('email').isEmail(), body('boardID').
 );
 
 // user receives new token on permission change to admin
-router.put('/admins/promoteUser', auth, validate([body('boardID').isMongoId()]),
+router.put('/admins/promoteUser',
+  validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const isAlreadyAdmin = req.userAdmins[req.body.boardID];
@@ -283,7 +293,8 @@ router.put('/admins/promoteUser', auth, validate([body('boardID').isMongoId()]),
 );
 
 // user receives new token on permission change from admin to member
-router.put('/admins/demoteUser', auth, validate([body('boardID').isMongoId()]),
+router.put('/admins/demoteUser',
+  validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const { boardID } = req.body;
@@ -299,7 +310,9 @@ router.put('/admins/demoteUser', auth, validate([body('boardID').isMongoId()]),
 
 // authorization: admin
 // change user permission from admin to member
-router.delete('/admins/:email/:boardID', auth, validate([param('email').isEmail(), param('boardID').isMongoId()]), useIsAdmin,
+router.delete('/admins/:email/:boardID',
+  validate([param('email').isEmail(), param('boardID').isMongoId()]),
+  useIsAdmin,
   async (req, res) => {
     try {
       const { email, boardID } = req.params;
@@ -328,7 +341,9 @@ router.delete('/admins/:email/:boardID', auth, validate([param('email').isEmail(
 
 // authorization: admin
 // send invite to a user to join the board
-router.post('/invites', auth, validate([body('email').isEmail(), body('boardID').isMongoId()]), useIsAdmin,
+router.post('/invites',
+  validate([body('email').isEmail(), body('boardID').isMongoId()]),
+  useIsAdmin,
   async (req, res) => {
     try {
       const { boardID, email } = req.body;
@@ -353,7 +368,8 @@ router.post('/invites', auth, validate([body('email').isEmail(), body('boardID')
 );
 
 // accept invitation to join a board
-router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
+router.put('/invites/accept',
+  validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const boardID = req.body.boardID;
@@ -392,7 +408,8 @@ router.put('/invites/accept', auth, validate([body('boardID').isMongoId()]),
 );
 
 // reject invitation to join a board
-router.put('/invites/reject', auth, validate([body('boardID').isMongoId()]),
+router.put('/invites/reject',
+  validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
@@ -407,7 +424,9 @@ router.put('/invites/reject', auth, validate([body('boardID').isMongoId()]),
 
 // authorization: admin
 // remove a user from the board
-router.put('/members/remove', auth, validate([body('email').isEmail(), body('boardID').isMongoId()]), useIsAdmin,
+router.put('/members/remove',
+  validate([body('email').isEmail(), body('boardID').isMongoId()]),
+  useIsAdmin,
   async (req, res) => {
     try {
       const { email, boardID } = req.body;
@@ -432,7 +451,9 @@ router.put('/members/remove', auth, validate([body('email').isEmail(), body('boa
 
 // authorization: admin
 // delete a board, its lists, and all of its activity
-router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIsAdmin,
+router.delete('/:boardID',
+  validate([param('boardID').isMongoId()]),
+  useIsAdmin,
   async (req, res) => {
     try {
       const boardID = req.params.boardID;
@@ -451,7 +472,8 @@ router.delete('/:boardID', auth, validate([param('boardID').isMongoId()]), useIs
 );
 
 // leave a board
-router.put('/leave', auth, validate([body('boardID').isMongoId()]),
+router.put('/leave',
+  validate([body('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const boardID = req.body.boardID;
@@ -494,13 +516,12 @@ router.put('/leave', auth, validate([body('boardID').isMongoId()]),
   }
 );
 
-// authorization: admin, team member
+// authorization: board admin, team member
 // move board to another team
-router.put('/changeTeam', auth, validate([
-  body('boardID').isMongoId(),
-  body('teamID').isMongoId(),
-  body('newTeamID').isMongoId()]),
-  useIsAdmin, useIsTeamMember,
+router.put('/changeTeam',
+  validate([body('boardID').isMongoId(), body('teamID').isMongoId(), body('newTeamID').isMongoId()]),
+  useIsAdmin,
+  useIsTeamMember,
   async (req, res) => {
     try {
       const { boardID, teamID, newTeamID } = req.body;
@@ -521,10 +542,12 @@ router.put('/changeTeam', auth, validate([
   }
 );
 
-// authorization: admin, team member
+// authorization: board admin, team member
 // move a personal board to a team
-router.put('/addToTeam', auth, validate([body('boardID').isMongoId(), body('teamID').isMongoId()]),
-useIsAdmin, useIsTeamMember,
+router.put('/addToTeam',
+  validate([body('boardID').isMongoId(), body('teamID').isMongoId()]),
+  useIsAdmin,
+  useIsTeamMember,
   async (req, res) => {
     try {
       const { boardID, teamID } = req.body;

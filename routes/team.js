@@ -11,6 +11,8 @@ const { signNewToken } = require('./board');
 const useIsTeamMember = require('../middleware/useIsTeamMember');
 const useIsTeamAdmin = require('../middleware/useIsTeamAdmin');
 
+router.use(auth);
+
 const validateURL = async url => {
   try {
     // validate URL
@@ -25,7 +27,9 @@ const validateURL = async url => {
 };
 
 // authorization: team member
-router.get('/:teamID', auth, validate([param('teamID').not().isEmpty()]), useIsTeamMember,
+router.get('/:teamID',
+  validate([param('teamID').isMongoId()]),
+  useIsTeamMember,
   async (req, res) => {
     try {
       const teamID = req.params.teamID;
@@ -50,7 +54,8 @@ router.get('/:teamID', auth, validate([param('teamID').not().isEmpty()]), useIsT
 );
 
 // check if team URL is taken
-router.get('/checkURL/:url', auth, validate([param('url').isLength({ min: 1, max: 50 })]),
+router.get('/checkURL/:url',
+  validate([param('url').isLength({ min: 1, max: 50 })]),
   async (req, res) => {
     try {
       const isTaken = await Team.exists({ url: req.params.url });
@@ -60,11 +65,13 @@ router.get('/checkURL/:url', auth, validate([param('url').isLength({ min: 1, max
 );
 
 // create a new team
-router.post('/', auth, validate(
-  [body('title').isLength({ min: 1, max: 100 }),
-  body('desc').isLength({ min: 0, max: 400 }),
-  body('url').isLength({ min: 0, max: 50 }),
-  body('emails').exists()]),
+router.post('/',
+  validate(
+    [body('title').isLength({ min: 1, max: 100 }),
+    body('desc').isLength({ max: 400 }),
+    body('url').isLength({ max: 50 }),
+    body('emails').exists()]
+  ),
   async (req, res) => {
     try {
       const { title, desc, url, emails } = req.body;
@@ -109,11 +116,14 @@ router.post('/', auth, validate(
 
 // authorization: team admin
 // edit a teams info
-router.put('/', auth, validate(
-  [body('title').isLength({ min: 1, max: 100 }),
-  body('desc').isLength({ min: 0, max: 400 }),
-  body('url').isLength({ min: 0, max: 50 }),
-  body('teamID').isMongoId()]), useIsTeamAdmin,
+router.put('/',
+  validate(
+    [body('title').isLength({ min: 1, max: 100 }),
+    body('desc').isLength({ max: 400 }),
+    body('url').isLength({ max: 50 }),
+    body('teamID').isMongoId()]
+  ),
+  useIsTeamAdmin,
   async (req, res) => {
     try {
       const { title, desc, url, teamID } = req.body;
@@ -139,7 +149,9 @@ router.put('/', auth, validate(
 
 // authorization: team admin
 // delete a team, does not delete team's boards
-router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTeamAdmin,
+router.delete('/:teamID',
+  validate([param('teamID').isMongoId()]),
+  useIsTeamAdmin,
   async (req, res) => {
     try {
       const teamID = req.params.teamID;
@@ -163,7 +175,9 @@ router.delete('/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTe
 
 // authorization: team admin
 // change team's logo
-router.put('/logo', auth, validate([body('teamID').isMongoId(), body('logo').not().isEmpty()]), useIsTeamAdmin,
+router.put('/logo',
+  validate([body('teamID').isMongoId(), body('logo').notEmpty()]),
+  useIsTeamAdmin,
   async (req, res) => {
     try {
       const team = await Team.findById(req.body.teamID);
@@ -188,7 +202,9 @@ router.put('/logo', auth, validate([body('teamID').isMongoId(), body('logo').not
 
 // authorization: team admin
 // delete a team's logo
-router.delete('/logo/:teamID', auth, validate([param('teamID').isMongoId()]), useIsTeamAdmin,
+router.delete('/logo/:teamID',
+  validate([param('teamID').isMongoId()]),
+  useIsTeamAdmin,
   async (req, res) => {
     try {
       const team = await Team.findByIdAndUpdate(req.params.teamID, { logo: null }).select('logo').lean();
@@ -203,7 +219,9 @@ router.delete('/logo/:teamID', auth, validate([param('teamID').isMongoId()]), us
 
 // authorization: team member
 // invite users to join team
-router.post('/invites', auth, validate([body('emails').not().isEmpty(), body('teamID').isMongoId()]), useIsTeamMember,
+router.post('/invites',
+  validate([body('emails').notEmpty(), body('teamID').isMongoId()]),
+  useIsTeamMember,
   async (req, res) => {
     try {
       const { emails, teamID } = req.body;
@@ -235,7 +253,8 @@ router.post('/invites', auth, validate([body('emails').not().isEmpty(), body('te
 );
 
 // accept invite to join team
-router.put('/invites/accept', auth, validate([body('teamID').isMongoId()]),
+router.put('/invites/accept',
+  validate([body('teamID').isMongoId()]),
   async (req, res) => {
     try {
       const teamID = req.body.teamID;
@@ -267,7 +286,8 @@ router.put('/invites/accept', auth, validate([body('teamID').isMongoId()]),
 );
 
 // reject invite to join a team
-router.put('/invites/reject', auth, validate([body('teamID').isMongoId()]),
+router.put('/invites/reject',
+  validate([body('teamID').isMongoId()]),
   async (req, res) => {
     try {
       const teamID = req.body.teamID;
@@ -283,7 +303,9 @@ router.put('/invites/reject', auth, validate([body('teamID').isMongoId()]),
 );
 
 // leave a team
-router.put('/leave', auth, validate([body('teamID').isMongoId()]), useIsTeamMember,
+router.put('/leave',
+  validate([body('teamID').isMongoId()]),
+  useIsTeamMember,
   async (req, res) => {
     try {
       const teamID = req.body.teamID;
@@ -316,7 +338,9 @@ router.put('/leave', auth, validate([body('teamID').isMongoId()]), useIsTeamMemb
 
 // authorization: team admin
 // promote a team member to admin
-router.put('/admins/add', auth, validate([body('teamID').isMongoId(), body('email').isEmail()]), useIsTeamAdmin,
+router.put('/admins/add',
+  validate([body('teamID').isMongoId(), body('email').isEmail()]),
+  useIsTeamAdmin,
   async (req, res) => {
     try {
       const { teamID, email } = req.body;
@@ -341,7 +365,9 @@ router.put('/admins/add', auth, validate([body('teamID').isMongoId(), body('emai
 
 // authorization: team admin
 // demote a team member from admin to member
-router.put('/admins/remove', auth, validate([body('teamID').isMongoId(), body('email').isEmail()]), useIsTeamAdmin,
+router.put('/admins/remove',
+  validate([body('teamID').isMongoId(), body('email').isEmail()]),
+  useIsTeamAdmin,
   async (req, res) => {
     try {
       const { teamID, email } = req.body;

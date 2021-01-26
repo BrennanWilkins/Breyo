@@ -9,8 +9,10 @@ const Board = require('../models/board');
 const { resizeImg, cloudinary } = require('./utils');
 const Team = require('../models/team');
 
+router.use(auth);
+
 // returns a user's boards/invites/teams to be used on dashboard page
-router.get('/', auth,
+router.get('/',
   async (req, res) => {
     try {
       const user = await User.findById(req.userID).populate('boards', 'title color teamID').populate('teams', 'title url').lean();
@@ -30,7 +32,8 @@ router.get('/', auth,
   }
 );
 
-router.delete('/deleteAccount/:password', auth, validate([param('password').not().isEmpty()]),
+router.delete('/deleteAccount/:password',
+  validate([param('password').notEmpty()]),
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
@@ -79,7 +82,8 @@ router.delete('/deleteAccount/:password', auth, validate([param('password').not(
   }
 );
 
-router.post('/avatar', auth, validate([body('avatar').not().isEmpty()]),
+router.post('/avatar',
+  validate([body('avatar').notEmpty()]),
   async (req, res) => {
     try {
       const avatar = await resizeImg(req.body.avatar);
@@ -97,7 +101,7 @@ router.post('/avatar', auth, validate([body('avatar').not().isEmpty()]),
   }
 );
 
-router.delete('/avatar', auth,
+router.delete('/avatar',
   async (req, res) => {
     try {
       const user = await User.findByIdAndUpdate(req.userID, { avatar: null }).select('avatar').lean();

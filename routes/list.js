@@ -1,5 +1,4 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const Board = require('../models/board');
 const List = require('../models/list');
 const { body, param } = require('express-validator');
@@ -10,11 +9,13 @@ const useIsAdmin = require('../middleware/useIsAdmin');
 const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 
+router.use(auth);
+
 // authorization: member
 // create a new list
-router.post('/', auth, validate([
-  body('boardID').isMongoId(),
-  body('title').isLength({ min: 1, max: 200 })]), useIsMember,
+router.post('/',
+  validate([body('boardID').isMongoId(), body('title').isLength({ min: 1, max: 200 })]),
+  useIsMember,
   async (req, res) => {
     try {
       const { boardID, title } = req.body;
@@ -37,10 +38,9 @@ router.post('/', auth, validate([
 
 // authorization: member
 // update list title
-router.put('/title', auth, validate([
-  body('boardID').isMongoId(),
-  body('listID').isMongoId(),
-  body('title').isLength({ min: 1, max: 200 })]), useIsMember,
+router.put('/title',
+  validate([body('boardID').isMongoId(), body('listID').isMongoId(), body('title').isLength({ min: 1, max: 200 })]),
+  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, title } = req.body;
@@ -58,10 +58,9 @@ router.put('/title', auth, validate([
 
 // authorization: member
 // move list to different index in board
-router.put('/moveList', auth, validate([
-  body('sourceIndex').isInt(),
-  body('destIndex').isInt(),
-  body('boardID').isMongoId()]), useIsMember,
+router.put('/moveList',
+  validate([body('sourceIndex').isInt(), body('destIndex').isInt(), body('boardID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
       const { sourceIndex, destIndex, boardID } = req.body;
@@ -86,10 +85,9 @@ router.put('/moveList', auth, validate([
 
 // authorization: member
 // create a copy of a list
-router.post('/copy', auth, validate([
-  body('boardID').isMongoId(),
-  body('listID').isMongoId(),
-  body('title').isLength({ min: 1, max: 200 })]), useIsMember,
+router.post('/copy',
+  validate([body('boardID').isMongoId(), body('listID').isMongoId(), body('title').isLength({ min: 1, max: 200 })]),
+  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, title } = req.body;
@@ -142,9 +140,9 @@ router.post('/copy', auth, validate([
 
 // authorization: admin
 // send list to archive
-router.post('/archive', auth, validate([
-  body('boardID').isMongoId(),
-  body('listID').isMongoId()]), useIsAdmin,
+router.post('/archive',
+  validate([body('boardID').isMongoId(), body('listID').isMongoId()]),
+  useIsAdmin,
   async (req, res) => {
     try {
       const { boardID, listID } = req.body;
@@ -177,9 +175,9 @@ router.post('/archive', auth, validate([
 
 // authorization: member
 // send list to board from archive
-router.put('/archive/recover', auth, validate([
-  body('boardID').isMongoId(),
-  body('listID').isMongoId()]), useIsMember,
+router.put('/archive/recover',
+  validate([body('boardID').isMongoId(), body('listID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID } = req.body;
@@ -198,9 +196,9 @@ router.put('/archive/recover', auth, validate([
 
 // authorization: admin
 // Permanently delete a list
-router.delete('/archive/:listID/:boardID', auth, validate([
-  param('boardID').isMongoId(),
-  param('listID').isMongoId()]), useIsAdmin,
+router.delete('/archive/:listID/:boardID',
+  validate([param('boardID').isMongoId(), param('listID').isMongoId()]),
+  useIsAdmin,
   async (req, res) => {
     try {
       const { boardID, listID } = req.params;
@@ -222,9 +220,9 @@ router.delete('/archive/:listID/:boardID', auth, validate([
 
 // authorization: member
 // Send all cards in list to archive
-router.put('/archive/allCards', auth, validate([
-  body('boardID').isMongoId(),
-  body('listID').isMongoId()]), useIsMember,
+router.put('/archive/allCards',
+  validate([body('boardID').isMongoId(), body('listID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
       const { listID, boardID } = req.body;
@@ -258,10 +256,9 @@ router.put('/archive/allCards', auth, validate([
 
 // authorization: member
 // move all cards in a list to another list
-router.put('/moveAllCards', auth, validate([
-  body('boardID').isMongoId(),
-  body('oldListID').isMongoId(),
-  body('newListID').isMongoId()]), useIsMember,
+router.put('/moveAllCards',
+  validate([body('boardID').isMongoId(), body('oldListID').isMongoId(), body('newListID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
       const { oldListID, newListID } = req.body;
