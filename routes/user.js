@@ -9,6 +9,36 @@ const Board = require('../models/board');
 const { resizeImg, cloudinary } = require('./utils');
 const Team = require('../models/team');
 
+const formatUserBoards = user => {
+  const formatted = user.boards.map(board => ({
+    boardID: board._id,
+    title: board.title,
+    color: board.color,
+    isStarred: user.starredBoards.includes(String(board._id)),
+    isAdmin: user.adminBoards.includes(String(board._id)),
+    teamID: board.teamID
+  }));
+  return formatted;
+};
+
+const leaveAllCards = async (boardID, email) => {
+  try {
+    // remove user from all cards they are a member of for given board
+    const lists = await List.find({ boardID });
+    for (let list of lists) {
+      let shouldUpdate = false;
+      for (let card of list.cards) {
+        for (let i = card.members.length - 1; i >= 0; i--) {
+          if (card.members[i].email === email) { card.members.splice(i, 1); }
+          shouldUpdate = true;
+        }
+      }
+      // only need to update list if member changed
+      if (shouldUpdate) { await list.save(); }
+    }
+  } catch (err) { return err; }
+};
+
 router.use(auth);
 
 // returns a user's boards/invites/teams to be used on dashboard page
@@ -18,14 +48,7 @@ router.get('/',
       const user = await User.findById(req.userID).populate('boards', 'title color teamID').populate('teams', 'title url').lean();
       if (!user) { throw 'user data not found'; }
 
-      user.boards = user.boards.map(board => ({
-        boardID: board._id,
-        title: board.title,
-        color: board.color,
-        isStarred: user.starredBoards.includes(String(board._id)),
-        isAdmin: user.adminBoards.includes(String(board._id)),
-        teamID: board.teamID
-      }));
+      user.boards = formatUserBoards(user);
 
       res.status(200).json({ boards: user.boards, invites: user.invites, teams: user.teams, teamInvites: user.teamInvites, adminTeams: user.adminTeams });
     } catch (err) { res.sendStatus(500); }
@@ -60,19 +83,7 @@ router.delete('/deleteAccount/:password',
             await board.save();
           }
 
-          // remove user from all cards they are a member of
-          const lists = await List.find({ boardID });
-          for (let list of lists) {
-            let shouldUpdate = false;
-            for (let card of list.cards) {
-              for (let i = card.members.length - 1; i >= 0; i--) {
-                if (card.members[i].email === user.email) { card.members.splice(i, 1); }
-                shouldUpdate = true;
-              }
-            }
-            // only need to update list if member changed
-            if (shouldUpdate) { await list.save(); }
-          }
+          await leaveAllCards(boardID, user.email);
         }
       }
       await Team.updateMany({ _id: { $in: user.teams }}, { $pull: { members: user._id, admins: req.userID }});
@@ -113,3 +124,5 @@ router.delete('/avatar',
 );
 
 module.exports = router;
+module.exports.formatUserBoards = formatUserBoards;
+module.exports.leaveAllCards = leaveAllCards;

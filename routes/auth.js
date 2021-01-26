@@ -7,6 +7,7 @@ const config = require('config');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const nodemailer = require('nodemailer');
+const { formatUserBoards } = require('./user');
 
 const getJWTPayload = user => {
   // create jwt sign payload for easier user data lookup
@@ -58,14 +59,7 @@ router.post('/login',
       const same = await bcryptjs.compare(password, user.password);
       if (!same) { return res.status(400).json({ msg: 'Incorrect email or password.' }); }
 
-      user.boards = user.boards.map(board => ({
-        boardID: board._id,
-        title: board.title,
-        color: board.color,
-        isStarred: user.starredBoards.includes(String(board._id)),
-        isAdmin: user.adminBoards.includes(String(board._id)),
-        teamID: board.teamID
-      }));
+      user.boards = formatUserBoards(user);
 
       // create jwt token that expires in 7 days
       const jwtPayload = getJWTPayload(user);
@@ -127,14 +121,7 @@ router.post('/autoLogin',
       const user = await User.findById(req.userID).populate('boards', 'title color teamID').populate('teams', 'title url').lean();
       if (!user) { throw 'User data not found'; }
 
-      user.boards = user.boards.map(board => ({
-        boardID: board._id,
-        title: board.title,
-        color: board.color,
-        isStarred: user.starredBoards.includes(String(board._id)),
-        isAdmin: user.adminBoards.includes(String(board._id)),
-        teamID: board.teamID
-      }));
+      user.boards = formatUserBoards(user);
 
       if (user.recoverPassID) { await User.updateOne({ _id: req.userID }, { recoverPassID: null }); }
 

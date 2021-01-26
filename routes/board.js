@@ -15,6 +15,7 @@ const config = require('config');
 const { getJWTPayload, getLeanJWTPayload } = require('./auth');
 const { COLORS, PHOTO_IDS } = require('./utils');
 const Team = require('../models/team');
+const { formatUserBoards, leaveAllCards } = require('./user');
 
 router.use(auth);
 
@@ -65,14 +66,7 @@ router.get('/:boardID',
       // if user's token is not up to date, send new token
       if ((!isAdminInToken && isAdminInBoard) || (isAdminInToken && !isAdminInBoard)) {
         const user = await User.findById(req.userID).populate('boards', 'title color').lean();
-        user.boards = user.boards.map(board => ({
-          boardID: board._id,
-          title: board.title,
-          color: board.color,
-          isStarred: user.starredBoards.includes(String(board._id)),
-          isAdmin: user.adminBoards.includes(String(board._id)),
-          teamID: board.teamID
-        }));
+        user.boards = formatUserBoards(user);
         const token = await signNewToken(user, req.header('x-auth-token'), false);
         data.invites = user.invites;
         data.boards = user.boards;
@@ -488,19 +482,7 @@ router.put('/leave',
       board.members = board.members.filter(id => String(id) !== req.userID);
       board.admins = board.admins.filter(id => id !== req.userID);
 
-      // remove user from cards they are a member of
-      const lists = await List.find({ boardID });
-      for (let list of lists) {
-        let shouldUpdate = false;
-        for (let card of list.cards) {
-          for (let i = card.members.length - 1; i >= 0; i--) {
-            if (card.members[i].email === req.email) { card.members.splice(i, 1); }
-            shouldUpdate = true;
-          }
-        }
-        // only need to update list if member changed
-        if (shouldUpdate) { await list.save(); }
-      }
+      await leaveAllCards(boardID, req.email);
 
       const actionData = { msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID };
 
