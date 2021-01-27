@@ -1,48 +1,31 @@
 .DeleteModal {
-  border-radius: 4px;
   margin-top: 5px;
-  box-shadow: var(--box-shadow5);
-  border: 0.8px solid rgb(var(--lightGray));
-  background: rgb(245,245,245);
-  position: absolute;
   top: 100%;
   left: 0;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  padding: 10px 10px 20px;
+  padding: 5px 5px 10px;
   font-size: 14px;
-  z-index: 2;
-  width: 300px;
-  box-sizing: border-box;
-}
-.DeleteModal div {
-  margin: 25px 0 0;
+  width: 290px;
   text-align: center;
 }
-.CloseBtn {
-  position: absolute;
-  top: 0;
-  right: 0;
+.DeleteModal p {
+  padding: 0 5px;
+}
+.DeleteListModal {
+  left: calc(50% - 145px);
 }
 .DeleteBtn {
   background: rgb(219, 55, 29);
   color: white;
+  width: calc(100% - 25px);
 }
 .DeleteBtn:hover, .DeleteBtn:active {
   background: rgb(213, 5, 5);
 }
+.DeleteBtn:disabled {
+  background: rgb(200,200,200);
+  cursor: not-allowed;
+}
 .Input {
   margin: 15px auto;
-  width: 230px;
-  box-sizing: border-box;
-  border: 2px solid rgb(210, 210, 210);
-  border-radius: 4px;
-  padding: 6px;
-  transition: border 250ms;
-  outline: none;
-  font-size: 15px;
-}
-.Input:focus {
-  border: 2px solid rgb(var(--red), 0.8);
+  width: calc(100% - 25px);
 }

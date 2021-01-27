@@ -30,7 +30,7 @@ export const BackBtn = props => (
 );
 
 export const ActionBtn = props => (
-  <button className={`${classes.ActionBtn} ${props.className || ''}`} onClick={props.clicked}>{props.children}</button>
+  <button disabled={props.disabled} className={`${classes.ActionBtn} ${props.className || ''}`} onClick={props.clicked}>{props.children}</button>
 );
 
 export default Button;

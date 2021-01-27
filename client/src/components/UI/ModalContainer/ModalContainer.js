@@ -9,7 +9,7 @@ const ModalContainer = props => {
   useModalToggle(true, modalRef, props.close);
 
   return (
-    <div ref={modalRef} className={`${classes.Container} ${props.className}`}>
+    <div ref={modalRef} className={`${classes.Container} ${props.className} ${props.addMargin ? classes.ContainerAfter : ''}`}>
       <ModalTitle close={props.close} title={props.title} light={props.light} lighter={props.lighter} />
       {props.children}
     </div>
@@ -21,7 +21,8 @@ ModalContainer.propTypes = {
   title: PropTypes.string.isRequired,
   close: PropTypes.func.isRequired,
   light: PropTypes.bool,
-  lighter: PropTypes.bool
+  lighter: PropTypes.bool,
+  addMargin: PropTypes.bool
 };
 
 export default ModalContainer;
