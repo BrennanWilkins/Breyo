@@ -1,8 +1,9 @@
 .Container {
-  width: 400px;
   top: -45px;
-  left: calc(50% - 200px);
   padding: 5px;
+  width: 96%;
+  max-width: 400px;
+  left: max(calc(50% - 200px), 2%);
 }
 .Info {
   font-size: 15px;
@@ -16,25 +17,22 @@
   text-align: center;
 }
 .Input {
-  width: 300px;
+  width: 96%;
+  max-width: 300px;
   margin: 10px auto;
 }
 .DeleteBtn {
   display: block;
-  background: red;
-  border-radius: 4px;
-  outline: none;
-  border: 0;
+  background: rgb(219, 55, 29);
   color: white;
-  padding: 8px 10px;
-  font-size: 14px;
   margin: 20px auto;
-  cursor: pointer;
-  transition: background 250ms;
+  width: 96%;
+  max-width: 300px;
 }
-.DeleteBtn:hover {
-  background: rgb(207, 4, 4);
+.DeleteBtn:hover, .DeleteBtn:active {
+  background: rgb(213, 5, 5);
 }
 .DeleteBtn:disabled {
-  background: rgb(170,170,170);
+  background: rgb(200,200,200);
+  cursor: not-allowed;
 }

@@ -6,14 +6,6 @@
   padding: 5px 5px 10px;
   font-size: 15px;
 }
-.Container::after {
-  content: "";
-  position: absolute;
-  height: 20px;
-  width: 1px;
-  visibility: hidden;
-  bottom: -20px;
-}
 .Options div {
   font-size: 14px;
   padding: 8px 10px;

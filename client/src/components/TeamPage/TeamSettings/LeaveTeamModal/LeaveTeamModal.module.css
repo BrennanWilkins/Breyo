@@ -6,33 +6,20 @@
   padding: 5px;
   font-size: 14px;
 }
-.Container::after {
-  content: "";
-  position: absolute;
-  height: 20px;
-  width: 1px;
-  visibility: hidden;
-  bottom: -20px;
-}
 .Container p {
   text-align: center;
   padding: 0 20px;
 }
 .LeaveBtn {
   display: block;
-  background: red;
-  border-radius: 4px;
-  outline: none;
-  border: 0;
+  background: rgb(219, 55, 29);
   color: white;
-  padding: 8px 20px;
-  font-size: 15px;
   margin: 20px auto 10px;
-  cursor: pointer;
-  transition: background 250ms;
+  width: 96%;
+  max-width: 300px;
 }
-.LeaveBtn:hover {
-  background: rgb(207, 4, 4);
+.LeaveBtn:hover, .LeaveBtn:active {
+  background: rgb(213, 5, 5);
 }
 .CannotLeave {
   margin: 20px 0;

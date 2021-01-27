@@ -21,7 +21,7 @@ const PermissionModal = props => {
   const memberDisabled = !props.isAdmin || (props.isAdmin && oneAdmin) || !props.userIsAdmin;
 
   return (
-    <ModalContainer className={classes.Container} close={props.close} title="Change Permissions">
+    <ModalContainer className={classes.Container} close={props.close} title="Change Permissions" addMargin>
       <div className={classes.Options}>
         <div onClick={() => changeHandler(true)} className={adminDisabled ? classes.Disabled : null}>
           Admin{props.isAdmin && checkIcon}

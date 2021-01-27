@@ -6,18 +6,19 @@ import { connect } from 'react-redux';
 import { useHistory } from 'react-router';
 import { Input } from '../../../UI/Inputs/Inputs';
 import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
+import { ActionBtn } from '../../../UI/Buttons/Buttons';
 
 const DeleteTeamModal = props => {
   const history = useHistory();
   const [inputVal, setInputVal] = useState('');
 
   return (
-    <ModalContainer className={classes.Modal} title="Delete this team?" close={props.close}>
+    <ModalContainer className={classes.Modal} title="Delete this team?" close={props.close} addMargin>
       {props.userIsAdmin ?
       <>
         <p>Deleting a team will not delete the team's boards. To confirm, please type 'DELETE THIS TEAM' below.</p>
         <Input className={classes.Input} value={inputVal} onChange={e => setInputVal(e.target.value)} />
-        <button className={classes.DeleteBtn} disabled={inputVal !== 'DELETE THIS TEAM'} onClick={() => props.deleteTeam(history.push)}>Delete Team</button>
+        <ActionBtn className={classes.DeleteBtn} disabled={inputVal !== 'DELETE THIS TEAM'} onClick={() => props.deleteTeam(history.push)}>DELETE TEAM</ActionBtn>
       </>
       : <p>You must be an admin to delete this team.</p>}
     </ModalContainer>

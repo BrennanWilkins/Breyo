@@ -5,6 +5,7 @@ import { inviteTeamMembers } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import { EmailChipInput } from '../../../UI/Inputs/Inputs';
 import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
+import { ActionBtn } from '../../../UI/Buttons/Buttons';
 
 const InviteTeamMembers = props => {
   const [emails, setEmails] = useState([]);
@@ -16,12 +17,12 @@ const InviteTeamMembers = props => {
   };
 
   return (
-    <ModalContainer className={classes.Container} title="Invite team members" close={props.close}>
+    <ModalContainer className={classes.Container} title="Invite team members" close={props.close} addMargin>
       <p>To invite multiple users, type or paste emails below and press enter.</p>
       <div className={classes.EmailChipInput}>
         <EmailChipInput emails={emails} setEmails={arr => setEmails(arr)} />
       </div>
-      <button className={classes.InviteBtn} onClick={inviteHandler}>Invite to team</button>
+      <ActionBtn className={classes.InviteBtn} onClick={inviteHandler}>Invite to team</ActionBtn>
     </ModalContainer>
   );
 };
