@@ -17,49 +17,52 @@ export const dndHandler = (source, destination, draggableID, boardID) => async (
         dispatch({ type: actionTypes.MOVE_LIST, sourceIndex: destIndex, destIndex: sourceIndex });
         throw err;
       });
-      sendUpdate('put/list/moveList', JSON.stringify({ sourceIndex, destIndex }));
+      sendUpdate('put/list/moveList', { sourceIndex, destIndex });
     } else if (sourceID === targetID) {
       // if cards are currently being filtered, then need to find the true unfiltered sourceIndex for the card
       if (state.lists.cardsAreFiltered) {
         sourceIndex = state.lists.lists.find(list => list.listID === sourceID).cards.findIndex(card => card.cardID === draggableID);
         if (sourceIndex === -1) { throw new Error('card not found'); }
       }
-      dispatch({ type: actionTypes.MOVE_CARD_SAME_LIST, sourceIndex, destIndex, listID: sourceID });
-      await axios.put('/card/moveCard/sameList', { sourceIndex, destIndex, listID: sourceID, boardID }).catch(err => {
+      const payload = { sourceIndex, destIndex, listID: sourceID };
+      dispatch({ type: actionTypes.MOVE_CARD_SAME_LIST, ...payload });
+      await axios.put('/card/moveCard/sameList', { ...payload, boardID }).catch(err => {
         // if server error then undo move card
         dispatch({ type: actionTypes.MOVE_CARD_SAME_LIST, sourceIndex: destIndex, destIndex: sourceIndex, listID: sourceID });
         throw err;
       });
-      sendUpdate('put/card/moveCard/sameList', JSON.stringify({ sourceIndex, destIndex, listID: sourceID }));
+      sendUpdate('put/card/moveCard/sameList', payload);
     } else if (sourceID !== targetID) {
       // if cards are currently being filtered, then need to find the true unfiltered sourceIndex for the card
       if (state.lists.cardsAreFiltered) {
         sourceIndex = state.lists.lists.find(list => list.listID === sourceID).cards.findIndex(card => card.cardID === draggableID);
         if (sourceIndex === -1) { throw new Error('card not found'); }
       }
-      dispatch({ type: actionTypes.MOVE_CARD_DIFF_LIST, sourceIndex, destIndex, sourceID, destID: targetID });
+      const payload = { sourceIndex, destIndex, sourceID, destID: targetID };
+      dispatch({ type: actionTypes.MOVE_CARD_DIFF_LIST, ...payload });
       await axios.put('/card/moveCard/diffList', { sourceIndex, destIndex, sourceID, targetID, boardID }).catch(err => {
         // if server error then undo move card
         dispatch({ type: actionTypes.MOVE_CARD_DIFF_LIST, sourceIndex: destIndex, destIndex: sourceIndex, sourceID: targetID, destID: sourceID });
         throw err;
       });
-      sendUpdate('put/card/moveCard/diffList', JSON.stringify({ sourceIndex, destIndex, sourceID, destID: targetID }));
+      sendUpdate('put/card/moveCard/diffList', payload);
     }
   } catch (err) { dispatch(serverErr()); }
 };
 
-export const manualMoveCardHandler = (sourceListID, destListID, sourceIndex, destIndex) => async (dispatch, getState) => {
+export const manualMoveCardHandler = (sourceID, destID, sourceIndex, destIndex) => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
-    if (sourceListID === destListID) {
-      const listID = sourceListID;
-      await axios.put('/card/moveCard/sameList', { sourceIndex, destIndex, listID, boardID });
-      dispatch({ type: actionTypes.MOVE_CARD_SAME_LIST, sourceIndex, destIndex, listID });
-      sendUpdate('put/card/moveCard/sameList', JSON.stringify({ sourceIndex, destIndex, listID }));
+    if (sourceID === destID) {
+      const payload = { sourceIndex, destIndex, listID: sourceID };
+      await axios.put('/card/moveCard/sameList', { ...payload, boardID });
+      dispatch({ type: actionTypes.MOVE_CARD_SAME_LIST, ...payload });
+      sendUpdate('put/card/moveCard/sameList', payload);
     } else {
-      await axios.put('/card/moveCard/diffList', { sourceIndex, destIndex, sourceID: sourceListID, targetID: destListID, boardID });
-      dispatch({ type: actionTypes.MOVE_CARD_DIFF_LIST, sourceIndex, destIndex, sourceID: sourceListID, destID: destListID });
-      sendUpdate('put/card/moveCard/diffList', JSON.stringify({ sourceIndex, destIndex, sourceID: sourceListID, destID: destListID }));
+      await axios.put('/card/moveCard/diffList', { sourceIndex, destIndex, sourceID, targetID: destID, boardID });
+      const payload = { sourceIndex, destIndex, sourceID, destID };
+      dispatch({ type: actionTypes.MOVE_CARD_DIFF_LIST, ...payload });
+      sendUpdate('put/card/moveCard/diffList', payload);
     }
   } catch (err) { dispatch(serverErr()); }
 };
@@ -67,12 +70,13 @@ export const manualMoveCardHandler = (sourceListID, destListID, sourceIndex, des
 export const checklistDndHandler = (sourceIndex, destIndex, checklistID) => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID } = getCardState(getState);
-    dispatch({ type: actionTypes.MOVE_CHECKLIST_ITEM, sourceIndex, destIndex, checklistID, cardID, listID });
-    await axios.put('/card/checklist/moveItem', { sourceIndex, destIndex, checklistID, cardID, listID, boardID }).catch(err => {
+    const payload = { sourceIndex, destIndex, checklistID, cardID, listID };
+    dispatch({ type: actionTypes.MOVE_CHECKLIST_ITEM, ...payload });
+    await axios.put('/card/checklist/moveItem', { ...payload, boardID }).catch(err => {
       // if server error then undo move item
       dispatch({ type: actionTypes.MOVE_CHECKLIST_ITEM, sourceIndex: destIndex, destIndex: sourceIndex, checklistID, cardID, listID });
       throw err;
     });
-    sendUpdate('put/card/checklist/moveItem', JSON.stringify({ sourceIndex, destIndex, checklistID, cardID, listID }));
+    sendUpdate('put/card/checklist/moveItem', payload);
   } catch (err) { dispatch(serverErr()); }
 };

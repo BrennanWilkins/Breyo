@@ -6,13 +6,13 @@ import store from '../../store';
 
 export const addRecentActivity = newActivity => {
   store.dispatch({ type: actionTypes.ADD_RECENT_ACTIVITY, newActivity });
-  sendUpdate('post/activity', JSON.stringify({ newActivity }));
+  sendUpdate('post/activity', { newActivity });
 };
 
 export const addRecentActivities = activities => {
   for (let newActivity of activities) {
     store.dispatch({ type: actionTypes.ADD_RECENT_ACTIVITY, newActivity });
-    sendUpdate('post/activity', JSON.stringify({ newActivity }));
+    sendUpdate('post/activity', { newActivity });
   }
 };
 

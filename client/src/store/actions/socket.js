@@ -32,8 +32,9 @@ export const initSocket = boardID => {
     }
   });
 
-  newSocket.on('post/board/admins', async email => {
+  newSocket.on('post/board/admins', async data => {
     try {
+      const email = JSON.parse(data);
       store.dispatch({ type: actionTypes.ADD_ADMIN, email });
       const state = store.getState();
       const userEmail = state.user.email;
@@ -46,8 +47,9 @@ export const initSocket = boardID => {
     } catch (err) { store.dispatch(serverErr()); }
   });
 
-  newSocket.on('delete/board/admins', async email => {
+  newSocket.on('delete/board/admins', async data => {
     try {
+      const email = JSON.parse(data);
       store.dispatch({ type: actionTypes.REMOVE_ADMIN, email });
       const state = store.getState();
       const userEmail = state.user.email;
@@ -76,9 +78,9 @@ export const initSocket = boardID => {
   socket = newSocket;
 };
 
-export const sendUpdate = (type, msg) => {
+export const sendUpdate = (type, data) => {
   if (!socket) { return; }
-  socket.emit(type, msg);
+  socket.emit(type, JSON.stringify(data));
 };
 
 export const connectSocket = () => {

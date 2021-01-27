@@ -126,9 +126,10 @@ export const updateActiveBoard = data => (dispatch, getState) => {
 
 export const updateBoardTitle = (title, boardID) => async dispatch => {
   try {
-    const res = await axios.put('/board/title', { boardID, title });
-    sendUpdate('put/board/title', JSON.stringify({ title, boardID }));
-    dispatch({ type: actionTypes.UPDATE_BOARD_TITLE, title, boardID });
+    const payload = { title, boardID };
+    const res = await axios.put('/board/title', payload);
+    sendUpdate('put/board/title', payload);
+    dispatch({ type: actionTypes.UPDATE_BOARD_TITLE, ...payload });
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -171,9 +172,10 @@ export const demoteSelf = boardID => ({ type: actionTypes.DEMOTE_SELF, boardID }
 export const updateColor = color => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
-    dispatch({ type: actionTypes.UPDATE_COLOR, color, boardID });
-    await axios.put('/board/color', { color, boardID });
-    sendUpdate('put/board/color', JSON.stringify({ color, boardID }));
+    const payload = { color, boardID };
+    dispatch({ type: actionTypes.UPDATE_COLOR, ...payload });
+    await axios.put('/board/color', payload);
+    sendUpdate('put/board/color', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -184,7 +186,7 @@ export const updateBoardDesc = desc => async (dispatch, getState) => {
     const boardID = getState().board.boardID;
     dispatch({ type: actionTypes.UPDATE_BOARD_DESC, desc });
     const res = await axios.put('/board/desc', { desc, boardID });
-    sendUpdate('put/board/desc', JSON.stringify({ desc }));
+    sendUpdate('put/board/desc', { desc });
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -195,7 +197,7 @@ export const deleteBoard = push => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
     await axios.delete('/board/' + boardID);
-    sendUpdate('delete/board', JSON.stringify({ boardID }));
+    sendUpdate('delete/board', { boardID });
     dispatch({ type: actionTypes.DELETE_BOARD, boardID });
     push('/');
   } catch (err) {
@@ -219,7 +221,7 @@ export const acceptInvite = (boardID, push) => async (dispatch, getState) => {
     push(`/board/${boardID}`);
     dispatch({ type: actionTypes.JOIN_BOARD, board });
     addRecentActivity(newActivity);
-    sendUpdate('post/board/newMember', JSON.stringify({ email, fullName }));
+    sendUpdate('post/board/newMember', { email, fullName });
   } catch (err) {
     if (err?.response?.status === 400) {
       dispatch({ type: actionTypes.REMOVE_INVITE, boardID });
@@ -245,7 +247,7 @@ export const leaveBoard = push => async (dispatch, getState) => {
     const email = state.user.email;
     const res = await axios.put('/board/leave', { boardID });
     addRecentActivity(res.data.newActivity);
-    sendUpdate('put/board/memberLeft', JSON.stringify({ email }));
+    sendUpdate('put/board/memberLeft', { email });
     dispatch({ type: actionTypes.LEAVE_BOARD, boardID });
     push('/');
   } catch (err) {
