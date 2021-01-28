@@ -75,17 +75,17 @@
   padding: 25px 0 10px;
   color: rgb(var(--red));
 }
-.InfoBtns a {
-  display: inline-block;
+.TechLink {
+  display: block;
   color: rgb(var(--red));
   padding: 5px;
   width: 150px;
-  margin: 0 10px;
+  margin: 0 auto;
   box-sizing: border-box;
-  border-radius: 2px;
-  transition: all 300ms;
+  border-radius: 4px;
+  transition: all 200ms;
 }
-.InfoBtns a:hover {
+.TechLink:hover {
   background: rgb(var(--red));
   color: white;
 }

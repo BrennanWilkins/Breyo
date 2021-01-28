@@ -20,10 +20,7 @@ const HomePage = () => (
         <h1>What is Breyo?</h1>
         <p>Breyo provides kanban-style boards, lists, and cards to manage your workflow and tasks.</p>
         <p>It is heavily inspired by the UI/UX and functionality of the popular application Trello, while utilizing a different tech stack and all original source code.</p>
-        <div className={classes.InfoBtns}>
-          <a href="https://trello.com" rel="noopener noreferrer" target="_blank">Visit Trello</a>
-          <Link to="/tech">Breyo's tech stack</Link>
-        </div>
+        <Link className={classes.TechLink} to="/tech">Breyo's tech stack</Link>
       </div>
     </div>
   </div>
