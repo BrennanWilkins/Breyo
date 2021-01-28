@@ -33,13 +33,13 @@ const ManualMoveModal = props => {
   return (
     <ModalContainer className={classes.Container} title="Move Card" close={props.close}>
       <div className={classes.Selects}>
-        <Select title="Destination List" currentValue={listTitle} classNames={[classes.ListSelect]}>
+        <Select title="Destination List" currentValue={listTitle} className={classes.ListSelect}>
           {props.lists.map(list => (
             <div key={list.listID} onClick={() => { setSelectedListID(list.listID); setListTitle(list.title); }}
             className={list.listID === selectedListID ? classes.ActiveOption : null}>{list.title}</div>
           ))}
         </Select>
-        <Select title="Position" currentValue={String(cardPosition + 1)} classNames={[classes.PositionSelect]}>
+        <Select title="Position" currentValue={String(cardPosition + 1)} className={classes.PositionSelect}>
           {positionArr.map((_, i) => (
             <div key={i} onClick={() => setCardPosition(i)}
             className={cardPosition === i ? classes.ActiveOption : classes.Option}>{i + 1}</div>

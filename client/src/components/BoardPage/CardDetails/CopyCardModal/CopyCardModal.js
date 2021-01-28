@@ -41,13 +41,13 @@ const CopyCardModal = props => {
       </div>
       <div className={classes.CopyTitle}>COPY TO</div>
       <div className={classes.Selects}>
-        <Select title="List" currentValue={listTitle} classNames={[classes.ListSelect]}>
+        <Select title="List" currentValue={listTitle} className={classes.ListSelect}>
           {props.lists.map(list => (
             <div key={list.listID} onClick={() => { setSelectedListID(list.listID); setListTitle(list.title); }}
             className={list.listID === selectedListID ? classes.ActiveOption : null}>{list.title}</div>
           ))}
         </Select>
-        <Select title="Position" currentValue={String(cardPosition + 1)} classNames={[classes.PositionSelect]}>
+        <Select title="Position" currentValue={String(cardPosition + 1)} className={classes.PositionSelect}>
           {positionArr.map((_, i) => (
             <div key={i} onClick={() => setCardPosition(i)}
             className={cardPosition === i ? classes.ActiveOption : null}>{i + 1}</div>

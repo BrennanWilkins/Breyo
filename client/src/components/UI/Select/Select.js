@@ -11,7 +11,7 @@ const Select = props => {
   useEffect(() => setShowSelectModal(false), [props.currentValue]);
 
   return (
-    <div className={props.classNames ? [classes.Select, ...props.classNames].join(' ') : classes.Select} onClick={() => setShowSelectModal(true)}>
+    <div className={`${classes.Select} ${props.className || ''}`} onClick={() => setShowSelectModal(true)}>
       <div className={classes.SelectTitle}>{props.title}</div>
       <div className={classes.SelectVal}>{props.currentValue}</div>
       {showSelectModal && <div className={classes.SelectModal} ref={selectRef}>
