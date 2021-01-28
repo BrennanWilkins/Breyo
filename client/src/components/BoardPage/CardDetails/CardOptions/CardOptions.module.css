@@ -42,10 +42,10 @@
     width: 100%;
   }
 }
-.RoadmapBtn {
+.RoadmapBtn, .CustomFieldBtn {
   text-align: left;
 }
-.RoadmapBtn svg {
+.RoadmapBtn svg, .CustomFieldBtn {
   min-width: 15px;
   min-height: 15px;
 }

@@ -1,0 +1,30 @@
+.Container {
+  padding: 5px 5px 10px;
+  width: 300px;
+  right: 0;
+  top: 185px;
+}
+@media (max-width: 610px) {
+  .Container {
+    top: auto;
+    left: 0;
+    right: auto;
+    bottom: 40px;
+  }
+}
+.AddBtn {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  padding: 7px 10px;
+  cursor: pointer;
+  color: rgb(100,100,100);
+}
+.AddBtn svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+}
+.AddBtn:hover {
+  background: rgb(241, 241, 241);
+}

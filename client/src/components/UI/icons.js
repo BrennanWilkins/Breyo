@@ -242,3 +242,10 @@ export const addMemberIcon = (
     <path fillRule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
   </svg>
 );
+
+export const customFieldIcon = (
+  <svg width="1em" height="1em" viewBox="0 0 100 50" fill="currentColor">
+    <rect x="6" y="0" rx="2" ry="2" width="45" height="2" style={{ fill: 'currentColor', stroke: 'currentColor', strokeWidth: '7'}} />
+    <rect x="4" y="16" rx="5" ry="5" width="90" height="30" style={{ fill: 'none', stroke: 'currentColor', strokeWidth: '7'}} />
+  </svg>
+);
