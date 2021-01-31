@@ -1,0 +1,47 @@
+.AddFieldContainer {
+  width: calc(100% - 10px);
+  margin: 10px auto;
+}
+.ActiveOption {
+  background: rgb(var(--red), 0.5) !important;
+}
+.TitleInput {
+  margin: 7px 0 7px 3px;
+  width: calc(100% - 3px);
+}
+.TitleInput span {
+  display: inline-block;
+  color: rgb(var(--darkGray));
+  font-size: 13px;
+  margin: 0 0 3px 6px;
+}
+.TitleInput input {
+  width: 100%;
+}
+.SaveBtn {
+  color: white;
+  background: rgb(var(--green));
+  font-size: 15px;
+  margin: 5px 0 0 3px;
+}
+.SaveBtn:hover {
+  background: rgba(var(--green), 0.85);
+}
+.SaveBtn:active {
+  background: rgb(19, 150, 25);
+}
+.SaveBtn:disabled {
+  background: rgb(221,221,221);
+}
+.Field {
+  display: flex;
+  align-items: center;
+}
+.Field svg {
+  margin-right: 5px;
+  font-size: 16px;
+  color: rgb(110,110,110);
+}
+.DateField svg {
+  margin: 0 7px 0 3px;
+}

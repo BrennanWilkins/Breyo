@@ -23,8 +23,7 @@ const Select = props => {
 
 Select.propTypes = {
   title: PropTypes.string.isRequired,
-  currentValue: PropTypes.string.isRequired,
-  classNames: PropTypes.array
+  className: PropTypes.string
 };
 
 export default Select;
