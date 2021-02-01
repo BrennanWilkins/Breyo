@@ -71,6 +71,10 @@ const reducer = (state = initialState, action) => {
     case actionTypes.RESET_SEARCH_QUERY: return resetSearchQuery(state, action);
     case actionTypes.MOVE_CHECKLIST_ITEM: return moveChecklistItem(state, action);
     case actionTypes.TOGGLE_COMMENT_LIKE: return toggleCommentLike(state, action);
+    case actionTypes.ADD_CUSTOM_FIELD: return addCustomField(state, action);
+    case actionTypes.UPDATE_CUSTOM_FIELD_TITLE: return updateCustomFieldTitle(state, action);
+    case actionTypes.UPDATE_CUSTOM_FIELD_VALUE: return updateCustomFieldValue(state, action);
+    case actionTypes.DELETE_CUSTOM_FIELD: return deleteCustomField(state, action);
     default: return state;
   }
 };
@@ -827,6 +831,37 @@ const moveChecklistItem = (state, action) => {
   checklist.items = items;
   checklists[checklistIndex] = checklist;
   card.checklists = checklists;
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const addCustomField = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  const newField = { fieldID: action.fieldID, fieldType: action.fieldType, fieldTitle: action.fieldTitle, value: null };
+  card.customFields = [...card.customFields, newField];
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const updateCustomFieldTitle = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  const fieldIndex = card.customFields.findIndex(({ fieldID }) => fieldID === action.fieldID);
+  const fields = [...card.customFields];
+  fields[fieldIndex] = { ...fields[fieldIndex], fieldTitle: action.fieldTitle };
+  card.customFields = fields;
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const updateCustomFieldValue = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  const fieldIndex = card.customFields.findIndex(({ fieldID }) => fieldID === action.fieldID);
+  const fields = [...card.customFields];
+  fields[fieldIndex] = { ...fields[fieldIndex], value: action.value };
+  card.customFields = fields;
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const deleteCustomField = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  card.customFields = card.customFields.filter(({ fieldID }) => fieldID !== action.fieldID);
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
