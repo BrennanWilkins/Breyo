@@ -5,6 +5,10 @@ import PropTypes from 'prop-types';
 import { plusIcon } from '../../../UI/icons';
 import { BackBtn } from '../../../UI/Buttons/Buttons';
 import AddCustomField from './AddCustomField/AddCustomField';
+import { connect } from 'react-redux';
+import { xIcon } from '../../../UI/icons';
+import { fieldIcons } from '../../../../utils/customFieldUtils';
+import { deleteCustomField } from '../../../../store/actions';
 
 const CustomFieldModal = props => {
   const [showAddField, setShowAddField] = useState(false);
@@ -15,14 +19,33 @@ const CustomFieldModal = props => {
       {showAddField ?
         <AddCustomField close={() => setShowAddField(false)} />
         :
-        <div className={classes.AddBtn} onClick={() => setShowAddField(true)}>{plusIcon}New Field</div>
+        <>
+          {props.customFields.map(field => (
+            <div key={field.fieldID} className={`${classes.Option} ${field.fieldType === 'Date' ? classes.DateField : ''}`}>
+              {fieldIcons[field.fieldType]}
+              {field.fieldTitle}
+              <div className={classes.DeleteBtn} onClick={() => props.deleteField(field.fieldID)}>{xIcon}</div>
+            </div>
+          ))}
+          <div className={`${classes.Option} ${classes.AddBtn}`} onClick={() => setShowAddField(true)}>{plusIcon}New Field</div>
+        </>
       }
     </ModalContainer>
   );
 };
 
 CustomFieldModal.propTypes = {
-  close: PropTypes.func.isRequired
+  close: PropTypes.func.isRequired,
+  customFields: PropTypes.array.isRequired,
+  deleteField: PropTypes.func.isRequired
 };
 
-export default CustomFieldModal;
+const mapStateToProps = state => ({
+  customFields: state.lists.currentCard.customFields
+});
+
+const mapDispatchToProps = dispatch => ({
+  deleteField: fieldID => dispatch(deleteCustomField(fieldID))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CustomFieldModal);

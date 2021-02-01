@@ -12,24 +12,52 @@
     bottom: 40px;
   }
 }
-.AddBtn {
+.Option {
   display: flex;
   align-items: center;
   font-size: 14px;
   padding: 7px 10px;
-  cursor: pointer;
-  color: rgb(100,100,100);
+  color: rgb(80,80,80);
 }
-.AddBtn svg {
+.Option svg {
   width: 16px;
   height: 16px;
   margin-right: 5px;
 }
-.AddBtn:hover {
+.Option:hover {
   background: rgb(241, 241, 241);
 }
 .BackBtn {
   position: absolute;
   top: 5px;
   left: 5px;
+}
+.DateField svg {
+  width: 12px;
+  height: 12px;
+  margin: 0 7px 0 3px;
+}
+.AddBtn {
+  cursor: pointer;
+  margin-top: 10px;
+  color: rgb(100,100,100);
+}
+.DeleteBtn {
+  margin-left: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px;
+  color: rgb(var(--darkGray));
+}
+.DeleteBtn:hover {
+  background: rgb(220,220,220);
+  color: black;
+}
+.DeleteBtn svg {
+  width: 20px;
+  height: 20px;
+  margin: 0;
 }

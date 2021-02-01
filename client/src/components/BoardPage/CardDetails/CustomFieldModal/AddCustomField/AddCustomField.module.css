@@ -33,11 +33,11 @@
 .SaveBtn:disabled {
   background: rgb(221,221,221);
 }
-.Field {
+.FieldSelect span {
   display: flex;
   align-items: center;
 }
-.Field svg {
+.FieldSelect svg {
   margin-right: 5px;
   font-size: 16px;
   color: rgb(110,110,110);
