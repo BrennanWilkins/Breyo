@@ -50,7 +50,11 @@ const socketMap = {
   'delete/card/roadmapLabel': actionTypes.REMOVE_ROADMAP_LABEL,
   'put/card/checklist/moveItem': actionTypes.MOVE_CHECKLIST_ITEM,
   'put/board/changeTeam': actionTypes.CHANGE_BOARD_TEAM,
-  'put/card/comments/like': actionTypes.TOGGLE_COMMENT_LIKE
+  'put/card/comments/like': actionTypes.TOGGLE_COMMENT_LIKE,
+  'post/card/customField': actionTypes.ADD_CUSTOM_FIELD,
+  'put/card/customField/title': actionTypes.UPDATE_CUSTOM_FIELD_TITLE,
+  'put/card/customField/value': actionTypes.UPDATE_CUSTOM_FIELD_VALUE,
+  'delete/card/customField': actionTypes.DELETE_CUSTOM_FIELD
 };
 
 export default socketMap;

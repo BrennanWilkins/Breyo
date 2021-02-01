@@ -41,7 +41,7 @@ export const toggleIsStarred = boardID => async (dispatch, getState) => {
 };
 
 const formatCardData = card => {
-  let { _id: cardID, comments, checklists, ...restCard } = card;
+  let { _id: cardID, comments, checklists, customFields, ...restCard } = card;
 
   comments = comments.map(comment => {
     const { _id: commentID, ...restComment } = comment;
@@ -58,7 +58,9 @@ const formatCardData = card => {
     }))
   }));
 
-  return { cardID, comments, checklists, ...restCard };
+  customFields = customFields.map(({ _id, fieldTitle, value, fieldType }) => ({ fieldID: _id, fieldTitle, fieldType, value }));
+
+  return { cardID, comments, checklists, customFields, ...restCard };
 };
 
 export const updateActiveBoard = data => (dispatch, getState) => {
