@@ -760,4 +760,96 @@ router.put('/comments/like',
   }
 );
 
+// authorization: member
+// add a custom field to card
+router.post('/customField',
+  validate([...areAllMongo(['boardID', 'listID', 'cardID'], 'body'), body('fieldType').notEmpty(), body('fieldTitle').isLength({ min: 1, max: 150 })]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, fieldType, fieldTitle } = req.body;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+      const fieldTypes = ['Text', 'Number', 'Date', 'Checkbox'];
+      if (!fieldTypes.includes(fieldType)) { throw 'Invalid field type'; }
+
+      card.customFields.push({ fieldType, fieldTitle, value: null });
+      const fieldID = card.customFields[card.customFields.length - 1]._id;
+      
+      await list.save();
+
+      res.status(200).json({ fieldID });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: member
+// edit a card custom field title
+router.put('/customField/title',
+  validate([...areAllMongo(['boardID', 'listID', 'cardID', 'fieldID'], 'body'), body('fieldTitle').isLength({ min: 1, max: 150 })]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, fieldID, fieldTitle } = req.body;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+
+      const field = card.customFields.id(fieldID);
+      if (!field) { throw 'Custom field not found'; }
+      field.fieldTitle = fieldTitle;
+
+      await list.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: member
+// edit the value of a card custom field
+router.put('/customField/value',
+  validate([...areAllMongo(['boardID', 'listID', 'cardID', 'fieldID'], 'body'), body('value').notEmpty()]),
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, fieldID, value } = req.body;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+      const field = card.customFields.id(fieldID);
+      if (!field) { throw 'Custom field not found'; }
+      if (field.fieldType === 'Text') {
+        if (value.length > 300) { throw 'Invalid field value length'; }
+        field.value = value;
+      } else if (field.fieldType === 'Checkbox') {
+        field.value = !field.value;
+      } else if (field.fieldType === 'Number') {
+        if (isNaN(value)) { throw 'Field value is not a number'; }
+        field.value = Number(value);
+      } else {
+        if (isNaN(new Date(value).getDate())) { throw 'Field value is not a date'; }
+        field.value = value;
+      }
+      await list.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: member
+// delete a custom field from card
+router.delete('/customField/:fieldID/:cardID/:listID/:boardID',
+  validate(areAllMongo(['boardID', 'listID', 'cardID', 'fieldID'], 'params')),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, fieldID } = req.params;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+
+      const field = card.customFields.id(fieldID);
+      if (!field) { throw 'Field not found'; }
+      field.remove();
+      await list.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;

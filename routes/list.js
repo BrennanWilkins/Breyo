@@ -261,7 +261,7 @@ router.put('/moveAllCards',
   useIsMember,
   async (req, res) => {
     try {
-      const { oldListID, newListID } = req.body;
+      const { oldListID, newListID, boardID } = req.body;
       const [oldList, newList] = await Promise.all([List.findOne({ _id: oldListID, boardID }), List.findOne({ _id: newListID, boardID })]);
       if (!oldList || !newList) { throw 'Old list or new list data not found'; }
 

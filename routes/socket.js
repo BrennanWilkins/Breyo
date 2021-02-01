@@ -50,7 +50,11 @@ const routes = [
   'delete/board',
   'put/card/checklist/moveItem',
   'put/board/changeTeam',
-  'put/card/comments/like'
+  'put/card/comments/like',
+  'post/card/customField',
+  'put/card/customField/title',
+  'put/card/customField/value',
+  'delete/card/customField'
 ];
 
 module.exports = routes;

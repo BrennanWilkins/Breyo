@@ -21,6 +21,12 @@ const CommentSchema = new Schema({
   likes: [String]
 });
 
+const cardCustomFieldSchema = new Schema({
+  fieldType: String,
+  fieldTitle: String,
+  value: Schema.Types.Mixed
+});
+
 const CardSchema = new Schema({
   title: String,
   desc: String,
@@ -29,7 +35,8 @@ const CardSchema = new Schema({
   dueDate: {},
   members: [],
   comments: [CommentSchema],
-  roadmapLabel: String
+  roadmapLabel: String,
+  customFields: [cardCustomFieldSchema]
 });
 
 const ListSchema = new Schema({
