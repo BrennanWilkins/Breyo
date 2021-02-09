@@ -16,15 +16,18 @@
   display: flex;
   align-items: center;
   font-size: 14px;
-  padding: 7px 10px;
+  padding: 7px 5px 7px 10px;
   color: rgb(80,80,80);
+  position: relative;
 }
-.Option svg {
+.AddBtn svg, .FieldIcon svg {
   width: 16px;
   height: 16px;
   margin-right: 5px;
+  min-width: 16px;
+  min-height: 16px;
 }
-.Option:hover {
+.Option:hover, .ActiveOption {
   background: rgb(241, 241, 241);
 }
 .BackBtn {
@@ -32,32 +35,73 @@
   top: 5px;
   left: 5px;
 }
+.Title {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 210px;
+}
+.FieldIcon, .DeleteBtn, .EditBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .DateField svg {
-  width: 12px;
-  height: 12px;
-  margin: 0 7px 0 3px;
+  width: 13px;
+  height: 13px;
+  min-width: 13px;
+  min-height: 13px;
+  margin: 0 7px 0 1.5px;
 }
 .AddBtn {
   cursor: pointer;
   margin-top: 10px;
   color: rgb(100,100,100);
 }
-.DeleteBtn {
-  margin-left: auto;
-  display: flex;
-  justify-content: center;
+.Btns {
+  position: absolute;
+  right: 5px;
+  display: none;
   align-items: center;
+}
+.DeleteBtn, .EditBtn {
   cursor: pointer;
   border-radius: 4px;
   padding: 1px;
   color: rgb(var(--darkGray));
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
 }
-.DeleteBtn:hover {
+.EditBtn {
+  margin-right: 1px;
+}
+.DeleteBtn:hover, .EditBtn:hover {
   background: rgb(220,220,220);
   color: black;
 }
 .DeleteBtn svg {
-  width: 20px;
-  height: 20px;
-  margin: 0;
+  width: 19px;
+  height: 19px;
+}
+.EditBtn svg {
+  width: 14px;
+  height: 14px;
+}
+.SaveBtn svg {
+  width: 16px;
+  height: 16px;
+}
+.Option:hover .Btns, .ActiveOption .Btns {
+  display: flex;
+}
+.TitleInput {
+  width: 200px;
+  padding: 6px;
+  font-size: 14px;
+  border-radius: 4px;
+  background: white;
+  border: 2px solid rgb(var(--red));
+  outline: none;
+  box-sizing: border-box;
 }
