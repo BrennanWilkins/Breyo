@@ -836,7 +836,8 @@ const moveChecklistItem = (state, action) => {
 
 const addCustomField = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const newField = { fieldID: action.fieldID, fieldType: action.fieldType, fieldTitle: action.fieldTitle, value: null };
+  const value = action.fieldType === 'Date' ? null : action.fieldType === 'Checkbox' ? false : '';
+  const newField = { fieldID: action.fieldID, fieldType: action.fieldType, fieldTitle: action.fieldTitle, value };
   card.customFields = [...card.customFields, newField];
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };

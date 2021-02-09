@@ -772,9 +772,10 @@ router.post('/customField',
       const fieldTypes = ['Text', 'Number', 'Date', 'Checkbox'];
       if (!fieldTypes.includes(fieldType)) { throw 'Invalid field type'; }
 
-      card.customFields.push({ fieldType, fieldTitle, value: null });
+      const value = fieldType === 'Checkbox' ? false : fieldType === 'Date' ? null : '';
+      card.customFields.push({ fieldType, fieldTitle, value });
       const fieldID = card.customFields[card.customFields.length - 1]._id;
-      
+
       await list.save();
 
       res.status(200).json({ fieldID });
@@ -819,8 +820,8 @@ router.put('/customField/value',
       } else if (field.fieldType === 'Checkbox') {
         field.value = !field.value;
       } else if (field.fieldType === 'Number') {
-        if (isNaN(value)) { throw 'Field value is not a number'; }
-        field.value = Number(value);
+        if (isNaN(value) || value > 1e20 || value < -1e20) { throw 'Field value is not a number'; }
+        field.value = value % 1 ? String(+parseFloat(value).toFixed(12)) : value;
       } else {
         if (isNaN(new Date(value).getDate())) { throw 'Field value is not a date'; }
         field.value = value;
