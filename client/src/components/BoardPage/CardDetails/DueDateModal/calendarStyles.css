@@ -6,6 +6,9 @@
 .react-datepicker-popper {
   transform: translate3d(5px, 70px, 0px) !important;
 }
+.CustomDateField .react-datepicker-popper {
+  transform: translate3d(0px, -240px, 0px) !important;
+}
 .react-datepicker__day--in-selecting-range {
   background: rgb(var(--red), 0.6) !important;
   color: white !important;

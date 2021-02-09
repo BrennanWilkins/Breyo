@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import { updateCustomFieldValue } from '../../../../store/actions';
 import { customFieldIcon } from '../../../UI/icons';
 import { fieldIcons } from '../../../../utils/customFieldUtils';
-// import TextCustomField from './TextCustomField';
-// import CheckboxCustomField from './CheckboxCustomField';
-// import DateCustomField from './DateCustomField';
+import TextCustomField from './TextCustomField';
+import CheckboxCustomField from './CheckboxCustomField';
+import DateCustomField from './DateCustomField';
 
 const CardCustomFields = props => (
   <div>
@@ -19,12 +19,12 @@ const CardCustomFields = props => (
             {fieldIcons[fieldType]}
             <span className={classes.TitleText}>{fieldTitle}</span>
           </div>
-          {/*{
+          {
             fieldType === 'Text' ? <TextCustomField value={value} updateValue={val => props.updateValue(fieldID, val)} /> :
             fieldType === 'Number' ? <TextCustomField isNumber value={value} updateValue={val => props.updateValue(fieldID, val)} /> :
             fieldType === 'Checkbox' ? <CheckboxCustomField value={value} updateValue={val => props.updateValue(fieldID, val)} /> :
             <DateCustomField value={value} updateValue={val => props.updateValue(fieldID, val)} />
-          }*/}
+          }
         </div>
       ))}
     </div>

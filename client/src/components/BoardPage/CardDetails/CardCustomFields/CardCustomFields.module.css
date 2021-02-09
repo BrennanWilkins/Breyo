@@ -1,0 +1,94 @@
+.Title {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  margin-top: 20px;
+}
+.Title svg {
+  font-size: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  margin: 0 20px 0 5px;
+}
+.Fields {
+  margin: 10px 0 10px 45px;
+  font-size: 14px;
+  width: calc(100% - 40px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.Field {
+  margin: 0 20px 20px 0;
+  min-width: 165px;
+  position: relative;
+}
+.FieldTitle {
+  color: rgb(var(--darkGray));
+  display: flex;
+  align-items: center;
+}
+.FieldTitle svg {
+  margin-right: 4px;
+  min-width: 17px;
+  min-height: 17px;
+}
+.Input {
+  max-width: 100%;
+}
+.Input input, .DateInput {
+  margin-top: 5px;
+  min-width: 140px;
+  padding: 6px 7px;
+  font-size: 14px;
+  border-radius: 4px;
+  background: rgb(235,235,235);
+  border: 2px solid transparent;
+  outline: none;
+  box-sizing: border-box;
+  max-width: calc(100% - 20px);
+}
+.DateInput {
+  width: calc(100% - 30px);
+}
+.Input input:hover, .DateInput:hover {
+  background: rgb(221, 221, 221);
+}
+.Input input:focus, .DateInput:focus {
+  border: 2px solid rgb(var(--red));
+  background: white;
+}
+.TitleText {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.Checkbox {
+  margin-top: 5px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+.DateContainer {
+  position: relative;
+  width: 120px;
+  height: 35px;
+}
+.DateField {
+  position: absolute;
+  width: 330px;
+}
+.DateContainer * {
+  outline: none;
+}
+.DateTitle svg {
+  margin: 0 6px 0 3px;
+  min-width: 14px;
+  min-height: 14px;
+}
