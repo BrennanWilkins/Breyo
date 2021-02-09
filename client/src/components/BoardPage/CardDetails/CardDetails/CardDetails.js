@@ -14,6 +14,7 @@ import CardChecklist from '../CardChecklist/CardChecklist';
 import { archiveCard } from '../../../../store/actions';
 import { alertIcon } from '../../../UI/icons';
 import CardMembers from '../CardMembers/CardMembers';
+import CardCustomFields from '../CardCustomFields/CardCustomFields';
 
 const CardDetails = props => {
   const modalRef = useRef();
@@ -48,6 +49,7 @@ const CardDetails = props => {
                 <CardDueDate currentDueDate={props.currentCard.dueDate} />}
             </div>
             <CardDesc currentDesc={props.currentCard.desc} />
+            {props.currentCard.customFields.length > 0 && <CardCustomFields customFields={props.currentCard.customFields} />}
             {props.currentCard.checklists.map(checklist => (
               <CardChecklist key={checklist.checklistID} {...checklist} />
             ))}
