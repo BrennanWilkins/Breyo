@@ -807,7 +807,7 @@ router.put('/customField/title',
 // authorization: member
 // edit the value of a card custom field
 router.put('/customField/value',
-  validate([...areAllMongo(['boardID', 'listID', 'cardID', 'fieldID'], 'body'), body('value').notEmpty()]),
+  validate([...areAllMongo(['boardID', 'listID', 'cardID', 'fieldID'], 'body'), body('value').exists()]),
   async (req, res) => {
     try {
       const { boardID, listID, cardID, fieldID, value } = req.body;
@@ -815,6 +815,7 @@ router.put('/customField/value',
       const field = card.customFields.id(fieldID);
       if (!field) { throw 'Custom field not found'; }
       if (field.fieldType === 'Text') {
+        if (typeof value !== 'string') { throw 'Invalid value type'; }
         if (value.length > 300) { throw 'Invalid field value length'; }
         field.value = value;
       } else if (field.fieldType === 'Checkbox') {
@@ -823,8 +824,8 @@ router.put('/customField/value',
         if (isNaN(value) || value > 1e20 || value < -1e20) { throw 'Field value is not a number'; }
         field.value = value % 1 ? String(+parseFloat(value).toFixed(12)) : value;
       } else {
-        if (isNaN(new Date(value).getDate())) { throw 'Field value is not a date'; }
-        field.value = value;
+        if (value && isNaN(new Date(value).getDate())) { throw 'Field value is not a date'; }
+        field.value = value !== '' ? value : null;
       }
       await list.save();
 
