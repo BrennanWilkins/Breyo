@@ -78,6 +78,8 @@ const HelpPage = () => {
           <p>You can choose a due date or delete a due date from the card details modal. To mark a due date complete or incomplete, click on the checkbox next to the due date.</p>
           <h3>Card description</h3>
           <p>You can add a description to the card with links, code segments, and other formatted text. To see how to write a formatted description, click on 'Formatting help'.</p>
+          <h3>Custom fields</h3>
+          <p>Custom fields allow you to add a custom text, number, checkbox, or date field to a card.</p>
           <h3>Comments</h3>
           <p>You can add, edit, or delete a comment at the bottom of the card details modal.</p>
         </div>

@@ -2,18 +2,16 @@ import React, { useState } from 'react';
 import classes from './CardCustomFields.module.css';
 import PropTypes from 'prop-types';
 import Input from 'react-input-autosize';
+import { useDidUpdate } from '../../../../utils/customHooks';
 
 const TextCustomField = props => {
   const [inputVal, setInputVal] = useState(props.value);
-  const [showInput, setShowInput] = useState(false);
 
-  const showHandler = () => {
-    setShowInput(true);
-    setInputVal(props.value);
-  };
+  useDidUpdate(() => {
+    if (props.value !== inputVal) { setInputVal(props.value); }
+  }, [props.value]);
 
   const blurHandler = () => {
-    setShowInput(false);
     if (props.value === inputVal) { return; }
     if (!props.isNumber) {
       if (inputVal.length > 300) { return setInputVal(props.value); }
