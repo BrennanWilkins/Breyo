@@ -117,3 +117,25 @@
 .MoveOption:hover {
   background: rgb(238,238,238);
 }
+@media (max-height: 415px) {
+  .Container {
+    left: auto !important;
+    right: 10px !important;
+    top: 10px !important;
+    overflow-y: auto;
+    max-height: 100%;
+  }
+  .Container::-webkit-scrollbar-track {
+    border-radius: 15px;
+    background: rgb(225, 225, 225);
+  }
+  .Container::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 15px;
+    background: rgb(225, 225, 225);
+  }
+  .Container::-webkit-scrollbar-thumb {
+    border-radius: 15px;
+    background: rgb(197, 197, 197);
+  }
+}

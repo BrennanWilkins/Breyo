@@ -3,7 +3,7 @@ import classes from './ListActions.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { BackBtn, CloseBtn } from '../../../UI/Buttons/Buttons';
-import { copyList, archiveList, archiveAllCards, addNotif, openRoadmapList, toggleVoting } from '../../../../store/actions';
+import { copyList, archiveList, archiveAllCards, openRoadmapList, toggleVoting } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import MoveCards from './MoveCards';
 import { roadmapIcon } from '../../../UI/icons';
@@ -29,13 +29,8 @@ const ListActions = props => {
   };
 
   const archiveAllHandler = () => {
-    props.archiveAllCards(props.listID, props.boardID);
+    props.archiveAllCards(props.listID);
     props.close();
-  };
-
-  const archiveHandler = () => {
-    if (!props.userIsAdmin) { return props.addNotif('You must be an admin to archive lists.'); }
-    props.archiveList(props.listID, props.boardID);
   };
 
   const defaultContent = (
@@ -43,7 +38,7 @@ const ListActions = props => {
       <div className={classes.Option} onClick={() => props.openRoadmapList(props.listID)}>{roadmapIcon} Roadmap</div>
       <div className={classes.Option} onClick={() => props.toggleVoting(props.listID)}>{props.isVoting ? 'Close voting on this list' : 'Start a vote on this list'}</div>
       <div className={classes.Option} onClick={() => setShowCopyList(true)}>Copy list</div>
-      <div className={classes.Option} onClick={archiveHandler}>Archive list</div>
+      <div className={classes.Option} onClick={() => props.archiveList(props.listID)}>Archive list</div>
       <div className={classes.Option} onClick={archiveAllHandler}>Archive all cards in this list</div>
       <div className={classes.Option} onClick={() => setShowMoveCards(true)}>Move all cards in this list</div>
     </>
@@ -57,8 +52,8 @@ const ListActions = props => {
         <CloseBtn className={classes.CloseBtn} close={props.close} />
       </div>
       {showCopyList ?
-        <CopyList title={props.title} close={props.close} copyList={title => props.copyList(title, props.listID, props.boardID)} /> :
-        showMoveCards ? <MoveCards listID={props.listID} boardID={props.boardID} close={props.close} />
+        <CopyList title={props.title} close={props.close} copyList={title => props.copyList(title, props.listID)} /> :
+        showMoveCards ? <MoveCards listID={props.listID} close={props.close} />
         : defaultContent}
     </div>
   );
@@ -68,12 +63,9 @@ ListActions.propTypes = {
   close: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   listID: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
   copyList: PropTypes.func.isRequired,
   archiveList: PropTypes.func.isRequired,
   archiveAllCards: PropTypes.func.isRequired,
-  userIsAdmin: PropTypes.bool.isRequired,
-  addNotif: PropTypes.func.isRequired,
   top: PropTypes.number.isRequired,
   left: PropTypes.number.isRequired,
   openRoadmapList: PropTypes.func.isRequired,
@@ -81,17 +73,12 @@ ListActions.propTypes = {
   toggleVoting: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => ({
-  userIsAdmin: state.board.userIsAdmin
-});
-
 const mapDispatchToProps = dispatch => ({
-  copyList: (title, listID, boardID) => dispatch(copyList(title, listID, boardID)),
-  archiveList: (listID, boardID) => dispatch(archiveList(listID, boardID)),
-  archiveAllCards: (listID, boardID) => dispatch(archiveAllCards(listID, boardID)),
-  addNotif: msg => dispatch(addNotif(msg)),
+  copyList: (title, listID) => dispatch(copyList(title, listID)),
+  archiveList: listID => dispatch(archiveList(listID)),
+  archiveAllCards: listID => dispatch(archiveAllCards(listID)),
   openRoadmapList: listID => dispatch(openRoadmapList(listID)),
   toggleVoting: listID => dispatch(toggleVoting(listID))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ListActions);
+export default connect(null, mapDispatchToProps)(ListActions);
