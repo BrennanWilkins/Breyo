@@ -18,7 +18,7 @@ const AddCard = props => {
   const submitHandler = e => {
     e.preventDefault();
     if (!cardTitle || cardTitle.length > 200) { return; }
-    props.addCard(cardTitle, props.boardID, props.listID);
+    props.addCard(cardTitle, props.listID);
     setCardTitle('');
   };
 
@@ -36,14 +36,13 @@ const AddCard = props => {
 };
 
 AddCard.propTypes = {
-  boardID: PropTypes.string.isRequired,
   close: PropTypes.func.isRequired,
   listID: PropTypes.string.isRequired,
   addCard: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
-  addCard: (title, boardID, listID) => dispatch(addCard(title, boardID, listID))
+  addCard: (title, listID) => dispatch(addCard(title, listID))
 });
 
 export default connect(null, mapDispatchToProps)(AddCard);

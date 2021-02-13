@@ -25,7 +25,7 @@ const ListContainer = props => {
           <div className={classes.Container} ref={provided.innerRef} style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
             {lists.map(list => <List key={list.listID} {...list} boardID={props.boardID} />)}
             {provided.placeholder}
-            <AddList listCount={props.lists.length} boardID={props.boardID} />
+            <AddList listCount={props.lists.length} />
           </div>
         )}
       </Droppable>

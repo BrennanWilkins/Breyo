@@ -22,7 +22,7 @@ const AddList = props => {
   const submitHandler = e => {
     e.preventDefault();
     if (!newListTitle || newListTitle.length > 200) { return resetState(); }
-    props.addList(newListTitle, props.boardID);
+    props.addList(newListTitle);
     resetState();
   };
 
@@ -45,12 +45,11 @@ const AddList = props => {
 
 AddList.propTypes = {
   listCount: PropTypes.number.isRequired,
-  boardID: PropTypes.string.isRequired,
   addList: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
-  addList: (title, boardID) => dispatch(addList(title, boardID))
+  addList: title => dispatch(addList(title))
 });
 
 export default connect(null, mapDispatchToProps)(AddList);

@@ -7,7 +7,7 @@ import { moveAllCards } from '../../../../store/actions';
 const MoveCards = props => {
   const moveHandler = listID => {
     if (listID === props.listID) { return; }
-    props.moveAllCards(props.listID, listID, props.boardID);
+    props.moveAllCards(props.listID, listID);
     props.close();
   };
 
@@ -27,7 +27,6 @@ const MoveCards = props => {
 MoveCards.propTypes = {
   lists: PropTypes.array.isRequired,
   listID: PropTypes.string.isRequired,
-  boardID: PropTypes.string.isRequired,
   moveAllCards: PropTypes.func.isRequired,
   close: PropTypes.func.isRequired
 };
@@ -37,7 +36,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  moveAllCards: (oldListID, newListID, boardID) => dispatch(moveAllCards(oldListID, newListID, boardID))
+  moveAllCards: (oldListID, newListID) => dispatch(moveAllCards(oldListID, newListID))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MoveCards);

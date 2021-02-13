@@ -47,7 +47,7 @@ const List = props => {
                 {props.cards.map((card, i) => (
                   <Card key={card.cardID} index={i} {...card} listID={props.listID} showDetails={setCardDetailsHandler} setShownMember={shownMemberHandler} />
                 ))}
-                {showAddCard && <AddCard close={() => setShowAddCard(false)} boardID={props.boardID} listID={props.listID} />}
+                {showAddCard && <AddCard close={() => setShowAddCard(false)} listID={props.listID} />}
                 {provided.placeholder}
               </div>
             )}
@@ -59,7 +59,7 @@ const List = props => {
       )}
     </Draggable>
     {showListActions && <ListActions {...actionsPos} close={() => setShowListActions(false)}
-    title={props.title} listID={props.listID} boardID={props.boardID} isVoting={props.isVoting} />}
+    title={props.title} listID={props.listID} isVoting={props.isVoting} />}
     {shownMember && <CardMemberModal {...shownMember} listID={props.listID} inCard close={() => setShownMember(null)} />}
     </>
   );

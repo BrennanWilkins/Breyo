@@ -10,8 +10,9 @@ export const getCardState = getState => {
   return { boardID: state.board.boardID, listID: state.lists.shownListID, cardID: state.lists.shownCardID, state };
 };
 
-export const addCard = (title, boardID, listID) => async dispatch => {
+export const addCard = (title, listID) => async (dispatch, getState) => {
   try {
+    const boardID = getState().board.boardID;
     const res = await axios.post('/card', { title, boardID, listID });
     const payload = { title, listID, cardID: res.data.cardID };
     dispatch({ type: actionTypes.ADD_CARD, ...payload });

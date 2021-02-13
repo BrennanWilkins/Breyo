@@ -7,9 +7,9 @@ import { addRecentActivity, addRecentActivities } from './activity';
 export const updateListTitle = (title, listID) => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
-    const payload = { title, listID };
+    const payload = { title, listID, boardID };
     dispatch({ type: actionTypes.UPDATE_LIST_TITLE, ...payload });
-    const res = await axios.put('/list/title', { ...payload, boardID });
+    const res = await axios.put('/list/title', payload);
     sendUpdate('put/list/title', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
@@ -17,8 +17,9 @@ export const updateListTitle = (title, listID) => async (dispatch, getState) => 
   }
 };
 
-export const addList = (title, boardID) => async dispatch => {
+export const addList = title => async (dispatch, getState) => {
   try {
+    const boardID = getState().board.boardID;
     const res = await axios.post('/list', { title, boardID });
     const payload = { title, listID: res.data.listID };
     dispatch({ type: actionTypes.ADD_LIST, ...payload });
@@ -29,8 +30,9 @@ export const addList = (title, boardID) => async dispatch => {
   }
 };
 
-export const copyList = (title, listID, boardID) => async dispatch => {
+export const copyList = (title, listID) => async (dispatch, getState) => {
   try {
+    const boardID = getState().board.boardID;
     const res = await axios.post('/list/copy', { title, listID, boardID });
     const { newList } = res.data;
     dispatch({ type: actionTypes.COPY_LIST, newList });
@@ -41,8 +43,12 @@ export const copyList = (title, listID, boardID) => async dispatch => {
   }
 };
 
-export const archiveList = (listID, boardID) => async dispatch => {
+export const archiveList = listID => async (dispatch, getState) => {
   try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    const userIsAdmin = state.board.userIsAdmin;
+    if (!userIsAdmin) { return dispatch(addNotif('You must be an admin to archive lists.')); }
     dispatch({ type: actionTypes.ARCHIVE_LIST, listID });
     const res = await axios.post('/list/archive', { listID, boardID }).catch(err => {
       // if server error while archiving list then undo archive
@@ -84,8 +90,9 @@ export const deleteList = (listID, boardID) => async dispatch => {
   }
 };
 
-export const archiveAllCards = (listID, boardID) => async dispatch => {
+export const archiveAllCards = listID => async (dispatch, getState) => {
   try {
+    const boardID = getState().board.boardID;
     const res = await axios.put('/list/archive/allCards', { listID, boardID });
     dispatch({ type: actionTypes.ARCHIVE_ALL_CARDS, listID });
     sendUpdate('put/list/archive/allCards', { listID });
@@ -95,10 +102,11 @@ export const archiveAllCards = (listID, boardID) => async dispatch => {
   }
 };
 
-export const moveAllCards = (oldListID, newListID, boardID) => async dispatch => {
+export const moveAllCards = (oldListID, newListID) => async (dispatch, getState) => {
   try {
-    const payload = { oldListID, newListID };
-    await axios.put('/list/moveAllCards', { ...payload, boardID });
+    const boardID = getState().board.boardID;
+    const payload = { oldListID, newListID, boardID };
+    await axios.put('/list/moveAllCards', payload);
     dispatch({ type: actionTypes.MOVE_ALL_CARDS, ...payload });
     sendUpdate('put/list/moveAllCards', payload);
   } catch (err) {
