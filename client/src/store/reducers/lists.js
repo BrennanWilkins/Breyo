@@ -129,7 +129,7 @@ const updateListTitle = (state, action) => {
 };
 
 const addList = (state, action) => {
-  const list = { listID: action.listID, title: action.title, cards: [], indexInBoard: state.lists.length };
+  const list = { listID: action.listID, title: action.title, cards: [], indexInBoard: state.lists.length, isVoting: false };
   const lists = [...state.lists, list];
   const filteredLists = state.cardsAreFiltered ? [...state.filteredLists, list] : state.filteredLists;
   return { ...state, lists, filteredLists };
@@ -138,7 +138,8 @@ const addList = (state, action) => {
 const addCard = (state, action) => {
   const index = state.lists.findIndex(list => list.listID === action.listID);
   const cards = [...state.lists[index].cards];
-  const card = { title: action.title, desc: '', checklists: [], dueDate: null, labels: [], cardID: action.cardID, members: [], comments: [], roadmapLabel: null };
+  const card = { title: action.title, desc: '', checklists: [], dueDate: null, labels: [],
+  cardID: action.cardID, members: [], comments: [], roadmapLabel: null, customFields: [], votes: [] };
   cards.push(card);
   const lists = [...state.lists];
   lists[index].cards = cards;
@@ -380,7 +381,14 @@ const copyCard = (state, action) => {
       isComplete: item.isComplete
     }))
   }));
-  const newCard = { title: action.title, desc: '', checklists, dueDate: null, cardID: action.newCardID, members: [], comments: [] };
+  const customFields = action.customFields.map(field => ({
+    fieldTitle: field.fieldTitle,
+    fieldType: field.fieldType,
+    value: field.value,
+    fieldID: field._id
+  }));
+  const newCard = { title: action.title, desc: '', checklists, dueDate: null, cardID: action.newCardID,
+    members: [], comments: [], customFields, votes: [] };
   newCard.labels = action.keepLabels ? [...action.currentCard.labels] : [];
   newCard.roadmapLabel = action.keepLabels ? action.currentCard.roadmapLabel : null;
   cards.splice(action.destIndex, 0, newCard);
@@ -488,6 +496,7 @@ const copyList = (state, action) => {
     listID: action.newList._id,
     title: action.newList.title,
     isArchived: false,
+    isVoting: false,
     cards: action.newList.cards.map(card => ({
       cardID: card._id,
       checklists: card.checklists.map(checklist => ({
@@ -505,7 +514,14 @@ const copyList = (state, action) => {
       title: card.title,
       desc: card.desc,
       comments: [],
-      members: card.members
+      members: card.members,
+      customFields: card.customFields.map(field => ({
+        fieldType: field.fieldType,
+        fieldTitle: field.fieldTitle,
+        value: field.value,
+        fieldID: field._id
+      })),
+      votes: []
     }))
   };
   lists.push(newList);

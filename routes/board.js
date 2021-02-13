@@ -104,9 +104,9 @@ router.post('/',
       const newBoard = { boardID, title, isStarred: false, isAdmin: true, color, teamID: null };
 
       // add default lists to board (to do, doing, done)
-      const list1 = { boardID, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false };
-      const list2 = { boardID, title: 'Doing', cards: [], archivedCards: [], indexInBoard: 1, isArchived: false };
-      const list3 = { boardID, title: 'Done', cards: [], archivedCards: [], indexInBoard: 2, isArchived: false };
+      const list1 = { boardID, title: 'To Do', cards: [], archivedCards: [], indexInBoard: 0, isArchived: false, isVoting: false };
+      const list2 = { boardID, title: 'Doing', cards: [], archivedCards: [], indexInBoard: 1, isArchived: false, isVoting: false };
+      const list3 = { boardID, title: 'Done', cards: [], archivedCards: [], indexInBoard: 2, isArchived: false, isVoting: false };
 
       const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID };
 

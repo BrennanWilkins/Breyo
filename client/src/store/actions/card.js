@@ -254,7 +254,8 @@ export const copyCard = (title, keepChecklists, keepLabels, destListID, destInde
     const cardID = state.lists.shownCardID;
     const currentCard = state.lists.currentCard;
     const res = await axios.post('/card/copy', { title, keepChecklists, keepLabels, cardID, sourceListID, destListID, destIndex, boardID });
-    const payload = { title, checklists: res.data.checklists, currentCard, newCardID: res.data.cardID, keepLabels, sourceListID, destListID, destIndex };
+    const payload = { title, checklists: res.data.checklists, customFields: res.data.customFields, currentCard,
+      newCardID: res.data.cardID, keepLabels, sourceListID, destListID, destIndex };
     dispatch({ type: actionTypes.COPY_CARD, ...payload });
     sendUpdate('post/card/copy', payload);
     addRecentActivity(res.data.newActivity);

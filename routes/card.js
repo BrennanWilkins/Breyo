@@ -35,7 +35,7 @@ router.post('/',
       const { boardID, listID, title } = req.body;
       const list = await getListAndValidate(boardID, listID);
 
-      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [], comments: [], roadmapLabel: null };
+      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [], comments: [], roadmapLabel: null, customFields: [], votes: [] };
       list.cards.push(card);
       const cardID = list.cards[list.cards.length - 1]._id;
 
@@ -492,7 +492,13 @@ router.post('/copy',
         }
       }
 
-      const newCard = { title, labels, roadmapLabel, checklists, desc: '', dueDate: null, members: [], comments: [] };
+      const customFields = sourceCard.customFields.map(field => ({
+        fieldType: field.fieldType,
+        fieldTitle: field.fieldTitle,
+        value: field.value
+      }));
+
+      const newCard = { title, labels, roadmapLabel, checklists, desc: '', dueDate: null, members: [], comments: [], customFields, votes: [] };
       // add copied card to destination list
       destList.cards.splice(destIndex, 0, newCard);
       const updatedCard = destList.cards[destIndex];
@@ -503,7 +509,7 @@ router.post('/copy',
       const results = await Promise.all([addActivity(actionData, req), destList.save()]);
       const newActivity = results[0];
 
-      res.status(200).json({ cardID: updatedCard._id, checklists: updatedCard.checklists, newActivity });
+      res.status(200).json({ cardID: updatedCard._id, checklists: updatedCard.checklists, customFields: updatedCard.customFields, newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );
