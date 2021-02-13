@@ -854,4 +854,24 @@ router.delete('/customField/:fieldID/:cardID/:listID/:boardID',
   }
 );
 
+// authorization: member
+// cast a vote on a card in a list with voting
+router.post('/vote',
+  validate(areAllMongo(['boardID', 'listID', 'cardID'], 'body')),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID } = req.body;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+      if (!list.isVoting) { throw 'List voting is not active'; }
+
+      if (card.votes.includes(req.email)) { card.votes.splice(card.votes.indexOf(req.email)); }
+      else { card.votes.push(req.email); }
+      await list.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;

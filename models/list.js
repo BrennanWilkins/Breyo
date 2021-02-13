@@ -36,7 +36,8 @@ const CardSchema = new Schema({
   members: [],
   comments: [CommentSchema],
   roadmapLabel: String,
-  customFields: [cardCustomFieldSchema]
+  customFields: [cardCustomFieldSchema],
+  votes: []
 });
 
 const ListSchema = new Schema({
@@ -45,7 +46,8 @@ const ListSchema = new Schema({
   cards: [CardSchema],
   archivedCards: [CardSchema],
   indexInBoard: Number,
-  isArchived: Boolean
+  isArchived: Boolean,
+  isVoting: Boolean
 });
 
 ListSchema.index({ boardID: 1 });

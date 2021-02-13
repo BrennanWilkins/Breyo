@@ -281,4 +281,26 @@ router.put('/moveAllCards',
   }
 );
 
+// authorization: admin
+// start or close a vote on the list
+router.post('/voting',
+  validate([body('boardID').isMongoId(), body('listID').isMongoId()]),
+  useIsAdmin,
+  async (req, res) => {
+    try {
+      const { boardID, listID } = req.body;
+      const list = await List.findOne({ boardID, _id: listID });
+      if (!list) { throw 'List not found'; }
+
+      for (let card of list.cards) { card.votes = []; }
+      list.isVoting = !list.isVoting;
+
+      const actionData = { msg: null, boardMsg: `${req.fullName} ${list.isVoting ? 'started a vote' : 'closed voting'} on ${list.title}`, cardID: null, listID, boardID };
+      const results = await Promise.all([addActivity(actionData, req), list.save()]);
+
+      res.status(200).json({ newActivity: results[0] });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;
