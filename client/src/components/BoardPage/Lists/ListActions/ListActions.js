@@ -3,7 +3,7 @@ import classes from './ListActions.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { BackBtn, CloseBtn } from '../../../UI/Buttons/Buttons';
-import { copyList, archiveList, archiveAllCards, addNotif, openRoadmapList } from '../../../../store/actions';
+import { copyList, archiveList, archiveAllCards, addNotif, openRoadmapList, toggleVoting } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import MoveCards from './MoveCards';
 import { roadmapIcon } from '../../../UI/icons';
@@ -41,6 +41,7 @@ const ListActions = props => {
   const defaultContent = (
     <>
       <div className={classes.Option} onClick={() => props.openRoadmapList(props.listID)}>{roadmapIcon} Roadmap</div>
+      <div className={classes.Option} onClick={() => props.toggleVoting(props.listID)}>{props.isVoting ? 'Close voting on this list' : 'Start a vote on this list'}</div>
       <div className={classes.Option} onClick={() => setShowCopyList(true)}>Copy list</div>
       <div className={classes.Option} onClick={archiveHandler}>Archive list</div>
       <div className={classes.Option} onClick={archiveAllHandler}>Archive all cards in this list</div>
@@ -75,7 +76,9 @@ ListActions.propTypes = {
   addNotif: PropTypes.func.isRequired,
   top: PropTypes.number.isRequired,
   left: PropTypes.number.isRequired,
-  openRoadmapList: PropTypes.func.isRequired
+  openRoadmapList: PropTypes.func.isRequired,
+  isVoting: PropTypes.bool.isRequired,
+  toggleVoting: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -87,7 +90,8 @@ const mapDispatchToProps = dispatch => ({
   archiveList: (listID, boardID) => dispatch(archiveList(listID, boardID)),
   archiveAllCards: (listID, boardID) => dispatch(archiveAllCards(listID, boardID)),
   addNotif: msg => dispatch(addNotif(msg)),
-  openRoadmapList: listID => dispatch(openRoadmapList(listID))
+  openRoadmapList: listID => dispatch(openRoadmapList(listID)),
+  toggleVoting: listID => dispatch(toggleVoting(listID))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ListActions);

@@ -59,7 +59,7 @@ const List = props => {
       )}
     </Draggable>
     {showListActions && <ListActions {...actionsPos} close={() => setShowListActions(false)}
-    title={props.title} listID={props.listID} boardID={props.boardID} />}
+    title={props.title} listID={props.listID} boardID={props.boardID} isVoting={props.isVoting} />}
     {shownMember && <CardMemberModal {...shownMember} listID={props.listID} inCard close={() => setShownMember(null)} />}
     </>
   );
@@ -70,7 +70,8 @@ List.propTypes = {
   listID: PropTypes.string.isRequired,
   cards: PropTypes.array.isRequired,
   indexInBoard: PropTypes.number.isRequired,
-  boardID: PropTypes.string.isRequired
+  boardID: PropTypes.string.isRequired,
+  isVoting: PropTypes.bool.isRequired
 };
 
 export default React.memo(List);
