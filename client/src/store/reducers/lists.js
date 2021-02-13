@@ -75,6 +75,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.UPDATE_CUSTOM_FIELD_TITLE: return updateCustomFieldTitle(state, action);
     case actionTypes.UPDATE_CUSTOM_FIELD_VALUE: return updateCustomFieldValue(state, action);
     case actionTypes.DELETE_CUSTOM_FIELD: return deleteCustomField(state, action);
+    case actionTypes.TOGGLE_LIST_VOTING: return toggleListVoting(state, action);
     default: return state;
   }
 };
@@ -864,6 +865,21 @@ const deleteCustomField = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
   card.customFields = card.customFields.filter(({ fieldID }) => fieldID !== action.fieldID);
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const toggleListVoting = (state, action) => {
+  const lists = [...state.lists];
+  const listIndex = lists.findIndex(list => list.listID === action.listID);
+  const list = { ...lists[listIndex] };
+  list.isVoting = !list.isVoting;
+  lists[listIndex] = list;
+
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
+  }
+
+  return { ...state, lists, filteredLists };
 };
 
 export default reducer;

@@ -105,3 +105,17 @@ export const moveAllCards = (oldListID, newListID, boardID) => async dispatch =>
     dispatch(serverErr());
   }
 };
+
+export const toggleVoting = listID => async (dispatch, getState) => {
+  try {
+    const state = getState();
+    if (!state.board.userIsAdmin) { return dispatch(addNotif('You must be an admin to start or close voting on a list.')); }
+    const payload = { listID, boardID: state.board.boardID };
+    const res = await axios.post('/list/voting', payload);
+    dispatch({ type: actionTypes.TOGGLE_LIST_VOTING, ...payload });
+    addRecentActivity(res.data.newActivity);
+    sendUpdate('post/list/voting', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
