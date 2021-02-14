@@ -1,0 +1,89 @@
+.Container {
+  margin: 10px;
+  position: relative;
+}
+.Title {
+  color: rgb(var(--darkGray));
+  font-size: 14px;
+  font-weight: 500;
+}
+.Votes {
+  display: inline-block;
+  background: rgb(235,235,235);
+  margin-top: 5px;
+  font-size: 15px;
+  padding: 5px 7px;
+  border-radius: 4px;
+  color: rgb(83, 83, 83);
+  cursor: pointer;
+}
+.Votes:hover {
+  text-decoration: underline;
+  background: rgb(225,225,225);
+}
+.Modal {
+  top: 52px;
+  left: 0;
+  padding: 5px 5px 10px;
+  width: 300px;
+}
+.VoteBtn, .RemoveVoteBtn {
+  width: calc(100% - 15px);
+  margin: 10px auto 0;
+  display: block;
+  font-size: 15px;
+  background: rgb(var(--green));
+  color: white;
+}
+.VoteBtn:hover {
+  background: rgba(var(--green), 0.85);
+}
+.VoteBtn:active {
+  background: rgb(19, 150, 25);
+}
+.RemoveVoteBtn {
+  background: rgb(219, 55, 29);
+}
+.RemoveVoteBtn:hover, .RemoveVoteBtn:active {
+  background: rgb(213, 5, 5);
+}
+.Voters {
+  width: calc(100% - 10px);
+  margin: auto;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.Voters::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Voters::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Voters::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}
+.AccountBtn {
+  width: 29px;
+  height: 29px;
+  margin: 0 4px 5px 0;
+}
+.AccountBtn {
+  background: rgb(230,230,230);
+}
+.AccountBtn:hover {
+  background: rgb(220,220,220);
+}
+.Voter {
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+}
+.VoterModal {
+  top: 28px;
+  left: -12px;
+  transform: scale(0.9);
+}

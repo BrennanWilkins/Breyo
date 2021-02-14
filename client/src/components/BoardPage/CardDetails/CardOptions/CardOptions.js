@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import classes from './CardOptions.module.css';
 import PropTypes from 'prop-types';
 import { checklistIcon, labelIcon, clockIcon, copyIcon, archiveIcon, personIcon,
-  roadmapIcon, arrowIcon, customFieldIcon } from '../../../UI/icons';
+  roadmapIcon, arrowIcon, customFieldIcon, voteIcon } from '../../../UI/icons';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import LabelModal from '../LabelModal/LabelModal';
 import DueDateModal from '../DueDateModal/DueDateModal';
@@ -38,6 +38,7 @@ const CardOptions = props => {
       </span>
       <div className={classes.Title2}>ACTIONS</div>
       <span className={classes.BtnContainer2}>
+        {props.listIsVoting && <ActionBtn className={classes.Btn} clicked={props.showVoting}>{voteIcon} Vote</ActionBtn>}
         <ActionBtn className={classes.Btn} clicked={() => setShownModal('move')}>{arrowIcon} Move</ActionBtn>
         <ActionBtn className={classes.Btn} clicked={() => setShownModal('copy')}>{copyIcon} Copy</ActionBtn>
         <ActionBtn className={classes.Btn} clicked={props.archiveCard}>{archiveIcon} Archive</ActionBtn>
@@ -50,7 +51,9 @@ const CardOptions = props => {
 };
 
 CardOptions.propTypes = {
-  archiveCard: PropTypes.func.isRequired
+  archiveCard: PropTypes.func.isRequired,
+  listIsVoting: PropTypes.bool.isRequired,
+  showVoting: PropTypes.func.isRequired
 };
 
 export default CardOptions;

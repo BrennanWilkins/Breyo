@@ -10,7 +10,7 @@ const Commenter = props => {
   useModalToggle(true, modalRef, props.close);
 
   return (
-    <div className={classes.Container} ref={modalRef}>
+    <div className={`${classes.Container} ${props.className || ''}`} ref={modalRef}>
       <CloseBtn className={classes.CloseBtn} close={props.close} />
       <AccountInfo fullName={props.fullName} email={props.email} noBorder avatar={props.avatar} />
     </div>
@@ -21,7 +21,8 @@ Commenter.propTypes = {
   close: PropTypes.func.isRequired,
   fullName: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
-  avatar: PropTypes.string
+  avatar: PropTypes.string,
+  className: PropTypes.string
 };
 
 export default Commenter;

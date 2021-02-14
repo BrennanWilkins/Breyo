@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import classes from './CardDetails.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
@@ -15,10 +15,12 @@ import { archiveCard } from '../../../../store/actions';
 import { alertIcon } from '../../../UI/icons';
 import CardMembers from '../CardMembers/CardMembers';
 import CardCustomFields from '../CardCustomFields/CardCustomFields';
+import CardVotes from '../CardVotes/CardVotes';
 
 const CardDetails = props => {
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
+  const [showVotingModal, setShowVotingModal] = useState(false);
 
   const archiveCardHandler = () => {
     props.archiveCard();
@@ -43,6 +45,8 @@ const CardDetails = props => {
         <div className={classes.DetailContent}>
           <div className={classes.LeftDetails}>
             <div className={classes.TopDetailsContainer}>
+              {props.currentCard.listIsVoting && <CardVotes votes={props.currentCard.votes} showVotingModal={showVotingModal}
+                close={() => setShowVotingModal(false)} open={() => setShowVotingModal(true)} />}
               {props.currentCard.members.length > 0 && <CardMembers members={props.currentCard.members} />}
               {props.currentCard.labels.length > 0 && <CardLabels labels={props.currentCard.labels} />}
               {!!props.currentCard.dueDate &&
@@ -55,7 +59,7 @@ const CardDetails = props => {
             ))}
             <CardActivity />
           </div>
-          <CardOptions archiveCard={archiveCardHandler} />
+          <CardOptions archiveCard={archiveCardHandler} listIsVoting={props.currentCard.listIsVoting} showVoting={() => setShowVotingModal(true)} />
         </div>
       </div>
     </div>
