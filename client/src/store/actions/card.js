@@ -38,10 +38,10 @@ const findCard = (cardID, listID, dispatch, getState, callback) => {
     currentCard = state.lists.allArchivedCards.find(card => card.cardID === cardID && card.listID === listID);
     // card not found anywhere
     if (!currentCard) { return callback(); }
-    currentCard = { ...currentCard, isArchived: true };
+    currentCard = { ...currentCard, isArchived: true, listIsVoting: list.isVoting };
   } else {
+    currentCard = { ...currentCard, listIsVoting: list.isVoting };
     // if card found in archivedLists then set list is archived
-    currentCard = { ...currentCard };
     if (list.isArchived) { currentCard.listIsArchived = true; }
   }
   dispatch({ type: actionTypes.SET_CARD_DETAILS, cardID, listID, currentCard, currentListTitle });
@@ -443,3 +443,17 @@ export const deleteCustomField = fieldID => async (dispatch, getState) => {
     dispatch(serverErr());
   }
 };
+
+export const toggleCardVote = () => async (dispatch, getState) => {
+  try {
+    const { boardID, listID, cardID, state } = getCardState(getState);
+    const email = state.user.email;
+    const fullName = state.user.fullName;
+    const payload = { boardID, listID, cardID, email, fullName };
+    dispatch({ type: actionTypes.TOGGLE_CARD_VOTE, ...payload });
+    await axios.post('/card/vote', { boardID, listID, cardID });
+    sendUpdate('post/card/vote', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+}

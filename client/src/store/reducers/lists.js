@@ -76,6 +76,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.UPDATE_CUSTOM_FIELD_VALUE: return updateCustomFieldValue(state, action);
     case actionTypes.DELETE_CUSTOM_FIELD: return deleteCustomField(state, action);
     case actionTypes.TOGGLE_LIST_VOTING: return toggleListVoting(state, action);
+    case actionTypes.TOGGLE_CARD_VOTE: return toggleCardVote(state, action);
     default: return state;
   }
 };
@@ -102,7 +103,7 @@ const updateLists = (cards, cardIndex, card, list, lists, listIndex, state) => {
     filteredLists = filterListsHelper(state.searchQueries, lists);
   }
 
-  return { ...state, lists, currentCard: card, filteredLists };
+  return { ...state, lists, currentCard: { ...card, listIsVoting: list.isVoting }, filteredLists };
 };
 
 // finds checklist items within a card based on ID
@@ -712,17 +713,32 @@ const toggleCommentLike = (state, action) => {
 const deleteBoardMember = (state, action) => {
   // remove member from any cards they are a member of
   const lists = [...state.lists];
+  let currentCard = state.currentCard;
   for (let listIdx = 0; listIdx < lists.length; listIdx++) {
     const list = { ...lists[listIdx] };
     const cards = [...list.cards];
     let shouldUpdate = false;
     for (let cardIdx = 0; cardIdx < cards.length; cardIdx++) {
       const card = { ...cards[cardIdx] };
-      const members = card.members.filter(member => member.email !== action.email);
-      if (members.length !== card.members.length) {
+      const memberIdx = card.members.findIndex(member => member.email === action.email);
+      if (memberIdx !== -1) {
+        const members = [...card.members];
+        members.splice(memberIdx, 1);
         card.members = members;
-        cards[cardIdx] = card;
         shouldUpdate = true;
+      }
+      if (list.isVoting) {
+        const voteIdx = card.votes.findIndex(vote => vote.email === action.email);
+        if (voteIdx !== -1) {
+          const votes = [...card.votes];
+          votes.splice(voteIdx, 1);
+          card.votes = votes;
+          shouldUpdate = true;
+        }
+      }
+      if (shouldUpdate) { cards[cardIdx] = card; }
+      if (state.shownCardID === card.cardID && shouldUpdate) {
+        currentCard = { ...card, listIsVoting: list.isVoting };
       }
     }
     if (shouldUpdate) {
@@ -736,7 +752,7 @@ const deleteBoardMember = (state, action) => {
     filteredLists = filterListsHelper(state.searchQueries, lists);
   }
 
-  return { ...state, lists, filteredLists };
+  return { ...state, lists, filteredLists, currentCard };
 };
 
 const checkForQuery = searchQueries => {
@@ -888,6 +904,10 @@ const toggleListVoting = (state, action) => {
   const listIndex = lists.findIndex(list => list.listID === action.listID);
   const list = { ...lists[listIndex] };
   list.isVoting = !list.isVoting;
+  if (!list.isVoting) {
+    const cards = list.cards.map(card => ({ ...card, votes: [] }));
+    list.cards = cards;
+  }
   lists[listIndex] = list;
 
   let filteredLists = state.filteredLists;
@@ -895,7 +915,25 @@ const toggleListVoting = (state, action) => {
     filteredLists = filterListsHelper(state.searchQueries, lists);
   }
 
-  return { ...state, lists, filteredLists };
+  let currentCard = state.currentCard;
+  if (currentCard && state.shownListID === action.listID) {
+    currentCard = { ...state.currentCard };
+    currentCard.listIsVoting = list.isVoting;
+    if (!list.isVoting) { currentCard.votes = []; }
+  }
+
+  return { ...state, lists, filteredLists, currentCard };
+};
+
+const toggleCardVote = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  const voteIdx = card.votes.findIndex(vote => vote.email === action.email);
+  if (voteIdx === -1) {
+    card.votes = [...card.votes, { email: action.email, fullName: action.fullName }];
+  } else {
+    card.votes = card.votes.filter(vote => vote.email !== action.email);
+  }
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
 export default reducer;
