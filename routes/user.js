@@ -27,9 +27,17 @@ const leaveAllCards = async (boardID, email) => {
   for (let list of lists) {
     let shouldUpdate = false;
     for (let card of list.cards) {
-      for (let i = card.members.length - 1; i >= 0; i--) {
-        if (card.members[i].email === email) { card.members.splice(i, 1); }
+      let memberIdx = card.members.findIndex(member => member.email === email);
+      if (memberIdx !== -1) {
+        card.members.splice(memberIdx, 1);
         shouldUpdate = true;
+      }
+      if (list.isVoting) {
+        let voteIdx = card.votes.findIndex(vote => vote.email === email);
+        if (voteIdx !== -1) {
+          card.votes.splice(voteIdx, 1);
+          shouldUpdate = true;
+        }
       }
     }
     // only need to update list if member changed

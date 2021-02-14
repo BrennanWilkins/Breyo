@@ -861,7 +861,7 @@ router.delete('/customField/:fieldID/:cardID/:listID/:boardID',
 );
 
 // authorization: member
-// cast a vote on a card in a list with voting
+// cast a vote or remove vote on a card in a list with voting
 router.post('/vote',
   validate(areAllMongo(['boardID', 'listID', 'cardID'], 'body')),
   useIsMember,
@@ -871,8 +871,10 @@ router.post('/vote',
       const [list, card] = await getListAndValidate(boardID, listID, cardID);
       if (!list.isVoting) { throw 'List voting is not active'; }
 
-      if (card.votes.includes(req.email)) { card.votes.splice(card.votes.indexOf(req.email)); }
-      else { card.votes.push(req.email); }
+      const idx = card.votes.findIndex(vote => vote.email === req.email);
+      if (idx === -1) { card.votes.push({ email: req.email, fullName: req.fullName }); }
+      else { card.votes.splice(idx, 1); }
+
       await list.save();
 
       res.sendStatus(200);
