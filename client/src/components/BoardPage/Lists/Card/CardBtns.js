@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import classes from './Card.module.css';
 import PropTypes from 'prop-types';
-import { clockIcon, checklistIcon, commentIcon, descIcon } from '../../../UI/icons';
+import { clockIcon, checklistIcon, commentIcon, descIcon, voteIcon } from '../../../UI/icons';
 import { format, isPast, isToday } from 'date-fns';
 import formatDate from '../../../../utils/formatDate';
 
@@ -29,12 +29,13 @@ const CardBtns = props => {
         className={`${classes.Btn} ${props.dueDate.isComplete ? classes.BtnComplete : isPast(date) ? classes.PastDue : isToday(date) ? classes.DueSoon : ''}`}>
           {clockIcon}{format(date, 'MMM d')}
         </div>}
-      {props.hasDesc && <div className={classes.Btn}>{descIcon}</div>}
+      {props.hasDesc && <div className={`${classes.Btn} ${classes.DescBtn}`}>{descIcon}</div>}
       {totalChecklists > 0 &&
         <div className={completedChecklists === totalChecklists ? `${classes.Btn} ${classes.BtnComplete}` : classes.Btn}>
           {checklistIcon}{completedChecklists}/{totalChecklists}
         </div>}
-      {props.commentLength > 0 && <div className={classes.CommentBtn}>{commentIcon}{props.commentLength}</div>}
+      {props.commentLength > 0 && <div className={`${classes.Btn} ${classes.CommentBtn}`}>{commentIcon}{props.commentLength}</div>}
+      {props.isVoting && <div className={classes.Btn} title={`${props.voteLength} vote${props.voteLength !== 1 ?'s':''}`}>{voteIcon}{props.voteLength}</div>}
     </div>
   );
 };
@@ -43,7 +44,9 @@ CardBtns.propTypes = {
   dueDate: PropTypes.object,
   commentLength: PropTypes.number.isRequired,
   hasDesc: PropTypes.bool.isRequired,
-  checklists: PropTypes.array.isRequired
+  checklists: PropTypes.array.isRequired,
+  isVoting: PropTypes.bool.isRequired,
+  voteLength: PropTypes.number.isRequired
 };
 
 export default CardBtns;

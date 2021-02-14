@@ -31,7 +31,8 @@ const Card = props => {
           </div>}
           <div className={classes.EditIcon}>{editIcon}</div>
           <div className={classes.Title}>{props.title}</div>
-          <CardBtns dueDate={props.dueDate} hasDesc={props.desc !== ''} checklists={props.checklists} commentLength={props.comments.length} />
+          <CardBtns dueDate={props.dueDate} hasDesc={props.desc !== ''} checklists={props.checklists} commentLength={props.comments.length}
+          voteLength={props.votes.length} isVoting={props.isVoting} />
           {props.members.length > 0 && <CardMembers members={props.members} clickHandler={accountBtnClickHandler} />}
         </div>
       )}
@@ -51,7 +52,9 @@ Card.propTypes = {
   listID: PropTypes.string.isRequired,
   comments: PropTypes.array.isRequired,
   setShownMember: PropTypes.func.isRequired,
-  desc: PropTypes.string.isRequired
+  desc: PropTypes.string.isRequired,
+  isVoting: PropTypes.bool.isRequired,
+  votes: PropTypes.array.isRequired
 };
 
 export default React.memo(Card);

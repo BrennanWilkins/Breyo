@@ -45,7 +45,8 @@ const List = props => {
             {(provided, snapshot) => (
               <div className={classes.CardContainer} ref={provided.innerRef}>
                 {props.cards.map((card, i) => (
-                  <Card key={card.cardID} index={i} {...card} listID={props.listID} showDetails={setCardDetailsHandler} setShownMember={shownMemberHandler} />
+                  <Card key={card.cardID} index={i} {...card} listID={props.listID} showDetails={setCardDetailsHandler}
+                  setShownMember={shownMemberHandler} isVoting={props.isVoting} />
                 ))}
                 {showAddCard && <AddCard close={() => setShowAddCard(false)} listID={props.listID} />}
                 {provided.placeholder}

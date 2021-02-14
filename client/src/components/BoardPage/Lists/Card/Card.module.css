@@ -42,7 +42,7 @@
   display: flex;
   align-items: center;
 }
-.Btn, .CommentBtn {
+.Btn {
   margin: 8px 5px 0 5px;
   display: inline-flex;
   align-items: center;
@@ -51,8 +51,10 @@
   margin-right: 4px;
 }
 .CommentBtn svg {
-  margin-right: 4px;
   font-size: 11px;
+}
+.DescBtn svg {
+  margin-right: 0;
 }
 .BtnComplete {
   border-radius: 3px;
