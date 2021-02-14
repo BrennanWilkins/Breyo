@@ -1,10 +1,5 @@
 .Container {
-  margin: 15px 18px 10px 47px;
-}
-@media (max-width: 610px) {
-  .Container {
-    margin: 10px;
-  }
+  margin: 10px;
 }
 .Title {
   color: rgb(var(--darkGray));
