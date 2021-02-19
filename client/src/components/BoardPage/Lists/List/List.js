@@ -39,7 +39,8 @@ const List = props => {
     <>
     <Draggable draggableId={props.listID} index={props.indexInBoard}>
       {(provided, snapshot) => (
-        <div className={classes.List} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} onMouseDown={blurInputHandler}>
+        <div className={`${classes.List} ${props.limit && props.cards.length > props.limit ? classes.ListHighlighted : ''}`}
+        ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} onMouseDown={blurInputHandler}>
           <ListTitle limit={props.limit} cardLength={props.cards.length} title={props.title} refs={{ actionsRef, inputRef }}
           showActions={() => setShowListActions(true)} listID={props.listID} />
           <Droppable droppableId={props.listID}>

@@ -26,7 +26,7 @@ const ListTitle = props => {
       <TextArea maxRows="10" ref={inputRef} value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.TitleInput}
       onFocus={e => e.target.select()} autoFocus onBlur={editTitleHandler} onKeyPress={e => { if (e.key === 'Enter') { e.preventDefault(); editTitleHandler(); }}} />}
       {props.limit && <div className={classes.ListLimit}>{props.cardLength} / {props.limit}</div>}
-      <div ref={actionsRef} className={classes.CardOptionBtn} onClick={props.showActions}>{dotsIcon}</div>
+      <div ref={actionsRef} className={classes.ListActionsBtn} onClick={props.showActions}>{dotsIcon}</div>
     </div>
   );
 };
