@@ -77,6 +77,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DELETE_CUSTOM_FIELD: return deleteCustomField(state, action);
     case actionTypes.TOGGLE_LIST_VOTING: return toggleListVoting(state, action);
     case actionTypes.TOGGLE_CARD_VOTE: return toggleCardVote(state, action);
+    case actionTypes.SET_LIST_LIMIT: return setListLimit(state, action);
+    case actionTypes.REMOVE_LIST_LIMIT: return removeListLimit(state, action);
     default: return state;
   }
 };
@@ -130,7 +132,7 @@ const updateListTitle = (state, action) => {
 };
 
 const addList = (state, action) => {
-  const list = { listID: action.listID, title: action.title, cards: [], indexInBoard: state.lists.length, isVoting: false };
+  const list = { listID: action.listID, title: action.title, cards: [], indexInBoard: state.lists.length, isVoting: false, limit: null };
   const lists = [...state.lists, list];
   const filteredLists = state.cardsAreFiltered ? [...state.filteredLists, list] : state.filteredLists;
   return { ...state, lists, filteredLists };
@@ -498,6 +500,7 @@ const copyList = (state, action) => {
     title: action.newList.title,
     isArchived: false,
     isVoting: false,
+    limit: action.newList.limit,
     cards: action.newList.cards.map(card => ({
       cardID: card._id,
       checklists: card.checklists.map(checklist => ({
@@ -934,6 +937,30 @@ const toggleCardVote = (state, action) => {
     card.votes = card.votes.filter(vote => vote.email !== action.email);
   }
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const setListLimit = (state, action) => {
+  const lists = [...state.lists];
+  const listIndex = lists.findIndex(list => list.listID === action.listID);
+  lists[listIndex] = { ...lists[listIndex], limit: action.limit };
+
+  const filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists[listIndex] = { ...filteredLists[listIndex], limit: action.limit };
+  }
+  return { ...state, lists, filteredLists };
+};
+
+const removeListLimit = (state, action) => {
+  const lists = [...state.lists];
+  const listIndex = lists.findIndex(list => list.listID === action.listID);
+  lists[listIndex] = { ...lists[listIndex], limit: null };
+
+  const filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists[listIndex] = { ...filteredLists[listIndex], limit: null };
+  }
+  return { ...state, lists, filteredLists };
 };
 
 export default reducer;

@@ -100,7 +100,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
   let allArchivedCards = [];
   let allComments = [];
   let lists = data.lists.map(list => {
-    const { _id: listID, indexInBoard, title, isArchived, isVoting } = list;
+    const { _id: listID, indexInBoard, title, isArchived, isVoting, limit } = list;
     const cards = list.cards.map(card => {
       const formatted = formatCardData(card);
       allComments = allComments.concat(formatted.comments.map(comment => ({ ...comment, cardTitle: card.title })));
@@ -112,7 +112,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
       return formatted;
     });
     allArchivedCards = allArchivedCards.concat(archivedCards.map(card => ({ ...card, listID })));
-    return { indexInBoard, listID, title, isArchived, cards, isVoting };
+    return { indexInBoard, listID, title, isArchived, cards, isVoting, limit };
   });
   const archivedLists = lists.filter(list => list.isArchived);
   lists = lists.filter(list => !list.isArchived);

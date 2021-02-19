@@ -56,7 +56,9 @@ const socketMap = {
   'put/card/customField/value': actionTypes.UPDATE_CUSTOM_FIELD_VALUE,
   'delete/card/customField': actionTypes.DELETE_CUSTOM_FIELD,
   'post/list/voting': actionTypes.TOGGLE_LIST_VOTING,
-  'post/card/vote': actionTypes.TOGGLE_CARD_VOTE
+  'post/card/vote': actionTypes.TOGGLE_CARD_VOTE,
+  'post/list/limit': actionTypes.SET_LIST_LIMIT,
+  'delete/list/limit': actionTypes.REMOVE_LIST_LIMIT
 };
 
 export default socketMap;

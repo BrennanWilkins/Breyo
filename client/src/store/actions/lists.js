@@ -127,3 +127,28 @@ export const toggleVoting = listID => async (dispatch, getState) => {
     dispatch(serverErr());
   }
 };
+
+export const setListLimit = (listID, limit) => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    const payload = { boardID, listID, limit };
+    const res = await axios.put('/list/limit', payload);
+    dispatch({ type: actionTypes.SET_LIST_LIMIT, ...payload });
+    addRecentActivity(res.data.newActivity);
+    sendUpdate('put/list/limit', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
+
+export const removeListLimit = listID => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    const res = await axios.delete(`/list/limit/${boardID}/${listID}`);
+    dispatch({ type: actionTypes.REMOVE_LIST_LIMIT, listID });
+    addRecentActivity(res.data.newActivity);
+    sendUpdate('delete/list/limit', { listID });
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
