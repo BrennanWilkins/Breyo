@@ -40,7 +40,8 @@ const List = props => {
     <Draggable draggableId={props.listID} index={props.indexInBoard}>
       {(provided, snapshot) => (
         <div className={classes.List} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} onMouseDown={blurInputHandler}>
-          <ListTitle title={props.title} refs={{ actionsRef, inputRef }} showActions={() => setShowListActions(true)} listID={props.listID} />
+          <ListTitle limit={props.limit} cardLength={props.cards.length} title={props.title} refs={{ actionsRef, inputRef }}
+          showActions={() => setShowListActions(true)} listID={props.listID} />
           <Droppable droppableId={props.listID}>
             {(provided, snapshot) => (
               <div className={classes.CardContainer} ref={provided.innerRef}>
@@ -60,7 +61,7 @@ const List = props => {
       )}
     </Draggable>
     {showListActions && <ListActions {...actionsPos} close={() => setShowListActions(false)}
-    title={props.title} listID={props.listID} isVoting={props.isVoting} />}
+    title={props.title} listID={props.listID} isVoting={props.isVoting} limit={props.limit} />}
     {shownMember && <CardMemberModal {...shownMember} listID={props.listID} inCard close={() => setShownMember(null)} />}
     </>
   );
@@ -72,7 +73,8 @@ List.propTypes = {
   cards: PropTypes.array.isRequired,
   indexInBoard: PropTypes.number.isRequired,
   boardID: PropTypes.string.isRequired,
-  isVoting: PropTypes.bool.isRequired
+  isVoting: PropTypes.bool.isRequired,
+  limit: PropTypes.number
 };
 
 export default React.memo(List);

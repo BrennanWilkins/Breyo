@@ -25,6 +25,7 @@ const ListTitle = props => {
       {!showTitleInput ? <div className={classes.ListTitle} onClick={() => setShowTitleInput(true)}>{titleInput}</div> :
       <TextArea maxRows="10" ref={inputRef} value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.TitleInput}
       onFocus={e => e.target.select()} autoFocus onBlur={editTitleHandler} onKeyPress={e => { if (e.key === 'Enter') { e.preventDefault(); editTitleHandler(); }}} />}
+      {props.limit && <div className={classes.ListLimit}>{props.cardLength} / {props.limit}</div>}
       <div ref={actionsRef} className={classes.CardOptionBtn} onClick={props.showActions}>{dotsIcon}</div>
     </div>
   );
@@ -35,7 +36,9 @@ ListTitle.propTypes = {
   showActions: PropTypes.func.isRequired,
   updateListTitle: PropTypes.func.isRequired,
   refs: PropTypes.object.isRequired,
-  listID: PropTypes.string.isRequired
+  listID: PropTypes.string.isRequired,
+  limit: PropTypes.number,
+  cardLength: PropTypes.number.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({

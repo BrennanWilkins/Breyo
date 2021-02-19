@@ -55,10 +55,10 @@
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
 }
-.CopyContainer {
+.ViewContainer {
   animation: slideIn 200ms forwards;
 }
-.CopyContainer form {
+.CopyForm {
   display: flex;
   flex-direction: column;
 }
@@ -89,10 +89,10 @@
   font-size: 15px;
   margin: 0 10px 10px;
 }
-.SubmitBtn:hover {
+.SubmitBtn:hover, .SaveLimitBtn:hover {
   background: rgba(var(--green), 0.85);
 }
-.SubmitBtn:active {
+.SubmitBtn:active, .SaveLimitBtn:active {
   background: rgb(19, 150, 25);
 }
 .SubmitBtn:disabled {
@@ -117,7 +117,47 @@
 .MoveOption:hover {
   background: rgb(238,238,238);
 }
-@media (max-height: 415px) {
+.LimitBtns {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+}
+.LimitBtns button {
+  color: white;
+  width: 80px;
+}
+.SaveLimitBtn {
+  background: rgb(var(--green));
+}
+.RemoveLimitBtn {
+  background: rgb(219, 55, 29);
+}
+.RemoveLimitBtn:hover, .RemoveLimitBtn:active {
+  background: rgb(213, 5, 5);
+}
+.Sep {
+  height: 1.2px;
+  width: calc(100% - 10px);
+  margin: 4px auto;
+  background: rgb(var(--lightGray));
+}
+.LimitInput {
+  width: calc(100% - 10px);
+  margin: 10px auto;
+}
+.LimitInfo {
+  font-size: 14px;
+  padding: 0 5px;
+  color: rgb(50,50,50);
+}
+.LimitErrMsg {
+  margin-top: 15px;
+  font-size: 13px;
+  padding: 0 5px;
+  text-align: center;
+}
+@media (max-height: 470px) {
   .Container {
     left: auto !important;
     right: 10px !important;

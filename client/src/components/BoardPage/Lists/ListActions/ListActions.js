@@ -8,12 +8,12 @@ import { connect } from 'react-redux';
 import MoveCards from './MoveCards';
 import { roadmapIcon } from '../../../UI/icons';
 import CopyList from './CopyList';
+import ListLimit from './ListLimit';
 
 const ListActions = props => {
   const modalRef = useRef();
   useModalToggle(true, modalRef, props.close);
-  const [showCopyList, setShowCopyList] = useState(false);
-  const [showMoveCards, setShowMoveCards] = useState(false);
+  const [shownView, setShownView] = useState('');
   const [top, setTop] = useState(0);
   const [left, setLeft] = useState(0);
 
@@ -22,11 +22,6 @@ const ListActions = props => {
     setTop(props.top);
     setLeft(props.left);
   }, [props.top, props.left]);
-
-  const resetState = () => {
-    setShowCopyList(false);
-    setShowMoveCards(false);
-  };
 
   const archiveAllHandler = () => {
     props.archiveAllCards(props.listID);
@@ -37,24 +32,32 @@ const ListActions = props => {
     <>
       <div className={classes.Option} onClick={() => props.openRoadmapList(props.listID)}>{roadmapIcon} Roadmap</div>
       <div className={classes.Option} onClick={() => props.toggleVoting(props.listID)}>{props.isVoting ? 'Close voting on this list' : 'Start a vote on this list'}</div>
-      <div className={classes.Option} onClick={() => setShowCopyList(true)}>Copy list</div>
-      <div className={classes.Option} onClick={() => props.archiveList(props.listID)}>Archive list</div>
+      <div className={classes.Option} onClick={() => setShownView('copy')}>Copy list</div>
+      <div className={classes.Option} onClick={() => setShownView('limit')}>{props.limit ? 'Set the card limit on this list' : 'Add a card limit to this list'}</div>
+      <div className={classes.Sep} />
       <div className={classes.Option} onClick={archiveAllHandler}>Archive all cards in this list</div>
-      <div className={classes.Option} onClick={() => setShowMoveCards(true)}>Move all cards in this list</div>
+      <div className={classes.Option} onClick={() => setShownView('move')}>Move all cards in this list</div>
+      <div className={classes.Sep} />
+      <div className={classes.Option} onClick={() => props.archiveList(props.listID)}>Archive list</div>
     </>
   );
 
   return (
     <div ref={modalRef} className={classes.Container} style={{ left: `${left}px`, top: `${top}px` }}>
       <div className={classes.Title}>
-        <span className={showCopyList || showMoveCards ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
-        {showCopyList ? 'Copy List' : showMoveCards ? 'Move all cards in this list' : 'List Actions'}
+        <span className={shownView ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={() => setShownView('')} /></span>
+        {shownView === 'copy' ? 'Copy List' : shownView === 'move' ? 'Move all cards in this list' : shownView === 'limit' ? 'Set List Limit' : 'List Actions'}
         <CloseBtn className={classes.CloseBtn} close={props.close} />
       </div>
-      {showCopyList ?
+      {
+        shownView === 'copy' ?
         <CopyList title={props.title} close={props.close} copyList={title => props.copyList(title, props.listID)} /> :
-        showMoveCards ? <MoveCards listID={props.listID} close={props.close} />
-        : defaultContent}
+        shownView === 'move' ?
+        <MoveCards listID={props.listID} close={props.close} /> :
+        shownView === 'limit' ?
+        <ListLimit limit={props.limit} listID={props.listID} close={() => setShownView('')} /> :
+        defaultContent
+      }
     </div>
   );
 };
@@ -70,7 +73,8 @@ ListActions.propTypes = {
   left: PropTypes.number.isRequired,
   openRoadmapList: PropTypes.func.isRequired,
   isVoting: PropTypes.bool.isRequired,
-  toggleVoting: PropTypes.func.isRequired
+  toggleVoting: PropTypes.func.isRequired,
+  limit: PropTypes.number
 };
 
 const mapDispatchToProps = dispatch => ({
