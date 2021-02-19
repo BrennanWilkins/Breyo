@@ -47,7 +47,8 @@ const ListSchema = new Schema({
   archivedCards: [CardSchema],
   indexInBoard: Number,
   isArchived: Boolean,
-  isVoting: Boolean
+  isVoting: Boolean,
+  limit: Number
 });
 
 ListSchema.index({ boardID: 1 });

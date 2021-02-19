@@ -23,7 +23,7 @@ router.post('/',
       if (!board) { throw 'New lists board not found'; }
 
       const listsLength = await List.countDocuments({ boardID, isArchived: false });
-      const list = new List({ boardID, title, cards: [], archivedCards: [], indexInBoard: listsLength, isArchived: false, isVoting: false });
+      const list = new List({ boardID, title, cards: [], archivedCards: [], indexInBoard: listsLength, isArchived: false, isVoting: false, limit: null });
       const listID = list._id;
 
       const actionData = { msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID, boardID };
@@ -118,7 +118,7 @@ router.post('/copy',
         votes: []
       }));
       const listsLength = await List.countDocuments({ boardID, isArchived: false });
-      const newList = new List({ boardID, title, desc: list.desc, indexInBoard: listsLength, cards, archivedCards: [], isArchived: false, isVoting: false });
+      const newList = new List({ boardID, title, desc: list.desc, indexInBoard: listsLength, cards, archivedCards: [], isArchived: false, isVoting: false, limit: list.limit });
 
       const actions = [];
       actions.push(new Activity({ msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID: newList._id,
@@ -301,7 +301,47 @@ router.post('/voting',
       for (let card of list.cards) { card.votes = []; }
       list.isVoting = !list.isVoting;
 
-      const actionData = { msg: null, boardMsg: `${req.fullName} ${list.isVoting ? 'started a vote' : 'closed voting'} on ${list.title}`, cardID: null, listID, boardID };
+      const actionData = { msg: null, boardMsg: `${list.isVoting ? 'started a vote' : 'closed voting'} on ${list.title}`, cardID: null, listID, boardID };
+      const results = await Promise.all([addActivity(actionData, req), list.save()]);
+
+      res.status(200).json({ newActivity: results[0] });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: member
+// set a limit to number of cards in list
+router.put('/limit',
+  validate([body('boardID').isMongoId(), body('listID').isMongoId(), body('limit').isInt({ min: 1, max: 200 })]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, limit } = req.body;
+      const list = await List.findOne({ boardID, _id: listID });
+      if (!list) { throw 'List not found'; }
+      list.limit = +limit;
+
+      const actionData = { msg: null, boardMsg: `set the card limit on ${list.title} to ${limit}`, cardID: null, listID, boardID };
+      const results = await Promise.all([addActivity(actionData, req), list.save()]);
+
+      res.status(200).json({ newActivity: results[0] });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: member
+// remove the card limit from a list
+router.delete('/limit/:boardID/:listID',
+  validate([param('boardID').isMongoId(), param('listID').isMongoId()]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID } = req.params;
+      const list = await List.findOne({ boardID, _id: listID });
+      if (!list) { throw 'List not found'; }
+      list.limit = null;
+
+      const actionData = { msg: null, boardMsg: `removed the card limit from ${list.title}`, cardID: null, listID, boardID };
       const results = await Promise.all([addActivity(actionData, req), list.save()]);
 
       res.status(200).json({ newActivity: results[0] });
