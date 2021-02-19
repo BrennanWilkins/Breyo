@@ -18,7 +18,7 @@ const DeleteAccntModal = props => {
       </div>
       <p>To confirm, please enter your password below.</p>
       <Input className={classes.Input} type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      <ActionBtn className={classes.DeleteBtn} onClick={() => props.deleteAccount(password)} disabled={!password}>DELETE MY ACCOUNT</ActionBtn>
+      <ActionBtn className={classes.DeleteBtn} clicked={() => props.deleteAccount(password)} disabled={!password}>DELETE MY ACCOUNT</ActionBtn>
     </ModalContainer>
   );
 };

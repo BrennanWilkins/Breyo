@@ -22,7 +22,7 @@ const InviteTeamMembers = props => {
       <div className={classes.EmailChipInput}>
         <EmailChipInput emails={emails} setEmails={arr => setEmails(arr)} />
       </div>
-      <ActionBtn className={classes.InviteBtn} onClick={inviteHandler}>Invite to team</ActionBtn>
+      <ActionBtn className={classes.InviteBtn} clicked={inviteHandler}>Invite to team</ActionBtn>
     </ModalContainer>
   );
 };

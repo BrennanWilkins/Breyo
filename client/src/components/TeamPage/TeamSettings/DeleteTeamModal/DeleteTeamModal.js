@@ -18,7 +18,7 @@ const DeleteTeamModal = props => {
       <>
         <p>Deleting a team will not delete the team's boards. To confirm, please type 'DELETE THIS TEAM' below.</p>
         <Input className={classes.Input} value={inputVal} onChange={e => setInputVal(e.target.value)} />
-        <ActionBtn className={classes.DeleteBtn} disabled={inputVal !== 'DELETE THIS TEAM'} onClick={() => props.deleteTeam(history.push)}>DELETE TEAM</ActionBtn>
+        <ActionBtn className={classes.DeleteBtn} disabled={inputVal !== 'DELETE THIS TEAM'} clicked={() => props.deleteTeam(history.push)}>DELETE TEAM</ActionBtn>
       </>
       : <p>You must be an admin to delete this team.</p>}
     </ModalContainer>

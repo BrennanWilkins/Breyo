@@ -23,7 +23,7 @@ const LeaveTeamModal = props => {
       <div className={classes.CannotLeave}>There must be at least one other admin to leave this team.</div>
       : <>
         <p>Leaving a team will not cause you to be removed from any of the team's boards.</p>
-        <ActionBtn className={classes.LeaveBtn} onClick={leaveHandler}>LEAVE TEAM</ActionBtn>
+        <ActionBtn className={classes.LeaveBtn} clicked={leaveHandler}>LEAVE TEAM</ActionBtn>
       </>}
     </ModalContainer>
   );
