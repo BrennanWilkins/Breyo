@@ -39,7 +39,7 @@ const EditTeam = props => {
     if (desc.length > 400) { return setErrMsg('Your team description cannot be over 400 characters.'); }
     setLoading(true);
     try {
-      await axios.put('/team', { title, desc, url, teamID: props.teamID });
+      await axios.put(`/team/${props.teamID}`, { title, desc, url });
       const payload = { title, desc, url, teamID: props.teamID };
       props.editTeam(payload);
       props.close();

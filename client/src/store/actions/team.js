@@ -42,7 +42,7 @@ export const changeTeamLogo = (img, teamID) => async dispatch => {
   reader.readAsDataURL(img);
 
   reader.onloadend = () => {
-    axios.put('/team/logo', { logo: reader.result, teamID }).then(res => {
+    axios.put(`/team/logo/${teamID}`, { logo: reader.result }).then(res => {
       dispatch({ type: actionTypes.CHANGE_TEAM_LOGO, logo: res.data.logoURL, teamID });
     }).catch(err => {
       if (err?.response?.status === 413) { return errHandler('That image is too large to upload.'); }
@@ -84,7 +84,7 @@ export const inviteTeamMembers = emails => async (dispatch, getState) => {
 
 export const acceptTeamInvite = (teamID, push) => async dispatch => {
   try {
-    const res = await axios.put('/team/invites/accept', { teamID });
+    const res = await axios.put(`/team/invites/${teamID}`);
     const { token, team } = res.data;
     axios.defaults.headers.common['x-auth-token'] = token;
     localStorage['token'] = token;
@@ -100,14 +100,14 @@ export const acceptTeamInvite = (teamID, push) => async dispatch => {
 export const rejectTeamInvite = teamID => async dispatch => {
   try {
     dispatch({ type: actionTypes.REJECT_TEAM_INVITE, teamID });
-    await axios.put('/team/invites/reject', { teamID });
+    await axios.delete(`/team/invites/${teamID}`);
   } catch (err) { dispatch(serverErr()); }
 };
 
 export const leaveTeam = push => async (dispatch, getState) => {
   try {
     const teamID = getState().team.teamID;
-    const res = await axios.put('/team/leave', { teamID });
+    const res = await axios.put(`/team/leave/${teamID}`);
     const token = res.data.token;
     axios.defaults.headers.common['x-auth-token'] = token;
     localStorage['token'] = token;
@@ -148,7 +148,7 @@ export const promoteTeamMember = email => async (dispatch, getState) => {
   try {
     const state = getState();
     const teamID = state.team.teamID;
-    await axios.put('/team/admins/add', { teamID, email });
+    await axios.post(`/team/admins/${teamID}`, { email });
     dispatch({ type: actionTypes.PROMOTE_TEAM_MEMBER, teamID, email });
   } catch (err) {
     if (err?.response?.status === 401) { return dispatch(addNotif('You must be an admin to change member permissions.')); }
@@ -162,7 +162,7 @@ export const demoteTeamMember = email => async (dispatch, getState) => {
     const state = getState();
     const teamID = state.team.teamID;
     const userEmail = state.user.email;
-    await axios.put('/team/admins/remove', { teamID, email });
+    await axios.delete(`/team/admins/${teamID}/${email}`);
     if (userEmail === email) {
       dispatch({ type: actionTypes.DEMOTE_SELF_TEAM_MEMBER, teamID });
     }

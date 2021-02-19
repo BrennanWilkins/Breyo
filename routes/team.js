@@ -116,18 +116,18 @@ router.post('/',
 
 // authorization: team admin
 // edit a teams info
-router.put('/',
+router.put('/:teamID',
   validate(
     [body('title').isLength({ min: 1, max: 100 }),
     body('desc').isLength({ max: 400 }),
     body('url').isLength({ max: 50 }),
-    body('teamID').isMongoId()]
+    param('teamID').isMongoId()]
   ),
   useIsTeamAdmin,
   async (req, res) => {
     try {
-      const { title, desc, url, teamID } = req.body;
-      const team = await Team.findById(teamID);
+      const { title, desc, url } = req.body;
+      const team = await Team.findById(req.params.teamID);
       if (!team) { throw 'Team not found'; }
 
       // only check url if its different
@@ -175,12 +175,12 @@ router.delete('/:teamID',
 
 // authorization: team admin
 // change team's logo
-router.put('/logo',
-  validate([body('teamID').isMongoId(), body('logo').notEmpty()]),
+router.put('/logo/:teamID',
+  validate([param('teamID').isMongoId(), body('logo').notEmpty()]),
   useIsTeamAdmin,
   async (req, res) => {
     try {
-      const team = await Team.findById(req.body.teamID);
+      const team = await Team.findById(req.params.teamID);
       if (!team) { throw 'Team data not found'; }
 
       const logo = await resizeImg(req.body.logo);
@@ -253,11 +253,11 @@ router.post('/invites',
 );
 
 // accept invite to join team
-router.put('/invites/accept',
-  validate([body('teamID').isMongoId()]),
+router.put('/invites/:teamID',
+  validate([param('teamID').isMongoId()]),
   async (req, res) => {
     try {
-      const teamID = req.body.teamID;
+      const teamID = req.params.teamID;
       const [team, user] = await Promise.all([Team.findById(teamID), User.findById(req.userID)]);
       if (!user) { throw 'User data not found'; }
 
@@ -286,15 +286,14 @@ router.put('/invites/accept',
 );
 
 // reject invite to join a team
-router.put('/invites/reject',
-  validate([body('teamID').isMongoId()]),
+router.delete('/invites/:teamID',
+  validate([param('teamID').isMongoId()]),
   async (req, res) => {
     try {
-      const teamID = req.body.teamID;
       const user = await User.findById(req.userID);
       if (!user) { throw 'User data not found'; }
 
-      user.teamInvites = user.teamInvites.filter(invite => String(invite.teamID) !== teamID);
+      user.teamInvites = user.teamInvites.filter(invite => String(invite.teamID) !== req.params.teamID);
       await user.save();
 
       res.sendStatus(200);
@@ -303,12 +302,12 @@ router.put('/invites/reject',
 );
 
 // leave a team
-router.put('/leave',
-  validate([body('teamID').isMongoId()]),
+router.put('/leave/:teamID',
+  validate([param('teamID').isMongoId()]),
   useIsTeamMember,
   async (req, res) => {
     try {
-      const teamID = req.body.teamID;
+      const teamID = req.params.teamID;
       const [team, user] = await Promise.all([Team.findById(teamID), User.findById(req.userID)]);
       if (!team || !user) { throw 'No team or user data found'; }
 
@@ -338,13 +337,12 @@ router.put('/leave',
 
 // authorization: team admin
 // promote a team member to admin
-router.put('/admins/add',
-  validate([body('teamID').isMongoId(), body('email').isEmail()]),
+router.post('/admins/:teamID',
+  validate([param('teamID').isMongoId(), body('email').isEmail()]),
   useIsTeamAdmin,
   async (req, res) => {
     try {
-      const { teamID, email } = req.body;
-      const [team, user] = await Promise.all([Team.findById(teamID), User.findOne({ email })]);
+      const [team, user] = await Promise.all([Team.findById(req.params.teamID), User.findOne({ email: req.body.email })]);
       if (!team || !user) { throw 'No team or user data found'; }
 
       if (team.admins.includes(String(user._id))) {
@@ -365,12 +363,12 @@ router.put('/admins/add',
 
 // authorization: team admin
 // demote a team member from admin to member
-router.put('/admins/remove',
-  validate([body('teamID').isMongoId(), body('email').isEmail()]),
+router.delete('/admins/:teamID/:email',
+  validate([param('teamID').isMongoId(), param('email').isEmail()]),
   useIsTeamAdmin,
   async (req, res) => {
     try {
-      const { teamID, email } = req.body;
+      const { teamID, email } = req.params;
       const [team, user] = await Promise.all([Team.findById(teamID), User.findOne({ email })]);
       if (!team || !user) { throw 'No team or user data found'; }
 
