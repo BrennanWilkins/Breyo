@@ -11,7 +11,7 @@ const Activity = require('../models/activity');
 
 router.use(auth);
 
-// authorization: member
+// authorization: board member
 // create a new list
 router.post('/',
   validate([body('boardID').isMongoId(), body('title').isLength({ min: 1, max: 200 })]),
@@ -23,7 +23,8 @@ router.post('/',
       if (!board) { throw 'New lists board not found'; }
 
       const listsLength = await List.countDocuments({ boardID, isArchived: false });
-      const list = new List({ boardID, title, cards: [], archivedCards: [], indexInBoard: listsLength, isArchived: false, isVoting: false, limit: null });
+      const list = new List({ boardID, title, cards: [], archivedCards: [], indexInBoard: listsLength,
+        isArchived: false, isVoting: false, limit: null });
       const listID = list._id;
 
       const actionData = { msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID, boardID };
@@ -36,7 +37,7 @@ router.post('/',
   }
 );
 
-// authorization: member
+// authorization: board member
 // update list title
 router.put('/title',
   validate([body('boardID').isMongoId(), body('listID').isMongoId(), body('title').isLength({ min: 1, max: 200 })]),
@@ -56,7 +57,7 @@ router.put('/title',
   }
 );
 
-// authorization: member
+// authorization: board member
 // move list to different index in board
 router.put('/moveList',
   validate([body('sourceIndex').isInt(), body('destIndex').isInt(), body('boardID').isMongoId()]),
@@ -83,7 +84,7 @@ router.put('/moveList',
   }
 );
 
-// authorization: member
+// authorization: board member
 // create a copy of a list
 router.post('/copy',
   validate([body('boardID').isMongoId(), body('listID').isMongoId(), body('title').isLength({ min: 1, max: 200 })]),
@@ -118,7 +119,8 @@ router.post('/copy',
         votes: []
       }));
       const listsLength = await List.countDocuments({ boardID, isArchived: false });
-      const newList = new List({ boardID, title, desc: list.desc, indexInBoard: listsLength, cards, archivedCards: [], isArchived: false, isVoting: false, limit: list.limit });
+      const newList = new List({ boardID, title, desc: list.desc, indexInBoard: listsLength, cards, archivedCards: [],
+        isArchived: false, isVoting: false, limit: list.limit });
 
       const actions = [];
       actions.push(new Activity({ msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID: newList._id,
@@ -144,7 +146,7 @@ router.post('/copy',
   }
 );
 
-// authorization: admin
+// authorization: board admin
 // send list to archive
 router.post('/archive',
   validate([body('boardID').isMongoId(), body('listID').isMongoId()]),
@@ -179,7 +181,7 @@ router.post('/archive',
   }
 );
 
-// authorization: member
+// authorization: board member
 // send list to board from archive
 router.put('/archive/recover',
   validate([body('boardID').isMongoId(), body('listID').isMongoId()]),
@@ -200,7 +202,7 @@ router.put('/archive/recover',
   }
 );
 
-// authorization: admin
+// authorization: board admin
 // Permanently delete a list
 router.delete('/archive/:listID/:boardID',
   validate([param('boardID').isMongoId(), param('listID').isMongoId()]),
@@ -224,7 +226,7 @@ router.delete('/archive/:listID/:boardID',
   }
 );
 
-// authorization: member
+// authorization: board member
 // Send all cards in list to archive
 router.put('/archive/allCards',
   validate([body('boardID').isMongoId(), body('listID').isMongoId()]),
@@ -260,7 +262,7 @@ router.put('/archive/allCards',
   }
 );
 
-// authorization: member
+// authorization: board member
 // move all cards in a list to another list
 router.put('/moveAllCards',
   validate([body('boardID').isMongoId(), body('oldListID').isMongoId(), body('newListID').isMongoId()]),
@@ -287,7 +289,7 @@ router.put('/moveAllCards',
   }
 );
 
-// authorization: admin
+// authorization: board admin
 // start or close a vote on the list
 router.post('/voting',
   validate([body('boardID').isMongoId(), body('listID').isMongoId()]),
@@ -309,7 +311,7 @@ router.post('/voting',
   }
 );
 
-// authorization: member
+// authorization: board member
 // set a limit to number of cards in list
 router.put('/limit',
   validate([body('boardID').isMongoId(), body('listID').isMongoId(), body('limit').isInt({ min: 1, max: 200 })]),
@@ -329,7 +331,7 @@ router.put('/limit',
   }
 );
 
-// authorization: member
+// authorization: board member
 // remove the card limit from a list
 router.delete('/limit/:boardID/:listID',
   validate([param('boardID').isMongoId(), param('listID').isMongoId()]),

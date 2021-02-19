@@ -28,6 +28,7 @@ const signNewToken = async (user, oldToken, getLean) => {
   return token;
 };
 
+// authorization: board member
 // returns all board & list data for a given board
 router.get('/:boardID',
   validate([param('boardID').isMongoId()]),
@@ -164,7 +165,7 @@ router.post('/teamBoard',
   }
 );
 
-// authorization: member
+// authorization: board member
 // updates board color
 router.put('/color',
   validate([body('boardID').isMongoId(), body('color').notEmpty()]),
@@ -181,7 +182,7 @@ router.put('/color',
   }
 );
 
-// authorization: member
+// authorization: board member
 // update board description
 router.put('/desc',
   validate([body('boardID').isMongoId(), body('desc').isLength({ max: 600 })]),
@@ -199,7 +200,7 @@ router.put('/desc',
   }
 );
 
-// authorization: member
+// authorization: board member
 // update board title
 router.put('/title',
   validate([body('title').trim().isLength({ min: 1, max: 100 }), body('boardID').isMongoId()], 'Please enter a valid title.'),
@@ -239,7 +240,7 @@ router.put('/starred',
   }
 );
 
-// authorization: admin
+// authorization: board admin
 // add another admin to the board
 router.post('/admins',
   validate([body('email').isEmail(), body('boardID').isMongoId()]),
@@ -300,7 +301,7 @@ router.put('/admins/demoteUser',
   }
 );
 
-// authorization: admin
+// authorization: board admin
 // change user permission from admin to member
 router.delete('/admins/:email/:boardID',
   validate([param('email').isEmail(), param('boardID').isMongoId()]),
@@ -331,7 +332,7 @@ router.delete('/admins/:email/:boardID',
   }
 );
 
-// authorization: admin
+// authorization: board admin
 // send invite to a user to join the board
 router.post('/invites',
   validate([body('email').isEmail(), body('boardID').isMongoId()]),
@@ -360,11 +361,11 @@ router.post('/invites',
 );
 
 // accept invitation to join a board
-router.put('/invites/accept',
-  validate([body('boardID').isMongoId()]),
+router.put('/invites/:boardID',
+  validate([param('boardID').isMongoId()]),
   async (req, res) => {
     try {
-      const boardID = req.body.boardID;
+      const boardID = req.params.boardID;
       const [board, user] = await Promise.all([Board.findById(boardID), User.findById(req.userID)]);
       if (!user) { throw 'No user data found'; }
 
@@ -400,23 +401,23 @@ router.put('/invites/accept',
 );
 
 // reject invitation to join a board
-router.put('/invites/reject',
-  validate([body('boardID').isMongoId()]),
+router.delete('/invites/:boardID',
+  validate([param('boardID').isMongoId()]),
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
       if (!user) { throw 'No user data found'; }
       // remove invite from user's model
-      user.invites = user.invites.filter(invite => String(invite.boardID) !== req.body.boardID);
+      user.invites = user.invites.filter(invite => String(invite.boardID) !== req.params.boardID);
       await user.save();
       res.sendStatus(200);
     } catch(err) { res.sendStatus(500); }
   }
 );
 
-// authorization: admin
+// authorization: board admin
 // remove a user from the board
-router.put('/members/remove',
+router.put('/removeMember',
   validate([body('email').isEmail(), body('boardID').isMongoId()]),
   useIsAdmin,
   async (req, res) => {
@@ -441,7 +442,7 @@ router.put('/members/remove',
   }
 );
 
-// authorization: admin
+// authorization: board admin
 // delete a board, its lists, and all of its activity
 router.delete('/:boardID',
   validate([param('boardID').isMongoId()]),
@@ -464,11 +465,12 @@ router.delete('/:boardID',
 );
 
 // leave a board
-router.put('/leave',
-  validate([body('boardID').isMongoId()]),
+router.put('/leave/:boardID',
+  validate([param('boardID').isMongoId()]),
+  useIsMember,
   async (req, res) => {
     try {
-      const boardID = req.body.boardID;
+      const boardID = req.params.boardID;
       const board = await Board.findById(boardID);
       if (!board) { throw 'No board data found'; }
 

@@ -18,7 +18,7 @@ const addActivity = async (data, req) => {
   return newActivity;
 };
 
-// authorization: member
+// authorization: board member
 // returns last 20 actions for given card
 router.get('/recent/card/:boardID/:cardID',
   validate([param('boardID').isMongoId(), param('cardID').isMongoId()]),
@@ -32,7 +32,7 @@ router.get('/recent/card/:boardID/:cardID',
   }
 );
 
-// authorization: member
+// authorization: board member
 // returns first 100 activities for a board sorted by most recent
 router.get('/all/board/:boardID/firstPage',
   validate([param('boardID').isMongoId()]),
@@ -46,7 +46,7 @@ router.get('/all/board/:boardID/firstPage',
   }
 );
 
-// authorization: member
+// authorization: board member
 // returns all activities for a board sorted by most recent
 router.get('/all/board/:boardID/allActions',
   validate([param('boardID').isMongoId()]),
@@ -60,7 +60,7 @@ router.get('/all/board/:boardID/allActions',
   }
 );
 
-// authorization: member
+// authorization: board member
 // returns all actions for given card
 router.get('/all/card/:boardID/:cardID',
   validate([param('boardID').isMongoId(), param('cardID').isMongoId()]),
@@ -74,7 +74,7 @@ router.get('/all/card/:boardID/:cardID',
   }
 );
 
-// authorization: member
+// authorization: board member
 // returns all activity for given board member
 router.get('/member/:email/:boardID',
   validate([param('boardID').isMongoId(), param('email').isEmail()]),
@@ -88,7 +88,7 @@ router.get('/member/:email/:boardID',
   }
 );
 
-// authorization: admin
+// authorization: board admin
 // deletes all board activity
 router.delete('/:boardID',
   validate([param('boardID').isMongoId()]),

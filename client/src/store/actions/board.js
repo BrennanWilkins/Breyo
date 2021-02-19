@@ -212,7 +212,7 @@ export const acceptInvite = (boardID, push) => async (dispatch, getState) => {
     const state = getState();
     const email = state.user.email;
     const fullName = state.user.fullName;
-    const res = await axios.put('/board/invites/accept', { boardID });
+    const res = await axios.put(`/board/invites/${boardID}`);
     const { token, board, newActivity } = res.data;
     axios.defaults.headers.common['x-auth-token'] = token;
     localStorage['token'] = token;
@@ -236,7 +236,7 @@ export const acceptInvite = (boardID, push) => async (dispatch, getState) => {
 export const rejectInvite = boardID => async dispatch => {
   try {
     dispatch({ type: actionTypes.REMOVE_INVITE, boardID });
-    await axios.put('/board/invites/reject', { boardID });
+    await axios.delete(`/board/invites/${boardID}`);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -247,7 +247,7 @@ export const leaveBoard = push => async (dispatch, getState) => {
     const state = getState();
     const boardID = state.board.boardID;
     const email = state.user.email;
-    const res = await axios.put('/board/leave', { boardID });
+    const res = await axios.put(`/board/leave/${boardID}`);
     addRecentActivity(res.data.newActivity);
     sendUpdate('put/board/memberLeft', { email });
     dispatch({ type: actionTypes.LEAVE_BOARD, boardID });

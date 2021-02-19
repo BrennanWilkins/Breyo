@@ -13,6 +13,8 @@ const { LABEL_COLORS } = require('./utils');
 const { areAllMongo } = require('../middleware/validate');
 
 router.use(auth);
+// user must be board member for all card routes
+router.use(useIsMember);
 
 const getListAndValidate = async (boardID, listID, cardID) => {
   const list = await List.findOne({ _id: listID, boardID });
@@ -25,11 +27,9 @@ const getListAndValidate = async (boardID, listID, cardID) => {
   return [list, card];
 };
 
-// authorization: member
 // create a new card
 router.post('/',
   validate([body('boardID').isMongoId(), body('listID').isMongoId(), body('title').isLength({ min: 1, max: 200 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, title } = req.body;
@@ -49,11 +49,9 @@ router.post('/',
   }
 );
 
-// authorization: member
 // update card title
 router.put('/title',
   validate([...areAllMongo(['cardID', 'boardID', 'listID'], 'body'), body('title').isLength({ min: 1, max: 200 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const { cardID, listID, boardID, title } = req.body;
@@ -73,11 +71,9 @@ router.put('/title',
   }
 );
 
-// authorization: member
 // update card description
 router.put('/desc',
   validate([...areAllMongo(['cardID', 'boardID', 'listID'], 'body'), body('desc').isLength({ max: 600 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const [list, card] = await getListAndValidate(req.body.boardID, req.body.listID, req.body.cardID);
@@ -90,11 +86,9 @@ router.put('/desc',
   }
 );
 
-// authorization: member
 // add label to card
 router.post('/label',
   validate([...areAllMongo(['listID', 'boardID', 'cardID'], 'body'), body('color').notEmpty()]),
-  useIsMember,
   async (req, res) => {
     try {
       const { color, listID, cardID, boardID } = req.body;
@@ -109,11 +103,9 @@ router.post('/label',
   }
 );
 
-// authorization: member
 // remove label from card
 router.put('/label/remove',
   validate([...areAllMongo(['listID', 'boardID', 'cardID'], 'body'), body('color').notEmpty()]),
-  useIsMember,
   async (req, res) => {
     try {
       const { color, cardID, listID, boardID } = req.body;
@@ -130,11 +122,9 @@ router.put('/label/remove',
   }
 );
 
-// authorization: member
 // add roadmap label to card
 router.post('/roadmapLabel',
   validate([...areAllMongo(['listID', 'boardID', 'cardID'], 'body'), body('color').notEmpty()]),
-  useIsMember,
   async (req, res) => {
     try {
       const { color, cardID, listID, boardID } = req.body;
@@ -149,11 +139,9 @@ router.post('/roadmapLabel',
   }
 );
 
-// authorization: member
 // remove roadmap label from card
 router.delete('/roadmapLabel/:cardID/:listID/:boardID',
   validate(areAllMongo(['listID', 'boardID', 'cardID'], 'params')),
-  useIsMember,
   async (req, res) => {
     try {
       const { listID, cardID, boardID } = req.params;
@@ -167,11 +155,9 @@ router.delete('/roadmapLabel/:cardID/:listID/:boardID',
   }
 );
 
-// authorization: member
 // toggle card due date as complete/incomplete
 router.put('/dueDate/isComplete',
   validate(areAllMongo(['listID', 'boardID', 'cardID'], 'body')),
-  useIsMember,
   async (req, res) => {
     try {
       const { cardID, listID, boardID } = req.body;
@@ -192,11 +178,9 @@ router.put('/dueDate/isComplete',
   }
 );
 
-// authorization: member
 // add due date to card
 router.post('/dueDate',
   validate([...areAllMongo(['listID', 'boardID', 'cardID'], 'body'), body('dueDate').notEmpty(), body('startDate').exists()]),
-  useIsMember,
   async (req, res) => {
     try {
       const { listID, boardID, cardID, dueDate, startDate } = req.body;
@@ -221,11 +205,9 @@ router.post('/dueDate',
   }
 );
 
-// authorization: member
 // remove due date from card
 router.delete('/dueDate/:cardID/:listID/:boardID',
   validate(areAllMongo(['listID', 'boardID', 'cardID'], 'params')),
-  useIsMember,
   async (req, res) => {
     try {
       const { listID, boardID, cardID } = req.params;
@@ -244,11 +226,9 @@ router.delete('/dueDate/:cardID/:listID/:boardID',
   }
 );
 
-// authorization: member
 // add checklist to card
 router.post('/checklist',
   validate([...areAllMongo(['listID', 'boardID', 'cardID'], 'body'), body('title').isLength({ min: 1, max: 200 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID, title } = req.body;
@@ -268,11 +248,9 @@ router.post('/checklist',
   }
 );
 
-// authorization: member
 // remove checklist from card
 router.delete('/checklist/:checklistID/:cardID/:listID/:boardID',
   validate(areAllMongo(['listID', 'boardID', 'cardID', 'checklistID'], 'params')),
-  useIsMember,
   async (req, res) => {
     try {
       const { listID, boardID, cardID, checklistID } = req.params;
@@ -292,11 +270,9 @@ router.delete('/checklist/:checklistID/:cardID/:listID/:boardID',
   }
 );
 
-// authorization: member
 // update checklist title
 router.put('/checklist/title',
   validate([...areAllMongo(['listID', 'boardID', 'cardID', 'checklistID'], 'body'), body('title').isLength({ min: 1, max: 200 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID, checklistID, title } = req.body;
@@ -318,11 +294,9 @@ router.put('/checklist/title',
   }
 );
 
-// authorization: member
 // add item to a checklist
 router.post('/checklist/item',
   validate([...areAllMongo(['listID', 'boardID', 'cardID', 'checklistID'], 'body'), body('title').isLength({ min: 1, max: 300 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const { listID, cardID, checklistID, boardID, title } = req.body;
@@ -340,11 +314,9 @@ router.post('/checklist/item',
   }
 );
 
-// authorization: member
 // toggle checklist item as complete/incomplete
 router.put('/checklist/item/isComplete',
   validate(areAllMongo(['listID', 'boardID', 'cardID', 'checklistID', 'itemID'], 'body')),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID, checklistID, itemID } = req.body;
@@ -368,11 +340,9 @@ router.put('/checklist/item/isComplete',
   }
 );
 
-// authorization: member
 // update checklist item title
 router.put('/checklist/item/title',
   validate([...areAllMongo(['listID', 'boardID', 'cardID', 'checklistID', 'itemID'], 'body'), body('title').isLength({ min: 1, max: 300 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const [list, card] = await getListAndValidate(req.body.boardID, req.body.listID, req.body.cardID);
@@ -390,11 +360,9 @@ router.put('/checklist/item/title',
   }
 );
 
-// authorization: member
 // delete item from checklist
 router.put('/checklist/item/delete',
   validate(areAllMongo(['listID', 'boardID', 'cardID', 'checklistID', 'itemID'], 'body')),
-  useIsMember,
   async (req, res) => {
     try {
       const [list, card] = await getListAndValidate(req.body.boardID, req.body.listID, req.body.cardID);
@@ -407,11 +375,9 @@ router.put('/checklist/item/delete',
   }
 );
 
-// authorization: member
 // move card inside the same list
 router.put('/moveCard/sameList',
   validate([body('boardID').isMongoId(), body('listID').isMongoId(), body('sourceIndex').isInt(), body('destIndex').isInt()]),
-  useIsMember,
   async (req, res) => {
     try {
       const list = await getListAndValidate(req.body.boardID, req.body.listID);
@@ -429,11 +395,9 @@ router.put('/moveCard/sameList',
   }
 );
 
-// authorization: member
 // move card to a different list
 router.put('/moveCard/diffList',
   validate([...areAllMongo(['boardID', 'sourceID', 'targetID'], 'body'), body('sourceIndex').isInt(), body('destIndex').isInt()]),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, sourceID, targetID, sourceIndex, destIndex } = req.body;
@@ -460,7 +424,6 @@ router.put('/moveCard/diffList',
   }
 );
 
-// authorization: member
 // create a copy of a card
 router.post('/copy',
   validate(
@@ -470,7 +433,6 @@ router.post('/copy',
     body('keepLabels').isBoolean(),
     body('keepChecklists').isBoolean()]
   ),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, sourceListID, destListID, cardID, title, destIndex, keepLabels, keepChecklists } = req.body;
@@ -514,11 +476,9 @@ router.post('/copy',
   }
 );
 
-// authorization: member
 // send a card to archive
 router.post('/archive',
   validate(areAllMongo(['boardID', 'listID', 'cardID'], 'body')),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID } = req.body;
@@ -538,11 +498,9 @@ router.post('/archive',
   }
 );
 
-// authorization: member
 // send card back to list from archive
 router.put('/archive/recover',
   validate(areAllMongo(['boardID', 'listID', 'cardID'], 'body')),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID } = req.body;
@@ -564,11 +522,9 @@ router.put('/archive/recover',
   }
 );
 
-// authorization: member
 // permanently delete a card
 router.delete('/archive/:cardID/:listID/:boardID',
   validate(areAllMongo(['boardID', 'listID', 'cardID'], 'params')),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID } = req.params;
@@ -593,11 +549,9 @@ router.delete('/archive/:cardID/:listID/:boardID',
   }
 );
 
-// authorization: member
 // add card member
 router.post('/members',
   validate([...areAllMongo(['boardID', 'listID', 'cardID'], 'body'), body('email').isEmail()]),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID, email } = req.body;
@@ -625,11 +579,9 @@ router.post('/members',
   }
 );
 
-// authorization: member
 // remove a card member
 router.delete('/members/:email/:cardID/:listID/:boardID',
   validate([...areAllMongo(['boardID', 'listID', 'cardID'], 'params'), param('email').isEmail()]),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID, email } = req.params;
@@ -652,11 +604,9 @@ router.delete('/members/:email/:cardID/:listID/:boardID',
   }
 );
 
-// authorization: member
 // add comment to card
 router.post('/comments',
   validate([...areAllMongo(['boardID', 'listID', 'cardID'], 'body'), body('msg').isLength({ min: 1, max: 400 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID, msg } = req.body;
@@ -676,11 +626,9 @@ router.post('/comments',
   }
 );
 
-// authorization: member, creator
 // edit comment msg, must be original author to edit
 router.put('/comments',
   validate([...areAllMongo(['boardID', 'listID', 'cardID', 'commentID'], 'body'), body('msg').isLength({ min: 1, max: 400 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const { listID, cardID, commentID, msg, boardID } = req.body;
@@ -698,11 +646,9 @@ router.put('/comments',
   }
 );
 
-// authorization: member, creator
 // delete a comment, must be original author
 router.delete('/comments/:commentID/:cardID/:listID/:boardID',
   validate(areAllMongo(['boardID', 'listID', 'cardID', 'commentID'], 'params')),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID, commentID } = req.params;
@@ -720,11 +666,9 @@ router.delete('/comments/:commentID/:cardID/:listID/:boardID',
   }
 );
 
-// authorization: member
 // move the position of a checklist item
 router.put('/checklist/moveItem',
   validate([...areAllMongo(['boardID', 'listID', 'cardID', 'checklistID'], 'body'), body('sourceIndex').isInt(), body('destIndex').isInt()]),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, cardID, listID, checklistID, sourceIndex, destIndex } = req.body;
@@ -741,11 +685,9 @@ router.put('/checklist/moveItem',
   }
 );
 
-// authorization: member
 // add/remove like from a card comment
 router.put('/comments/like',
   validate(areAllMongo(['boardID', 'listID', 'cardID', 'commentID'], 'body')),
-  useIsMember,
   async (req, res) => {
     try {
       const { commentID, cardID, listID, boardID } = req.body;
@@ -766,11 +708,9 @@ router.put('/comments/like',
   }
 );
 
-// authorization: member
 // add a custom field to card
 router.post('/customField',
   validate([...areAllMongo(['boardID', 'listID', 'cardID'], 'body'), body('fieldType').notEmpty(), body('fieldTitle').isLength({ min: 1, max: 150 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID, fieldType, fieldTitle } = req.body;
@@ -789,11 +729,9 @@ router.post('/customField',
   }
 );
 
-// authorization: member
 // edit a card custom field title
 router.put('/customField/title',
   validate([...areAllMongo(['boardID', 'listID', 'cardID', 'fieldID'], 'body'), body('fieldTitle').isLength({ min: 1, max: 150 })]),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID, fieldID, fieldTitle } = req.body;
@@ -810,7 +748,6 @@ router.put('/customField/title',
   }
 );
 
-// authorization: member
 // edit the value of a card custom field
 router.put('/customField/value',
   validate([...areAllMongo(['boardID', 'listID', 'cardID', 'fieldID'], 'body'), body('value').exists()]),
@@ -820,6 +757,7 @@ router.put('/customField/value',
       const [list, card] = await getListAndValidate(boardID, listID, cardID);
       const field = card.customFields.id(fieldID);
       if (!field) { throw 'Custom field not found'; }
+
       if (field.fieldType === 'Text') {
         if (typeof value !== 'string') { throw 'Invalid value type'; }
         if (value.length > 300) { throw 'Invalid field value length'; }
@@ -828,11 +766,14 @@ router.put('/customField/value',
         field.value = !field.value;
       } else if (field.fieldType === 'Number') {
         if (isNaN(value) || value > 1e20 || value < -1e20) { throw 'Field value is not a number'; }
+        // if value is float then can have max 12 decimal places
         field.value = value % 1 ? String(+parseFloat(value).toFixed(12)) : value;
       } else {
         if (value && isNaN(new Date(value).getDate())) { throw 'Field value is not a date'; }
+        // date value defaults to null if empty
         field.value = value !== '' ? value : null;
       }
+
       await list.save();
 
       res.sendStatus(200);
@@ -840,11 +781,9 @@ router.put('/customField/value',
   }
 );
 
-// authorization: member
 // delete a custom field from card
 router.delete('/customField/:fieldID/:cardID/:listID/:boardID',
   validate(areAllMongo(['boardID', 'listID', 'cardID', 'fieldID'], 'params')),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID, fieldID } = req.params;
@@ -860,17 +799,16 @@ router.delete('/customField/:fieldID/:cardID/:listID/:boardID',
   }
 );
 
-// authorization: member
 // cast a vote or remove vote on a card in a list with voting
 router.post('/vote',
   validate(areAllMongo(['boardID', 'listID', 'cardID'], 'body')),
-  useIsMember,
   async (req, res) => {
     try {
       const { boardID, listID, cardID } = req.body;
       const [list, card] = await getListAndValidate(boardID, listID, cardID);
       if (!list.isVoting) { throw 'List voting is not active'; }
 
+      // add vote if user hasn't voted else remove vote
       const idx = card.votes.findIndex(vote => vote.email === req.email);
       if (idx === -1) { card.votes.push({ email: req.email, fullName: req.fullName }); }
       else { card.votes.splice(idx, 1); }
