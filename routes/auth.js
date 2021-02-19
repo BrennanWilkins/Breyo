@@ -45,7 +45,7 @@ const getLeanJWTPayload = user => {
   return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins, userTeams, userAdminTeams };
 };
 
-router.post('/login',
+router.post('/',
   validate([body('email').isEmail(), body('password').notEmpty()], 'Email and password cannot be empty.'),
   async (req, res) => {
     try {
@@ -114,7 +114,7 @@ router.post('/signup',
 );
 
 // retrieve user data if userID token already present
-router.post('/autoLogin',
+router.get('/',
   auth,
   async (req, res) => {
     try {

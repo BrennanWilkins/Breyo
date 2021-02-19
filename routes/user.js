@@ -61,13 +61,13 @@ router.get('/',
   }
 );
 
-router.delete('/deleteAccount/:password',
-  validate([param('password').notEmpty()]),
+router.post('/deleteAccount',
+  validate([body('password').notEmpty()]),
   async (req, res) => {
     try {
       const user = await User.findById(req.userID);
       // validate user's password
-      const same = await bcryptjs.compare(req.params.password, user.password);
+      const same = await bcryptjs.compare(req.body.password, user.password);
       if (!same) { return res.sendStatus(400); }
 
       await user.remove();

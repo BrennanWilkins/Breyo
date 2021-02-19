@@ -12,7 +12,7 @@ export const authReset = () => ({ type: actionTypes.AUTH_RESET });
 export const login = (email, password) => async dispatch => {
   try {
     dispatch({ type: actionTypes.LOGIN_LOADING });
-    const res = await axios.post('/auth/login', { email, password });
+    const res = await axios.post('/auth', { email, password });
     dispatch(authSuccess(res.data));
   } catch (err) {
     const msg = err?.response?.data?.msg || 'There was an error connecting to the server.';
@@ -49,7 +49,7 @@ export const autoLogin = () => async dispatch => {
   try {
     dispatch({ type: actionTypes.AUTO_LOGIN_LOADING, bool: true });
     axios.defaults.headers.common['x-auth-token'] = localStorage['token'];
-    const res = await axios.post('/auth/autoLogin');
+    const res = await axios.get('/auth');
     dispatch(loginDispatch(res.data));
     dispatch({ type: actionTypes.AUTO_LOGIN_LOADING, bool: false });
   } catch (err) { dispatch(logout()); }

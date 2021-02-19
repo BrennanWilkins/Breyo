@@ -12,9 +12,9 @@ export const getUserData = () => async dispatch => {
   }
 };
 
-export const deleteAccount = pass => async dispatch => {
+export const deleteAccount = password => async dispatch => {
   try {
-    await axios.delete(`/user/deleteAccount/${pass}`);
+    await axios.post('/user/deleteAccount', { password });
     dispatch(logout());
   } catch (err) {
     if (err?.response?.status === 400) { return dispatch(addNotif('Incorrect password.')); }
