@@ -176,8 +176,8 @@ export const deleteChecklist = checklistID => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID } = getCardState(getState);
     const payload = { checklistID, cardID, listID };
-    dispatch({ type: actionTypes.DELETE_CHECKLIST, ...payload });
     const res = await axios.delete(`/card/checklist/${checklistID}/${cardID}/${listID}/${boardID}`);
+    dispatch({ type: actionTypes.DELETE_CHECKLIST, ...payload });
     sendUpdate('delete/card/checklist', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
@@ -330,7 +330,7 @@ const removeCardMemberHelper = async (dispatch, email, cardID, listID, boardID) 
 export const removeCardMemberCurrentCard = email => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID } = getCardState(getState);
-    removeCardMemberHelper(dispatch, email, cardID, listID, boardID);
+    await removeCardMemberHelper(dispatch, email, cardID, listID, boardID);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -339,7 +339,7 @@ export const removeCardMemberCurrentCard = email => async (dispatch, getState) =
 export const removeCardMember = (email, cardID, listID) => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
-    removeCardMemberHelper(dispatch, email, cardID, listID, boardID);
+    await removeCardMemberHelper(dispatch, email, cardID, listID, boardID);
   } catch (err) {
     dispatch(serverErr());
   }
