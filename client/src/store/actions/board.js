@@ -64,11 +64,16 @@ const formatCardData = card => {
 };
 
 export const updateActiveBoard = data => (dispatch, getState) => {
-  const { _id: boardID, members, desc, creatorEmail, color, title, activity, teamID } = data;
+  const { _id: boardID, members, desc, creator, color, title, activity, teamID } = data;
   const state = getState();
   const activeBoard = state.user.boards.byID[boardID];
   let { isStarred, isAdmin: userIsAdmin } = activeBoard;
-  const { isAdmin, ...creator} = data.members.find(member => member.email === creatorEmail);
+
+  const avatars = {};
+  for (let member of data.members) {
+    avatars[member.email] = member.avatar;
+    if (member.email === creator.email) { creator.avatar = member.avatar; }
+  }
 
   let team = { teamID, title: '', url: null };
   if (teamID && !data.team) {
@@ -79,10 +84,10 @@ export const updateActiveBoard = data => (dispatch, getState) => {
     team.title = data.team.title;
   }
 
-  if (data.invites && data.boards) {
+  if (data.invites && data.boards && data.teamInvites) {
     const userEmail = state.user.email;
     userIsAdmin = members.find(member => member.email === userEmail).isAdmin;
-    dispatch({ type: actionTypes.UPDATE_USER_DATA, invites: data.invites, boards: data.boards });
+    dispatch({ type: actionTypes.UPDATE_USER_BOARDS, invites: data.invites, boards: data.boards, teamInvites: data.teamInvites });
   }
 
   if (data.token) {
@@ -90,12 +95,8 @@ export const updateActiveBoard = data => (dispatch, getState) => {
     axios.defaults.headers.common['x-auth-token'] = data.token;
   }
 
-  const boardPayload = { isStarred, creator, userIsAdmin, title, members, color, boardID, desc, team };
+  const boardPayload = { isStarred, creator, userIsAdmin, title, members, color, boardID, desc, team, avatars };
   dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload: boardPayload });
-
-  const avatars = {};
-  for (let member of data.members) { avatars[member.email] = member.avatar; }
-  dispatch({ type: actionTypes.SET_BOARD_AVATARS, avatars });
 
   let allArchivedCards = [];
   let allComments = [];

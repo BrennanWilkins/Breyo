@@ -7,7 +7,7 @@ const BoardSchema = new Schema({
   title: String,
   color: String,
   desc: String,
-  creatorEmail: String,
+  creator: {},
   teamID: String
 });
 

@@ -39,7 +39,6 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SET_SHOWN_ROADMAP_LIST: return { ...state, shownRoadmapListID: action.listID };
     case actionTypes.CLOSE_ROADMAP: return { ...state, roadmapShown: false };
     case actionTypes.TOGGLE_CREATE_BOARD: return toggleCreateBoard(state, action);
-    case actionTypes.SET_BOARD_AVATARS: return { ...state, avatars: action.avatars };
     case actionTypes.CHANGE_BOARD_TEAM: return changeBoardTeam(state, action);
     default: return state;
   }
@@ -55,7 +54,8 @@ const updateActiveBoard = (state, action) => ({
   desc: action.payload.desc,
   isStarred: action.payload.isStarred,
   userIsAdmin: action.payload.userIsAdmin,
-  team: action.payload.team
+  team: action.payload.team,
+  avatars: action.payload.avatars
 });
 
 const addAdmin = (state, action) => {
@@ -69,8 +69,7 @@ const removeAdmin = (state, action) => {
 };
 
 const addBoardMember = (state, action) => {
-  const members = [...state.members];
-  members.push({ email: action.email, fullName: action.fullName, isAdmin: false });
+  const members = [...state.members, { email: action.email, fullName: action.fullName, isAdmin: false }];
   return { ...state, members };
 };
 
@@ -79,19 +78,20 @@ const deleteBoardMember = (state, action) => {
   return { ...state, members };
 };
 
-const toggleCreateBoard = (state, action) => {
-  const createBoardTeamID = action.teamID || null;
-  const createBoardTeamTitle = action.teamTitle || null;
-  return { ...state, createBoardTeamID, createBoardTeamTitle, showCreateBoard: !state.showCreateBoard };
-};
+const toggleCreateBoard = (state, action) => ({
+  ...state,
+  createBoardTeamID: action.teamID || null,
+  createBoardTeamTitle: action.teamTitle || null,
+  showCreateBoard: !state.showCreateBoard
+});
 
-const changeBoardTeam = (state, action) => {
-  const team = {
+const changeBoardTeam = (state, action) => ({
+  ...state,
+  team: {
     teamID: action.team.teamID,
     title: action.team.title,
     url: !state.team.url ? null : action.team.url
-  };
-  return { ...state, team };
-};
+  }
+});
 
 export default reducer;

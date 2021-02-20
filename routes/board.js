@@ -68,6 +68,7 @@ router.get('/:boardID',
         user.boards = formatUserBoards(user);
         const token = await signNewToken(user, req.header('x-auth-token'), false);
         data.invites = user.invites;
+        data.teamInvites = user.teamInvites;
         data.boards = user.boards;
         data.token = token;
       }
@@ -95,7 +96,8 @@ router.post('/',
       if (!user) { throw 'No user data found'; }
 
       // user is admin of new board by default
-      const board = new Board({ title, members: [req.userID], admins: [req.userID], color, creatorEmail: user.email, desc: '', teamID: null });
+      const board = new Board({ title, members: [req.userID], admins: [req.userID], color,
+        creator: { email: user.email, fullName: user.fullName }, desc: '', teamID: null });
       const boardID = board._id;
 
       // add board to user's boards
@@ -140,7 +142,8 @@ router.post('/teamBoard',
       if (!user || !teamExists) { throw 'No user or team data found'; }
 
       // user is admin of new board by default
-      const board = new Board({ title, members: [req.userID], admins: [req.userID], color, creatorEmail: user.email, desc: '', teamID });
+      const board = new Board({ title, members: [req.userID], admins: [req.userID], color,
+        creator: { email: user.email, fullName: user.fullName }, desc: '', teamID });
       const boardID = board._id;
 
       // add board to user's boards
