@@ -23,6 +23,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.CREATE_BOARD: return createBoard(state, action);
     case actionTypes.TOGGLE_IS_STARRED: return toggleIsStarred(state, action);
     case actionTypes.UPDATE_USER_DATA: return updateUserData(state, action);
+    case actionTypes.UPDATE_USER_BOARDS: return updateUserBoards(state, action);
     case actionTypes.DEMOTE_SELF: return changeUserMembership(state, action, false);
     case actionTypes.PROMOTE_SELF: return changeUserMembership(state, action, true);
     case actionTypes.DELETE_BOARD: return deleteBoard(state, action);
@@ -100,11 +101,18 @@ const updateUserData = (state, action) => {
   };
 };
 
+const updateUserBoards = (state, action) => {
+  const boardsByID = {};
+  const allBoardIDs = [];
+  for (let board of action.boards) {
+    boardsByID[board.boardID] = board;
+    allBoardIDs.push(board.boardID);
+  }
+  return { ...state, invites: action.invites, teamInvites: action.teamInvites, boards: { byID: boardsByID, allIDs: allBoardIDs } };
+};
+
 const changeUserMembership = (state, action, isAdmin) => {
-  const boardsByID = { ...state.boards.byID };
-  const board = { ...boardsByID[action.boardID] };
-  board.isAdmin = isAdmin;
-  boardsByID[action.boardID] = board;
+  const boardsByID = { ...state.boards.byID, [action.boardID]: { ...state.boards.byID[action.boardID], isAdmin } };
   return { ...state, boards: { byID: boardsByID, allIDs: state.boards.allIDs } };
 };
 
@@ -115,22 +123,18 @@ const deleteBoard = (state, action) => {
   return { ...state, boards: { byID: boardsByID, allIDs } };
 };
 
-const removeInvite = (state, action) => {
-  const invites = state.invites.filter(invite => invite.boardID !== action.boardID);
-  return { ...state, invites };
-};
+const removeInvite = (state, action) => ({
+  ...state,
+  invites: state.invites.filter(invite => invite.boardID !== action.boardID)
+});
 
 const updateBoardTitle = (state, action) => {
-  const boardsByID = { ...state.boards.byID };
-  const board = { ...boardsByID[action.boardID], title: action.title };
-  boardsByID[action.boardID] = board;
+  const boardsByID = { ...state.boards.byID, [action.boardID]: { ...state.boards.byID[action.boardID], title: action.title } };
   return { ...state, boards: { byID: boardsByID, allIDs: state.boards.allIDs } };
 };
 
 const updateColor = (state, action) => {
-  const boardsByID = { ...state.boards.byID };
-  const board = { ...boardsByID[action.boardID], color: action.color };
-  boardsByID[action.boardID] = board;
+  const boardsByID = { ...state.boards.byID, [action.boardID]: { ...state.boards.byID[action.boardID], color: action.color } };
   return { ...state, boards: { byID: boardsByID, allIDs: state.boards.allIDs } };
 };
 
@@ -144,9 +148,7 @@ const createTeam = (state, action) => ({
 
 const editTeam = (state, action) => {
   const { teamID, url, title } = action.payload;
-  const teamsByID = { ...state.teams.byID };
-  const team = { ...teamsByID[teamID], url, title };
-  teamsByID[teamID] = team;
+  const teamsByID = { ...state.teams.byID, [teamID]: { ...state.teams.byID[teamID], url, title } };
   return { ...state, teams: { byID: teamsByID, allIDs: state.teams.allIDs } };
 };
 
@@ -157,17 +159,19 @@ const joinTeam = (state, action) => {
   return { ...state, teamInvites, teams: { byID: teamsByID, allIDs } };
 };
 
-const rejectTeamInvite = (state, action) => {
-  const teamInvites = state.teamInvites.filter(invite => invite.teamID !== action.teamID);
-  return { ...state, teamInvites };
-};
+const rejectTeamInvite = (state, action) => ({
+  ...state,
+  teamInvites: state.teamInvites.filter(invite => invite.teamID !== action.teamID)
+});
 
-const joinBoard = (state, action) => {
-  const invites = state.invites.filter(invite => invite.boardID !== action.board.boardID);
-  const boardsByID = { ...state.boards.byID, [action.board.boardID]: action.board };
-  const allIDs = [...state.boards.allIDs, action.board.boardID];
-  return { ...state, invites, boards: { byID: boardsByID, allIDs } };
-};
+const joinBoard = (state, action) => ({
+  ...state,
+  invites: state.invites.filter(invite => invite.boardID !== action.board.boardID),
+  boards: {
+    byID: { ...state.boards.byID, [action.board.boardID]: action.board },
+    allIDs: [...state.boards.allIDs, action.board.boardID]
+  }
+});
 
 const updateUserTeams = (state, action) => {
   const teamsByID = {};

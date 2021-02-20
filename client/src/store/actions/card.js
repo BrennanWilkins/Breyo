@@ -456,4 +456,4 @@ export const toggleCardVote = () => async (dispatch, getState) => {
   } catch (err) {
     dispatch(serverErr());
   }
-}
+};

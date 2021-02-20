@@ -1,5 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
-import { findAndReplace, filterByDueDate } from './reducerUtils';
+import { isToday, isTomorrow, isThisWeek, isThisMonth, isPast } from 'date-fns';
 
 const initialState = {
   lists: [],
@@ -51,8 +51,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DELETE_CARD: return deleteCard(state, action);
     case actionTypes.COPY_LIST: return copyList(state, action);
     case actionTypes.ARCHIVE_LIST: return archiveList(state, action);
-    case actionTypes.UNDO_ARCHIVE_LIST: return undoArchiveList(state, action);
-    case actionTypes.RECOVER_LIST: return recoverList(state, action);
+    case actionTypes.UNDO_ARCHIVE_LIST: return recoverList(state, action, false);
+    case actionTypes.RECOVER_LIST: return recoverList(state, action, true);
     case actionTypes.DELETE_LIST: return deleteList(state, action);
     case actionTypes.ARCHIVE_ALL_CARDS: return archiveAllCards(state, action);
     case actionTypes.MOVE_ALL_CARDS: return moveAllCards(state, action);
@@ -94,17 +94,34 @@ const findCard = (state, listID, cardID) => {
   return { lists, listIndex, list, cards, cardIndex, card };
 };
 
+const getFilteredLists = (state, lists) => {
+  let filteredLists = state.filteredLists;
+  if (state.cardsAreFiltered) {
+    filteredLists = filterListsHelper(state.searchQueries, lists);
+  }
+  return filteredLists;
+};
+
+// filter cards by search query mode & its dueDate
+const filterByDueDate = (mode, dueDate) => {
+  const date = new Date(dueDate.dueDate);
+  switch (mode) {
+    case 'today': return isTomorrow(date) || isToday(date);
+    case 'week': return isThisWeek(date);
+    case 'month': return isThisMonth(date);
+    case 'overdue': return isPast(date) && dueDate.isComplete === false;
+    case 'complete': return dueDate.isComplete === true;
+    case 'incomplete': return dueDate.isComplete === false;
+    default: return false;
+  }
+};
+
 // update lists state after updating a card
 const updateLists = (cards, cardIndex, card, list, lists, listIndex, state) => {
   cards[cardIndex] = card;
   list.cards = cards;
   lists[listIndex] = list;
-
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
-
+  const filteredLists = getFilteredLists(state, lists);
   return { ...state, lists, currentCard: { ...card, listIsVoting: list.isVoting }, filteredLists };
 };
 
@@ -124,12 +141,12 @@ const setListData = (state, action) => ({
   archivedLists: action.payload.archivedLists
 });
 
-const updateListTitle = (state, action) => {
-  const lists = findAndReplace(state.lists, 'listID', action.listID, 'title', action.title);
-  const currentListTitle = state.currentListTitle ? action.title : null;
-  const filteredLists = state.cardsAreFiltered ? findAndReplace(state.filteredLists, 'listID', action.listID, 'title', action.title) : state.filteredLists;
-  return { ...state, lists, currentListTitle, filteredLists };
-};
+const updateListTitle = (state, action) => ({
+  ...state,
+  lists: state.lists.map(list => list.listID === action.listID ? { ...list, title: action.title } : list),
+  currentListTitle: state.currentListTitle ? action.title : null,
+  filteredLists: state.cardsAreFiltered ? state.filteredLists.map(list => list.listID === action.listID ? { ...list, title: action.title } : list) : state.filteredLists
+});
 
 const addList = (state, action) => {
   const list = { listID: action.listID, title: action.title, cards: [], indexInBoard: state.lists.length, isVoting: false, limit: null };
@@ -139,23 +156,14 @@ const addList = (state, action) => {
 };
 
 const addCard = (state, action) => {
-  const index = state.lists.findIndex(list => list.listID === action.listID);
-  const cards = [...state.lists[index].cards];
   const card = { title: action.title, desc: '', checklists: [], dueDate: null, labels: [],
   cardID: action.cardID, members: [], comments: [], roadmapLabel: null, customFields: [], votes: [] };
-  cards.push(card);
-  const lists = [...state.lists];
-  lists[index].cards = cards;
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    if (filterCardHelper(state.searchQueries, card)) {
-      filteredLists = [...filteredLists];
-      const index = filteredLists.findIndex(list => list.listID === action.listID);
-      const cards = [...filteredLists[index].cards, card];
-      filteredLists[index].cards = cards;
-    }
-  }
+  const lists = state.lists.map(list => list.listID === action.listID ? { ...list, cards: [...list.cards, card] } : list);
+
+  const filteredLists = state.cardsAreFiltered && filterCardHelper(state.searchQueries, card) ?
+    state.filteredLists.map(list => list.listID === action.listID ? { ...list, cards: [...list.cards, card] } : list) :
+    state.filteredLists;
 
   return { ...state, lists, filteredLists };
 };
@@ -182,16 +190,13 @@ const updateCardDesc = (state, action) => {
 
 const addCardLabel = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const labels = [...card.labels, action.color];
-  card.labels = labels;
+  card.labels = [...card.labels, action.color];
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
 const removeCardLabel = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const labels = [...card.labels];
-  labels.splice(labels.indexOf(action.color), 1);
-  card.labels = labels;
+  card.labels = card.labels.filter(label => label !== action.color);
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
@@ -209,16 +214,13 @@ const removeRoadmapLabel = (state, action) => {
 
 const toggleDueDate = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const dueDate = {...card.dueDate};
-  dueDate.isComplete = !dueDate.isComplete;
-  card.dueDate = dueDate;
+  card.dueDate = { ...card.dueDate, isComplete: !card.dueDate.isComplete };
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
 const addDueDate = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const dueDate = { dueDate: action.dueDate, startDate: action.startDate, isComplete: false };
-  card.dueDate = dueDate;
+  card.dueDate = { dueDate: action.dueDate, startDate: action.startDate, isComplete: false };
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
@@ -230,18 +232,13 @@ const removeDueDate = (state, action) => {
 
 const addChecklist = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const checklists = [...card.checklists];
-  checklists.push({ title: action.title, items: [], checklistID: action.checklistID });
-  card.checklists = checklists;
+  card.checklists = [...card.checklists, { title: action.title, items: [], checklistID: action.checklistID }];
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
 const deleteChecklist = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const checklists = [...card.checklists];
-  const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
-  checklists.splice(checklistIndex, 1);
-  card.checklists = checklists;
+  card.checklists = card.checklists.filter(checklist => checklist.checklistID !== action.checklistID);
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
@@ -249,9 +246,7 @@ const editChecklistTitle = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
   const checklists = [...card.checklists];
   const checklistIndex = checklists.findIndex(checklist => checklist.checklistID === action.checklistID);
-  const checklist = { ...checklists[checklistIndex] };
-  checklist.title = action.title;
-  checklists[checklistIndex] = checklist;
+  checklists[checklistIndex] = { ...checklists[checklistIndex], title: action.title };
   card.checklists = checklists;
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
@@ -291,9 +286,7 @@ const editChecklistItem = (state, action) => {
 const deleteChecklistItem = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
   const { checklists, checklistIndex, checklist, items } = findChecklistItems(card, action.checklistID);
-  const itemIndex = items.findIndex(item => item.itemID === action.itemID);
-  items.splice(itemIndex, 1);
-  checklist.items = items;
+  checklist.items = checklist.items.filter(item => item.itemID !== action.itemID);
   checklists[checklistIndex] = checklist;
   card.checklists = checklists;
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
@@ -305,36 +298,30 @@ const moveList = (state, action) => {
   const list = { ...lists[listIndex] };
   lists.splice(action.sourceIndex, 1);
   lists.splice(action.destIndex, 0, list);
+
   for (let i = 0; i < lists.length; i++) {
     if (lists[i].indexInBoard !== i) {
-      const list = { ...lists[i] };
-      list.indexInBoard = i;
-      lists[i] = list;
+      lists[i] = { ...lists[i], indexInBoard: i };
     }
   }
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
   return { ...state, lists, filteredLists };
 };
 
 const moveCardSameList = (state, action) => {
-  const lists = [...state.lists];
-  const listIndex = lists.findIndex(list => list.listID === action.listID);
-  const list = { ...lists[listIndex] };
-  const cards = [...list.cards];
-  const card = cards.splice(action.sourceIndex, 1)[0];
-  cards.splice(action.destIndex, 0, card);
-  list.cards = cards;
-  lists[listIndex] = list;
+  const lists = state.lists.map(list => {
+    if (list.listID === action.listID) {
+      const cards = [...list.cards];
+      const card = cards.splice(action.sourceIndex, 1)[0];
+      cards.splice(action.destIndex, 0, card);
+      return { ...list, cards };
+    }
+    return list;
+  });
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
   return { ...state, lists, filteredLists };
 };
@@ -354,54 +341,53 @@ const moveCardDiffList = (state, action) => {
   lists[sourceIndex] = sourceList;
   lists[destIndex] = destList;
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
-  let shownListID = state.shownListID;
-  let currentListTitle = state.currentListTitle;
   if (state.currentCard && state.currentCard.cardID === card.cardID) {
-    shownListID = action.destID;
-    currentListTitle = destList.title;
+    return { ...state, lists, filteredLists, shownListID: action.destID, currentListTitle: destList.title };
   }
-  return { ...state, lists, shownListID, currentListTitle, filteredLists };
+  return { ...state, lists, filteredLists };
 };
 
 const copyCard = (state, action) => {
-  const lists = [...state.lists];
-  const listIndex = action.sourceListID === action.destListID ?
-  lists.findIndex(list => list.listID === action.sourceListID) :
-  lists.findIndex(list => list.listID === action.destListID);
-  const list = { ...lists[listIndex] };
-  const cards = [...list.cards];
-  const checklists = action.checklists.map(checklist => ({
-    title: checklist.title,
-    checklistID: checklist._id,
-    items: checklist.items.map(item => ({
-      itemID: item._id,
-      title: item.title,
-      isComplete: item.isComplete
-    }))
-  }));
-  const customFields = action.customFields.map(field => ({
-    fieldTitle: field.fieldTitle,
-    fieldType: field.fieldType,
-    value: field.value,
-    fieldID: field._id
-  }));
-  const newCard = { title: action.title, desc: '', checklists, dueDate: null, cardID: action.newCardID,
-    members: [], comments: [], customFields, votes: [] };
-  newCard.labels = action.keepLabels ? [...action.currentCard.labels] : [];
-  newCard.roadmapLabel = action.keepLabels ? action.currentCard.roadmapLabel : null;
-  cards.splice(action.destIndex, 0, newCard);
-  list.cards = cards;
-  lists[listIndex] = list;
+  const newCard = {
+    title: action.title,
+    desc: '',
+    checklists: action.checklists.map(checklist => ({
+      title: checklist.title,
+      checklistID: checklist._id,
+      items: checklist.items.map(item => ({
+        itemID: item._id,
+        title: item.title,
+        isComplete: item.isComplete
+      }))
+    })),
+    dueDate: null,
+    cardID: action.newCardID,
+    members: [],
+    comments: [],
+    customFields: action.customFields.map(field => ({
+      fieldTitle: field.fieldTitle,
+      fieldType: field.fieldType,
+      value: field.value,
+      fieldID: field._id
+    })),
+    votes: [],
+    labels: action.keepLabels ? [...action.currentCard.labels] : [],
+    roadmapLabel: action.keepLabels ? action.currentCard.roadmapLabel : null
+  };
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const targetID = action.sourceListID === action.destListID ? action.sourceListID : action.destListID;
+  const lists = state.lists.map(list => {
+    if (list.listID === targetID) {
+      const cards = [...list.cards];
+      cards.splice(action.destIndex, 0, newCard);
+      return { ...list, cards };
+    }
+    return list;
+  });
+
+  const filteredLists = getFilteredLists(state, lists);
 
   return { ...state, lists, filteredLists };
 };
@@ -415,76 +401,52 @@ const archiveCard = (state, action) => {
   const card = cards.splice(cardIndex, 1)[0];
   list.cards = cards;
   lists[listIndex] = list;
-  const allArchivedCards = [...state.allArchivedCards];
-  allArchivedCards.unshift({ ...card, listID: action.listID });
+  const allArchivedCards = [{ ...card, listID: action.listID }, ...state.allArchivedCards];
 
   let currentCard = state.currentCard;
   if (currentCard && currentCard.cardID === action.cardID) {
-    currentCard = { ...state.currentCard };
-    currentCard.isArchived = true;
+    currentCard = { ...state.currentCard, isArchived: true };
   }
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
   return { ...state, lists, allArchivedCards, currentCard, filteredLists };
 };
 
 const recoverCard = (state, action) => {
+  let currentCard = state.currentCard;
   const listIsArchived = !state.lists.find(list => list.listID === action.listID);
   if (!listIsArchived) {
-    const lists = [...state.lists];
-    const listIndex = lists.findIndex(list => list.listID === action.listID);
-    const list = { ...lists[listIndex] };
     const allArchivedCards = [...state.allArchivedCards];
     const cardIndex = allArchivedCards.findIndex(card => card.cardID === action.cardID);
     const card = allArchivedCards.splice(cardIndex, 1)[0];
     delete card.listID;
-    const cards = [...list.cards];
-    cards.push(card);
-    list.cards = cards;
-    lists[listIndex] = list;
+    const lists = state.lists.map(list => list.listID === action.listID ? { ...list, cards: [...list.cards, card] } : list);
 
-    let filteredLists = state.filteredLists;
-    if (state.cardsAreFiltered) {
-      filteredLists = filterListsHelper(state.searchQueries, lists);
-    }
+    const filteredLists = getFilteredLists(state, lists);
 
-    let currentCard = state.currentCard;
     if (currentCard && currentCard.cardID === action.cardID) {
       currentCard = { ...state.currentCard };
       delete currentCard.isArchived;
     }
     return { ...state, lists, allArchivedCards, currentCard, filteredLists };
   } else {
-    const archivedLists = [...state.archivedLists];
-    const listIndex = archivedLists.findIndex(list => list.listID === action.listID);
-    const list = { ...archivedLists[listIndex] };
     const allArchivedCards = [...state.allArchivedCards];
     const cardIndex = allArchivedCards.findIndex(card => card.cardID === action.cardID);
     const card = allArchivedCards.splice(cardIndex, 1)[0];
     delete card.listID;
-    const cards = [...list.cards];
-    cards.push(card);
-    list.cards = cards;
-    archivedLists[listIndex] = list;
+    const archivedLists = state.archivedLists.map(list => list.listID === action.listID ? { ...list, cards: [...list.cards, card] } : list);
 
-    let currentCard = state.currentCard;
     if (currentCard && currentCard.cardID === action.cardID) {
-      currentCard = { ...state.currentCard };
+      currentCard = { ...state.currentCard, listIsArchived: true };
       delete currentCard.isArchived;
-      currentCard.listIsArchived = true;
     }
     return { ...state, archivedLists, allArchivedCards, currentCard };
   }
 };
 
 const deleteCard = (state, action) => {
-  const allArchivedCards = [...state.allArchivedCards];
-  const cardIndex = allArchivedCards.findIndex(card => card.cardID === action.cardID);
-  allArchivedCards.splice(cardIndex, 1);
+  const allArchivedCards = state.allArchivedCards.filter(card => card.cardID !== action.cardID);
 
   if (state.currentCard && state.currentCard.cardID === action.cardID) {
     return { ...state, allArchivedCards, currentCard: null, shownCardID: null, shownListID: null, currentListTitle: null };
@@ -493,7 +455,6 @@ const deleteCard = (state, action) => {
 };
 
 const copyList = (state, action) => {
-  const lists = [...state.lists];
   const newList = {
     indexInBoard: action.newList.indexInBoard,
     listID: action.newList._id,
@@ -528,12 +489,9 @@ const copyList = (state, action) => {
       votes: []
     }))
   };
-  lists.push(newList);
+  const lists = [...state.lists, newList];
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
   return { ...state, lists, filteredLists };
 };
@@ -541,33 +499,24 @@ const copyList = (state, action) => {
 const archiveList = (state, action) => {
   const lists = [...state.lists];
   const listIndex = lists.findIndex(list => list.listID === action.listID);
-  const archivedList = { ...lists.splice(listIndex, 1)[0] };
-  archivedList.isArchived = true;
-  // archivedList.indexInBoard = lists.length;
+  const archivedList = { ...lists.splice(listIndex, 1)[0], isArchived: true };
   for (let i = 0; i < lists.length; i++) {
     if (lists[i].indexInBoard !== i) {
-      const list = { ...lists[i] };
-      list.indexInBoard = i;
-      lists[i] = list;
+      lists[i] = { ...lists[i], indexInBoard: i };
     }
   }
-  const archivedLists = [...state.archivedLists];
-  archivedLists.push(archivedList);
+  const archivedLists = [...state.archivedLists, archivedList];
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
   let currentCard = state.currentCard;
   if (currentCard && state.shownListID === action.listID) {
-    currentCard = { ...state.currentCard };
-    currentCard.listIsArchived = true;
+    currentCard = { ...state.currentCard, listIsArchived: true };
   }
   return { ...state, lists, archivedLists, currentCard, filteredLists };
 };
 
-const recoverListHelper = (state, action, addToEnd) => {
+const recoverList = (state, action, addToEnd) => {
   const lists = [...state.lists];
   const archivedLists = [...state.archivedLists];
   const listIndex = archivedLists.findIndex(list => list.listID === action.listID);
@@ -582,10 +531,7 @@ const recoverListHelper = (state, action, addToEnd) => {
     lists.splice(archivedList.indexInBoard, 0, archivedList);
   }
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
   let currentCard = state.currentCard;
   if (currentCard && state.shownListID === action.listID) {
@@ -595,14 +541,8 @@ const recoverListHelper = (state, action, addToEnd) => {
   return { ...state, lists, archivedLists, currentCard, filteredLists };
 };
 
-const undoArchiveList = (state, action) => recoverListHelper(state, action, false);
-
-const recoverList = (state, action) => recoverListHelper(state, action, true);
-
 const deleteList = (state, action) => {
-  const archivedLists = [...state.archivedLists];
-  const listIndex = archivedLists.findIndex(list => list.listID === action.listID);
-  archivedLists.splice(listIndex, 1);
+  const archivedLists = state.archivedLists.filter(list => list.listID !== action.listID);
   const allArchivedCards = state.allArchivedCards.filter(card => card.listID !== action.listID);
 
   if (state.currentCard && state.shownListID === action.listID) {
@@ -614,53 +554,38 @@ const deleteList = (state, action) => {
 const archiveAllCards = (state, action) => {
   const lists = [...state.lists];
   const listIndex = lists.findIndex(list => list.listID === action.listID);
-  const list = { ...lists[listIndex] };
-  const allArchivedCards = state.allArchivedCards.concat(list.cards.map(card => ({ ...card, listID: list.listID })));
-  list.cards = [];
-  lists[listIndex] = list;
+  const allArchivedCards = state.allArchivedCards.concat(lists[listIndex].cards.map(card => ({ ...card, listID: lists[listIndex].listID })));
+  lists[listIndex] = { ...lists[listIndex], cards: [] };
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
   let currentCard = state.currentCard;
   if (currentCard && state.shownListID === action.listID) {
-    currentCard = { ...state.currentCard };
-    currentCard.isArchived = true;
+    currentCard = { ...state.currentCard, isArchived: true };
   }
   return { ...state, lists, allArchivedCards, currentCard, filteredLists };
 };
 
 const moveAllCards = (state, action) => {
   const lists = [...state.lists];
-  const oldListIndex = lists.findIndex(list => list.listID === action.oldListID);
-  const newListIndex = lists.findIndex(list => list.listID === action.newListID);
-  const oldList = { ...lists[oldListIndex] };
-  const newList = { ...lists[newListIndex] };
-  newList.cards = newList.cards.concat([...oldList.cards]);
-  oldList.cards = [];
-  lists[oldListIndex] = oldList;
-  lists[newListIndex] = newList;
+  const oldIndex = lists.findIndex(list => list.listID === action.oldListID);
+  const newIndex = lists.findIndex(list => list.listID === action.newListID);
+  lists[newIndex] = { ...lists[newIndex], cards: lists[newIndex].cards.concat([...lists[oldIndex].cards]) };
+  lists[oldIndex] = { ...lists[oldIndex], cards: [] };
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
   if (state.currentCard && state.shownListID === action.oldListID) {
-    return { ...state, lists, shownListID: action.newListID, currentListTitle: newList.title, filteredLists };
+    return { ...state, lists, shownListID: action.newListID, currentListTitle: lists[newIndex].title, filteredLists };
   }
   return { ...state, lists, filteredLists };
 };
 
 const addCardMember = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const members = [...card.members];
   // check if user already member
-  if (members.find(member => member.email === action.email)) { return state; }
-  members.push({ email: action.email, fullName: action.fullName });
-  card.members = members;
+  if (card.members.find(member => member.email === action.email)) { return state; }
+  card.members = [...card.members, { email: action.email, fullName: action.fullName }];
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
@@ -672,44 +597,33 @@ const removeCardMember = (state, action) => {
 
 const addComment = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.payload.listID, action.payload.cardID);
-  const comments = [...card.comments];
-  comments.unshift({ ...action.payload, likes: [] });
-  card.comments = comments;
+  card.comments = [{ ...action.payload, likes: [] }, ...card.comments];
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
 const updateComment = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const comments = [...card.comments];
-  const commentIndex = comments.findIndex(comment => comment.commentID === action.commentID);
-  const comment = { ...comments[commentIndex] };
-  comment.msg = action.msg;
-  comments[commentIndex] = comment;
-  card.comments = comments;
+  card.comments = card.comments.map(comment => comment.commentID === action.commentID ? { ...comment, msg: action.msg } : comment);
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
 const deleteComment = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const comments = [...card.comments];
-  const commentIndex = comments.findIndex(comment => comment.commentID === action.commentID);
-  comments.splice(commentIndex, 1);
-  card.comments = comments;
+  card.comments = card.comments.filter(comment => comment.commentID !== action.commentID);
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
 const toggleCommentLike = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const comments = [...card.comments];
-  const commentIndex = comments.findIndex(comment => comment.commentID === action.commentID);
-  const comment = { ...comments[commentIndex] };
-  if (comment.likes.includes(action.email)) {
-    comment.likes = comment.likes.filter(like => like !== action.email);
-  } else {
-    comment.likes = [...comment.likes, action.email];
-  }
-  comments[commentIndex] = comment;
-  card.comments = comments;
+  card.comments = card.comments.map(comment => {
+    if (comment.commentID === action.commentID) {
+      if (comment.likes.includes(action.email)) {
+        return { ...comment, likes: comment.likes.filter(like => like !== action.email) };
+      }
+      return { ...comment, likes: [...comment.likes, action.email] };
+    }
+    return comment;
+  });
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
@@ -750,10 +664,7 @@ const deleteBoardMember = (state, action) => {
     }
   }
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
   return { ...state, lists, filteredLists, currentCard };
 };
@@ -806,8 +717,7 @@ const filterCardHelper = (searchQueries, card) => {
 };
 
 const addTitleSearchQuery = (state, action) => {
-  const searchQueries = { ...state.searchQueries };
-  searchQueries.titleQuery = action.title;
+  const searchQueries = { ...state.searchQueries, titleQuery: action.title };
   if (!action.title) {
     if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
   }
@@ -816,12 +726,11 @@ const addTitleSearchQuery = (state, action) => {
 };
 
 const addLabelSearchQuery = (state, action) => {
-  const searchQueries = { ...state.searchQueries };
-  const labels = [...searchQueries.labels];
+  const labels = [...state.searchQueries.labels];
   const labelIndex = labels.indexOf(action.label);
-  if (labelIndex === -1) { labels.push(action.label); }
-  else { labels.splice(labelIndex, 1); }
-  searchQueries.labels = labels;
+  labelIndex === -1 ? labels.push(action.label) : labels.splice(labelIndex, 1);
+  const searchQueries = { ...state.searchQueries, labels };
+
   if (!labels.length) {
     if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
   }
@@ -830,8 +739,7 @@ const addLabelSearchQuery = (state, action) => {
 };
 
 const addMemberSearchQuery = (state, action) => {
-  const searchQueries = { ...state.searchQueries };
-  searchQueries.memberQuery = action.email;
+  const searchQueries = { ...state.searchQueries, memberQuery: action.email };
   if (!action.email) {
     if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
   }
@@ -840,8 +748,7 @@ const addMemberSearchQuery = (state, action) => {
 };
 
 const addDueDateSearchQuery = (state, action) => {
-  const searchQueries = { ...state.searchQueries };
-  searchQueries.dueDateQuery = action.query;
+  const searchQueries = { ...state.searchQueries, dueDateQuery: action.query };
   if (!action.query) {
     if (!checkForQuery(searchQueries)) { return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] }; }
   }
@@ -880,19 +787,13 @@ const addCustomField = (state, action) => {
 
 const updateCustomFieldTitle = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const fieldIndex = card.customFields.findIndex(({ fieldID }) => fieldID === action.fieldID);
-  const fields = [...card.customFields];
-  fields[fieldIndex] = { ...fields[fieldIndex], fieldTitle: action.fieldTitle };
-  card.customFields = fields;
+  card.customFields = card.customFields.map(field => field.fieldID === action.fieldID ? { ...field, fieldTitle: action.fieldTitle } : field);
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
 const updateCustomFieldValue = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const fieldIndex = card.customFields.findIndex(({ fieldID }) => fieldID === action.fieldID);
-  const fields = [...card.customFields];
-  fields[fieldIndex] = { ...fields[fieldIndex], value: action.value };
-  card.customFields = fields;
+  card.customFields = card.customFields.map(field => field.fieldID === action.fieldID ? { ...field, value: action.value } : field);
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
@@ -908,20 +809,15 @@ const toggleListVoting = (state, action) => {
   const list = { ...lists[listIndex] };
   list.isVoting = !list.isVoting;
   if (!list.isVoting) {
-    const cards = list.cards.map(card => ({ ...card, votes: [] }));
-    list.cards = cards;
+    list.cards = list.cards.map(card => ({ ...card, votes: [] }));;
   }
   lists[listIndex] = list;
 
-  let filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists = filterListsHelper(state.searchQueries, lists);
-  }
+  const filteredLists = getFilteredLists(state, lists);
 
   let currentCard = state.currentCard;
   if (currentCard && state.shownListID === action.listID) {
-    currentCard = { ...state.currentCard };
-    currentCard.listIsVoting = list.isVoting;
+    currentCard = { ...state.currentCard, listIsVoting: list.isVoting };
     if (!list.isVoting) { currentCard.votes = []; }
   }
 
@@ -939,28 +835,16 @@ const toggleCardVote = (state, action) => {
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
-const setListLimit = (state, action) => {
-  const lists = [...state.lists];
-  const listIndex = lists.findIndex(list => list.listID === action.listID);
-  lists[listIndex] = { ...lists[listIndex], limit: action.limit };
+const setListLimit = (state, action) => ({
+  ...state,
+  lists: state.lists.map(list => list.listID === action.listID ? { ...list, limit: action.limit } : list),
+  filteredLists: state.cardsAreFiltered ? state.filteredLists.map(list => list.listID === action.listID ? { ...list, limit: action.limit } : list) : state.filteredLists
+});
 
-  const filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists[listIndex] = { ...filteredLists[listIndex], limit: action.limit };
-  }
-  return { ...state, lists, filteredLists };
-};
-
-const removeListLimit = (state, action) => {
-  const lists = [...state.lists];
-  const listIndex = lists.findIndex(list => list.listID === action.listID);
-  lists[listIndex] = { ...lists[listIndex], limit: null };
-
-  const filteredLists = state.filteredLists;
-  if (state.cardsAreFiltered) {
-    filteredLists[listIndex] = { ...filteredLists[listIndex], limit: null };
-  }
-  return { ...state, lists, filteredLists };
-};
+const removeListLimit = (state, action) => ({
+  ...state,
+  lists: state.lists.map(list => list.listID === action.listID ? { ...list, limit: null } : list),
+  filteredLists: state.cardsAreFiltered ? state.filteredLists.map(list => list.listID === action.listID ? { ...list, limit: null } : list) : state.filteredLists
+});
 
 export default reducer;

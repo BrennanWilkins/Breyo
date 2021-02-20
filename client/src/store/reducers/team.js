@@ -51,20 +51,14 @@ const editTeam = (state, action) => {
   };
 };
 
-const promoteTeamMember = (state, action) => {
-  const members = [...state.members];
-  const index = members.findIndex(member => member.email === action.email);
-  const member = { ...members[index], isAdmin: true };
-  members[index] = member;
-  return { ...state, members };
-};
+const promoteTeamMember = (state, action) => ({
+  ...state,
+  members: state.members.map(member => member.email === action.email ? { ...member, isAdmin: true } : member)
+});
 
-const demoteTeamMember = (state, action) => {
-  const members = [...state.members];
-  const index = members.findIndex(member => member.email === action.email);
-  const member = { ...members[index], isAdmin: false };
-  members[index] = member;
-  return { ...state, members };
-};
+const demoteTeamMember = (state, action) => ({
+  ...state,
+  members: state.members.map(member => member.email === action.email ? { ...member, isAdmin: false } : member)
+});
 
 export default reducer;

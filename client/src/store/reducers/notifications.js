@@ -12,7 +12,7 @@ const reducer = (state = initialState, action) => {
     };
     case actionTypes.DELETE_NOTIF: return {
       ...state,
-      notifs: state.notifs.filter(notif => notif.id !== action.id)
+      notifs: state.notifs.filter(({ id }) => id !== action.id)
     };
     case actionTypes.LOGOUT: return { ...initialState };
     default: return state;

@@ -1,5 +1,4 @@
 import * as actionTypes from '../actions/actionTypes';
-import { checkBoardActivity, updateActivityListID } from './reducerUtils';
 
 const initialState = {
   boardActivity: [],
@@ -41,6 +40,9 @@ const reducer = (state = initialState, action) => {
   }
 };
 
+// checks if an action can be done if all board activity shown, it is not currently loading, & no errors
+const checkBoardActivity = state => state.allBoardActivityShown && !state.allBoardActivityLoading && !state.allBoardActivityErr;
+
 const resetCardActivity = (state, action) => ({
   ...state,
   cardActivity: [],
@@ -48,49 +50,35 @@ const resetCardActivity = (state, action) => ({
   shownCardActivityID: ''
 });
 
-const setCardActivity = (state, action) => {
-  return { ...state, cardActivity: action.activity, shownCardActivityID: action.cardID };
-};
+const setCardActivity = (state, action) => ({
+  ...state,
+  cardActivity: action.activity,
+  shownCardActivityID: action.cardID
+});
 
 const deleteBoardActivity = (state, action) => {
   const boardActivity = state.boardActivity.filter(activity => activity.commentID);
-  let cardActivity = state.cardActivity;
-  let allBoardActivity = state.allBoardActivity;
-  if (state.shownCardActivityID !== '') {
-    cardActivity = cardActivity.filter(activity => activity.commentID);
-  }
-  if (state.allBoardActivityShown) {
-    allBoardActivity = allBoardActivity.filter(activity => activity.commentID);
-  }
+  const cardActivity = state.shownCardActivityID ? state.cardActivity.filter(act => act.commentID) : state.cardActivity;
+  const allBoardActivity = state.allBoardActivityShown ? state.allBoardActivity.filter(act => act.commentID) : state.allBoardActivity;
   return { ...state, boardActivity, allBoardActivity, cardActivity };
 };
 
 const addRecentActivity = (state, action) => {
-  const boardActivity = [...state.boardActivity];
-  boardActivity.unshift(action.newActivity);
+  const boardActivity = [action.newActivity, ...state.boardActivity];
   if (boardActivity.length > 20) { boardActivity.pop(); }
-  let allBoardActivity = state.allBoardActivity;
-  if (checkBoardActivity(state)) {
-    allBoardActivity = [...allBoardActivity];
-    allBoardActivity.unshift(action.newActivity);
-  }
-  let cardActivity = state.cardActivity;
-  if (action.newActivity.cardID === state.shownCardActivityID) {
-    cardActivity = [...cardActivity];
-    cardActivity.unshift(action.newActivity);
-  }
+  const allBoardActivity = checkBoardActivity(state) ? [action.newActivity, ...state.allBoardActivity] : state.allBoardActivity;
+  const cardActivity = action.newActivity.cardID === state.shownCardActivityID ? [action.newActivity, ...state.cardActivity] : state.cardActivity;
   return { ...state, boardActivity, allBoardActivity, cardActivity };
 };
 
 const moveCardDiffList = (state, action) => {
   // update listID for card's activities in boardActivity
-  const boardActivity = updateActivityListID([...state.boardActivity], action.sourceID, action.destID);
-  const allComments = updateActivityListID([...state.allComments], action.sourceID, action.destID);
-  if (checkBoardActivity(state)) {
-    const allBoardActivity = updateActivityListID([...state.allBoardActivity], action.sourceID, action.destID);
-    return { ...state, boardActivity, allComments, allBoardActivity };
-  }
-  return { ...state, boardActivity, allComments };
+  const boardActivity = state.boardActivity.map(act => act.listID === action.sourceID ? { ...act, listID: action.destID } : act);
+  const allComments = state.allComments.map(comment => comment.listID === action.sourceID ? { ...comment, listID: action.destID } : comment);
+  const allBoardActivity = checkBoardActivity(state) ?
+    state.allBoardActivity.map(act => act.listID === action.sourceID ? { ...act, listID: action.destID } : act) :
+    state.allBoardActivity;
+  return { ...state, boardActivity, allComments, allBoardActivity };
 };
 
 const setBoardActivity = (state, action) => ({
@@ -101,78 +89,40 @@ const setBoardActivity = (state, action) => ({
 
 const updateBoardActivityDeleteCard = (state, action) => {
   const allComments = state.allComments.filter(comment => comment.cardID !== action.cardID);
-  let allBoardActivity = state.allBoardActivity;
-  if (checkBoardActivity(state)) {
-    allBoardActivity = state.allBoardActivity.filter(activity => activity.cardID !== action.cardID);
-  }
+  const allBoardActivity = checkBoardActivity(state) ? state.allBoardActivity.filter(act => act.cardID !== action.cardID) : state.allBoardActivity;
   return { ...state, boardActivity: action.activity, allComments, allBoardActivity };
 };
 
 const updateBoardActivityDeleteList = (state, action) => {
   const allComments = state.allComments.filter(comment => comment.listID !== action.listID);
-  if (checkBoardActivity(state)) {
-    const allBoardActivity = state.allBoardActivity.filter(activity => activity.listID !== action.listID);
-    return { ...state, boardActivity: action.activity, allComments, allBoardActivity };
-  }
-  return { ...state, boardActivity: action.activity, allComments };
+  const allBoardActivity = checkBoardActivity(state) ? state.allBoardActivity.filter(act => act.listID !== action.listID) : state.allBoardActivity;
+  return { ...state, boardActivity: action.activity, allComments, allBoardActivity };
 };
 
 const addComment = (state, action) => {
-  const allComments = [...state.allComments];
   const comment = { ...action.payload, cardTitle: action.cardTitle };
-  allComments.unshift(comment);
-  const boardActivity = [...state.boardActivity];
-  boardActivity.unshift(comment);
-  let allBoardActivity = state.allBoardActivity;
-  if (checkBoardActivity(state)) {
-    allBoardActivity = [...allBoardActivity];
-    allBoardActivity.unshift(comment);
-  }
-  let cardActivity = state.cardActivity;
-  if (state.shownCardActivityID === action.payload.cardID) {
-    cardActivity = [...cardActivity];
-    cardActivity.unshift(comment);
-  }
+  const allComments = [comment, ...state.allComments];
+  const boardActivity = [comment, ...state.boardActivity];
+  const allBoardActivity = checkBoardActivity(state) ? [comment, ...state.allBoardActivity] : state.allBoardActivity;
+  const cardActivity = state.shownCardActivityID === action.payload.cardID ? [comment, ...state.cardActivity] : state.cardActivity;
   return { ...state, allComments, boardActivity, allBoardActivity, cardActivity };
 };
 
 const updateComment = (state, action) => {
-  const allComments = [...state.allComments];
-  const commentIndex = allComments.findIndex(comment => comment.commentID === action.commentID);
-  const comment = { ...allComments[commentIndex] };
-  comment.msg = action.msg;
-  allComments[commentIndex] = comment;
-  const activityIndex = state.boardActivity.findIndex(activity => activity.commentID === action.commentID);
-  let boardActivity = state.boardActivity;
-  if (activityIndex !== -1) {
-    boardActivity = [...boardActivity];
-    boardActivity[activityIndex] = comment;
-  }
-  let cardActivity = state.cardActivity;
-  if (state.shownCardActivityID === action.cardID) {
-    cardActivity = [...cardActivity];
-    const cardActivityIndex = cardActivity.findIndex(activity => activity.commentID === action.commentID);
-    if (cardActivityIndex !== -1) { cardActivity[cardActivityIndex] = comment; }
-  }
+  const allComments = state.allComments.map(comment => comment.commentID === action.commentID ? { ...comment, msg: action.msg } : comment);
+  const boardActivity = state.boardActivity.map(act => act.commentID === action.commentID ? { ...act, msg: action.msg } : act);
+  const cardActivity = state.shownCardActivityID === action.cardID ?
+    state.cardActivity.map(act => act.commentID === action.commentID ? { ...act, msg: action.msg } : act) :
+    state.cardActivity;
   return { ...state, allComments, boardActivity, cardActivity };
 };
 
 const deleteComment = (state, action) => {
-  const allComments = [...state.allComments];
-  const allCommentIndex = allComments.findIndex(comment => comment.commentID === action.commentID);
-  allComments.splice(allCommentIndex, 1);
-  let cardActivity = state.cardActivity;
-  if (state.shownCardActivityID === action.cardID) {
-    cardActivity = [...cardActivity];
-    const cardActivityIndex = cardActivity.findIndex(activity => activity.commentID === action.commentID);
-    if (cardActivityIndex !== -1) { cardActivity.splice(cardActivityIndex, 1); }
-  }
-  const activityIndex = state.boardActivity.findIndex(activity => activity.commentID === action.commentID);
-  let boardActivity = state.boardActivity;
-  if (activityIndex !== -1) {
-    boardActivity = [...boardActivity];
-    boardActivity.splice(activityIndex, 1);
-  }
+  const allComments = state.allComments.filter(({ commentID }) => commentID !== action.commentID);
+  const cardActivity = state.shownCardActivityID === action.cardID ?
+    state.cardActivity.filter(({ commentID }) => commentID !== action.commentID) :
+    state.cardActivity;
+  const boardActivity = state.boardActivity.filter(({ commentID }) => commentID !== action.commentID);
   return { ...state, allComments, cardActivity, boardActivity };
 };
 

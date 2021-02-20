@@ -1,5 +1,4 @@
 import * as actionTypes from '../actions/actionTypes';
-import { findAndReplace } from './reducerUtils';
 
 const initialState = {
   title: '',
@@ -23,8 +22,8 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.UPDATE_ACTIVE_BOARD: return updateActiveBoard(state, action);
     case actionTypes.UPDATE_BOARD_TITLE: return { ...state, title: action.title };
-    case actionTypes.ADD_ADMIN: return addAdmin(state, action);
-    case actionTypes.REMOVE_ADMIN: return removeAdmin(state, action);
+    case actionTypes.ADD_ADMIN: return toggleIsAdmin(state, action, true);
+    case actionTypes.REMOVE_ADMIN: return toggleIsAdmin(state, action, false);
     case actionTypes.DEMOTE_SELF: return { ...state, userIsAdmin: false };
     case actionTypes.PROMOTE_SELF: return { ...state, userIsAdmin: true };
     case actionTypes.UPDATE_COLOR: return { ...state, color: action.color };
@@ -58,25 +57,20 @@ const updateActiveBoard = (state, action) => ({
   avatars: action.payload.avatars
 });
 
-const addAdmin = (state, action) => {
-  const members = findAndReplace(state.members, 'email', action.email, 'isAdmin', true);
-  return { ...state, members };
-};
+const toggleIsAdmin = (state, action, isAdmin) => ({
+  ...state,
+  members: state.members.map(member => member.email === action.email ? { ...member, isAdmin } : member)
+});
 
-const removeAdmin = (state, action) => {
-  const members = findAndReplace(state.members, 'email', action.email, 'isAdmin', false);
-  return { ...state, members };
-};
+const addBoardMember = (state, action) => ({
+  ...state,
+  members: [...state.members, { email: action.email, fullName: action.fullName, isAdmin: false }]
+});
 
-const addBoardMember = (state, action) => {
-  const members = [...state.members, { email: action.email, fullName: action.fullName, isAdmin: false }];
-  return { ...state, members };
-};
-
-const deleteBoardMember = (state, action) => {
-  const members = state.members.filter(member => member.email !== action.email);
-  return { ...state, members };
-};
+const deleteBoardMember = (state, action) => ({
+  ...state,
+  members: state.members.filter(member => member.email !== action.email)
+});
 
 const toggleCreateBoard = (state, action) => ({
   ...state,
