@@ -41,12 +41,12 @@
   white-space: nowrap;
   max-width: 210px;
 }
-.FieldIcon, .DeleteBtn, .EditBtn {
+.FieldIcon, .Btns div {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.DateField svg {
+.DateField .FieldIcon svg {
   width: 13px;
   height: 13px;
   min-width: 13px;
@@ -64,7 +64,7 @@
   display: none;
   align-items: center;
 }
-.DeleteBtn, .EditBtn {
+.Btns div {
   cursor: pointer;
   border-radius: 4px;
   padding: 1px;
@@ -72,13 +72,14 @@
   box-sizing: border-box;
   width: 22px;
   height: 22px;
-}
-.EditBtn {
   margin-right: 1px;
 }
-.DeleteBtn:hover, .EditBtn:hover {
+.Btns div:hover {
   background: rgb(220,220,220);
   color: black;
+}
+.DeleteBtn {
+  margin: 0;
 }
 .DeleteBtn svg {
   width: 19px;

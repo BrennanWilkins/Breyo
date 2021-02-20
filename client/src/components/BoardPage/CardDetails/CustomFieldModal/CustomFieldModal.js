@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import classes from './CustomFieldModal.module.css';
 import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 import PropTypes from 'prop-types';
@@ -12,33 +12,23 @@ import { deleteCustomField, updateCustomFieldTitle } from '../../../../store/act
 
 const CustomFieldModal = props => {
   const [showAddField, setShowAddField] = useState(false);
-  const [showEditTitle, setShowEditTitle] = useState({ fieldID: '', fieldTitle: '' });
   const [titleInput, setTitleInput] = useState('');
-  const editBtnRef = useRef();
-  const inputRef = useRef();
+  const [showEditTitle, setShowEditTitle] = useState('');
 
-  const editHandler = (isActive, fieldID, fieldTitle) => {
-    if (isActive) {
-      if (!titleInput || titleInput.length > 150 || titleInput === showEditTitle.fieldTitle) { return setTitleInput(''); }
-      props.updateTitle(showEditTitle.fieldID, titleInput);
-      return setShowEditTitle({ fieldID: '', fieldTitle: '' });
-    }
-    setShowEditTitle({ fieldID, fieldTitle });
+  const showEditHandler = (fieldID, fieldTitle) => {
+    setShowEditTitle(fieldID);
     setTitleInput(fieldTitle);
   };
 
-  useEffect(() => {
-    const clickHandler = e => {
-      if (inputRef.current && !inputRef.current.contains(e.target)) {
-        if (editBtnRef && !editBtnRef.current.contains(e.target)) { setShowEditTitle({ fieldID: '', fieldTitle: '' }); }
-        e.stopPropagation();
-        document.removeEventListener('mousedown', clickHandler);
-      }
-    };
+  const deleteHandler = fieldID => {
+    if (showEditTitle) { return setShowEditTitle(''); }
+    props.deleteField(fieldID);
+  };
 
-    if (showEditTitle.fieldID) { document.addEventListener('mousedown', clickHandler); }
-    return () => document.removeEventListener('mousedown', clickHandler);
-  }, [showEditTitle]);
+  const showAddFieldHandler = () => {
+    setShowAddField(true);
+    setShowEditTitle('');
+  };
 
   return (
     <ModalContainer close={props.close} className={classes.Container} title="Custom Fields">
@@ -50,25 +40,28 @@ const CustomFieldModal = props => {
         :
         <>
           {props.customFields.map(({ fieldID, fieldType, fieldTitle }) => {
-            const isActive = showEditTitle.fieldID === fieldID;
+            const isActive = showEditTitle === fieldID;
             return (
               <div key={fieldID} className={`${classes.Option} ${fieldType === 'Date' ? classes.DateField : ''} ${isActive ? classes.ActiveOption : ''}`}>
                 <span className={classes.FieldIcon}>{fieldIcons[fieldType]}</span>
                 {isActive ?
-                  <input ref={inputRef} className={classes.TitleInput} value={titleInput} autoFocus onChange={e => setTitleInput(e.target.value)} />
+                  <input className={classes.TitleInput} value={titleInput} autoFocus onFocus={e => e.target.select()}
+                  onChange={e => setTitleInput(e.target.value)} />
                   :
                   <span className={classes.Title}>{fieldTitle}</span>
                 }
                 <div className={classes.Btns}>
-                  <div ref={editBtnRef} className={`${classes.EditBtn} ${isActive ? classes.SaveBtn : ''}`} onClick={() => editHandler(isActive, fieldID, fieldTitle)}>
-                    {isActive ? checkIcon : editIcon}
-                  </div>
-                  <div className={classes.DeleteBtn} onClick={() => props.deleteField(fieldID)}>{xIcon}</div>
+                  {isActive ?
+                    <div className={classes.SaveBtn} onClick={() => props.updateTitle(fieldID, titleInput)}>{checkIcon}</div>
+                    :
+                    <div className={classes.EditBtn} onClick={() => showEditHandler(fieldID, fieldTitle)}>{editIcon}</div>
+                  }
+                  <div className={classes.DeleteBtn} onClick={() => deleteHandler(fieldID)}>{xIcon}</div>
                 </div>
               </div>
             );
           })}
-          <div className={`${classes.Option} ${classes.AddBtn}`} onClick={() => setShowAddField(true)}>{plusIcon}New Field</div>
+          <div className={`${classes.Option} ${classes.AddBtn}`} onClick={showAddFieldHandler}>{plusIcon}New Field</div>
         </>
       }
     </ModalContainer>
