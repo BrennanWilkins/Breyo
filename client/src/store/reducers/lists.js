@@ -79,6 +79,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.TOGGLE_CARD_VOTE: return toggleCardVote(state, action);
     case actionTypes.SET_LIST_LIMIT: return setListLimit(state, action);
     case actionTypes.REMOVE_LIST_LIMIT: return removeListLimit(state, action);
+    case actionTypes.MOVE_CUSTOM_FIELD: return moveCustomField(state, action);
     default: return state;
   }
 };
@@ -792,5 +793,14 @@ const removeListLimit = (state, action) => ({
   lists: state.lists.map(list => list.listID === action.listID ? { ...list, limit: null } : list),
   filteredLists: state.cardsAreFiltered ? state.filteredLists.map(list => list.listID === action.listID ? { ...list, limit: null } : list) : state.filteredLists
 });
+
+const moveCustomField = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  const customFields = [...card.customFields];
+  const field = customFields.splice(action.sourceIndex, 1)[0];
+  customFields.splice(action.destIndex, 0, field);
+  card.customFields = customFields;
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
 
 export default reducer;

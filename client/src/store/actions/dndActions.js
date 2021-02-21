@@ -80,3 +80,17 @@ export const checklistDndHandler = (sourceIndex, destIndex, checklistID) => asyn
     sendUpdate('put/card/checklist/moveItem', payload);
   } catch (err) { dispatch(serverErr()); }
 };
+
+export const customFieldDndHandler = (sourceIndex, destIndex) => async (dispatch, getState) => {
+  try {
+    const { boardID, listID, cardID } = getCardState(getState);
+    const payload = { sourceIndex, destIndex, cardID, listID, boardID };
+    dispatch({ type: actionTypes.MOVE_CUSTOM_FIELD, ...payload });
+    await axios.put('/card/customField/move', payload).catch(err => {
+      // if server error then undo move field
+      dispatch({ type: actionTypes.MOVE_CUSTOM_FIELD, sourceIndex: destIndex, destIndex: sourceIndex, cardID, listID });
+      throw err;
+    });
+    sendUpdate('put/card/customField/move', payload);
+  } catch (err) { dispatch(serverErr()); }
+};

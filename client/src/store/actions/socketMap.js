@@ -54,6 +54,7 @@ const socketMap = {
   'post/card/customField': actionTypes.ADD_CUSTOM_FIELD,
   'put/card/customField/title': actionTypes.UPDATE_CUSTOM_FIELD_TITLE,
   'put/card/customField/value': actionTypes.UPDATE_CUSTOM_FIELD_VALUE,
+  'put/card/customField/move': actionTypes.MOVE_CUSTOM_FIELD,
   'delete/card/customField': actionTypes.DELETE_CUSTOM_FIELD,
   'post/list/voting': actionTypes.TOGGLE_LIST_VOTING,
   'post/card/vote': actionTypes.TOGGLE_CARD_VOTE,
