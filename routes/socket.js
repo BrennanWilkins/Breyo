@@ -58,7 +58,8 @@ const routes = [
   'post/list/voting',
   'post/card/vote',
   'put/list/limit',
-  'delete/list/limit'
+  'delete/list/limit',
+  'put/card/customField/move'
 ];
 
 module.exports = routes;

@@ -832,6 +832,27 @@ router.delete('/customField/:fieldID/:cardID/:listID/:boardID',
   }
 );
 
+// change position of custom field in card
+router.put('/customField/move',
+  validate([...areAllMongo(['boardID', 'listID', 'cardID'], 'body'), body('sourceIndex').isInt({ min: 0 }), body('destIndex').isInt({ min: 0 })]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, sourceIndex, destIndex } = req.body;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+
+      if (sourceIndex >= card.customFields.length || destIndex >= card.customFields.length) {
+        throw 'Invalid indexes';
+      }
+      const field = card.customFields.splice(sourceIndex, 1)[0];
+      card.customFields.splice(destIndex, 0, field);
+
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 // cast a vote or remove vote on a card in a list with voting
 router.post('/vote',
   validate(areAllMongo(['boardID', 'listID', 'cardID'], 'body')),
