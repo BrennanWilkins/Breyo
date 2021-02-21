@@ -18,8 +18,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.REMOVE_TEAM_LOGO: return { ...state, logo: null };
     case actionTypes.DELETE_TEAM: return { ...initialState };
     case actionTypes.LOGOUT: return { ...initialState };
-    case actionTypes.PROMOTE_TEAM_MEMBER: return promoteTeamMember(state, action);
-    case actionTypes.DEMOTE_TEAM_MEMBER: return demoteTeamMember(state, action);
+    case actionTypes.PROMOTE_TEAM_MEMBER: return toggleTeamAdmin(state, action, true);
+    case actionTypes.DEMOTE_TEAM_MEMBER: return toggleTeamAdmin(state, action, false);
     case actionTypes.DEMOTE_SELF_TEAM_MEMBER: return { ...state, userIsAdmin: false };
     default: return state;
   }
@@ -51,14 +51,9 @@ const editTeam = (state, action) => {
   };
 };
 
-const promoteTeamMember = (state, action) => ({
+const toggleTeamAdmin = (state, action, isAdmin) => ({
   ...state,
-  members: state.members.map(member => member.email === action.email ? { ...member, isAdmin: true } : member)
-});
-
-const demoteTeamMember = (state, action) => ({
-  ...state,
-  members: state.members.map(member => member.email === action.email ? { ...member, isAdmin: false } : member)
+  members: state.members.map(member => member.email === action.email ? { ...member, isAdmin } : member)
 });
 
 export default reducer;

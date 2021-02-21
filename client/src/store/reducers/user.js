@@ -44,24 +44,29 @@ const reducer = (state = initialState, action) => {
   }
 };
 
-const formatUserData = action => {
+const formatUserBoards = boards => {
   const boardsByID = {};
   const allBoardIDs = [];
-  for (let board of action.payload.boards) {
+  for (let board of boards) {
     boardsByID[board.boardID] = board;
     allBoardIDs.push(board.boardID);
   }
+  return { boardsByID, allBoardIDs };
+};
+
+const formatUserTeams = (teams, adminTeams) => {
   const teamsByID = {};
   const allTeamIDs = [];
-  for (let team of action.payload.teams) {
-    teamsByID[team._id] = { teamID: team._id, title: team.title, url: team.url, isAdmin: action.payload.adminTeams.includes(team._id) };
+  for (let team of teams) {
+    teamsByID[team._id] = { teamID: team._id, title: team.title, url: team.url, isAdmin: adminTeams.includes(team._id) };
     allTeamIDs.push(team._id);
   }
-  return { boardsByID, allBoardIDs, teamsByID, allTeamIDs };
+  return { teamsByID, allTeamIDs };
 };
 
 const login = (state, action) => {
-  const { boardsByID, allBoardIDs, teamsByID, allTeamIDs } = formatUserData(action);
+  const { boardsByID, allBoardIDs } = formatUserBoards(action.payload.boards);
+  const { teamsByID, allTeamIDs } = formatUserTeams(action.payload.teams, action.payload.adminTeams);
   return {
     ...state,
     fullName: action.payload.fullName,
@@ -91,7 +96,8 @@ const toggleIsStarred = (state, action) => {
 };
 
 const updateUserData = (state, action) => {
-  const { boardsByID, allBoardIDs, teamsByID, allTeamIDs } = formatUserData(action);
+  const { boardsByID, allBoardIDs } = formatUserBoards(action.payload.boards);
+  const { teamsByID, allTeamIDs } = formatUserTeams(action.payload.teams, action.payload.adminTeams);
   return {
     ...state,
     boards: { byID: boardsByID, allIDs: allBoardIDs },
@@ -102,12 +108,7 @@ const updateUserData = (state, action) => {
 };
 
 const updateUserBoards = (state, action) => {
-  const boardsByID = {};
-  const allBoardIDs = [];
-  for (let board of action.boards) {
-    boardsByID[board.boardID] = board;
-    allBoardIDs.push(board.boardID);
-  }
+  const { boardsByID, allBoardIDs } = formatUserBoards(action.boards);
   return { ...state, invites: action.invites, teamInvites: action.teamInvites, boards: { byID: boardsByID, allIDs: allBoardIDs } };
 };
 
@@ -174,12 +175,7 @@ const joinBoard = (state, action) => ({
 });
 
 const updateUserTeams = (state, action) => {
-  const teamsByID = {};
-  const allTeamIDs = [];
-  for (let team of action.teams) {
-    teamsByID[team._id] = { teamID: team._id, title: team.title, url: team.url, isAdmin: action.adminTeams.includes(team._id) };
-    allTeamIDs.push(team._id);
-  }
+  const { teamsByID, allTeamIDs } = formatUserTeams(action.teams, action.adminTeams);
   return { ...state, teams: { byID: teamsByID, allIDs: allTeamIDs } };
 };
 
