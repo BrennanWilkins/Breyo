@@ -8,7 +8,8 @@ import AddCustomField from './AddCustomField/AddCustomField';
 import { connect } from 'react-redux';
 import { xIcon, editIcon, checkIcon } from '../../../UI/icons';
 import { fieldIcons } from '../../../../utils/customFieldUtils';
-import { deleteCustomField, updateCustomFieldTitle } from '../../../../store/actions';
+import { deleteCustomField, updateCustomFieldTitle, customFieldDndHandler } from '../../../../store/actions';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 const CustomFieldModal = props => {
   const [showAddField, setShowAddField] = useState(false);
@@ -30,6 +31,16 @@ const CustomFieldModal = props => {
     setShowEditTitle('');
   };
 
+  const onDragEndHandler = ({ source, destination }) => {
+    if (!destination) { return; }
+    if (source.index === destination.index) { return; }
+    props.moveField(source.index, destination.index);
+  };
+
+  const getDragStyle = (isDragging, otherStyles) => (
+    isDragging ? { background: 'rgb(241, 241, 241)', ...otherStyles } : otherStyles
+  );
+
   return (
     <ModalContainer close={props.close} className={classes.Container} title="Custom Fields">
       {showAddField ?
@@ -39,28 +50,43 @@ const CustomFieldModal = props => {
         </>
         :
         <>
-          {props.customFields.map(({ fieldID, fieldType, fieldTitle }) => {
-            const isActive = showEditTitle === fieldID;
-            return (
-              <div key={fieldID} className={`${classes.Option} ${fieldType === 'Date' ? classes.DateField : ''} ${isActive ? classes.ActiveOption : ''}`}>
-                <span className={classes.FieldIcon}>{fieldIcons[fieldType]}</span>
-                {isActive ?
-                  <input className={classes.TitleInput} value={titleInput} autoFocus onFocus={e => e.target.select()}
-                  onChange={e => setTitleInput(e.target.value)} />
-                  :
-                  <span className={classes.Title}>{fieldTitle}</span>
-                }
-                <div className={classes.Btns}>
-                  {isActive ?
-                    <div className={classes.SaveBtn} onClick={() => props.updateTitle(fieldID, titleInput)}>{checkIcon}</div>
-                    :
-                    <div className={classes.EditBtn} onClick={() => showEditHandler(fieldID, fieldTitle)}>{editIcon}</div>
-                  }
-                  <div className={classes.DeleteBtn} onClick={() => deleteHandler(fieldID)}>{xIcon}</div>
+          <DragDropContext onDragEnd={onDragEndHandler}>
+            <Droppable droppableId="fields" direction="vertical" type="list">
+              {(provided, snapshot) => (
+                <div ref={provided.innerRef}>
+                  {props.customFields.map(({ fieldID, fieldType, fieldTitle }, i) => {
+                    const isActive = showEditTitle === fieldID;
+                    return (
+                      <Draggable draggableId={fieldID} index={i} key={fieldID}>
+                        {(provided, snapshot) => (
+                          <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}
+                          style={getDragStyle(snapshot.isDragging, provided.draggableProps.style)}
+                          className={`${classes.Option} ${fieldType === 'Date' ? classes.DateField : ''} ${isActive ? classes.ActiveOption : ''}`}>
+                            <span className={classes.FieldIcon}>{fieldIcons[fieldType]}</span>
+                            {isActive ?
+                              <input className={classes.TitleInput} value={titleInput} autoFocus onFocus={e => e.target.select()}
+                              onChange={e => setTitleInput(e.target.value)} />
+                              :
+                              <span className={classes.Title}>{fieldTitle}</span>
+                            }
+                            <div className={classes.Btns}>
+                              {isActive ?
+                                <div className={classes.SaveBtn} onClick={() => props.updateTitle(fieldID, titleInput)}>{checkIcon}</div>
+                                :
+                                <div className={classes.EditBtn} onClick={() => showEditHandler(fieldID, fieldTitle)}>{editIcon}</div>
+                              }
+                              <div className={classes.DeleteBtn} onClick={() => deleteHandler(fieldID)}>{xIcon}</div>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                  {provided.placeholder}
                 </div>
-              </div>
-            );
-          })}
+              )}
+            </Droppable>
+          </DragDropContext>
           <div className={`${classes.Option} ${classes.AddBtn}`} onClick={showAddFieldHandler}>{plusIcon}New Field</div>
         </>
       }
@@ -72,7 +98,8 @@ CustomFieldModal.propTypes = {
   close: PropTypes.func.isRequired,
   customFields: PropTypes.array.isRequired,
   deleteField: PropTypes.func.isRequired,
-  updateTitle: PropTypes.func.isRequired
+  updateTitle: PropTypes.func.isRequired,
+  moveField: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -81,7 +108,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   updateTitle: (fieldID, title) => dispatch(updateCustomFieldTitle(fieldID, title)),
-  deleteField: fieldID => dispatch(deleteCustomField(fieldID))
+  deleteField: fieldID => dispatch(deleteCustomField(fieldID)),
+  moveField: (sourceIndex, destIndex) => dispatch(customFieldDndHandler(sourceIndex, destIndex))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CustomFieldModal);
