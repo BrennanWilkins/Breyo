@@ -45,7 +45,7 @@ router.put('/title',
   async (req, res) => {
     try {
       const { boardID, listID, title } = req.body;
-      const list = await List.findOneAndUpdate({ _id: listID, boardID }, { title }).select('title').lean();
+      const list = await List.findOneAndUpdate({ _id: listID, boardID, isArchived: false }, { title }).select('title').lean();
       if (!list) { throw 'List data not found'; }
       const oldTitle = list.title;
 
@@ -92,7 +92,7 @@ router.post('/copy',
   async (req, res) => {
     try {
       const { boardID, listID, title } = req.body;
-      const list = await List.findOne({ _id: listID, boardID }).select('cards desc title').lean();
+      const list = await List.findOne({ _id: listID, boardID, isArchived: false }).select('cards desc title').lean();
       if (!list) { throw 'List data not found'; }
       // create deeply nested copy of all cards & all checklists/members/dueDate/etc of each card
       const cards = list.cards.map(card => ({
@@ -210,7 +210,7 @@ router.delete('/archive/:listID/:boardID',
   async (req, res) => {
     try {
       const { boardID, listID } = req.params;
-      const list = await List.findOneAndDelete({ _id: listID, boardID }).select('title');
+      const list = await List.findOneAndDelete({ _id: listID, boardID }).select('title').lean();
       if (!list) { throw 'List not found'; }
 
       const actionData = { msg: null, boardMsg: `deleted list ${list.title}`, cardID: null, listID: null, boardID };
@@ -234,7 +234,7 @@ router.put('/archive/allCards',
   async (req, res) => {
     try {
       const { listID, boardID } = req.body;
-      const list = await List.findOne({ _id: listID, boardID });
+      const list = await List.findOne({ _id: listID, boardID, isArchived: false });
       if (!list) { throw 'List data not found'; }
 
       // set all cards to isArchived & add action for each card
@@ -270,7 +270,10 @@ router.put('/moveAllCards',
   async (req, res) => {
     try {
       const { oldListID, newListID, boardID } = req.body;
-      const [oldList, newList] = await Promise.all([List.findOne({ _id: oldListID, boardID }), List.findOne({ _id: newListID, boardID })]);
+      const [oldList, newList] = await Promise.all([
+        List.findOne({ _id: oldListID, boardID, isArchived: false }),
+        List.findOne({ _id: newListID, boardID, isArchived: false })
+      ]);
       if (!oldList || !newList) { throw 'Old list or new list data not found'; }
 
       newList.cards = newList.cards.concat(oldList.cards);
@@ -297,7 +300,7 @@ router.post('/voting',
   async (req, res) => {
     try {
       const { boardID, listID } = req.body;
-      const list = await List.findOne({ boardID, _id: listID });
+      const list = await List.findOne({ boardID, _id: listID, isArchived: false });
       if (!list) { throw 'List not found'; }
 
       for (let card of list.cards) { card.votes = []; }
@@ -319,7 +322,7 @@ router.put('/limit',
   async (req, res) => {
     try {
       const { boardID, listID, limit } = req.body;
-      const list = await List.findOne({ boardID, _id: listID });
+      const list = await List.findOne({ boardID, _id: listID, isArchived: false });
       if (!list) { throw 'List not found'; }
       list.limit = +limit;
 
@@ -339,7 +342,7 @@ router.delete('/limit/:boardID/:listID',
   async (req, res) => {
     try {
       const { boardID, listID } = req.params;
-      const list = await List.findOne({ boardID, _id: listID });
+      const list = await List.findOne({ boardID, _id: listID, isArchived: false });
       if (!list) { throw 'List not found'; }
       list.limit = null;
 
@@ -347,6 +350,54 @@ router.delete('/limit/:boardID/:listID',
       const results = await Promise.all([addActivity(actionData, req), list.save()]);
 
       res.status(200).json({ newActivity: results[0] });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: board member
+// sort the cards in a list based on mode
+router.put('/sort',
+  validate([body('listID').isMongoId(), body('boardID').isMongoId(), body('mode').notEmpty()]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, mode } = req.body;
+      const list = await List.findOne({ boardID, _id: listID, isArchived: false });
+      if (!list) { throw 'List not found'; }
+
+      switch (mode) {
+        case 'AtoZ': {
+          list.cards = list.cards.sort((a,b) => a.title.localeCompare(b.title)); break;
+        }
+        case 'ZtoA': {
+          list.cards = list.cards.sort((a,b) => b.title.localeCompare(a.title)); break;
+        }
+        case 'due': {
+          list.cards = list.cards.sort((a,b) => {
+            if (!a.dueDate && !b.dueDate) { return 0; }
+            if (!a.dueDate && b.dueDate) { return 1; }
+            if (a.dueDate && !b.dueDate) { return -1; }
+            return new Date(a.dueDate.dueDate) - new Date(b.dueDate.dueDate);
+          });
+          break;
+        }
+        case 'newest': {
+          list.cards = list.cards.sort((a,b) => (
+            new Date(parseInt(b._id.toString().slice(0,8), 16)*1000) - new Date(parseInt(a._id.toString().slice(0,8), 16)*1000)
+          ));
+          break;
+        }
+        case 'oldest': {
+          list.cards = list.cards.sort((a,b) => (
+            new Date(parseInt(a._id.toString().slice(0,8), 16)*1000) - new Date(parseInt(b._id.toString().slice(0,8), 16)*1000)
+          ));
+          break;
+        }
+        default: throw 'Invalid mode value';
+      }
+
+      await list.save();
+      res.status(200).json({ cards: list.cards });
     } catch (err) { res.sendStatus(500); }
   }
 );
