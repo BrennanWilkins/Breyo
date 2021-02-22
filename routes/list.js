@@ -94,6 +94,7 @@ router.post('/copy',
       const { boardID, listID, title } = req.body;
       const list = await List.findOne({ _id: listID, boardID, isArchived: false }).select('cards desc title').lean();
       if (!list) { throw 'List data not found'; }
+
       // create deeply nested copy of all cards & all checklists/members/dueDate/etc of each card
       const cards = list.cards.map(card => ({
         title: card.title,
@@ -108,25 +109,25 @@ router.post('/copy',
         labels: card.labels,
         roadmapLabel: card.roadmapLabel,
         dueDate: card.dueDate,
-        isArchived: false,
         members: card.members,
-        comments: [],
         customFields: card.customFields.map(field => ({
           fieldType: field.fieldType,
           fieldTitle: field.fieldTitle,
           value: field.value
         })),
+        comments: [],
         votes: []
       }));
+
       const listsLength = await List.countDocuments({ boardID, isArchived: false });
       const newList = new List({ boardID, title, desc: list.desc, indexInBoard: listsLength, cards, archivedCards: [],
         isArchived: false, isVoting: false, limit: list.limit });
 
-      const actions = [];
-      actions.push(new Activity({ msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID: newList._id,
-        boardID, email: req.email, fullName: req.fullName, date: new Date() }));
-      for (let card of newList.cards) {
-        actions.push(new Activity({
+      const listActivity = new Activity({ msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID: newList._id,
+        boardID, email: req.email, fullName: req.fullName, date: new Date() })
+
+      const actions = [listActivity, ...newList.cards.map(card => (
+        new Activity({
           msg: `copied this card from ${card.title} in list ${list.title}`,
           boardMsg: `copied **(link)${card.title}** from ${card.title} in list ${list.title}`,
           cardID: card._id,
@@ -135,13 +136,12 @@ router.post('/copy',
           date: new Date(),
           email: req.email,
           fullName: req.fullName
-        }));
-      }
+        }))
+      ))];
 
       const results = await Promise.all([Activity.insertMany(actions), newList.save()]);
-      const activities = results[0];
 
-      res.status(200).json({ newList, activities });
+      res.status(200).json({ newList, activities: results[0] });
     } catch (err) { res.sendStatus(500); }
   }
 );

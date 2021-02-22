@@ -460,27 +460,27 @@ router.post('/copy',
         getListAndValidate(boardID, destListID)
       ]);
 
-      // keep card labels in the copy if requested
-      const labels = keepLabels ? sourceCard.labels : [];
-      const roadmapLabel = keepLabels ? sourceCard.roadmapLabel : null;
+      // create nested copy of card checklists & card labels if requested
+      const newCard = {
+        title,
+        labels: keepLabels ? sourceCard.labels : [],
+        roadmapLabel: keepLabels ? sourceCard.roadmapLabel : null,
+        checklists: keepChecklists ? sourceCard.checklists.map(checklist => ({
+          items: checklist.items.map(item => ({ title: item.title, isComplete: item.isComplete })),
+          title: checklist.title
+        })) : [],
+        customFields: sourceCard.customFields.map(field => ({
+          fieldType: field.fieldType,
+          fieldTitle: field.fieldTitle,
+          value: field.value
+        })),
+        desc: '',
+        dueDate: sourceCard.dueDate,
+        members: sourceCard.members,
+        comments: [],
+        votes: []
+      };
 
-      const checklists = [];
-      // create nested copy of card checklists if requested
-      if (keepChecklists) {
-        for (let checklist of sourceCard.checklists) {
-          const items = checklist.items.map(item => ({ title: item.title, isComplete: item.isComplete }));
-          checklists.push({ title: checklist.title, items });
-        }
-      }
-
-      const customFields = sourceCard.customFields.map(field => ({
-        fieldType: field.fieldType,
-        fieldTitle: field.fieldTitle,
-        value: field.value
-      }));
-
-      const newCard = { title, labels, roadmapLabel, checklists, desc: '', dueDate: null, members: [], comments: [], customFields, votes: [] };
-      // add copied card to destination list
       destList.cards.splice(destIndex, 0, newCard);
       const updatedCard = destList.cards[destIndex];
 
@@ -490,7 +490,7 @@ router.post('/copy',
       const results = await Promise.all([addActivity(actionData, req), destList.save()]);
       const newActivity = results[0];
 
-      res.status(200).json({ cardID: updatedCard._id, checklists: updatedCard.checklists, customFields: updatedCard.customFields, newActivity });
+      res.status(200).json({ card: updatedCard, newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );

@@ -249,14 +249,9 @@ export const deleteChecklistItem = (itemID, checklistID) => async (dispatch, get
 
 export const copyCard = (title, keepChecklists, keepLabels, destListID, destIndex) => async (dispatch, getState) => {
   try {
-    const state = getState();
-    const boardID = state.board.boardID;
-    const sourceListID = state.lists.shownListID;
-    const cardID = state.lists.shownCardID;
-    const currentCard = state.lists.currentCard;
-    const res = await axios.post('/card/copy', { title, keepChecklists, keepLabels, cardID, sourceListID, destListID, destIndex, boardID });
-    const payload = { title, checklists: res.data.checklists, customFields: res.data.customFields, currentCard,
-      newCardID: res.data.cardID, keepLabels, sourceListID, destListID, destIndex };
+    const { boardID, listID, cardID } = getCardState(getState);
+    const res = await axios.post('/card/copy', { title, keepChecklists, keepLabels, cardID, sourceListID: listID, destListID, destIndex, boardID });
+    const payload = { card: res.data.card, sourceListID: listID, destListID, destIndex };
     dispatch({ type: actionTypes.COPY_CARD, ...payload });
     sendUpdate('post/card/copy', payload);
     addRecentActivity(res.data.newActivity);

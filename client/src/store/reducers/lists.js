@@ -132,7 +132,7 @@ const findChecklistItems = (card, checklistID) => {
   return { checklists, checklistIndex, checklist, items };
 };
 
-const formatCardData = (card, noComments) => ({
+const formatCardData = (card, fromList) => ({
   cardID: card._id,
   checklists: card.checklists.map(checklist => ({
     title: checklist.title,
@@ -148,7 +148,7 @@ const formatCardData = (card, noComments) => ({
   roadmapLabel: card.roadmapLabel,
   title: card.title,
   desc: card.desc,
-  comments: noComments ? [] : card.comments.map(comment => {
+  comments: fromList ? [] : card.comments.map(comment => {
     const { _id: commentID, ...restComment } = comment;
     return { ...restComment, commentID };
   }).reverse(),
@@ -159,7 +159,7 @@ const formatCardData = (card, noComments) => ({
     value: field.value,
     fieldID: field._id
   })),
-  votes: card.votes
+  votes: fromList ? [] : card.votes
 });
 
 const setListData = (state, action) => ({
@@ -376,32 +376,7 @@ const moveCardDiffList = (state, action) => {
 };
 
 const copyCard = (state, action) => {
-  const newCard = {
-    title: action.title,
-    desc: '',
-    checklists: action.checklists.map(checklist => ({
-      title: checklist.title,
-      checklistID: checklist._id,
-      items: checklist.items.map(item => ({
-        itemID: item._id,
-        title: item.title,
-        isComplete: item.isComplete
-      }))
-    })),
-    dueDate: null,
-    cardID: action.newCardID,
-    members: [],
-    comments: [],
-    customFields: action.customFields.map(field => ({
-      fieldTitle: field.fieldTitle,
-      fieldType: field.fieldType,
-      value: field.value,
-      fieldID: field._id
-    })),
-    votes: [],
-    labels: action.keepLabels ? [...action.currentCard.labels] : [],
-    roadmapLabel: action.keepLabels ? action.currentCard.roadmapLabel : null
-  };
+  const newCard = formatCardData(action.card);
 
   const targetID = action.sourceListID === action.destListID ? action.sourceListID : action.destListID;
   const lists = state.lists.map(list => {
@@ -477,11 +452,7 @@ const copyList = (state, action) => {
     isArchived: false,
     isVoting: false,
     limit: action.newList.limit,
-    cards: action.newList.cards.map(card => ({
-      ...formatCardData(card, true),
-      votes: [],
-      comments: []
-    }))
+    cards: action.newList.cards.map(card => formatCardData(card, true))
   };
 
   const lists = [...state.lists, newList];
