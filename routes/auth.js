@@ -10,29 +10,13 @@ const nodemailer = require('nodemailer');
 const { formatUserBoards } = require('./user');
 
 const getJWTPayload = user => {
-  // create jwt sign payload for easier user data lookup
+  // create jwt sign payload for easier user data lookup in middleware
   const userMembers = {};
-  const userAdmins = {};
   for (let board of user.boards) {
-    userMembers[board.boardID] = true;
-    if (board.isAdmin) { userAdmins[board.boardID] = true; }
+    if (board.boardID) { userMembers[board.boardID] = true; }
+    else { userMembers[board] = true; }
   }
-  const userTeams = {};
-  for (let team of user.teams) {
-    if (team._id) { userTeams[team._id] = true; }
-    else { userTeams[team] = true; }
-  }
-  const userAdminTeams = {};
-  for (let teamID of user.adminTeams) { userAdminTeams[teamID] = true; }
-
-  return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins, userTeams, userAdminTeams };
-};
-
-const getLeanJWTPayload = user => {
-  // create jwt sign payload for user data that hasnt been populated yet
-  const userMembers = {};
   const userAdmins = {};
-  for (let boardID of user.boards) { userMembers[boardID] = true; }
   for (let boardID of user.adminBoards) { userAdmins[boardID] = true; }
   const userTeams = {};
   for (let team of user.teams) {
@@ -45,6 +29,16 @@ const getLeanJWTPayload = user => {
   return { email: user.email, userID: user._id, fullName: user.fullName, userMembers, userAdmins, userTeams, userAdminTeams };
 };
 
+// creates new jwt token if users token is not up to date
+const signNewToken = async (user, oldToken) => {
+  const decoded = jwt.decode(oldToken);
+  const jwtPayload = getJWTPayload(user);
+  // token expires at same time as oldToken
+  const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
+  return token;
+};
+
+// login
 router.post('/',
   validate([body('email').isEmail(), body('password').notEmpty()], 'Email and password cannot be empty.'),
   async (req, res) => {
@@ -125,9 +119,8 @@ router.get('/',
 
       if (user.recoverPassID) { await User.updateOne({ _id: req.userID }, { recoverPassID: null }); }
 
-      const { email, fullName, invites, boards, avatar, teams, teamInvites, adminTeams } = user;
-
-      res.status(200).json({ email, fullName, invites, boards, avatar, teams, teamInvites, adminTeams });
+      const { _id, adminBoards, password, __v, starredBoards, recoverPassID, ...userData } = user;
+      res.status(200).json({ ...userData });
     } catch(err) { res.sendStatus(500); }
   }
 );
@@ -224,5 +217,4 @@ router.post('/forgotPassword',
 );
 
 module.exports = router;
-module.exports.getJWTPayload = getJWTPayload;
-module.exports.getLeanJWTPayload = getLeanJWTPayload;
+module.exports.signNewToken = signNewToken;

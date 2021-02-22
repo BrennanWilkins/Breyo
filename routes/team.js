@@ -7,7 +7,7 @@ const User = require('../models/user');
 const { cloudinary, resizeImg, nanoid } = require('./utils');
 const Activity = require('../models/activity');
 const Board = require('../models/board');
-const { signNewToken } = require('./board');
+const { signNewToken } = require('./auth');
 const useIsTeamMember = require('../middleware/useIsTeamMember');
 const useIsTeamAdmin = require('../middleware/useIsTeamAdmin');
 
@@ -40,10 +40,9 @@ router.get('/:teamID',
       const isAdminInToken = req.userAdminTeams[teamID];
       const isAdminInTeam = team.admins.includes(req.userID);
       // if user's token is not up to date, send new token
-      if ((!isAdminInToken && isAdminInTeam) || (isAdminInToken && !isAdminInTeam)) {
-        const user = await User.findById(req.userID).lean();
-        const token = await signNewToken(user, req.header('x-auth-token'), true);
-        data.token = token;
+      if (!!isAdminInToken !== !!isAdminInTeam) {
+        const user = await User.findById(req.userID).populate('teams', 'title url').lean();
+        data.token = await signNewToken(user, req.header('x-auth-token'));
         data.teams = user.teams;
         data.adminTeams = user.adminTeams;
       }
@@ -102,12 +101,11 @@ router.post('/',
         await Promise.all([...users.map(user => user.save())]);
       }
 
-      const results = await Promise.all([
-        signNewToken(user, req.header('x-auth-token'), true),
+      const [token] = await Promise.all([
+        signNewToken(user, req.header('x-auth-token')),
         team.save(),
         user.save()
       ]);
-      const token = results[0];
 
       res.status(200).json({ teamID: team._id, url: team.url, token });
     } catch (err) { res.sendStatus(500); }
@@ -157,6 +155,7 @@ router.delete('/:teamID',
       const teamID = req.params.teamID;
       const team = await Team.findById(teamID);
       if (!team) { throw 'Team data not found'; }
+      if (!team.admins.includes(req.userID)) { throw 'User must be admin'; }
 
       await Promise.all([
         team.remove(),
@@ -272,12 +271,11 @@ router.put('/invites/:teamID',
       team.members.push(req.userID);
       user.teams.push(teamID);
 
-      const results = await Promise.all([
-        signNewToken(user, req.header('x-auth-token'), true),
+      const [token] = await Promise.all([
+        signNewToken(user, req.header('x-auth-token')),
         team.save(),
         user.save()
       ]);
-      const token = results[0];
       const teamData = { teamID: team._id, url: team.url, title: team.title };
 
       res.status(200).json({ token, team: teamData });
@@ -323,12 +321,11 @@ router.put('/leave/:teamID',
       user.teams = user.teams.filter(id => String(id) !== teamID);
       user.adminTeams = user.adminTeams.filter(id => id !== teamID);
 
-      const results = await Promise.all([
-        signNewToken(user, req.header('x-auth-token'), true),
+      const [token] = await Promise.all([
+        signNewToken(user, req.header('x-auth-token')),
         team.save(),
         user.save()
       ]);
-      const token = results[0];
 
       res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }

@@ -10,23 +10,12 @@ const useIsTeamMember = require('../middleware/useIsTeamMember');
 const List = require('../models/list');
 const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const { getJWTPayload, getLeanJWTPayload } = require('./auth');
+const { signNewToken } = require('./auth');
 const { COLORS, PHOTO_IDS } = require('./utils');
 const Team = require('../models/team');
 const { formatUserBoards, leaveAllCards } = require('./user');
 
 router.use(auth);
-
-const signNewToken = async (user, oldToken, getLean) => {
-  // used to update user's jwt token when new board created or joined, or user promoted/demoted to/from admin
-  const decoded = jwt.decode(oldToken);
-  const jwtPayload = getLean ? getLeanJWTPayload(user) : getJWTPayload(user);
-  // token expires at same time as oldToken
-  const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: decoded.exp });
-  return token;
-};
 
 // authorization: board member
 // returns all board & list data for a given board
@@ -63,14 +52,13 @@ router.get('/:boardID',
       const isAdminInToken = req.userAdmins[boardID];
       const isAdminInBoard = admins.includes(req.userID);
       // if user's token is not up to date, send new token
-      if ((!isAdminInToken && isAdminInBoard) || (isAdminInToken && !isAdminInBoard)) {
-        const user = await User.findById(req.userID).populate('boards', 'title color').lean();
+      if (!!isAdminInToken !== !!isAdminInBoard) {
+        const user = await User.findById(req.userID).populate('boards', 'title color teamID').lean();
         user.boards = formatUserBoards(user);
-        const token = await signNewToken(user, req.header('x-auth-token'), false);
+        data.token = await signNewToken(user, req.header('x-auth-token'));
         data.invites = user.invites;
         data.teamInvites = user.teamInvites;
         data.boards = user.boards;
-        data.token = token;
       }
 
       // board stores max 200 past actions, if over 250 actions then delete ones over 200
@@ -114,7 +102,7 @@ router.post('/',
       const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
 
       const [token] = await Promise.all([
-        signNewToken(user, req.header('x-auth-token'), true),
+        signNewToken(user, req.header('x-auth-token')),
         board.save(),
         user.save(),
         List.insertMany([list1, list2, list3]),
@@ -153,7 +141,7 @@ router.post('/teamBoard',
       const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
 
       const [token] = await Promise.all([
-        signNewToken(user, req.header('x-auth-token'), true),
+        signNewToken(user, req.header('x-auth-token')),
         board.save(),
         user.save(),
         addActivity(actionData)
@@ -280,7 +268,7 @@ router.put('/admins/promoteUser',
       const isAlreadyAdmin = req.userAdmins[req.body.boardID];
       if (isAlreadyAdmin) { throw 'User already an admin'; }
       const user = await User.findById(req.userID).lean();
-      const token = await signNewToken(user, req.header('x-auth-token'), true);
+      const token = await signNewToken(user, req.header('x-auth-token'));
       res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }
   }
@@ -296,7 +284,7 @@ router.put('/admins/demoteUser',
       const isMember = req.userMembers[boardID];
       if (!isAdmin && isMember) { throw 'User already demoted'; }
       const user = await User.findById(req.userID).lean();
-      const token = await signNewToken(user, req.header('x-auth-token'), true);
+      const token = await signNewToken(user, req.header('x-auth-token'));
       res.status(200).json({ token });
     } catch (err) { res.sendStatus(500); }
   }
@@ -386,7 +374,7 @@ router.put('/invites/:boardID',
       const actionData = { msg: null, boardMsg: 'was added to this board', cardID: null, listID: null, boardID: board._id, email: user.email, fullName: user.fullName };
 
       const [token, newActivity] = await Promise.all([
-        signNewToken(user, req.header('x-auth-token'), true),
+        signNewToken(user, req.header('x-auth-token')),
         addActivity(actionData),
         user.save(),
         board.save()
@@ -451,6 +439,7 @@ router.delete('/:boardID',
       const boardID = req.params.boardID;
       const board = await Board.findByIdAndDelete(boardID).select('members');
       if (!board) { throw 'No board data found'; }
+      if (!board.admins.includes(req.userID)) { throw 'User must be admin to delete board.'; }
 
       await Promise.all([
         User.updateMany({ _id: { $in: board.members }}, { $pull: { boards: board._id, adminBoards: boardID, starredBoards: boardID } }),
@@ -481,12 +470,11 @@ router.put('/leave/:boardID',
       board.members = board.members.filter(id => String(id) !== req.userID);
       board.admins = board.admins.filter(id => id !== req.userID);
 
-      await leaveAllCards(boardID, req.email);
-
       const actionData = { msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
 
       const [newActivity] = await Promise.all([
         addActivity(actionData),
+        leaveAllCards(boardID, req.email),
         User.updateOne({ _id: req.userID }, { $pull: { boards: board._id, starredBoards: boardID, adminBoards: boardID }}),
         board.save()
       ]);
@@ -545,4 +533,3 @@ router.put('/addToTeam',
 );
 
 module.exports = router;
-module.exports.signNewToken = signNewToken;
