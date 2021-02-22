@@ -1,3 +1,4 @@
+// auth actionTypes
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
 export const LOGIN_ERR = 'AUTH_ERR';
@@ -7,15 +8,18 @@ export const SIGNUP_LOADING = 'SIGNUP_LOADING';
 export const AUTH_RESET = 'AUTH_RESET';
 export const AUTO_LOGIN_LOADING = 'AUTO_LOGIN_LOADING';
 
+// user actionTypes
 export const UPDATE_USER_DATA = 'UPDATE_USER_DATA';
 export const CHANGE_AVATAR = 'CHANGE_AVATAR';
 export const DELETE_AVATAR = 'DELETE_AVATAR';
 export const UPDATE_USER_TEAMS = 'UPDATE_USER_TEAMS';
 export const UPDATE_USER_BOARDS = 'UPDATE_USER_BOARDS';
 
+// notification actionTypes
 export const SET_NOTIFS = 'SET_NOTIFS';
 export const DELETE_NOTIF = 'DELETE_NOTIF';
 
+// board actionTypes
 export const CREATE_BOARD = 'CREATE_BOARD';
 export const TOGGLE_IS_STARRED = 'TOGGLE_IS_STARRED';
 export const TOGGLE_IS_STARRED_ACTIVE = 'TOGGLE_IS_STARRED_ACTIVE';
@@ -39,6 +43,7 @@ export const TOGGLE_CREATE_BOARD = 'TOGGLE_CREATE_BOARD';
 export const JOIN_BOARD = 'JOIN_BOARD';
 export const CHANGE_BOARD_TEAM = 'CHANGE_BOARD_TEAM';
 
+// list actionTypes
 export const UPDATE_LIST_TITLE = 'UPDATE_LIST_TITLE';
 export const ADD_LIST = 'ADD_LIST';
 export const COPY_LIST = 'COPY_LIST';
@@ -52,13 +57,16 @@ export const SET_LIST_DATA = 'SET_LIST_DATA';
 export const TOGGLE_LIST_VOTING = 'TOGGLE_LIST_VOTING';
 export const SET_LIST_LIMIT = 'SET_LIST_LIMIT';
 export const REMOVE_LIST_LIMIT = 'REMOVE_LIST_LIMIT';
+export const SORT_LIST = 'SORT_LIST';
 
+// search query actionTypes
 export const ADD_TITLE_SEARCH_QUERY = 'ADD_TITLE_SEARCH_QUERY';
 export const ADD_MEMBER_SEARCH_QUERY = 'ADD_MEMBER_SEARCH_QUERY';
 export const ADD_LABEL_SEARCH_QUERY = 'ADD_LABEL_SEARCH_QUERY';
 export const ADD_DUE_DATE_SEARCH_QUERY = 'ADD_DUE_DATE_SEARCH_QUERY';
 export const RESET_SEARCH_QUERY = 'RESET_SEARCH_QUERY';
 
+// card actionTypes
 export const ADD_CARD = 'ADD_CARD';
 export const SET_CARD_DETAILS = 'SET_CARD_DETAILS';
 export const UPDATE_CARD_TITLE = 'UPDATE_CARD_TITLE';
@@ -92,13 +100,15 @@ export const UPDATE_CUSTOM_FIELD_TITLE = 'UPDATE_CUSTOM_FIELD_TITLE';
 export const UPDATE_CUSTOM_FIELD_VALUE = 'UPDATE_CUSTOM_FIELD_VALUE';
 export const DELETE_CUSTOM_FIELD = 'DELETE_CUSTOM_FIELD';
 export const TOGGLE_CARD_VOTE = 'TOGGLE_CARD_VOTE';
-export const MOVE_CUSTOM_FIELD = 'MOVE_CUSTOM_FIELD';
 
+// DND actionTypes
 export const MOVE_LIST = 'MOVE_LIST';
 export const MOVE_CARD_SAME_LIST = 'MOVE_CARD_SAME_LIST';
 export const MOVE_CARD_DIFF_LIST = 'MOVE_CARD_DIFF_LIST';
 export const MOVE_CHECKLIST_ITEM = 'MOVE_CHECKLIST_ITEM';
+export const MOVE_CUSTOM_FIELD = 'MOVE_CUSTOM_FIELD';
 
+// activity actionTypes
 export const SET_CARD_ACTIVITY = 'SET_CARD_ACTIVITY';
 export const RESET_CARD_ACTIVITY = 'RESET_CARD_ACTIVITY';
 export const CARD_ACTIVITY_LOADING = 'CARD_ACTIVITY_LOADING';
@@ -115,6 +125,7 @@ export const SET_ERR_ALL_BOARD_ACTIVITY = 'SET_ERR_ALL_BOARD_ACTIVITY';
 export const SET_ALL_BOARD_ACTIVITY_SHOWN = 'SET_ALL_BOARD_ACTIVITY_SHOWN';
 export const RESET_ALL_BOARD_ACTIVITY = 'RESET_ALL_BOARD_ACTIVITY';
 
+// team actionTypes
 export const CREATE_TEAM = 'CREATE_TEAM';
 export const SET_ACTIVE_TEAM = 'SET_ACTIVE_TEAM';
 export const EDIT_TEAM = 'EDIT_TEAM';

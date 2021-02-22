@@ -152,3 +152,16 @@ export const removeListLimit = listID => async (dispatch, getState) => {
     dispatch(serverErr());
   }
 };
+
+export const sortList = (listID, mode) => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    const payload = { listID, boardID, mode };
+    const res = await axios.put('/list/sort', payload);
+    payload.cards = res.data.cards;
+    dispatch({ type: actionTypes.SORT_LIST, ...payload });
+    sendUpdate('put/list/sort', payload);
+  } catch (err) {
+    dispatch(addNotif('There was an error while sorting the list.'));
+  }
+};

@@ -80,6 +80,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SET_LIST_LIMIT: return setListLimit(state, action);
     case actionTypes.REMOVE_LIST_LIMIT: return removeListLimit(state, action);
     case actionTypes.MOVE_CUSTOM_FIELD: return moveCustomField(state, action);
+    case actionTypes.SORT_LIST: return sortList(state, action);
     default: return state;
   }
 };
@@ -130,6 +131,36 @@ const findChecklistItems = (card, checklistID) => {
   const items = [...checklist.items];
   return { checklists, checklistIndex, checklist, items };
 };
+
+const formatCardData = (card, noComments) => ({
+  cardID: card._id,
+  checklists: card.checklists.map(checklist => ({
+    title: checklist.title,
+    checklistID: checklist._id,
+    items: checklist.items.map(item => ({
+      itemID: item._id,
+      title: item.title,
+      isComplete: item.isComplete
+    }))
+  })),
+  dueDate: card.dueDate,
+  labels: card.labels,
+  roadmapLabel: card.roadmapLabel,
+  title: card.title,
+  desc: card.desc,
+  comments: noComments ? [] : card.comments.map(comment => {
+    const { _id: commentID, ...restComment } = comment;
+    return { ...restComment, commentID };
+  }).reverse(),
+  members: card.members,
+  customFields: card.customFields.map(field => ({
+    fieldType: field.fieldType,
+    fieldTitle: field.fieldTitle,
+    value: field.value,
+    fieldID: field._id
+  })),
+  votes: card.votes
+});
 
 const setListData = (state, action) => ({
   ...state,
@@ -447,34 +478,13 @@ const copyList = (state, action) => {
     isVoting: false,
     limit: action.newList.limit,
     cards: action.newList.cards.map(card => ({
-      cardID: card._id,
-      checklists: card.checklists.map(checklist => ({
-        title: checklist.title,
-        checklistID: checklist._id,
-        items: checklist.items.map(item => ({
-          itemID: item._id,
-          title: item.title,
-          isComplete: item.isComplete
-        }))
-      })),
-      dueDate: card.dueDate,
-      labels: card.labels,
-      roadmapLabel: card.roadmapLabel,
-      title: card.title,
-      desc: card.desc,
-      comments: [],
-      members: card.members,
-      customFields: card.customFields.map(field => ({
-        fieldType: field.fieldType,
-        fieldTitle: field.fieldTitle,
-        value: field.value,
-        fieldID: field._id
-      })),
-      votes: []
+      ...formatCardData(card, true),
+      votes: [],
+      comments: []
     }))
   };
-  const lists = [...state.lists, newList];
 
+  const lists = [...state.lists, newList];
   const filteredLists = getFilteredLists(state, lists);
 
   return { ...state, lists, filteredLists };
@@ -801,6 +811,12 @@ const moveCustomField = (state, action) => {
   customFields.splice(action.destIndex, 0, field);
   card.customFields = customFields;
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const sortList = (state, action) => {
+  const lists = state.lists.map(list => list.listID === action.listID ? { ...list, cards: action.cards.map(card => formatCardData(card)) } : list);
+  const filteredLists = getFilteredLists(state, lists);
+  return { ...state, lists, filteredLists };
 };
 
 export default reducer;

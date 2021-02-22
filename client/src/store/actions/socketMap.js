@@ -59,7 +59,8 @@ const socketMap = {
   'post/list/voting': actionTypes.TOGGLE_LIST_VOTING,
   'post/card/vote': actionTypes.TOGGLE_CARD_VOTE,
   'post/list/limit': actionTypes.SET_LIST_LIMIT,
-  'delete/list/limit': actionTypes.REMOVE_LIST_LIMIT
+  'delete/list/limit': actionTypes.REMOVE_LIST_LIMIT,
+  'put/list/sort': actionTypes.SORT_LIST
 };
 
 export default socketMap;
