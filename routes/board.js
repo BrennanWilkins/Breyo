@@ -111,17 +111,15 @@ router.post('/',
       const list2 = { boardID, title: 'Doing', cards: [], archivedCards: [], indexInBoard: 1, isArchived: false, isVoting: false, limit: null };
       const list3 = { boardID, title: 'Done', cards: [], archivedCards: [], indexInBoard: 2, isArchived: false, isVoting: false, limit: null };
 
-      const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID };
+      const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([
+      const [token] = await Promise.all([
         signNewToken(user, req.header('x-auth-token'), true),
         board.save(),
         user.save(),
         List.insertMany([list1, list2, list3]),
-        addActivity(actionData, req)
+        addActivity(actionData)
       ]);
-
-      const token = results[0];
 
       res.status(200).json({ board: newBoard, token });
     } catch(err) { res.sendStatus(500); }
@@ -152,16 +150,14 @@ router.post('/teamBoard',
 
       const newBoard = { boardID, title, isStarred: false, isAdmin: true, color, teamID };
 
-      const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID };
+      const actionData = { msg: null, boardMsg: 'created this board', cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([
+      const [token] = await Promise.all([
         signNewToken(user, req.header('x-auth-token'), true),
         board.save(),
         user.save(),
-        addActivity(actionData, req)
+        addActivity(actionData)
       ]);
-
-      const token = results[0];
 
       res.status(200).json({ board: newBoard, token });
     } catch(err) { res.sendStatus(500); }
@@ -195,8 +191,9 @@ router.put('/desc',
       const { boardID, desc } = req.body;
       await Board.updateOne({ _id: boardID }, { desc });
 
-      const actionData = { msg: null, boardMsg: 'updated the board description', cardID: null, listID: null, boardID };
-      const newActivity = await addActivity(actionData, req);
+      const actionData = { msg: null, boardMsg: 'updated the board description',
+      cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
+      const newActivity = await addActivity(actionData);
 
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
@@ -215,9 +212,10 @@ router.put('/title',
       if (!board) { throw 'No board data found'; }
       const oldTitle = board.title;
 
-      const actionData = { msg: null, boardMsg: `renamed this board from ${oldTitle} to ${title}`, cardID: null, listID: null, boardID };
+      const actionData = { msg: null, boardMsg: `renamed this board from ${oldTitle} to ${title}`,
+      cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
 
-      const newActivity = await addActivity(actionData, req);
+      const newActivity = await addActivity(actionData);
 
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
@@ -260,14 +258,14 @@ router.post('/admins',
       board.admins.push(user._id);
       user.adminBoards.push(boardID);
 
-      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to admin`, cardID: null, listID: null, boardID };
+      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to admin`,
+      cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([
-        addActivity(actionData, req),
+      const [newActivity] = await Promise.all([
+        addActivity(actionData),
         user.save(),
         board.save()
       ]);
-      const newActivity = results[0];
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -325,10 +323,10 @@ router.delete('/admins/:email/:boardID',
       if (boardIndex === -1) { throw 'Board not found in users boards'; }
       user.adminBoards.splice(boardIndex, 1);
 
-      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to member`, cardID: null, listID: null, boardID };
+      const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to member`,
+      cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), user.save(), board.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), user.save(), board.save()]);
 
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
@@ -387,14 +385,12 @@ router.put('/invites/:boardID',
 
       const actionData = { msg: null, boardMsg: 'was added to this board', cardID: null, listID: null, boardID: board._id, email: user.email, fullName: user.fullName };
 
-      const results = await Promise.all([
+      const [token, newActivity] = await Promise.all([
+        signNewToken(user, req.header('x-auth-token'), true),
+        addActivity(actionData),
         user.save(),
-        board.save(),
-        addActivity(actionData, req),
-        signNewToken(user, req.header('x-auth-token'), true)
+        board.save()
       ]);
-      const newActivity = results[2];
-      const token = results[3];
 
       const newBoard = { boardID, title: board.title, color: board.color, isStarred: false, isAdmin: false, teamID: board.teamID };
 
@@ -431,14 +427,14 @@ router.put('/removeMember',
       if (!user.boards.find(id => String(id) === boardID)) { throw 'User not a member of the board'; }
       if (req.email === email) { throw 'Cannot remove yourself'; }
 
-      const actionData = { msg: null, boardMsg: `removed ${user.fullName} from this board`, cardID: null, listID: null, boardID };
+      const actionData = { msg: null, boardMsg: `removed ${user.fullName} from this board`,
+      cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([
-        addActivity(actionData, req),
+      const [newActivity] = await Promise.all([
+        addActivity(actionData),
         Board.updateOne({ _id: boardID }, { $pull: { boards: user._id, admins: user._id } }),
         User.updateOne({ email }, { $pull: { boards: boardID, adminBoards: boardID, starredBoards: boardID } })
       ]);
-      const newActivity = results[0];
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -487,14 +483,13 @@ router.put('/leave/:boardID',
 
       await leaveAllCards(boardID, req.email);
 
-      const actionData = { msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID };
+      const actionData = { msg: null, boardMsg: 'left this board', cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([
-        addActivity(actionData, req),
+      const [newActivity] = await Promise.all([
+        addActivity(actionData),
         User.updateOne({ _id: req.userID }, { $pull: { boards: board._id, starredBoards: boardID, adminBoards: boardID }}),
         board.save()
       ]);
-      const newActivity = results[0];
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }

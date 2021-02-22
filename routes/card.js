@@ -35,14 +35,15 @@ router.post('/',
       const { boardID, listID, title } = req.body;
       const list = await getListAndValidate(boardID, listID);
 
-      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [], comments: [], roadmapLabel: null, customFields: [], votes: [] };
+      const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [],
+      comments: [], roadmapLabel: null, customFields: [], votes: [] };
       list.cards.push(card);
       const cardID = list.cards[list.cards.length - 1]._id;
 
-      const actionData = { msg: 'created this card', boardMsg: `added **(link)${title}** to ${list.title}`, cardID, listID, boardID };
+      const actionData = { msg: 'created this card', boardMsg: `added **(link)${title}** to ${list.title}`,
+      cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ cardID, newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -62,10 +63,9 @@ router.put('/title',
       card.title = title;
 
       const actionData = { msg: `renamed this card from ${oldTitle} to ${title}`, boardMsg: `renamed **(link)${title}** from ${oldTitle} to ${title}`,
-        cardID, listID, boardID };
+        cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -175,10 +175,9 @@ router.put('/dueDate/isComplete',
 
       const completeText = card.dueDate.isComplete ? 'complete' : 'incomplete';
       const actionData = { msg: `marked the due date as ${completeText}`, boardMsg: `marked the due date on **(link)${card.title}** as ${completeText}`,
-        cardID, listID, boardID };
+        cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -203,10 +202,9 @@ router.post('/dueDate',
       date = isThisYear(date) ? format(date, `MMM d 'at' h:mm aa`) : format(date, `MMM d, yyyy 'at' h:mm aa`);
 
       const actionData = { msg: `set this card to be due ${date}`, boardMsg: `set **(link)${card.title}** to be due ${date}`,
-        cardID, listID, boardID };
+        cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -225,10 +223,9 @@ router.delete('/dueDate/:cardID/:listID/:boardID',
       card.dueDate = null;
 
       const actionData = { msg: `removed the due date from this card`, boardMsg: `removed the due date from **(link)${card.title}**`,
-        cardID, listID, boardID };
+        cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -248,10 +245,9 @@ router.post('/checklist',
       const checklistID = card.checklists[card.checklists.length - 1]._id;
 
       const actionData = { msg: `added checklist ${title} to this card`, boardMsg: `added checklist ${title} to **(link)${card.title}**`,
-        cardID, listID, boardID };
+        cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ checklistID, newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -271,10 +267,9 @@ router.delete('/checklist/:checklistID/:cardID/:listID/:boardID',
       checklist.remove();
 
       const actionData = { msg: `removed checklist ${checklist.title} from this card`, boardMsg: `removed checklist ${checklist.title} from **(link)${card.title}**`,
-        cardID, listID, boardID };
+        cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -296,10 +291,9 @@ router.put('/checklist/title',
       checklist.title = title;
 
       const actionData = { msg: `renamed checklist ${oldTitle} to ${title}`, boardMsg: `renamed checklist ${oldTitle} to ${title} in **(link)${card.title}**`,
-        cardID, listID, boardID };
+        cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -344,10 +338,9 @@ router.put('/checklist/item/isComplete',
 
       const cardMsg = item.isComplete ? `completed ${item.title} in checklist ${checklist.title}` : `marked ${item.title} incomplete in checklist ${checklist.title}`;
       const boardMsg = item.isComplete ? `completed ${item.title} in **(link)${card.title}**` : `marked ${item.title} incomplete in **(link)${card.title}**`;
-      const actionData = { msg: cardMsg, boardMsg, cardID, listID, boardID };
+      const actionData = { msg: cardMsg, boardMsg, cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -485,10 +478,9 @@ router.post('/copy',
       const updatedCard = destList.cards[destIndex];
 
       const actionData = { msg: `copied this card to list ${destList.title}`, boardMsg: `copied **(link)${title}** to list ${destList.title}`,
-        cardID: updatedCard._id, listID: destListID, boardID };
+        cardID: updatedCard._id, listID: destListID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), destList.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), destList.save()]);
 
       res.status(200).json({ card: updatedCard, newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -508,10 +500,9 @@ router.post('/archive',
       card.remove();
 
       const actionData = { msg: `archived this card`, boardMsg: `archived **(link)${card.title}**`,
-        cardID, listID, boardID };
+        cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -533,10 +524,10 @@ router.put('/archive/recover',
       list.cards.push(card);
       card.remove();
 
-      const actionData = { msg: `recovered this card`, boardMsg: `recovered **(link)${card.title}**`, cardID, listID, boardID };
+      const actionData = { msg: `recovered this card`, boardMsg: `recovered **(link)${card.title}**`,
+      cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -558,7 +549,7 @@ router.delete('/archive/:cardID/:listID/:boardID',
       card.remove();
 
       const newActivity = new Activity({ msg: null, boardMsg: `deleted ${card.title} from list ${list.title}`,
-        email: req.email, fullName: req.fullName, cardID: null, listID: null, boardID, date: new Date() })
+        email: req.email, fullName: req.fullName, cardID: null, listID: null, boardID, date: new Date() });
 
       await Promise.all([newActivity.save(), list.save(), Activity.deleteMany({ cardID })]);
 
@@ -592,10 +583,9 @@ router.post('/members',
       card.members.push({ email, fullName: user.fullName });
 
       const actionData = { msg: `added ${user.fullName} to this card`, boardMsg: `added ${user.fullName} to **(link)${card.title}**`,
-        cardID, listID, boardID };
+        cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -618,10 +608,9 @@ router.delete('/members/:email/:cardID/:listID/:boardID',
       card.members = card.members.filter(member => member.email !== email);
 
       const actionData = { msg: `removed ${user.fullName} from this card`, boardMsg: `removed ${user.fullName} from **(link)${card.title}**`,
-        cardID, listID, boardID };
+        cardID, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -641,10 +630,9 @@ router.post('/comments',
       card.comments.push({ email: req.email, fullName: req.fullName, date, msg, cardID, listID, likes: [] });
       const commentID = card.comments[card.comments.length - 1]._id;
 
-      const actionData = { msg, boardMsg: msg, cardID, listID, boardID, commentID, cardTitle: card.title };
+      const actionData = { msg, boardMsg: msg, cardID, listID, boardID, commentID, cardTitle: card.title, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ commentID, cardTitle: card.title, newActivity, date });
     } catch (err) { res.sendStatus(500); }

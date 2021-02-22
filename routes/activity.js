@@ -9,11 +9,19 @@ const Activity = require('../models/activity');
 router.use(auth);
 
 // for every action addActivity is called to create new doc in activity collection
-const addActivity = async (data, req) => {
-  const { msg, boardMsg, cardID, listID, boardID, email, fullName } = data;
-  if (!req.email || !req.fullName) { throw 'User data not found'; }
-  const activity = new Activity({ msg, boardMsg, email: email || req.email, fullName: fullName || req.fullName,
-    cardID, listID, boardID, date: new Date(), commentID: data.commentID || null, cardTitle: data.cardTitle || null });
+const addActivity = async data => {
+  const activity = new Activity({
+    msg: data.msg,
+    boardMsg: data.boardMsg,
+    email: data.email,
+    fullName: data.fullName,
+    cardID: data.cardID,
+    listID: data.listID,
+    boardID: data.boardID,
+    date: new Date(),
+    commentID: data.commentID || null,
+    cardTitle: data.cardTitle || null
+  });
   const newActivity = await activity.save();
   return newActivity;
 };

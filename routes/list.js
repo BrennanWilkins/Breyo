@@ -27,10 +27,10 @@ router.post('/',
         isArchived: false, isVoting: false, limit: null });
       const listID = list._id;
 
-      const actionData = { msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID, boardID };
+      const actionData = { msg: null, boardMsg: `added list ${title} to this board`,
+      cardID: null, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
 
       res.status(200).json({ listID, newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -49,8 +49,10 @@ router.put('/title',
       if (!list) { throw 'List data not found'; }
       const oldTitle = list.title;
 
-      const actionData = { msg: null, boardMsg: `renamed list ${oldTitle} to ${title}`, cardID: null, listID, boardID };
-      const newActivity = await addActivity(actionData, req);
+      const actionData = { msg: null, boardMsg: `renamed list ${oldTitle} to ${title}`,
+      cardID: null, listID, boardID, email: req.email, fullName: req.fullName };
+
+      const newActivity = await addActivity(actionData);
 
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
@@ -124,7 +126,7 @@ router.post('/copy',
         isArchived: false, isVoting: false, limit: list.limit });
 
       const listActivity = new Activity({ msg: null, boardMsg: `added list ${title} to this board`, cardID: null, listID: newList._id,
-        boardID, email: req.email, fullName: req.fullName, date: new Date() })
+        boardID, email: req.email, fullName: req.fullName, date: new Date() });
 
       const actions = [listActivity, ...newList.cards.map(card => (
         new Activity({
@@ -137,11 +139,11 @@ router.post('/copy',
           email: req.email,
           fullName: req.fullName
         }))
-      ))];
+      )];
 
-      const results = await Promise.all([Activity.insertMany(actions), newList.save()]);
+      const [activities] = await Promise.all([Activity.insertMany(actions), newList.save()]);
 
-      res.status(200).json({ newList, activities: results[0] });
+      res.status(200).json({ newList, activities });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -171,10 +173,10 @@ router.post('/archive',
         }
       }
 
-      const actionData = { msg: null, boardMsg: `archived list ${archivedList.title}`, cardID: null, listID, boardID };
+      const actionData = { msg: null, boardMsg: `archived list ${archivedList.title}`,
+      cardID: null, listID, boardID, email: req.email, fullName: req.fullName };
 
-      const results = await Promise.all([addActivity(actionData, req), archivedList.save(), ...lists.map(list => list.save())]);
-      const newActivity = results[0];
+      const [newActivity] = await Promise.all([addActivity(actionData), archivedList.save(), ...lists.map(list => list.save())]);
 
       res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
@@ -194,8 +196,8 @@ router.put('/archive/recover',
       const list = await List.findOneAndUpdate({ _id: listID, boardID }, { indexInBoard: listsLength, isArchived: false }).select('title').lean();
       if (!list) { throw 'List not found'; }
 
-      const actionData = { msg: null, boardMsg: `recovered list ${list.title}`, cardID: null, listID, boardID };
-      const newActivity = await addActivity(actionData, req);
+      const actionData = { msg: null, boardMsg: `recovered list ${list.title}`, cardID: null, listID, boardID, email: req.email, fullName: req.fullName };
+      const newActivity = await addActivity(actionData);
 
       res.status(200).json({ newActivity });
     } catch(err) { res.sendStatus(500); }
@@ -213,8 +215,8 @@ router.delete('/archive/:listID/:boardID',
       const list = await List.findOneAndDelete({ _id: listID, boardID }).select('title').lean();
       if (!list) { throw 'List not found'; }
 
-      const actionData = { msg: null, boardMsg: `deleted list ${list.title}`, cardID: null, listID: null, boardID };
-      const newActivity = await addActivity(actionData, req);
+      const actionData = { msg: null, boardMsg: `deleted list ${list.title}`, cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };
+      await addActivity(actionData);
 
       // delete all of lists activities & return new recent activities
       await Activity.deleteMany({ listID });
@@ -254,8 +256,7 @@ router.put('/archive/allCards',
       list.archivedCards = list.archivedCards.concat(list.cards);
       list.cards = [];
 
-      const results = await Promise.all([Activity.insertMany(actionData), list.save()]);
-      const activities = results[0];
+      const [activities] = await Promise.all([Activity.insertMany(actionData), list.save()]);
 
       res.status(200).json({ activities });
     } catch(err) { res.sendStatus(500); }
@@ -306,10 +307,12 @@ router.post('/voting',
       for (let card of list.cards) { card.votes = []; }
       list.isVoting = !list.isVoting;
 
-      const actionData = { msg: null, boardMsg: `${list.isVoting ? 'started a vote' : 'closed voting'} on ${list.title}`, cardID: null, listID, boardID };
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
+      const actionData = { msg: null, boardMsg: `${list.isVoting ? 'started a vote' : 'closed voting'} on ${list.title}`,
+      cardID: null, listID, boardID, email: req.email, fullName: req.fullName };
 
-      res.status(200).json({ newActivity: results[0] });
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
+
+      res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -326,10 +329,12 @@ router.put('/limit',
       if (!list) { throw 'List not found'; }
       list.limit = +limit;
 
-      const actionData = { msg: null, boardMsg: `set the card limit on ${list.title} to ${limit}`, cardID: null, listID, boardID };
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
+      const actionData = { msg: null, boardMsg: `set the card limit on ${list.title} to ${limit}`,
+      cardID: null, listID, boardID, email: req.email, fullName: req.fullName };
 
-      res.status(200).json({ newActivity: results[0] });
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
+
+      res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );
@@ -346,10 +351,12 @@ router.delete('/limit/:boardID/:listID',
       if (!list) { throw 'List not found'; }
       list.limit = null;
 
-      const actionData = { msg: null, boardMsg: `removed the card limit from ${list.title}`, cardID: null, listID, boardID };
-      const results = await Promise.all([addActivity(actionData, req), list.save()]);
+      const actionData = { msg: null, boardMsg: `removed the card limit from ${list.title}`,
+      cardID: null, listID, boardID, email: req.email, fullName: req.fullName };
 
-      res.status(200).json({ newActivity: results[0] });
+      const [newActivity] = await Promise.all([addActivity(actionData), list.save()]);
+
+      res.status(200).json({ newActivity });
     } catch (err) { res.sendStatus(500); }
   }
 );
