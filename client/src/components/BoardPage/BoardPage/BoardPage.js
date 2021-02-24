@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 import BoardNavBar from '../BoardNavBar/BoardNavBar';
 import { initSocket, connectSocket, closeSocket }  from '../../../store/actions/socket';
 import { instance as axios } from '../../../axios';
-import { addNotif, updateActiveBoard, setCardDetails, setShownMemberActivity, setCardDetailsInitial } from '../../../store/actions';
+import { addNotif, updateActiveBoard, setCardDetails, setShownMemberActivity,
+  setCardDetailsInitial, setShownBoardView } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
 import ListContainer from '../Lists/ListContainer/ListContainer';
 import { useDidUpdate } from '../../../utils/customHooks';
@@ -15,6 +16,7 @@ import { getPhotoURL } from '../../../utils/backgrounds';
 const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'));
 const MemberActivity = lazy(() => import('../MemberActivity/MemberActivity'));
 const RoadmapContainer = lazy(() => import('../RoadmapView/RoadmapContainer/RoadmapContainer'));
+const BoardOverview = lazy(() => import('../BoardOverview/BoardOverview'));
 
 const BoardPage = props => {
   const [showMenu, setShowMenu] = useState(false);
@@ -70,7 +72,11 @@ const BoardPage = props => {
       }
     };
     fetchData();
-    return () => { document.title = 'Breyo'; document.body.style.overflow = 'auto'; }
+    return () => {
+      document.title = 'Breyo';
+      document.body.style.overflow = 'auto';
+      props.resetView();
+    }
   }, [props.match.params.boardID]);
 
   const closeDetailsHandler = () => {
@@ -89,8 +95,12 @@ const BoardPage = props => {
     <>
     <div className={classes.Container} style={props.color[0] === '#' ? { background: props.color } :
     { backgroundImage: getPhotoURL(props.color, 1280, 1280) }}>
-      <BoardNavBar showMenu={showMenu} toggleMenu={showMenuHandler} />
-      {props.roadmapShown ? <Suspense fallback=""><RoadmapContainer showMenu={showMenu} /></Suspense> : <ListContainer showMenu={showMenu} />}
+      <BoardNavBar menuShown={showMenu} toggleMenu={showMenuHandler} />
+      {
+        props.shownView === 'lists' ? <ListContainer menuShown={showMenu} /> :
+        props.shownView === 'roadmap' ? <Suspense fallback=""><RoadmapContainer menuShown={showMenu} /></Suspense> :
+        <Suspense fallback=""><BoardOverview menuShown={showMenu} /></Suspense>
+      }
     </div>
     {props.shownCardID !== null && props.shownListID !== null &&
       <Suspense fallback={fallback}><CardDetails close={closeDetailsHandler} cardID={props.shownCardID} listID={props.shownListID} /></Suspense>}
@@ -114,7 +124,8 @@ BoardPage.propTypes = {
   setCardDetailsInitial: PropTypes.func.isRequired,
   shownCardID: PropTypes.string,
   shownListID: PropTypes.string,
-  roadmapShown: PropTypes.bool.isRequired
+  shownView: PropTypes.string.isRequired,
+  resetView: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -123,7 +134,7 @@ const mapStateToProps = state => ({
   shownCardID: state.lists.shownCardID,
   shownListID: state.lists.shownListID,
   shownMember: state.activity.shownMemberActivity,
-  roadmapShown: state.board.roadmapShown
+  shownView: state.board.shownView
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -131,7 +142,8 @@ const mapDispatchToProps = dispatch => ({
   updateActiveBoard: data => dispatch(updateActiveBoard(data)),
   setCardDetails: (cardID, listID) => dispatch(setCardDetails(cardID, listID)),
   setCardDetailsInitial: (cardID, listID, push) => dispatch(setCardDetailsInitial(cardID, listID, push)),
-  closeMemberActivity: () => dispatch(setShownMemberActivity(null))
+  closeMemberActivity: () => dispatch(setShownMemberActivity(null)),
+  resetView: () => dispatch(setShownBoardView('lists'))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(BoardPage));

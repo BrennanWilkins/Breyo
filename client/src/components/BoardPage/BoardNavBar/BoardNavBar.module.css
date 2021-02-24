@@ -78,16 +78,18 @@
   font-size: 15px;
   margin-bottom: 4px;
 }
-.MenuBtn, .RoadBtn {
+.MenuBtn, .ViewBtn {
   padding-right: 10px;
 }
-.RoadBtn svg {
+.ViewBtn svg {
   margin-right: 3px;
   width: 15px;
   height: 15px;
 }
-.RoadBtn2 svg {
-  margin: 0 5px 0 2px;
+.ChevronIcon svg {
+  width: 13px;
+  height: 13px;
+  margin: 12.5px 0 0 5px;
 }
 .MenuBtns {
   margin-left: auto;
@@ -131,4 +133,40 @@
   padding: 0 8px;
   height: 25px;
   line-height: 25px;
+}
+.ViewModal {
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  border: 1px solid rgb(227, 227, 227);
+  background: white;
+  position: absolute;
+  box-sizing: border-box;
+  z-index: 2;
+  top: 40px;
+  right: 2.5px;
+  width: 250px;
+  padding: 5px 0;
+}
+.ViewOption {
+  cursor: pointer;
+  padding: 5px 0;
+}
+.ViewOption:hover {
+  background: rgb(245,245,245);
+}
+.ViewTitle {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  font-size: 14px;
+}
+.ViewTitle svg {
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+}
+.ViewInfo {
+  padding: 0 10px;
+  font-size: 13px;
+  color: rgb(120,120,120);
 }

@@ -1,0 +1,71 @@
+.Container {
+  width: 100%;
+  height: 100%;
+  transition: width 250ms;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  background: rgb(245,245,245);
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+.ContainerSmall {
+  width: calc(100% - 350px);
+}
+.Container::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Container::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Container::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}
+.DataCard {
+  background: white;
+  border-radius: 4px;
+  width: 45%;
+  max-width: 600px;
+  height: 350px;
+  box-shadow: var(--cardShadow);
+  margin: 20px 10px;
+}
+@media (max-width: 1200px) {
+  .ContainerSmall {
+    padding: 10px;
+  }
+  .ContainerSmall .DataCard {
+    width: 100%;
+  }
+}
+@media (max-width: 900px) {
+  .Container .DataCard {
+    width: 100%;
+  }
+  .Container {
+    padding: 10px;
+  }
+}
+.Title {
+  font-weight: 500;
+  font-size: 15px;
+  padding: 10px 5px 10px 10px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.ChartBtns {
+  margin-left: auto;
+}
+.ChartBtns button {
+  margin: 0 5px;
+}
+.ChartBtns svg {
+  margin-right: 5px;
+}

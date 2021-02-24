@@ -22,7 +22,7 @@ const ListContainer = props => {
     <DragDropContext onDragEnd={onDragEndHandler}>
       <Droppable droppableId="droppable" direction="horizontal" type="list">
         {(provided, snapshot) => (
-          <div className={classes.Container} ref={provided.innerRef} style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
+          <div className={classes.Container} ref={provided.innerRef} style={props.menuShown ? {width: 'calc(100% - 350px)'} : null}>
             {lists.map(list => <List key={list.listID} {...list} boardID={props.boardID} />)}
             {provided.placeholder}
             <AddList listCount={props.lists.length} />
@@ -37,7 +37,7 @@ ListContainer.propTypes = {
   lists: PropTypes.array.isRequired,
   boardID: PropTypes.string.isRequired,
   dndHandler: PropTypes.func.isRequired,
-  showMenu: PropTypes.bool.isRequired,
+  menuShown: PropTypes.bool.isRequired,
   cardsAreFiltered: PropTypes.bool.isRequired,
   filteredLists: PropTypes.array.isRequired
 };

@@ -30,9 +30,9 @@ const BoardNavBar = props => {
 
   return (
     <div className={`${classes.NavBar} ${darkMode === 'darker' ? classes.DarkenBtns2 : darkMode === 'dark' ? classes.DarkenBtns : ''}`}
-    style={props.showMenu ? {width: 'calc(100% - 350px)'} : null}>
-      <BoardMenu show={props.showMenu} close={() => props.toggleMenu(false)} showSearch={showSearch} setShowSearch={bool => setShowSearch(bool)} />
-      <span className={props.showMenu ? `${classes.Input} ${classes.InputContracted}` : classes.Input}>
+    style={props.menuShown ? {width: 'calc(100% - 350px)'} : null}>
+      <BoardMenu show={props.menuShown} close={() => props.toggleMenu(false)} showSearch={showSearch} setShowSearch={bool => setShowSearch(bool)} />
+      <span className={props.menuShown ? `${classes.Input} ${classes.InputContracted}` : classes.Input}>
         <BoardTitle boardID={props.boardID} />
       </span>
       <Button className={`${classes.StarBtn} ${props.isStarred ? classes.Highlight : ''}`} clicked={() => props.toggleIsStarred(props.boardID)}>{starIcon}</Button>
@@ -51,7 +51,7 @@ const BoardNavBar = props => {
         {showAddToTeam && <AddToTeamModal close={() => setShowAddToTeam(false)} />}
         {showBoardTeamModal && <BoardTeamModal team={props.team} close={() => setShowBoardTeamModal(false)} />}
       </span>
-      <RightMenuBtns showMenu={props.showMenu} openMenu={() => props.toggleMenu(true)} openSearch={() => setShowSearch(true)} />
+      <RightMenuBtns menuShown={props.menuShown} openMenu={() => props.toggleMenu(true)} openSearch={() => setShowSearch(true)} />
     </div>
   );
 };
@@ -60,7 +60,7 @@ BoardNavBar.propTypes = {
   boardID: PropTypes.string.isRequired,
   isStarred: PropTypes.bool.isRequired,
   toggleIsStarred: PropTypes.func.isRequired,
-  showMenu: PropTypes.bool.isRequired,
+  menuShown: PropTypes.bool.isRequired,
   toggleMenu: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
   team: PropTypes.object.isRequired

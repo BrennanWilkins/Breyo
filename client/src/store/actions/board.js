@@ -264,13 +264,13 @@ export const openRoadmap = () => (dispatch, getState) => {
     const listID = state.lists.lists[0].listID;
     dispatch({ type: actionTypes.SET_SHOWN_ROADMAP_LIST, listID });
   }
-  dispatch({ type: actionTypes.OPEN_ROADMAP });
+  dispatch({ type: actionTypes.SET_SHOWN_BOARD_VIEW, view: 'roadmap' });
 };
 
-export const closeRoadmap = () => ({ type: actionTypes.CLOSE_ROADMAP });
+export const setShownBoardView = view => ({ type: actionTypes.SET_SHOWN_BOARD_VIEW, view });
 
 export const openRoadmapList = listID => dispatch => {
-  dispatch({ type: actionTypes.OPEN_ROADMAP });
+  dispatch({ type: actionTypes.SET_SHOWN_BOARD_VIEW, view: 'roadmap' });
   dispatch({ type: actionTypes.SET_SHOWN_ROADMAP_LIST, listID });
 };
 

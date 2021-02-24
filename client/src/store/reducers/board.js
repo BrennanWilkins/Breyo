@@ -9,7 +9,7 @@ const initialState = {
   desc: '',
   isStarred: false,
   userIsAdmin: false,
-  roadmapShown: false,
+  shownView: 'lists',
   shownRoadmapListID: null,
   showCreateBoard: false,
   createBoardTeamID: null,
@@ -34,11 +34,10 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ADD_BOARD_MEMBER: return addBoardMember(state, action);
     case actionTypes.DELETE_BOARD_MEMBER: return deleteBoardMember(state, action);
     case actionTypes.LOGOUT: return { ...initialState };
-    case actionTypes.OPEN_ROADMAP: return { ...state, roadmapShown: true };
     case actionTypes.SET_SHOWN_ROADMAP_LIST: return { ...state, shownRoadmapListID: action.listID };
-    case actionTypes.CLOSE_ROADMAP: return { ...state, roadmapShown: false };
     case actionTypes.TOGGLE_CREATE_BOARD: return toggleCreateBoard(state, action);
     case actionTypes.CHANGE_BOARD_TEAM: return changeBoardTeam(state, action);
+    case actionTypes.SET_SHOWN_BOARD_VIEW: return { ...state, shownView: action.view };
     default: return state;
   }
 };
