@@ -11,9 +11,16 @@ const List = require('../models/list');
 const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 const { signNewToken } = require('./auth');
-const { COLORS, PHOTO_IDS } = require('./utils');
 const Team = require('../models/team');
 const { formatUserBoards, leaveAllCards } = require('./user');
+
+const COLORS = ['#f05544', '#f09000', '#489a3c', '#0079bf', '#7150df', '#38bbf4', '#ad5093', '#4a32dd', '#046b8b'];
+
+const PHOTO_IDS = [
+  '1607556049122-5e3874a25a1f', '1605325811474-ba58cf3180d8', '1513580638-fda5563960d6',
+  '1554129352-f8c3ab6d5595', '1596709097416-6d4206796022', '1587732282555-321fddb19dc0',
+  '1605580556856-db8fae94b658', '1605738862138-6704bedb5202', '1605447781678-2a5baca0e07b'
+];
 
 router.use(auth);
 
@@ -220,7 +227,7 @@ router.put('/starred',
       if (!user) { throw 'No user data found'; }
 
       const index = user.starredBoards.indexOf(boardID);
-      if (index === -1) { user.starredBoards.unshift(boardID); }
+      if (index === -1) { user.starredBoards.push(boardID); }
       else { user.starredBoards.splice(index, 1); }
 
       await user.save();
@@ -301,15 +308,12 @@ router.delete('/admins/:email/:boardID',
       const [board, user] = await Promise.all([Board.findById(boardID), User.findOne({ email })]);
       if (!board || !user) { throw 'No board or user data found'; }
 
-      // remove user from board's admins
+      // remove user from board's admins & board from user's admin boards
       const adminIndex = board.admins.indexOf(String(user._id));
       if (adminIndex === -1) { throw 'User not found in boards admins'; }
       if (board.admins.length <= 1) { throw 'There must be at least 1 admin at all times'; }
       board.admins.splice(adminIndex, 1);
-      // remove board from user's adminBoards
-      const boardIndex = user.adminBoards.indexOf(boardID);
-      if (boardIndex === -1) { throw 'Board not found in users boards'; }
-      user.adminBoards.splice(boardIndex, 1);
+      user.adminBoards = user.adminBoards.filter(id => id !== boardID);
 
       const actionData = { msg: null, boardMsg: `changed ${user.fullName}'s permissions to member`,
       cardID: null, listID: null, boardID, email: req.email, fullName: req.fullName };

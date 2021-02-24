@@ -9,8 +9,9 @@ const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
 const { format } = require('date-fns');
 const isThisYear = require('date-fns/isThisYear');
-const { LABEL_COLORS } = require('./utils');
 const { areAllMongo } = require('../middleware/validate');
+
+const LABEL_COLORS = ['#60C44D', '#F5DD2A', '#FF8C00', '#F60000', '#3783FF', '#4815AA'];
 
 router.use(auth);
 // user must be board member for all card routes
@@ -171,7 +172,7 @@ router.put('/dueDate/isComplete',
       const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
       if (!card.dueDate) { throw 'No due date found for card'; }
-      card.dueDate = { ...card.dueDate, isComplete: !card.dueDate.isComplete};
+      card.dueDate = { ...card.dueDate, isComplete: !card.dueDate.isComplete };
 
       const completeText = card.dueDate.isComplete ? 'complete' : 'incomplete';
       const actionData = { msg: `marked the due date as ${completeText}`, boardMsg: `marked the due date on **(link)${card.title}** as ${completeText}`,
@@ -386,18 +387,22 @@ router.put('/checklist/item/delete',
 
 // move card inside the same list
 router.put('/moveCard/sameList',
-  validate([body('boardID').isMongoId(), body('listID').isMongoId(), body('sourceIndex').isInt(), body('destIndex').isInt()]),
+  validate([body('boardID').isMongoId(), body('listID').isMongoId(), body('sourceIndex').isInt({ min: 0 }), body('destIndex').isInt({ min: 0 })]),
   useIsMember,
   async (req, res) => {
     try {
-      const list = await getListAndValidate(req.body.boardID, req.body.listID);
+      const { boardID, listID, sourceIndex, destIndex } = req.body;
+      const list = await getListAndValidate(boardID, listID);
+      if (sourceIndex >= list.cards.length || destIndex >= list.cards.length) {
+        throw 'Invalid source or dest index';
+      }
 
       // remove card from original index
-      const card = list.cards.splice(req.body.sourceIndex, 1)[0];
+      const card = list.cards.splice(sourceIndex, 1)[0];
       if (!card) { throw 'Card not found in list'; }
 
       // add card back to new index
-      list.cards.splice(req.body.destIndex, 0, card);
+      list.cards.splice(destIndex, 0, card);
 
       await list.save();
       res.sendStatus(200);
@@ -407,12 +412,15 @@ router.put('/moveCard/sameList',
 
 // move card to a different list
 router.put('/moveCard/diffList',
-  validate([...areAllMongo(['boardID', 'sourceID', 'targetID'], 'body'), body('sourceIndex').isInt(), body('destIndex').isInt()]),
+  validate([...areAllMongo(['boardID', 'sourceID', 'targetID'], 'body'), body('sourceIndex').isInt({ min: 0 }), body('destIndex').isInt({ min: 0 })]),
   useIsMember,
   async (req, res) => {
     try {
       const { boardID, sourceID, targetID, sourceIndex, destIndex } = req.body;
       const [sourceList, destList] = await Promise.all([getListAndValidate(boardID, sourceID), getListAndValidate(boardID, targetID)]);
+      if (sourceIndex >= sourceList.cards.length || destIndex > destList.cards.length) {
+        throw 'Invalid source or dest index';
+      }
 
       // remove card from source list
       const card = sourceList.cards.splice(sourceIndex, 1)[0];
@@ -440,7 +448,7 @@ router.post('/copy',
   validate(
     [...areAllMongo(['boardID', 'sourceListID', 'destListID', 'cardID'], 'body'),
     body('title').isLength({ min: 1, max: 200 }),
-    body('destIndex').isInt(),
+    body('destIndex').isInt({ min: 0 }),
     body('keepLabels').isBoolean(),
     body('keepChecklists').isBoolean()]
   ),
@@ -452,6 +460,7 @@ router.post('/copy',
         getListAndValidate(boardID, sourceListID, cardID),
         getListAndValidate(boardID, destListID)
       ]);
+      if (destIndex > destList.cards.length) { throw 'Invalid destination index'; }
 
       // create nested copy of card checklists & card labels if requested
       const newCard = {
@@ -575,7 +584,7 @@ router.post('/members',
       ]);
       if (!user) { throw 'User data not found'; }
 
-      if (!user.boards.map(String).includes(boardID)) { throw 'User must be member of board'; }
+      if (!user.boards.find(id => String(id) === boardID)) { throw 'User must be member of board'; }
 
       // if user already member of the card
       if (card.members.find(member => member.email === email)) { throw 'User already a member of the card'; }
@@ -683,7 +692,11 @@ router.delete('/comments/:commentID/:cardID/:listID/:boardID',
 
 // move the position of a checklist item
 router.put('/checklist/moveItem',
-  validate([...areAllMongo(['boardID', 'listID', 'cardID', 'checklistID'], 'body'), body('sourceIndex').isInt(), body('destIndex').isInt()]),
+  validate([
+    ...areAllMongo(['boardID', 'listID', 'cardID', 'checklistID'], 'body'),
+    body('sourceIndex').isInt({ min: 0 }),
+    body('destIndex').isInt({ min: 0 })
+  ]),
   useIsMember,
   async (req, res) => {
     try {
@@ -692,6 +705,10 @@ router.put('/checklist/moveItem',
 
       const checklist = card.checklists.id(checklistID);
       if (!checklist) { throw 'Checklist not found'; }
+      if (destIndex >= checklist.items.length || sourceIndex >= checklist.items.length) {
+        throw 'Invalid source or dest index';
+      }
+
       const item = checklist.items.splice(sourceIndex, 1)[0];
       checklist.items.splice(destIndex, 0, item);
 
@@ -778,20 +795,30 @@ router.put('/customField/value',
       const field = card.customFields.id(fieldID);
       if (!field) { throw 'Custom field not found'; }
 
-      if (field.fieldType === 'Text') {
-        if (typeof value !== 'string') { throw 'Invalid value type'; }
-        if (value.length > 300) { throw 'Invalid field value length'; }
-        field.value = value;
-      } else if (field.fieldType === 'Checkbox') {
-        field.value = !field.value;
-      } else if (field.fieldType === 'Number') {
-        if (isNaN(value) || value > 1e20 || value < -1e20) { throw 'Field value is not a number'; }
-        // if value is float then can have max 12 decimal places
-        field.value = value % 1 ? String(+parseFloat(value).toFixed(12)) : value;
-      } else {
-        if (value && isNaN(new Date(value).getDate())) { throw 'Field value is not a date'; }
-        // date value defaults to null if empty
-        field.value = value !== '' ? value : null;
+      switch (field.fieldType) {
+        case 'Text': {
+          if (typeof value !== 'string') { throw 'Invalid value type'; }
+          if (value.length > 300) { throw 'Invalid field value length'; }
+          field.value = value;
+          break;
+        }
+        case 'Checkbox': {
+          field.value = !field.value;
+          break;
+        }
+        case 'Number': {
+          if (isNaN(value) || value > 1e20 || value < -1e20) { throw 'Field value is not a number'; }
+          // if value is float then can have max 12 decimal places
+          field.value = value % 1 ? String(+parseFloat(value).toFixed(12)) : value;
+          break;
+        }
+        case 'Date': {
+          if (value && isNaN(new Date(value).getDate())) { throw 'Field value is not a date'; }
+          // date value defaults to null if empty
+          field.value = value !== '' ? value : null;
+          break;
+        }
+        default: throw 'Invalid field type';
       }
 
       await list.save();

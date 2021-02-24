@@ -4,26 +4,26 @@ const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const { param, body } = require('express-validator');
 const User = require('../models/user');
-const { cloudinary, resizeImg, nanoid } = require('./utils');
+const cloudinary = require('./cloudinary');
 const Activity = require('../models/activity');
 const Board = require('../models/board');
 const { signNewToken } = require('./auth');
 const useIsTeamMember = require('../middleware/useIsTeamMember');
 const useIsTeamAdmin = require('../middleware/useIsTeamAdmin');
+const { customAlphabet } = require('nanoid');
+const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 12);
 
 router.use(auth);
 
 const validateURL = async url => {
-  try {
-    // validate URL
-    const urlTest = /^[a-zA-Z0-9]*$/;
-    const checkURL = urlTest.test(url);
-    // check if URL is already taken
-    if (!checkURL) { return `Your team's URL can only contain letters or numbers.`; }
-    const isTaken = await Team.exists({ url });
-    if (isTaken) { return 'That URL is already taken.'; }
-    return '';
-  } catch (err) { return err; }
+  // URL must be alphanumeric
+  const urlTest = /^[a-zA-Z0-9]*$/;
+  const checkURL = urlTest.test(url);
+  // check if URL is already taken
+  if (!checkURL) { return `Your team's URL can only contain letters or numbers.`; }
+  const isTaken = await Team.exists({ url });
+  if (isTaken) { return 'That URL is already taken.'; }
+  return '';
 };
 
 // authorization: team member
@@ -76,6 +76,7 @@ router.post('/',
       const { title, desc, url, emails } = req.body;
 
       if (url !== '') {
+        // check if url valid & not taken
         const urlIsValid = await validateURL(url);
         if (urlIsValid !== '') { return res.status(400).json({ msg: urlIsValid }); }
       }
@@ -88,9 +89,9 @@ router.post('/',
       // user is admin of team by default
       user.adminTeams.push(team._id);
 
+      const users = [];
       if (emails.length) {
         // members sent as emails separated by space, if user found then send invite
-        const users = [];
         for (let email of emails) {
           if (email === req.email) { continue; }
           const user = await User.findOne({ email });
@@ -98,13 +99,13 @@ router.post('/',
           user.teamInvites.push({ inviterEmail: req.email, inviterName: req.fullName, title, teamID: team._id });
           users.push(user);
         }
-        await Promise.all([...users.map(user => user.save())]);
       }
 
       const [token] = await Promise.all([
         signNewToken(user, req.header('x-auth-token')),
         team.save(),
-        user.save()
+        user.save(),
+        ...users.map(invitee => invitee.save())
       ]);
 
       res.status(200).json({ teamID: team._id, url: team.url, token });
@@ -163,9 +164,7 @@ router.delete('/:teamID',
         User.updateMany({ _id: { $in: team.members }}, { $pull: { teams: team._id, adminTeams: team._id }})
       ]);
 
-      if (team.logo) {
-        await cloudinary.destroy(team.logo.slice(team.logo.lastIndexOf('/') + 1, team.logo.lastIndexOf('.')));
-      }
+      if (team.logo) { await cloudinary.destroy(team.logo); }
 
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
@@ -182,15 +181,10 @@ router.put('/logo/:teamID',
       const team = await Team.findById(req.params.teamID);
       if (!team) { throw 'Team data not found'; }
 
-      const logo = await resizeImg(req.body.logo);
-      const data = await cloudinary.upload(logo);
-      const logoURL = data.secure_url;
+      // delete old logo
+      if (team.logo) { await cloudinary.destroy(team.logo); }
 
-      if (team.logo) {
-        // delete old logo
-        await cloudinary.destroy(team.logo.slice(team.logo.lastIndexOf('/') + 1, team.logo.lastIndexOf('.')));
-      }
-
+      const logoURL = await cloudinary.upload(req.body.logo);
       team.logo = logoURL;
       await team.save();
 
@@ -210,7 +204,7 @@ router.delete('/logo/:teamID',
       if (!team) { throw 'Team not found'; }
       if (!team.logo) { throw 'Team logo not found'; }
 
-      await cloudinary.destroy(team.logo.slice(team.logo.lastIndexOf('/') + 1, team.logo.lastIndexOf('.')));
+      await cloudinary.destroy(team.logo);
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }

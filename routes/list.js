@@ -19,10 +19,9 @@ router.post('/',
   async (req, res) => {
     try {
       const { boardID, title } = req.body;
-      const board = await Board.exists({ _id: boardID });
+      const [board, listsLength] = await Promise.all([Board.exists({ _id: boardID }), List.countDocuments({ boardID, isArchived: false })]);
       if (!board) { throw 'New lists board not found'; }
 
-      const listsLength = await List.countDocuments({ boardID, isArchived: false });
       const list = new List({ boardID, title, cards: [], archivedCards: [], indexInBoard: listsLength,
         isArchived: false, isVoting: false, limit: null });
       const listID = list._id;
@@ -62,22 +61,22 @@ router.put('/title',
 // authorization: board member
 // move list to different index in board
 router.put('/moveList',
-  validate([body('sourceIndex').isInt(), body('destIndex').isInt(), body('boardID').isMongoId()]),
+  validate([body('sourceIndex').isInt({ min: 0 }), body('destIndex').isInt({ min: 0 }), body('boardID').isMongoId()]),
   useIsMember,
   async (req, res) => {
     try {
       const { sourceIndex, destIndex, boardID } = req.body;
       const lists = await List.find({ boardID, isArchived: false }).sort({ indexInBoard: 'asc' });
       if (!lists) { throw 'List data not found'; }
+      if (sourceIndex >= lists.length || destIndex >= lists.length) {
+        throw 'Invalid source or dest index';
+      }
       const list = lists.splice(sourceIndex, 1)[0];
-      if (!list) { throw 'Invalid list sourceIndex'; }
       lists.splice(destIndex, 0, list);
 
       // update all lists in board to match new order
       for (let i = 0; i < lists.length; i++) {
-        if (lists[i].indexInBoard !== i) {
-          lists[i].indexInBoard = i;
-        }
+        if (lists[i].indexInBoard !== i) { lists[i].indexInBoard = i; }
       }
       await Promise.all(lists.map(list => list.save()));
 
@@ -94,8 +93,11 @@ router.post('/copy',
   async (req, res) => {
     try {
       const { boardID, listID, title } = req.body;
-      const list = await List.findOne({ _id: listID, boardID, isArchived: false }).select('cards desc title').lean();
-      if (!list) { throw 'List data not found'; }
+      const [list, listsLength] = await Promise.all([
+        List.findOne({ _id: listID, boardID, isArchived: false }).select('cards desc title').lean(),
+        List.countDocuments({ boardID, isArchived: false })
+      ]);
+      if (!list || !listsLength) { throw 'List data not found'; }
 
       // create deeply nested copy of all cards & all checklists/members/dueDate/etc of each card
       const cards = list.cards.map(card => ({
@@ -121,7 +123,6 @@ router.post('/copy',
         votes: []
       }));
 
-      const listsLength = await List.countDocuments({ boardID, isArchived: false });
       const newList = new List({ boardID, title, desc: list.desc, indexInBoard: listsLength, cards, archivedCards: [],
         isArchived: false, isVoting: false, limit: list.limit });
 
@@ -157,20 +158,17 @@ router.post('/archive',
     try {
       const { boardID, listID } = req.body;
       const lists = await List.find({ boardID, isArchived: false }).sort({ indexInBoard: 'asc' });
-      if (!lists || lists.length === 0) { throw 'List data not found'; }
+      if (!lists || !lists.length) { throw 'List data not found'; }
       const listIndex = lists.findIndex(list => String(list._id) === listID);
-      if (listIndex === -1) { throw 'List not found in board lists'; }
+      if (listIndex === -1) { throw 'List not found in boards lists'; }
 
       const archivedList = lists.splice(listIndex, 1)[0];
-      // set archived list's index to end of list & set as isArchived
       archivedList.indexInBoard = lists.length;
       archivedList.isArchived = true;
 
       // update all lists index in board to reflect missing list
       for (let i = 0; i < lists.length; i++) {
-        if (lists[i].indexInBoard !== i) {
-          lists[i].indexInBoard = i;
-        }
+        if (lists[i].indexInBoard !== i) { lists[i].indexInBoard = i; }
       }
 
       const actionData = { msg: null, boardMsg: `archived list ${archivedList.title}`,
