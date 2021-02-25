@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import classes from './BoardOverview.module.css';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar, PieChart, Pie, Legend, Cell } from 'recharts';
 import { isThisWeek, isPast } from 'date-fns';
 import OverviewCard from './OverviewCard';
+import { BarChart, PieChart } from './Charts';
 
 const getDueDateTypes = lists => {
   const data = [
@@ -80,52 +80,22 @@ const BoardOverview = props => {
     <div className={`${classes.Container} ${props.menuShown ? classes.ContainerSmall : ''}`}>
       <OverviewCard title="Cards per list" mode="bar" changeMode={changeModeHandler}>
         {!cardsPerList.length ? <p className={classes.NoData}>There are no lists in this board.</p> :
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={cardsPerList}>
-              <YAxis />
-              <XAxis dataKey="title" />
-              <Tooltip />
-              <Bar dataKey="cards" fill="#555555" />
-            </BarChart>
-          </ResponsiveContainer>
+          <BarChart data={cardsPerList} xKey="title" yKey="cards" />
         }
       </OverviewCard>
       <OverviewCard title="Cards per member" mode="bar" changeMode={changeModeHandler}>
         {!cardsByMember.length ? <p className={classes.NoData}>There are no members assigned to cards in this board.</p> :
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={cardsByMember}>
-              <YAxis />
-              <XAxis dataKey="name" />
-              <Tooltip />
-              <Bar dataKey="cards" fill="#555555" />
-            </BarChart>
-          </ResponsiveContainer>
+          <BarChart data={cardsByMember} xKey="name" yKey="cards" />
         }
       </OverviewCard>
       <OverviewCard title="Cards per due date" mode="pie" changeMode={changeModeHandler}>
         {!cardsByDueDate.length ? <p className={classes.NoData}>There are no cards in this board.</p> :
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={cardsByDueDate} dataKey="cards" nameKey="title">
-                {cardsByDueDate.map(date => <Cell key={date.title} fill={date.fill} />)}
-              </Pie>
-              <Tooltip />
-              <Legend align="right" layout="vertical" verticalAlign="middle" />
-            </PieChart>
-          </ResponsiveContainer>
+          <PieChart data={cardsByDueDate} yKey="cards" xKey="title" />
         }
       </OverviewCard>
       <OverviewCard title="Cards per label" mode="pie" changeMode={changeModeHandler}>
         {!cardsByLabel.length ? <p className={classes.NoData}>There are no cards with labels in this board.</p> :
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={cardsByLabel} dataKey="cards" nameKey="title">
-                {cardsByLabel.map(label => <Cell key={label.fill} fill={label.fill} />)}
-              </Pie>
-              <Tooltip />
-              <Legend align="right" layout="vertical" verticalAlign="middle" />
-            </PieChart>
-          </ResponsiveContainer>
+          <PieChart data={cardsByLabel} yKey="cards" xKey="title" />
         }
       </OverviewCard>
     </div>
