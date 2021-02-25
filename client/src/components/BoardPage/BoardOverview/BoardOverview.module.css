@@ -30,11 +30,12 @@
 .DataCard {
   background: white;
   border-radius: 4px;
-  width: 45%;
+  width: calc(50% - 30px);
   max-width: 600px;
-  height: 350px;
   box-shadow: var(--cardShadow);
   margin: 20px 10px;
+  padding: 10px;
+  box-sizing: border-box;
 }
 @media (max-width: 1200px) {
   .ContainerSmall {
@@ -44,7 +45,7 @@
     width: 100%;
   }
 }
-@media (max-width: 900px) {
+@media (max-width: 950px) {
   .Container .DataCard {
     width: 100%;
   }
@@ -55,10 +56,10 @@
 .Title {
   font-weight: 500;
   font-size: 15px;
-  padding: 10px 5px 10px 10px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  margin: 0 -5px 30px 0;
 }
 .ChartBtns {
   margin-left: auto;
@@ -68,4 +69,8 @@
 }
 .ChartBtns svg {
   margin-right: 5px;
+}
+.NoData {
+  text-align: center;
+  margin-top: 40px;
 }
