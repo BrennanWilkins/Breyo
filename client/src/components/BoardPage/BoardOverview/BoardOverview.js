@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import classes from './BoardOverview.module.css';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { pieChartIcon, barChartIcon } from '../../UI/icons';
-import { ActionBtn } from '../../UI/Buttons/Buttons';
-import { ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar,
-  PieChart, Pie, Legend, Cell } from 'recharts';
+import { ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar, PieChart, Pie, Legend, Cell } from 'recharts';
 import { isThisWeek, isPast } from 'date-fns';
+import OverviewCard from './OverviewCard';
 
 const getDueDateTypes = lists => {
   const data = [
@@ -27,7 +25,7 @@ const getDueDateTypes = lists => {
       else { data[4].cards++; }
     });
   });
-  if (noCardsCount === lists.length) { return false; }
+  if (noCardsCount === lists.length) { return []; }
   return data;
 };
 
@@ -74,16 +72,13 @@ const BoardOverview = props => {
     setCardsByLabel(getCardsByLabel(props.lists));
   }, []);
 
+  const changeModeHandler = mode => {
+
+  };
+
   return (
     <div className={`${classes.Container} ${props.menuShown ? classes.ContainerSmall : ''}`}>
-      <div className={classes.DataCard}>
-        <div className={classes.Title}>
-          Cards per list
-          <div className={classes.ChartBtns}>
-            <ActionBtn>{pieChartIcon} Pie Chart</ActionBtn>
-            <ActionBtn>{barChartIcon} Bar Chart</ActionBtn>
-          </div>
-        </div>
+      <OverviewCard title="Cards per list" mode="bar" changeMode={changeModeHandler}>
         {!cardsPerList.length ? <p className={classes.NoData}>There are no lists in this board.</p> :
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={cardsPerList}>
@@ -94,15 +89,8 @@ const BoardOverview = props => {
             </BarChart>
           </ResponsiveContainer>
         }
-      </div>
-      <div className={classes.DataCard}>
-        <div className={classes.Title}>
-          Cards per member
-          <div className={classes.ChartBtns}>
-            <ActionBtn>{pieChartIcon} Pie Chart</ActionBtn>
-            <ActionBtn>{barChartIcon} Bar Chart</ActionBtn>
-          </div>
-        </div>
+      </OverviewCard>
+      <OverviewCard title="Cards per member" mode="bar" changeMode={changeModeHandler}>
         {!cardsByMember.length ? <p className={classes.NoData}>There are no members assigned to cards in this board.</p> :
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={cardsByMember}>
@@ -113,16 +101,9 @@ const BoardOverview = props => {
             </BarChart>
           </ResponsiveContainer>
         }
-      </div>
-      <div className={classes.DataCard}>
-        <div className={classes.Title}>
-          Cards per due date
-          <div className={classes.ChartBtns}>
-            <ActionBtn>{pieChartIcon} Pie Chart</ActionBtn>
-            <ActionBtn>{barChartIcon} Bar Chart</ActionBtn>
-          </div>
-        </div>
-        {!cardsByDueDate ? <p className={classes.NoData}>There are no cards in this board.</p> :
+      </OverviewCard>
+      <OverviewCard title="Cards per due date" mode="pie" changeMode={changeModeHandler}>
+        {!cardsByDueDate.length ? <p className={classes.NoData}>There are no cards in this board.</p> :
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={cardsByDueDate} dataKey="cards" nameKey="title">
@@ -133,15 +114,8 @@ const BoardOverview = props => {
             </PieChart>
           </ResponsiveContainer>
         }
-      </div>
-      <div className={classes.DataCard}>
-        <div className={classes.Title}>
-          Cards per label
-          <div className={classes.ChartBtns}>
-            <ActionBtn>{pieChartIcon} Pie Chart</ActionBtn>
-            <ActionBtn>{barChartIcon} Bar Chart</ActionBtn>
-          </div>
-        </div>
+      </OverviewCard>
+      <OverviewCard title="Cards per label" mode="pie" changeMode={changeModeHandler}>
         {!cardsByLabel.length ? <p className={classes.NoData}>There are no cards with labels in this board.</p> :
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -153,7 +127,7 @@ const BoardOverview = props => {
             </PieChart>
           </ResponsiveContainer>
         }
-      </div>
+      </OverviewCard>
     </div>
   );
 };

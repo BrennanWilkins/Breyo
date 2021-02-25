@@ -59,18 +59,56 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  margin: 0 -5px 30px 0;
-}
-.ChartBtns {
-  margin-left: auto;
-}
-.ChartBtns button {
-  margin: 0 5px;
-}
-.ChartBtns svg {
-  margin-right: 5px;
+  margin-bottom: 30px;
 }
 .NoData {
   text-align: center;
-  margin-top: 40px;
+  padding-top: 10px;
+}
+.Options {
+  margin-left: auto;
+  position: relative;
+}
+.OptionsBtn {
+  color: rgb(50,50,50);
+  border-radius: 4px;
+  padding: 7px 6px;
+  font-size: 16px;
+  transition: all 300ms;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.OptionsBtn:hover {
+  color: black;
+  background: rgb(230,230,230);
+}
+.CardOptions {
+  top: 35px;
+  right: 0;
+  padding: 10px 0;
+  width: 200px;
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  border: 1px solid rgb(227, 227, 227);
+  background: white;
+  position: absolute;
+  box-sizing: border-box;
+  z-index: 2;
+}
+.Option {
+  padding: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+}
+.Option svg {
+  margin-right: 7px;
+  color: rgb(50,50,50);
+}
+.Option:hover {
+  background: rgb(245,245,245);
 }
