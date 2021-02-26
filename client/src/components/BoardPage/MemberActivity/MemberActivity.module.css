@@ -1,27 +1,5 @@
-.Container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgb(0,0,0,0.5);
-  overflow-x: hidden;
-  overflow-y: auto;
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
 .Modal {
-  margin: 45px 0;
-  width: 96%;
   max-width: 600px;
-  background: rgb(246,246,246);
-  padding: 15px;
-  box-sizing: border-box;
-  border-radius: 2px;
-  position: relative;
-  min-height: 300px;
 }
 .Title {
   display: flex;

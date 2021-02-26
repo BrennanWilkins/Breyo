@@ -1,7 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import classes from './MemberActivity.module.css';
-import { useModalToggle } from '../../../utils/customHooks';
-import { CloseBtnCircle } from '../../UI/Buttons/Buttons';
 import PropTypes from 'prop-types';
 import { activityIcon } from '../../UI/icons';
 import Action from '../../UI/Action/Action';
@@ -9,10 +7,9 @@ import CommentAction from '../../UI/Action/CommentAction';
 import AuthSpinner from '../../UI/AuthSpinner/AuthSpinner';
 import { instance as axios } from '../../../axios';
 import { connect } from 'react-redux';
+import FixedModalContainer from '../../UI/FixedModalContainer/FixedModalContainer';
 
 const MemberActivity = props => {
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
   const [userActivity, setUserActivity] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(false);
@@ -37,24 +34,21 @@ const MemberActivity = props => {
   }, [props.path]);
 
   return (
-    <div className={classes.Container}>
-      <div ref={modalRef} className={classes.Modal}>
-        <CloseBtnCircle close={props.close} />
-        <div className={classes.Title}>
-          {activityIcon}
-          <span className={classes.Name}>{props.fullName}</span>
-          <span className={classes.Email}>({props.email})</span>
-        </div>
-        <div className={classes.Activity}>
-          {loading ? <div className={classes.Spinner}><AuthSpinner /></div> : !err ?
-            userActivity.map(action => {
-              if (action.commentID) { return <CommentAction key={action.commentID} {...action} avatar={props.avatars[action.email]} />; }
-              return <Action key={action._id} isBoard {...action} msg={action.boardMsg} avatar={props.avatars[action.email]} />;
-            }) :
-            <div className={classes.ErrMsg}>This user's activity could not be retrieved.</div>}
-        </div>
+    <FixedModalContainer close={props.close} className={classes.Modal}>
+      <div className={classes.Title}>
+        {activityIcon}
+        <span className={classes.Name}>{props.fullName}</span>
+        <span className={classes.Email}>({props.email})</span>
       </div>
-    </div>
+      <div className={classes.Activity}>
+        {loading ? <div className={classes.Spinner}><AuthSpinner /></div> : !err ?
+          userActivity.map(action => {
+            if (action.commentID) { return <CommentAction key={action.commentID} {...action} avatar={props.avatars[action.email]} />; }
+            return <Action key={action._id} isBoard {...action} msg={action.boardMsg} avatar={props.avatars[action.email]} />;
+          }) :
+          <div className={classes.ErrMsg}>This user's activity could not be retrieved.</div>}
+      </div>
+    </FixedModalContainer>
   );
 };
 

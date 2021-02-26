@@ -158,7 +158,7 @@
   padding: 0 5px;
   text-align: center;
 }
-@media (max-height: 505px) {
+@media (max-height: 530px) {
   .Container {
     left: auto !important;
     right: 10px !important;

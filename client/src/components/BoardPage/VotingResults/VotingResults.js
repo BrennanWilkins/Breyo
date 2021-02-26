@@ -1,16 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import classes from './VotingResults.module.css';
 import PropTypes from 'prop-types';
-import { useModalToggle } from '../../../utils/customHooks';
 import { BarChart } from '../../UI/Charts/Charts';
-import { CloseBtnCircle } from '../../UI/Buttons/Buttons';
 import { connect } from 'react-redux';
 import { closeVotingResults } from '../../../store/actions';
 import store from '../../../store';
+import FixedModalContainer from '../../UI/FixedModalContainer/FixedModalContainer';
 
 const VotingResults = props => {
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
   const [data, setData] = useState([]);
   const [listTitle, setListTitle] = useState('');
 
@@ -22,17 +19,14 @@ const VotingResults = props => {
   }, []);
 
   return (
-    <div className={classes.Container}>
-      <div className={classes.Modal} ref={modalRef}>
-        <CloseBtnCircle close={props.close} />
-        <div className={classes.Title}>Voting results for {listTitle}</div>
-        {!data.length ?
-          <p className={classes.NoData}>There are no cards in this list yet.</p> :
-          <BarChart data={data} xKey="title" yKey="votes" />
-        }
-      </div>
-    </div>
-  );
+    <FixedModalContainer close={props.close} className={classes.Modal}>
+      <div className={classes.Title}>Voting results for {listTitle}</div>
+      {!data.length ?
+        <p className={classes.NoData}>There are no cards in this list yet.</p> :
+        <BarChart data={data} xKey="title" yKey="votes" />
+      }
+    </FixedModalContainer>
+  )
 };
 
 VotingResults.propTypes = {

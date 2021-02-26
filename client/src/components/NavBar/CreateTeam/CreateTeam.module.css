@@ -14,6 +14,20 @@
   overflow: auto;
   padding: 15px;
 }
+.Container::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Container::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Container::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}
 .Title {
   text-align: center;
   margin: 0;

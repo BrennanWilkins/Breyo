@@ -20,7 +20,7 @@
 .NoInvites {
   color: rgb(112, 112, 112);
   font-size: 15px;
-  margin-top: 20px;
+  margin: 20px 0 10px;
   text-align: center;
 }
 .Invite {

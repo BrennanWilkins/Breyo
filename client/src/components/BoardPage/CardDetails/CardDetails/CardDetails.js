@@ -1,8 +1,7 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import classes from './CardDetails.module.css';
-import { useModalToggle } from '../../../../utils/customHooks';
-import { CloseBtnCircle } from '../../../UI/Buttons/Buttons';
+import FixedModalContainer from '../../../UI/FixedModalContainer/FixedModalContainer';
 import { connect } from 'react-redux';
 import CardTitle from '../CardTitle/CardTitle';
 import CardDesc from '../CardDesc/CardDesc';
@@ -18,8 +17,6 @@ import CardCustomFields from '../CardCustomFields/CardCustomFields';
 import CardVotes from '../CardVotes/CardVotes';
 
 const CardDetails = props => {
-  const modalRef = useRef();
-  useModalToggle(true, modalRef, props.close);
   const [showVotingModal, setShowVotingModal] = useState(false);
 
   const archiveCardHandler = () => {
@@ -30,39 +27,36 @@ const CardDetails = props => {
   useEffect(() => { return () => props.close(); }, []);
 
   return (
-    <div className={classes.Container}>
-      <div ref={modalRef} className={classes.CardDetails} style={(props.currentCard.isArchived || props.currentCard.listIsArchived) ? { paddingTop: '55px'} : null}>
-        <CloseBtnCircle close={props.close} />
-        {(props.currentCard.isArchived || props.currentCard.listIsArchived) &&
-          <div className={classes.DisabledOverlay}>
-            <div>
-              <span className={classes.AlertIcon}>{alertIcon}</span>
-              {props.currentCard.isArchived ? ' This card is currently archived.' : ' This card\'s list is currently archived.'}
-              <CloseBtnCircle close={props.close} />
-            </div>
-          </div>}
-        <CardTitle title={props.currentCard.title} listTitle={props.currentListTitle} />
-        <div className={classes.DetailContent}>
-          <div className={classes.LeftDetails}>
-            <div className={classes.TopDetailsContainer}>
-              {props.currentCard.listIsVoting && <CardVotes votes={props.currentCard.votes} showVotingModal={showVotingModal}
-                close={() => setShowVotingModal(false)} open={() => setShowVotingModal(true)} />}
-              {props.currentCard.members.length > 0 && <CardMembers members={props.currentCard.members} />}
-              {props.currentCard.labels.length > 0 && <CardLabels labels={props.currentCard.labels} />}
-              {!!props.currentCard.dueDate &&
-                <CardDueDate currentDueDate={props.currentCard.dueDate} />}
-            </div>
-            <CardDesc currentDesc={props.currentCard.desc} />
-            {props.currentCard.customFields.length > 0 && <CardCustomFields customFields={props.currentCard.customFields} />}
-            {props.currentCard.checklists.map(checklist => (
-              <CardChecklist key={checklist.checklistID} {...checklist} />
-            ))}
-            <CardActivity />
+    <FixedModalContainer close={props.close} className={classes.CardDetails}
+    style={(props.currentCard.isArchived || props.currentCard.listIsArchived) ? { paddingTop: '55px'} : null}>
+      {(props.currentCard.isArchived || props.currentCard.listIsArchived) &&
+        <div className={classes.DisabledOverlay}>
+          <div>
+            <span className={classes.AlertIcon}>{alertIcon}</span>
+            {props.currentCard.isArchived ? ' This card is currently archived.' : ' This card\'s list is currently archived.'}
           </div>
-          <CardOptions archiveCard={archiveCardHandler} listIsVoting={props.currentCard.listIsVoting} showVoting={() => setShowVotingModal(true)} />
+        </div>}
+      <CardTitle title={props.currentCard.title} listTitle={props.currentListTitle} />
+      <div className={classes.DetailContent}>
+        <div className={classes.LeftDetails}>
+          <div className={classes.TopDetailsContainer}>
+            {props.currentCard.listIsVoting && <CardVotes votes={props.currentCard.votes} showVotingModal={showVotingModal}
+              close={() => setShowVotingModal(false)} open={() => setShowVotingModal(true)} />}
+            {props.currentCard.members.length > 0 && <CardMembers members={props.currentCard.members} />}
+            {props.currentCard.labels.length > 0 && <CardLabels labels={props.currentCard.labels} />}
+            {!!props.currentCard.dueDate &&
+              <CardDueDate currentDueDate={props.currentCard.dueDate} />}
+          </div>
+          <CardDesc currentDesc={props.currentCard.desc} />
+          {props.currentCard.customFields.length > 0 && <CardCustomFields customFields={props.currentCard.customFields} />}
+          {props.currentCard.checklists.map(checklist => (
+            <CardChecklist key={checklist.checklistID} {...checklist} />
+          ))}
+          <CardActivity />
         </div>
+        <CardOptions archiveCard={archiveCardHandler} listIsVoting={props.currentCard.listIsVoting} showVoting={() => setShowVotingModal(true)} />
       </div>
-    </div>
+    </FixedModalContainer>
   );
 };
 

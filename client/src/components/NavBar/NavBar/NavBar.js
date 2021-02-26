@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import classes from './NavBar.module.css';
 import Button, { AccountBtn } from '../../UI/Buttons/Buttons';
@@ -12,7 +12,7 @@ import SearchBoardMenu from '../SearchBoardMenu/SearchBoardMenu';
 import LogoTitle from '../../UI/LogoTitle/LogoTitle';
 import { toggleCreateBoard } from '../../../store/actions';
 import CreateMenu from '../CreateMenu/CreateMenu';
-import CreateTeam from '../CreateTeam/CreateTeam';
+const CreateTeam = React.lazy(() => import('../CreateTeam/CreateTeam'));
 
 const NavBar = props => {
   const [showAccountModal, setShowAccountModal] = useState(false);
@@ -34,7 +34,7 @@ const NavBar = props => {
       </div>
       {showCreateMenu && <CreateMenu close={() => setShowCreateMenu(false)} openCreateBoard={props.toggleCreateBoard} openCreateTeam={() => setShowCreateTeam(true)} />}
       <CreateBoard show={props.showCreateBoard} close={props.toggleCreateBoard} />
-      {showCreateTeam && <CreateTeam close={() => setShowCreateTeam(false)} />}
+      {showCreateTeam && <Suspense fallback=""><CreateTeam close={() => setShowCreateTeam(false)} /></Suspense>}
       {showAccountModal && <AccountModal close={() => setShowAccountModal(false)} />}
       {showBoardMenu && <SearchBoardMenu close={() => setShowBoardMenu(false)} />}
       {(props.showCreateBoard || showCreateTeam) && <div className={classes.Backdrop}></div>}
