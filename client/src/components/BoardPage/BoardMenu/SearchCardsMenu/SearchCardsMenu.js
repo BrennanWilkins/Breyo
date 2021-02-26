@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
 import { addTitleSearchQuery, addLabelSearchQuery, addDueDateSearchQuery,
-  addMemberSearchQuery, resetSearchQuery } from '../../../../store/actions';
+  addMemberSearchQuery, resetSearchQuery, setShownBoardView } from '../../../../store/actions';
 import { useDidUpdate } from '../../../../utils/customHooks';
 
 const SearchCardsMenu = props => {
@@ -19,16 +19,25 @@ const SearchCardsMenu = props => {
 
   useDidUpdate(() => {
     props.addTitleSearchQuery(titleInput);
+    // if not on board view then navigate to it
+    if (props.shownView !== 'lists') { props.resetView(); }
   }, [titleInput]);
 
   const memberHandler = email => {
     if (email === memberQuery) { props.addMemberSearchQuery(''); }
     else { props.addMemberSearchQuery(email); }
+    if (props.shownView !== 'lists') { props.resetView(); }
   };
 
   const dueDateFilterHandler = mode => {
     if (dueDateQuery === mode) { props.addDueDateSearchQuery(''); }
     else { props.addDueDateSearchQuery(mode); }
+    if (props.shownView !== 'lists') { props.resetView(); }
+  };
+
+  const labelFilterHandler = color => {
+    props.addLabelSearchQuery(color);
+    if (props.shownView !== 'lists') { props.resetView(); }
   };
 
   return (
@@ -43,7 +52,7 @@ const SearchCardsMenu = props => {
     <div className={classes.Label}>Filter by card label</div>
     <div className={classes.CardLabels}>
       {LABEL_COLORS.map(color => (
-        <div key={color} className={classes.CardLabel} style={{ background: color }} onClick={() => props.addLabelSearchQuery(color)}>
+        <div key={color} className={classes.CardLabel} style={{ background: color }} onClick={() => labelFilterHandler(color)}>
           {labels.includes(color) && checkIcon}
         </div>
       ))}
@@ -78,12 +87,15 @@ SearchCardsMenu.propTypes = {
   addMemberSearchQuery: PropTypes.func.isRequired,
   addDueDateSearchQuery: PropTypes.func.isRequired,
   searchQueries: PropTypes.object.isRequired,
-  resetSearchQuery: PropTypes.func.isRequired
+  resetSearchQuery: PropTypes.func.isRequired,
+  resetView: PropTypes.func.isRequired,
+  shownView: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
   members: state.board.members,
-  searchQueries: state.lists.searchQueries
+  searchQueries: state.lists.searchQueries,
+  shownView: state.board.shownView
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -91,7 +103,8 @@ const mapDispatchToProps = dispatch => ({
   addLabelSearchQuery: query => dispatch(addLabelSearchQuery(query)),
   addMemberSearchQuery: query => dispatch(addMemberSearchQuery(query)),
   addDueDateSearchQuery: query => dispatch(addDueDateSearchQuery(query)),
-  resetSearchQuery: () => dispatch(resetSearchQuery())
+  resetSearchQuery: () => dispatch(resetSearchQuery()),
+  resetView: () => dispatch(setShownBoardView('lists')),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchCardsMenu);
