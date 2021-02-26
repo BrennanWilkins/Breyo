@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { isThisWeek, isPast } from 'date-fns';
 import OverviewCard from './OverviewCard';
-import { BarChart, PieChart } from './Charts/Charts';
+import { BarChart, PieChart } from '../../UI/Charts/Charts';
 
 const getDueDateTypes = lists => {
   const data = [
