@@ -1,0 +1,31 @@
+.recharts-legend-item, .recharts-tooltip-wrapper {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.recharts-legend-item {
+  font-size: 13.5px;
+  margin: 6px 0;
+  max-width: 150px;
+}
+.recharts-tooltip-wrapper {
+  max-width: 100%;
+  font-size: 14px;
+}
+.recharts-legend-wrapper {
+  max-height: 100% !important;
+  overflow-y: auto;
+}
+.recharts-legend-wrapper::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.recharts-legend-wrapper::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.recharts-legend-wrapper::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}

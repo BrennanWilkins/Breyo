@@ -1,0 +1,19 @@
+.Tooltip {
+  padding: 10px;
+  background: white;
+  border: 1px solid #ccc;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.TooltipLabel, .TooltipContent {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.TooltipLabel {
+  margin-bottom: 5px;
+}
+.TooltipContent {
+  color: rgb(100,100,100);
+}

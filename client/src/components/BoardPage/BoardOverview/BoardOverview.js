@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { isThisWeek, isPast } from 'date-fns';
 import OverviewCard from './OverviewCard';
-import { BarChart, PieChart } from './Charts';
+import { BarChart, PieChart } from './Charts/Charts';
 
 const getDueDateTypes = lists => {
   const data = [
@@ -64,6 +64,12 @@ const BoardOverview = props => {
   const [cardsByDueDate, setCardsByDueDate] = useState([]);
   const [cardsByMember, setCardsByMember] = useState([]);
   const [cardsByLabel, setCardsByLabel] = useState([]);
+  const [modes, setModes] = useState({
+    list: 'bar',
+    members: 'bar',
+    dates: 'pie',
+    labels: 'pie'
+  });
 
   useEffect(() => {
     setCardsPerList(props.lists.map(list => ({ title: list.title, cards: list.cards.length })));
@@ -72,30 +78,39 @@ const BoardOverview = props => {
     setCardsByLabel(getCardsByLabel(props.lists));
   }, []);
 
-  const changeModeHandler = mode => {
-
+  const changeModeHandler = (mode, chartType) => {
+    if (mode === modes[chartType]) { return; }
+    setModes({ ...modes, [chartType]: mode });
   };
 
   return (
     <div className={`${classes.Container} ${props.menuShown ? classes.ContainerSmall : ''}`}>
-      <OverviewCard title="Cards per list" mode="bar" changeMode={changeModeHandler}>
-        {!cardsPerList.length ? <p className={classes.NoData}>There are no lists in this board.</p> :
-          <BarChart data={cardsPerList} xKey="title" yKey="cards" />
+      <OverviewCard title="Cards per list" changeMode={mode => changeModeHandler(mode, 'list')}>
+        {
+          !cardsPerList.length ? <p className={classes.NoData}>There are no lists in this board.</p> :
+          modes.list === 'bar' ? <BarChart data={cardsPerList} xKey="title" /> :
+          <PieChart data={cardsPerList} xKey="title" randomFill />
         }
       </OverviewCard>
-      <OverviewCard title="Cards per member" mode="bar" changeMode={changeModeHandler}>
-        {!cardsByMember.length ? <p className={classes.NoData}>There are no members assigned to cards in this board.</p> :
-          <BarChart data={cardsByMember} xKey="name" yKey="cards" />
+      <OverviewCard title="Cards per member" changeMode={mode => changeModeHandler(mode, 'members')}>
+        {
+          !cardsByMember.length ? <p className={classes.NoData}>There are no members assigned to cards in this board.</p> :
+          modes.members === 'bar' ? <BarChart data={cardsByMember} xKey="name" /> :
+          <PieChart data={cardsByMember} xKey="name" randomFill />
         }
       </OverviewCard>
-      <OverviewCard title="Cards per due date" mode="pie" changeMode={changeModeHandler}>
-        {!cardsByDueDate.length ? <p className={classes.NoData}>There are no cards in this board.</p> :
-          <PieChart data={cardsByDueDate} yKey="cards" xKey="title" />
+      <OverviewCard title="Cards per due date" changeMode={mode => changeModeHandler(mode, 'dates')}>
+        {
+          !cardsByDueDate.length ? <p className={classes.NoData}>There are no cards in this board.</p> :
+          modes.dates === 'bar' ? <BarChart data={cardsByDueDate} xKey="title" /> :
+          <PieChart data={cardsByDueDate} xKey="title" />
         }
       </OverviewCard>
-      <OverviewCard title="Cards per label" mode="pie" changeMode={changeModeHandler}>
-        {!cardsByLabel.length ? <p className={classes.NoData}>There are no cards with labels in this board.</p> :
-          <PieChart data={cardsByLabel} yKey="cards" xKey="title" />
+      <OverviewCard title="Cards per label" changeMode={mode => changeModeHandler(mode, 'labels')}>
+        {
+          !cardsByLabel.length ? <p className={classes.NoData}>There are no cards with labels in this board.</p> :
+          modes.labels === 'bar' ? <BarChart data={cardsByLabel} xKey="title" /> :
+          <PieChart data={cardsByLabel} xKey="title" />
         }
       </OverviewCard>
     </div>

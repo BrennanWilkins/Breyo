@@ -11,7 +11,6 @@ const OverviewCard = props => {
 
   const modeHandler = mode => {
     setShowOptions(false);
-    if (mode === props.mode) { return; }
     props.changeMode(mode);
   };
 
@@ -41,7 +40,6 @@ const OverviewCard = props => {
 OverviewCard.propTypes = {
   title: PropTypes.string.isRequired,
   children: PropTypes.object.isRequired,
-  mode: PropTypes.string.isRequired,
   changeMode: PropTypes.func.isRequired
 };
 
