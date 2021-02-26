@@ -88,29 +88,29 @@ const BoardOverview = props => {
       <OverviewCard title="Cards per list" changeMode={mode => changeModeHandler(mode, 'list')}>
         {
           !cardsPerList.length ? <p className={classes.NoData}>There are no lists in this board.</p> :
-          modes.list === 'bar' ? <BarChart data={cardsPerList} xKey="title" /> :
-          <PieChart data={cardsPerList} xKey="title" randomFill />
+          modes.list === 'bar' ? <BarChart data={cardsPerList} xKey="title" yKey="cards" /> :
+          <PieChart data={cardsPerList} xKey="title" yKey="cards" randomFill />
         }
       </OverviewCard>
       <OverviewCard title="Cards per member" changeMode={mode => changeModeHandler(mode, 'members')}>
         {
           !cardsByMember.length ? <p className={classes.NoData}>There are no members assigned to cards in this board.</p> :
-          modes.members === 'bar' ? <BarChart data={cardsByMember} xKey="name" /> :
-          <PieChart data={cardsByMember} xKey="name" randomFill />
+          modes.members === 'bar' ? <BarChart data={cardsByMember} xKey="name" yKey="cards" /> :
+          <PieChart data={cardsByMember} xKey="name" yKey="cards" randomFill />
         }
       </OverviewCard>
       <OverviewCard title="Cards per due date" changeMode={mode => changeModeHandler(mode, 'dates')}>
         {
           !cardsByDueDate.length ? <p className={classes.NoData}>There are no cards in this board.</p> :
-          modes.dates === 'bar' ? <BarChart data={cardsByDueDate} xKey="title" /> :
-          <PieChart data={cardsByDueDate} xKey="title" />
+          modes.dates === 'bar' ? <BarChart data={cardsByDueDate} xKey="title" yKey="cards" /> :
+          <PieChart data={cardsByDueDate} xKey="title" yKey="cards" />
         }
       </OverviewCard>
       <OverviewCard title="Cards per label" changeMode={mode => changeModeHandler(mode, 'labels')}>
         {
           !cardsByLabel.length ? <p className={classes.NoData}>There are no cards with labels in this board.</p> :
-          modes.labels === 'bar' ? <BarChart data={cardsByLabel} xKey="title" /> :
-          <PieChart data={cardsByLabel} xKey="title" />
+          modes.labels === 'bar' ? <BarChart data={cardsByLabel} xKey="title" yKey="cards" /> :
+          <PieChart data={cardsByLabel} xKey="title" yKey="cards" />
         }
       </OverviewCard>
     </div>
