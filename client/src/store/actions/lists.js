@@ -165,3 +165,7 @@ export const sortList = (listID, mode) => async (dispatch, getState) => {
     dispatch(addNotif('There was an error while sorting the list.'));
   }
 };
+
+export const setVotingResultsID = listID => ({ type: actionTypes.SET_VOTING_RESULTS_ID, listID });
+
+export const closeVotingResults = () => ({ type: actionTypes.CLOSE_VOTING_RESULTS });

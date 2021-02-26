@@ -16,7 +16,8 @@ const initialState = {
     labels: []
   },
   filteredLists: [],
-  cardsAreFiltered: false
+  cardsAreFiltered: false,
+  votingResultsListID: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -81,6 +82,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.REMOVE_LIST_LIMIT: return removeListLimit(state, action);
     case actionTypes.MOVE_CUSTOM_FIELD: return moveCustomField(state, action);
     case actionTypes.SORT_LIST: return sortList(state, action);
+    case actionTypes.SET_VOTING_RESULTS_ID: return { ...state, votingResultsListID: action.listID };
+    case actionTypes.CLOSE_VOTING_RESULTS: return { ...state, votingResultsListID: null };
     default: return state;
   }
 };

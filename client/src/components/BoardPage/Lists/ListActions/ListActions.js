@@ -3,7 +3,8 @@ import classes from './ListActions.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { BackBtn, CloseBtn } from '../../../UI/Buttons/Buttons';
-import { copyList, archiveList, archiveAllCards, openRoadmapList, toggleVoting } from '../../../../store/actions';
+import { copyList, archiveList, archiveAllCards, openRoadmapList, toggleVoting,
+  setVotingResultsID } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import MoveCards from './MoveCards';
 import { roadmapIcon } from '../../../UI/icons';
@@ -29,10 +30,16 @@ const ListActions = props => {
     props.close();
   };
 
+  const votingResHandler = () => {
+    props.setVotingResultsID(props.listID);
+    props.close();
+  };
+
   const defaultContent = (
     <div className={classes.Options}>
       <div onClick={() => props.openRoadmapList(props.listID)}>{roadmapIcon} Roadmap</div>
       <div onClick={() => props.toggleVoting(props.listID)}>{props.isVoting ? 'Close voting on this list' : 'Start a vote on this list'}</div>
+      {props.isVoting && <div onClick={votingResHandler}>Voting results</div>}
       <div onClick={() => setShownView('copy')}>Copy list</div>
       <div onClick={() => setShownView('sort')}>Sort list</div>
       <div onClick={() => setShownView('limit')}>{props.limit ? 'Change the card limit on this list' : 'Add a card limit to this list'}</div>
@@ -81,7 +88,8 @@ ListActions.propTypes = {
   openRoadmapList: PropTypes.func.isRequired,
   isVoting: PropTypes.bool.isRequired,
   toggleVoting: PropTypes.func.isRequired,
-  limit: PropTypes.number
+  limit: PropTypes.number,
+  setVotingResultsID: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
@@ -89,7 +97,8 @@ const mapDispatchToProps = dispatch => ({
   archiveList: listID => dispatch(archiveList(listID)),
   archiveAllCards: listID => dispatch(archiveAllCards(listID)),
   openRoadmapList: listID => dispatch(openRoadmapList(listID)),
-  toggleVoting: listID => dispatch(toggleVoting(listID))
+  toggleVoting: listID => dispatch(toggleVoting(listID)),
+  setVotingResultsID: listID => dispatch(setVotingResultsID(listID))
 });
 
 export default connect(null, mapDispatchToProps)(ListActions);

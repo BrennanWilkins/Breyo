@@ -1,0 +1,38 @@
+.Container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.Modal {
+  margin: 45px 0;
+  width: 96%;
+  max-width: 900px;
+  background: rgb(246,246,246);
+  padding: 15px;
+  box-sizing: border-box;
+  border-radius: 2px;
+  position: relative;
+  min-height: 300px;
+}
+.Title {
+  margin: 25px 0;
+  font-weight: 500;
+  font-size: 17.5px;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.NoData {
+  padding: 20px;
+  text-align: center;
+}

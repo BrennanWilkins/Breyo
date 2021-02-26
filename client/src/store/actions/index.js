@@ -5,7 +5,8 @@ rejectInvite, leaveBoard, openRoadmap, setShownRoadmapList, setShownBoardView, o
 toggleCreateBoard, openCreateTeamBoard, createTeamBoard } from './board';
 export { addNotif, deleteNotif } from './notifications';
 export { updateListTitle, addList, copyList, archiveList, recoverList, deleteList,
-archiveAllCards, moveAllCards, toggleVoting, setListLimit, removeListLimit, sortList } from './lists';
+archiveAllCards, moveAllCards, toggleVoting, setListLimit, removeListLimit, sortList,
+setVotingResultsID, closeVotingResults } from './lists';
 export { addCard, setCardDetails, updateCardTitle, updateCardDesc, addCardLabel,
 removeCardLabel, toggleDueDateIsComplete, addDueDate, removeDueDate, addChecklist,
 deleteChecklist, addChecklistItem, toggleChecklistItemIsComplete, editChecklistItem,

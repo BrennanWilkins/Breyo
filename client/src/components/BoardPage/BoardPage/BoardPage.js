@@ -17,6 +17,7 @@ const CardDetails = lazy(() => import('../CardDetails/CardDetails/CardDetails'))
 const MemberActivity = lazy(() => import('../MemberActivity/MemberActivity'));
 const RoadmapContainer = lazy(() => import('../RoadmapView/RoadmapContainer/RoadmapContainer'));
 const BoardOverview = lazy(() => import('../BoardOverview/BoardOverview'));
+const VotingResults = lazy(() => import('../VotingResults/VotingResults'));
 
 const BoardPage = props => {
   const [showMenu, setShowMenu] = useState(false);
@@ -109,6 +110,7 @@ const BoardPage = props => {
         <MemberActivity close={props.closeMemberActivity} email={props.shownMember.email} fullName={props.shownMember.fullName}
           boardID={props.boardID} path={props.location.pathname} />
       </Suspense>}
+    {props.votingResultsListID && <Suspense fallback={fallback}><VotingResults listID={props.votingResultsListID} /></Suspense>}
     </>
   );
 };
@@ -125,7 +127,8 @@ BoardPage.propTypes = {
   shownCardID: PropTypes.string,
   shownListID: PropTypes.string,
   shownView: PropTypes.string.isRequired,
-  resetView: PropTypes.func.isRequired
+  resetView: PropTypes.func.isRequired,
+  votingResultsListID: PropTypes.string
 };
 
 const mapStateToProps = state => ({
@@ -134,7 +137,8 @@ const mapStateToProps = state => ({
   shownCardID: state.lists.shownCardID,
   shownListID: state.lists.shownListID,
   shownMember: state.activity.shownMemberActivity,
-  shownView: state.board.shownView
+  shownView: state.board.shownView,
+  votingResultsListID: state.lists.votingResultsListID
 });
 
 const mapDispatchToProps = dispatch => ({
