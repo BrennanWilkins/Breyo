@@ -23,7 +23,8 @@ const LabelModal = props => {
     setLabelMode('');
     setTitleInput('');
     setSelectedColor(LABEL_COLORS[0]);
-  }
+    setShownEditLabelID('');
+  };
 
   const toggleLabelHandler = color => {
     if (props.labels.includes(color)) {
@@ -54,7 +55,6 @@ const LabelModal = props => {
   };
 
   const editCustomLabelHandler = () => {
-    setShownEditLabelID('');
     backHandler();
     const prevLabel = props.customLabelsByID[shownEditLabelID];
     // dont update if not changed
@@ -64,7 +64,6 @@ const LabelModal = props => {
 
   const deleteCustomLabelHandler = () => {
     props.deleteCustomLabel(shownEditLabelID);
-    setShownEditLabelID('');
     backHandler();
   };
 
@@ -77,6 +76,23 @@ const LabelModal = props => {
     }
   }, [props.openFromMiddle]);
 
+  const createLabel = (
+    <>
+      <label className={classes.InputLabel}>
+        Name
+        <Input autoFocus value={titleInput} className={classes.TitleInput} onChange={e => setTitleInput(e.target.value)} />
+      </label>
+      <div className={classes.InputLabel}>Select a color</div>
+      <div className={classes.SelectColors}>
+        {LABEL_COLORS.map(color => (
+          <div key={color} style={{ background: color }} className={classes.SelectColor} onClick={() => setSelectedColor(color)}>
+            <span>{selectedColor === color && checkIcon}</span>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+
   return (
     <div ref={modalRef} className={props.openFromMiddle ? classes.MiddleContainer : classes.Container}>
       <ModalTitle close={props.close} title={labelMode === 'create' ? 'Create Label' : labelMode === 'edit' ? 'Change Label' : 'Labels'} />
@@ -84,34 +100,12 @@ const LabelModal = props => {
       {
         labelMode === 'create' ?
         <>
-          <label className={classes.InputLabel}>
-            Name
-            <Input autoFocus value={titleInput} className={classes.TitleInput} onChange={e => setTitleInput(e.target.value)} />
-          </label>
-          <div className={classes.InputLabel}>Select a color</div>
-          <div className={classes.SelectColors}>
-            {LABEL_COLORS.map(color => (
-              <div key={color} style={{ background: color }} className={classes.SelectColor} onClick={() => setSelectedColor(color)}>
-                <span>{selectedColor === color && checkIcon}</span>
-              </div>
-            ))}
-          </div>
+          {createLabel}
           <ActionBtn disabled={!titleInput || titleInput.length > 100} clicked={createLabelHandler} className={classes.CreateBtn}>Create</ActionBtn>
         </>
         : labelMode === 'edit' ?
         <>
-          <label className={classes.InputLabel}>
-            Name
-            <Input autoFocus value={titleInput} className={classes.TitleInput} onChange={e => setTitleInput(e.target.value)} />
-          </label>
-          <div className={classes.InputLabel}>Select a color</div>
-          <div className={classes.SelectColors}>
-            {LABEL_COLORS.map(color => (
-              <div key={color} style={{ background: color }} className={classes.SelectColor} onClick={() => setSelectedColor(color)}>
-                <span>{selectedColor === color && checkIcon}</span>
-              </div>
-            ))}
-          </div>
+          {createLabel}
           <div className={classes.EditBtns}>
             <ActionBtn disabled={!titleInput || titleInput.length > 100} clicked={editCustomLabelHandler} className={classes.EditBtn}>Save</ActionBtn>
             <ActionBtn clicked={deleteCustomLabelHandler} className={classes.DeleteBtn}>Delete</ActionBtn>
@@ -119,19 +113,24 @@ const LabelModal = props => {
         </>
         :
         <>
-          {props.customLabels.map(labelID => (
-            <div key={labelID} style={{ background: [props.customLabelsByID[labelID].color] }} className={classes.Color}>
-              <span onClick={() => toggleCustomLabelHandler(labelID)}>
-                <div className={classes.LabelTitle}>{props.customLabelsByID[labelID].title}</div>{props.cardCustomLabels.includes(labelID) && checkIcon}
-              </span>
-              <div className={classes.ShowEditBtn} onClick={() => showEditLabelHandler(labelID)}>{editIcon}</div>
-            </div>
-          ))}
-          {LABEL_COLORS.map(color => (
-            <div key={color} style={{ background: color }} className={classes.Color} onClick={() => toggleLabelHandler(color)}>
-              <span>{props.labels.includes(color) && checkIcon}</span>
-            </div>
-          ))}
+          <div className={classes.Colors}>
+            {props.customLabels.map(labelID => {
+              const label = props.customLabelsByID[labelID];
+              return (
+                <div key={labelID} style={{ background: label.color }} className={classes.Color}>
+                  <span onClick={() => toggleCustomLabelHandler(labelID)}>
+                    <div className={classes.LabelTitle}>{label.title}</div>{props.cardCustomLabels.includes(labelID) && checkIcon}
+                  </span>
+                  <div className={classes.ShowEditBtn} onClick={() => showEditLabelHandler(labelID)}>{editIcon}</div>
+                </div>
+              );
+            })}
+            {LABEL_COLORS.map(color => (
+              <div key={color} style={{ background: color }} className={classes.Color} onClick={() => toggleLabelHandler(color)}>
+                <span>{props.labels.includes(color) && checkIcon}</span>
+              </div>
+            ))}
+          </div>
           <ActionBtn className={classes.ShowCreateBtn} clicked={() => setLabelMode('create')}>Create a new label</ActionBtn>
         </>
       }

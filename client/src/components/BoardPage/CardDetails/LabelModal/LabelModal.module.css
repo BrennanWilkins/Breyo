@@ -24,6 +24,25 @@
     top: auto;
   }
 }
+.Colors {
+  width: 100%;
+  max-height: 400px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.Colors::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Colors::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Colors::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}
 .Color {
   width: 80%;
   height: 30px;
@@ -113,7 +132,7 @@
 .CreateBtn:active, .EditBtn:active {
   background: rgb(19, 150, 25);
 }
-.CreateBtn:disabled {
+.CreateBtn:disabled, .EditBtn:disabled {
   background: rgb(200,200,200);
   cursor: default;
 }
@@ -124,17 +143,16 @@
   padding: 0 5px;
   margin-top: 15px;
 }
-.EditBtn {
+.EditBtns button {
   color: white;
   width: 100px;
-  background: rgb(var(--green));
   font-size: 15px;
 }
+.EditBtn {
+  background: rgb(var(--green));
+}
 .DeleteBtn {
-  color: white;
-  width: 100px;
   background: rgb(219, 55, 29);
-  font-size: 15px;
 }
 .DeleteBtn:hover, .DeleteBtn:active {
   background: rgb(213, 5, 5);
