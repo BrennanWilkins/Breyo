@@ -16,6 +16,8 @@ const { formatUserBoards, leaveAllCards } = require('./user');
 
 const COLORS = ['#f05544', '#f09000', '#489a3c', '#0079bf', '#7150df', '#38bbf4', '#ad5093', '#4a32dd', '#046b8b'];
 
+const LABEL_COLORS = ['#60C44D', '#F5DD2A', '#FF8C00', '#F60000', '#3783FF', '#4815AA'];
+
 const PHOTO_IDS = [
   '1607556049122-5e3874a25a1f', '1605325811474-ba58cf3180d8', '1513580638-fda5563960d6',
   '1554129352-f8c3ab6d5595', '1596709097416-6d4206796022', '1587732282555-321fddb19dc0',
@@ -91,7 +93,7 @@ router.post('/',
       if (!user) { throw 'No user data found'; }
 
       // user is admin of new board by default
-      const board = new Board({ title, members: [req.userID], admins: [req.userID], color,
+      const board = new Board({ title, members: [req.userID], admins: [req.userID], color, customLabels: [],
         creator: { email: user.email, fullName: user.fullName }, desc: '', teamID: null });
       const boardID = board._id;
 
@@ -135,7 +137,7 @@ router.post('/teamBoard',
       if (!user || !teamExists) { throw 'No user or team data found'; }
 
       // user is admin of new board by default
-      const board = new Board({ title, members: [req.userID], admins: [req.userID], color,
+      const board = new Board({ title, members: [req.userID], admins: [req.userID], color, customLabels: [],
         creator: { email: user.email, fullName: user.fullName }, desc: '', teamID });
       const boardID = board._id;
 
@@ -530,6 +532,82 @@ router.put('/addToTeam',
 
       board.teamID = teamID;
       await board.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: board member
+// add a new custom label to use across cards in board
+router.post('/customLabel',
+  validate([body('boardID').isMongoId(), body('color').notEmpty(), body('title').isLength({ min: 1, max: 100 })]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, color, title } = req.body;
+      if (!LABEL_COLORS.includes(color)) { throw 'Invalid color value'; }
+      const board = await Board.findById(boardID);
+
+      board.customLabels.push({ title, color });
+      await board.save();
+
+      res.status(200).json({ labelID: board.customLabels[board.customLabels.length - 1]._id });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: board member
+// edit the title/color of a custom label
+router.put('/customLabel',
+  validate([body('boardID').isMongoId(), body('labelID').isMongoId(), body('color').notEmpty(), body('title').isLength({ min: 1, max: 100 })]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, color, title, labelID } = req.body;
+      if (!LABEL_COLORS.includes(color)) { throw 'Invalid color value'; }
+      const board = await Board.findById(boardID);
+      const label = board.customLabels.id(labelID);
+      if (!label) { throw 'Custom label not found'; }
+
+      label.title = title;
+      label.color = color;
+      await board.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: board member
+// delete a custom label from board, removes label from all cards
+router.delete('/customLabel/:boardID/:labelID',
+  validate([param('boardID').isMongoId(), param('labelID').isMongoId()]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, labelID } = req.params;
+      const [board, lists] = await Promise.all([
+        Board.findById(boardID),
+        List.find({ boardID })
+      ]);
+      const label = board.customLabels.id(labelID).remove();
+      if (!label) { throw 'Custom label not found'; }
+
+      // remove the custom label from all cards, only update list if it changed
+      const listsToUpdate = [];
+      for (let list of lists) {
+        let shouldUpdate = false;
+        for (let card of list.cards) {
+          const idx = card.customLabels.indexOf(labelID);
+          if (idx !== -1) {
+            card.customLabels.splice(idx, 1);
+            shouldUpdate = true;
+          }
+        }
+        if (shouldUpdate) { listsToUpdate.push(list); }
+      }
+      await Promise.all([board.save(), ...listsToUpdate.map(list => list.save())]);
 
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }

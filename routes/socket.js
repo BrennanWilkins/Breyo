@@ -60,7 +60,12 @@ const routes = [
   'put/list/limit',
   'delete/list/limit',
   'put/card/customField/move',
-  'put/list/sort'
+  'put/list/sort',
+  'post/board/customLabel',
+  'put/board/customLabel',
+  'delete/board/customLabel',
+  'post/card/customLabel',
+  'delete/card/customLabel'
 ];
 
 module.exports = routes;

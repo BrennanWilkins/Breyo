@@ -120,7 +120,8 @@ router.post('/copy',
           value: field.value
         })),
         comments: [],
-        votes: []
+        votes: [],
+        customLabels: card.customLabels
       }));
 
       const newList = new List({ boardID, title, desc: list.desc, indexInBoard: listsLength, cards, archivedCards: [],

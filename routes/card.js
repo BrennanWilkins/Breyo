@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const List = require('../models/list');
+const Board = require('../models/board');
 const User = require('../models/user');
 const { body, param } = require('express-validator');
 const auth = require('../middleware/auth');
@@ -37,7 +38,7 @@ router.post('/',
       const list = await getListAndValidate(boardID, listID);
 
       const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [],
-      comments: [], roadmapLabel: null, customFields: [], votes: [] };
+      comments: [], roadmapLabel: null, customFields: [], votes: [], customLabels: [] };
       list.cards.push(card);
       const cardID = list.cards[list.cards.length - 1]._id;
 
@@ -480,7 +481,8 @@ router.post('/copy',
         dueDate: sourceCard.dueDate,
         members: sourceCard.members,
         comments: [],
-        votes: []
+        votes: [],
+        customLabels: keepLabels ? sourceCard.customLabels : []
       };
 
       destList.cards.splice(destIndex, 0, newCard);
@@ -883,6 +885,45 @@ router.post('/vote',
       if (idx === -1) { card.votes.push({ email: req.email, fullName: req.fullName }); }
       else { card.votes.splice(idx, 1); }
 
+      await list.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// add a custom label to a card
+router.post('/customLabel',
+  validate(areAllMongo(['boardID', 'listID', 'cardID', 'labelID'], 'body')),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, labelID } = req.body;
+      const [board, [list, card]] = await Promise.all([
+        Board.findById(boardID).select('customLabels').lean(),
+        getListAndValidate(boardID, listID, cardID)
+      ]);
+      if (!board) { throw 'No board data found'; }
+      if (!board.customLabels.find(label => String(label._id) === labelID)) { throw 'Invalid labelID'; }
+
+      card.customLabels.push(labelID);
+      await list.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// remove a custom label from a card
+router.delete('/customLabel/:boardID/:listID/:cardID/:labelID',
+  validate(areAllMongo(['boardID', 'listID', 'cardID', 'labelID'], 'params')),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, labelID } = req.params;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+
+      card.customLabels = card.customLabels.filter(id => id !== labelID);
       await list.save();
 
       res.sendStatus(200);

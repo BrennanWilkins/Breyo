@@ -32,6 +32,7 @@ const CardSchema = new Schema({
   desc: String,
   checklists: [ChecklistSchema],
   labels: [],
+  customLabels: [],
   dueDate: {},
   members: [],
   comments: [CommentSchema],
