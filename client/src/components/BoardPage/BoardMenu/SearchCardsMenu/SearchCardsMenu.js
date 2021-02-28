@@ -50,36 +50,35 @@ const SearchCardsMenu = props => {
 
   return (
     <>
-    <div className={classes.Input}>
-      <label className={classes.Label}>
-        Search by card title
-        <input value={titleInput} className={classes.Input} onChange={e => setTitleInput(e.target.value)} />
-      </label>
-    </div>
+    <label className={classes.Label}>
+      Search by card title
+      <input value={titleInput} className={classes.Input} onChange={e => setTitleInput(e.target.value)} />
+    </label>
     <div onClick={props.resetSearchQuery} className={classes.ClearSearch}>Clear Search</div>
     <div className={classes.Label}>Filter by card label</div>
-    <div className={classes.CardLabels}>
+    <div className={`${classes.Section} ${classes.CardLabels}`}>
       {LABEL_COLORS.map(color => (
         <div key={color} className={classes.CardLabel} style={{ background: color }} onClick={() => labelFilterHandler(color)}>
-          {labels.includes(color) && checkIcon}
+          <span>{labels.includes(color) && checkIcon}</span>
         </div>
       ))}
     </div>
     <div className={classes.Label}>Filter by custom card label</div>
-    <div className={classes.CustomCardLabels}>
+    <div className={`${classes.Section} ${classes.CustomCardLabels}`}>
       {props.customLabels.map(labelID => {
         const label = props.customLabelsByID[labelID];
+        if (!label) { return null; }
         return (
           <div key={labelID} className={classes.CustomLabel} onClick={() => customLabelFilterHandler(labelID)}>
             <div className={classes.CustomLabelColor} style={{ background: label.color }} />
             <div className={classes.CustomLabelTitle}>{label.title}</div>
-            {customLabels.includes(labelID) && <div className={classes.CustomLabelCheck}>{checkIcon}</div>}
+            {customLabels.includes(labelID) && checkIcon}
           </div>
         );
       })}
     </div>
     <div className={classes.Label}>Filter by due date</div>
-    <div className={classes.DateFilters}>
+    <div className={`${classes.Section} ${classes.DateFilters}`}>
       <div onClick={() => dueDateFilterHandler('day')}>Due in the next day {dueDateQuery === 'day' && checkIcon}</div>
       <div onClick={() => dueDateFilterHandler('week')}>Due this week {dueDateQuery === 'week' && checkIcon}</div>
       <div onClick={() => dueDateFilterHandler('month')}>Due this month {dueDateQuery === 'month' && checkIcon}</div>
@@ -88,11 +87,11 @@ const SearchCardsMenu = props => {
       <div onClick={() => dueDateFilterHandler('incomplete')}>Due date marked as incomplete {dueDateQuery === 'incomplete' && checkIcon}</div>
     </div>
     <div className={classes.Label}>Filter by card member</div>
-    <div className={classes.BoardMembers}>
+    <div>
       {props.members.map(member => (
         <div className={classes.Member} key={member.email} onClick={() => memberHandler(member.email)}>
           <AccountBtn avatar={member.avatar}>{member.fullName[0]}</AccountBtn>
-          {member.fullName}
+          <div className={classes.MemberName}>{member.fullName}</div>
           {memberQuery === member.email && checkIcon}
         </div>
       ))}
