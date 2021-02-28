@@ -12,7 +12,7 @@ const { format } = require('date-fns');
 const isThisYear = require('date-fns/isThisYear');
 const { areAllMongo } = require('../middleware/validate');
 
-const LABEL_COLORS = ['#60C44D', '#F5DD2A', '#FF8C00', '#F60000', '#3783FF', '#4815AA'];
+const LABEL_COLORS = ['#60C44D', '#F5DD2A', '#FF8C00', '#F60000', '#1086C9', '#6349BD', '#65CAF6', '#DA57A8', '#39DAAE', '#0E1137'];
 
 router.use(auth);
 // user must be board member for all card routes

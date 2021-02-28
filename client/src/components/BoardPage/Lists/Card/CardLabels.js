@@ -17,6 +17,7 @@ const CardLabels = props => {
     <div className={classes.Labels}>
       {props.customLabels.map(labelID => {
         const label = props.customLabelsByID[labelID];
+        if (!label) { return null; }
         return (
           <div key={labelID} className={`${classes.Label} ${labelsHovered ? classes.DarkenLabel : ''} ${expandLabels ? classes.ExpandLabel : ''}`}
           onClick={clickHandler} onMouseEnter={() => setLabelsHovered(true)} onMouseLeave={() => setLabelsHovered(false)}

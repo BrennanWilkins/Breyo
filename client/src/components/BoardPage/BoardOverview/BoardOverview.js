@@ -45,8 +45,12 @@ const labelsByTitle = {
   '#F5DD2A': 'yellow',
   '#FF8C00': 'orange',
   '#F60000': 'red',
-  '#3783FF': 'blue',
-  '#4815AA': 'purple'
+  '#1086C9': 'blue',
+  '#6349BD': 'purple',
+  '#65CAF6': 'light blue',
+  '#DA57A8': 'pink',
+  '#39DAAE': 'turquoise',
+  '#0E1137': 'black'
 };
 
 const getCardsByLabel = (lists, customLabelsByID) => {

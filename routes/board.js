@@ -14,9 +14,9 @@ const { signNewToken } = require('./auth');
 const Team = require('../models/team');
 const { formatUserBoards, leaveAllCards } = require('./user');
 
-const COLORS = ['#f05544', '#f09000', '#489a3c', '#0079bf', '#7150df', '#38bbf4', '#ad5093', '#4a32dd', '#046b8b'];
+const BOARD_COLORS = ['#f05544', '#f09000', '#489a3c', '#0079bf', '#7150df', '#38bbf4', '#ad5093', '#4a32dd', '#046b8b'];
 
-const LABEL_COLORS = ['#60C44D', '#F5DD2A', '#FF8C00', '#F60000', '#3783FF', '#4815AA'];
+const LABEL_COLORS = ['#60C44D', '#F5DD2A', '#FF8C00', '#F60000', '#1086C9', '#6349BD', '#65CAF6', '#DA57A8', '#39DAAE', '#0E1137'];
 
 const PHOTO_IDS = [
   '1607556049122-5e3874a25a1f', '1605325811474-ba58cf3180d8', '1513580638-fda5563960d6',
@@ -88,7 +88,7 @@ router.post('/',
     try {
       let { color, title } = req.body;
       // if invalid background then default to red
-      if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { color = COLORS[0]; }
+      if (!BOARD_COLORS.includes(color) && !PHOTO_IDS.includes(color)) { color = BOARD_COLORS[0]; }
       const user = await User.findById(req.userID);
       if (!user) { throw 'No user data found'; }
 
@@ -132,7 +132,7 @@ router.post('/teamBoard',
     try {
       let { color, title, teamID } = req.body;
       // if invalid background then default to red
-      if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { color = COLORS[0]; }
+      if (!BOARD_COLORS.includes(color) && !PHOTO_IDS.includes(color)) { color = BOARD_COLORS[0]; }
       const [user, teamExists] = await Promise.all([User.findById(req.userID), Team.exists({ _id: teamID })]);
       if (!user || !teamExists) { throw 'No user or team data found'; }
 
@@ -169,7 +169,7 @@ router.put('/color',
   async (req, res) => {
     try {
       const { boardID, color } = req.body;
-      if (!COLORS.includes(color) && !PHOTO_IDS.includes(color)) { throw 'Background not found'; }
+      if (!BOARD_COLORS.includes(color) && !PHOTO_IDS.includes(color)) { throw 'Background not found'; }
 
       await Board.updateOne({ _id: boardID }, { color });
 
