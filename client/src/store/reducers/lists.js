@@ -13,7 +13,8 @@ const initialState = {
     titleQuery: '',
     memberQuery: '',
     dueDateQuery: '',
-    labels: []
+    labels: [],
+    customLabels: []
   },
   filteredLists: [],
   cardsAreFiltered: false,
@@ -68,6 +69,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ADD_TITLE_SEARCH_QUERY: return addTitleSearchQuery(state, action);
     case actionTypes.ADD_MEMBER_SEARCH_QUERY: return addMemberSearchQuery(state, action);
     case actionTypes.ADD_LABEL_SEARCH_QUERY: return addLabelSearchQuery(state, action);
+    case actionTypes.ADD_CUSTOM_LABEL_SEARCH_QUERY: return addCustomLabelSearchQuery(state, action);
     case actionTypes.ADD_DUE_DATE_SEARCH_QUERY: return addDueDateSearchQuery(state, action);
     case actionTypes.RESET_SEARCH_QUERY: return resetSearchQuery(state, action);
     case actionTypes.MOVE_CHECKLIST_ITEM: return moveChecklistItem(state, action);
@@ -623,31 +625,39 @@ const deleteBoardMember = (state, action) => {
 const checkForQuery = searchQueries => {
   // return false if no queries, else true
   if (!searchQueries.titleQuery && !searchQueries.dueDateQuery &&
-  !searchQueries.memberQuery && !searchQueries.labels.length) { return false; }
+  !searchQueries.memberQuery && !searchQueries.labels.length &&
+  !searchQueries.customLabels.length) { return false; }
   return true;
 };
 
 const filterListsHelper = (searchQueries, lists) => {
   // filters all cards in all lists by search queries
-  const { titleQuery, dueDateQuery, memberQuery, labels } = searchQueries;
+  const { titleQuery, dueDateQuery, memberQuery, labels, customLabels } = searchQueries;
   lists = lists.map(list => {
-    let cards = list.cards;
-    if (titleQuery) { cards = cards.filter(card => card.title.includes(titleQuery)); }
-    if (memberQuery) { cards = cards.filter(card => card.members.find(member => member.email === memberQuery)); }
-    if (labels.length) { cards = cards.filter(card => card.labels.length ? labels.every(label => card.labels.includes(label)) : false); }
-    if (dueDateQuery) { cards = cards.filter(card => card.dueDate ? filterByDueDate(dueDateQuery, card.dueDate) : false); }
-    return { ...list, cards };
+    let updatedCards = list.cards.filter(card => {
+      if (titleQuery && !card.title.includes(titleQuery)) { return false; }
+      if (memberQuery && !card.members.find(member => member.email === memberQuery)) { return false; }
+      if (labels.length && !card.labels.length) { return false; }
+      if (labels.length && !labels.every(label => card.labels.includes(label))) { return false; }
+      if (customLabels.length && !card.customLabels.length) { return false; }
+      if (customLabels.length && !customLabels.every(label => card.customLabels.includes(label))) { return false; }
+      if (dueDateQuery && !card.dueDate) { return false; }
+      if (dueDateQuery && !filterByDueDate(dueDateQuery, card.dueDate)) { return false; }
+      return true;
+    });
+    return { ...list, cards: updatedCards.length === list.cards.length ? list.cards : updatedCards };
   });
   return lists;
 };
 
 const filterCardHelper = (searchQueries, card) => {
   // returns true if card passes all search queries else returns false
-  const { titleQuery, dueDateQuery, memberQuery, labels } = searchQueries;
+  const { titleQuery, dueDateQuery, memberQuery, labels, customLabels } = searchQueries;
   if (titleQuery && !card.title.includes(titleQuery)) { return false; }
   if (memberQuery && !card.members.find(member => member.email === memberQuery)) { return false; }
   if (labels.length && !card.labels.length) { return false; }
   if (labels.length && !labels.every(label => card.labels.includes(label))) { return false; }
+  if (customLabels.length && !customLabels.every(label => card.customLabels.includes(label))) { return false; }
   if (dueDateQuery && !card.dueDate) { return false; }
   if (dueDateQuery && !filterByDueDate(dueDateQuery, card.dueDate)) { return false; }
   return true;
@@ -670,6 +680,19 @@ const addLabelSearchQuery = (state, action) => {
   const searchQueries = { ...state.searchQueries, labels };
 
   if (!labels.length && !checkForQuery(searchQueries)) {
+    return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] };
+  }
+  const filteredLists = filterListsHelper(searchQueries, state.lists);
+  return { ...state, searchQueries, cardsAreFiltered: true, filteredLists };
+};
+
+const addCustomLabelSearchQuery = (state, action) => {
+  const customLabels = [...state.searchQueries.customLabels];
+  const labelIndex = customLabels.indexOf(action.labelID);
+  labelIndex === -1 ? customLabels.push(action.labelID) : customLabels.splice(labelIndex, 1);
+  const searchQueries = { ...state.searchQueries, customLabels };
+
+  if (!customLabels.length && !checkForQuery(searchQueries)) {
     return { ...state, searchQueries, cardsAreFiltered: false, filteredLists: [] };
   }
   const filteredLists = filterListsHelper(searchQueries, state.lists);
@@ -699,7 +722,8 @@ const resetSearchQuery = (state, action) => {
     titleQuery: '',
     memberQuery: '',
     dueDateQuery: '',
-    labels: []
+    labels: [],
+    customLabels: []
   };
   return { ...state, cardsAreFiltered: false, searchQueries, filteredLists: [] };
 };

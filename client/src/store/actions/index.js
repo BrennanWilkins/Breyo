@@ -21,7 +21,7 @@ export { getRecentCardActivity, resetCardActivity, setShownMemberActivity, delet
 getAllCardActivity, fetchFirstPageBoardActivity, fetchAllBoardActivity,
 setAllBoardActivityShown, resetAllBoardActivity } from './activity';
 export { addTitleSearchQuery, addDueDateSearchQuery, addMemberSearchQuery, addLabelSearchQuery,
-resetSearchQuery } from './cardSearchQueries';
+resetSearchQuery, addCustomLabelSearchQuery } from './cardSearchQueries';
 export { createTeam, getActiveTeam, editTeam, changeTeamLogo, removeTeamLogo,
 deleteTeam, inviteTeamMembers, acceptTeamInvite, rejectTeamInvite, leaveTeam,
 changeBoardTeam, addToTeam, promoteTeamMember, demoteTeamMember } from './team';

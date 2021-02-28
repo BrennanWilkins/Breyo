@@ -8,4 +8,6 @@ export const addMemberSearchQuery = email => ({ type: actionTypes.ADD_MEMBER_SEA
 
 export const addLabelSearchQuery = label => ({ type: actionTypes.ADD_LABEL_SEARCH_QUERY, label });
 
+export const addCustomLabelSearchQuery = labelID => ({ type: actionTypes.ADD_CUSTOM_LABEL_SEARCH_QUERY, labelID });
+
 export const resetSearchQuery = () => ({ type: actionTypes.RESET_SEARCH_QUERY });

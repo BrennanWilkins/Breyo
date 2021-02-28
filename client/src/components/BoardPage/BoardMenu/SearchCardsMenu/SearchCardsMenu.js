@@ -5,39 +5,47 @@ import { checkIcon } from '../../../UI/icons';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
-import { addTitleSearchQuery, addLabelSearchQuery, addDueDateSearchQuery,
-  addMemberSearchQuery, resetSearchQuery, setShownBoardView } from '../../../../store/actions';
+import { addTitleSearchQuery, addLabelSearchQuery, addDueDateSearchQuery, addMemberSearchQuery,
+  resetSearchQuery, setShownBoardView, addCustomLabelSearchQuery } from '../../../../store/actions';
 import { useDidUpdate } from '../../../../utils/customHooks';
 
 const SearchCardsMenu = props => {
-  const { titleQuery, memberQuery, labels, dueDateQuery } = props.searchQueries;
+  const { titleQuery, memberQuery, labels, dueDateQuery, customLabels } = props.searchQueries;
   const [titleInput, setTitleInput] = useState('');
 
   useDidUpdate(() => {
     if (titleInput !== titleQuery && !titleQuery) { setTitleInput(''); }
   }, [titleQuery]);
 
+  const resetCheck = () => {
+    if (props.shownView !== 'lists') { props.resetView(); }
+  };
+
   useDidUpdate(() => {
     props.addTitleSearchQuery(titleInput);
     // if not on board view then navigate to it
-    if (props.shownView !== 'lists') { props.resetView(); }
   }, [titleInput]);
 
   const memberHandler = email => {
     if (email === memberQuery) { props.addMemberSearchQuery(''); }
     else { props.addMemberSearchQuery(email); }
-    if (props.shownView !== 'lists') { props.resetView(); }
+    resetCheck();
   };
 
   const dueDateFilterHandler = mode => {
     if (dueDateQuery === mode) { props.addDueDateSearchQuery(''); }
     else { props.addDueDateSearchQuery(mode); }
-    if (props.shownView !== 'lists') { props.resetView(); }
+    resetCheck();
   };
 
   const labelFilterHandler = color => {
     props.addLabelSearchQuery(color);
-    if (props.shownView !== 'lists') { props.resetView(); }
+    resetCheck();
+  };
+
+  const customLabelFilterHandler = labelID => {
+    props.addCustomLabelSearchQuery(labelID);
+    resetCheck();
   };
 
   return (
@@ -56,6 +64,19 @@ const SearchCardsMenu = props => {
           {labels.includes(color) && checkIcon}
         </div>
       ))}
+    </div>
+    <div className={classes.Label}>Filter by custom card label</div>
+    <div className={classes.CustomCardLabels}>
+      {props.customLabels.map(labelID => {
+        const label = props.customLabelsByID[labelID];
+        return (
+          <div key={labelID} className={classes.CustomLabel} onClick={() => customLabelFilterHandler(labelID)}>
+            <div className={classes.CustomLabelColor} style={{ background: label.color }} />
+            <div className={classes.CustomLabelTitle}>{label.title}</div>
+            {customLabels.includes(labelID) && <div className={classes.CustomLabelCheck}>{checkIcon}</div>}
+          </div>
+        );
+      })}
     </div>
     <div className={classes.Label}>Filter by due date</div>
     <div className={classes.DateFilters}>
@@ -84,23 +105,29 @@ SearchCardsMenu.propTypes = {
   members: PropTypes.array.isRequired,
   addTitleSearchQuery: PropTypes.func.isRequired,
   addLabelSearchQuery: PropTypes.func.isRequired,
+  addCustomLabelSearchQuery: PropTypes.func.isRequired,
   addMemberSearchQuery: PropTypes.func.isRequired,
   addDueDateSearchQuery: PropTypes.func.isRequired,
   searchQueries: PropTypes.object.isRequired,
   resetSearchQuery: PropTypes.func.isRequired,
   resetView: PropTypes.func.isRequired,
-  shownView: PropTypes.string.isRequired
+  shownView: PropTypes.string.isRequired,
+  customLabels: PropTypes.array.isRequired,
+  customLabelsByID: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
   members: state.board.members,
   searchQueries: state.lists.searchQueries,
-  shownView: state.board.shownView
+  shownView: state.board.shownView,
+  customLabels: state.board.customLabels.allIDs,
+  customLabelsByID: state.board.customLabels.byID
 });
 
 const mapDispatchToProps = dispatch => ({
   addTitleSearchQuery: query => dispatch(addTitleSearchQuery(query)),
   addLabelSearchQuery: query => dispatch(addLabelSearchQuery(query)),
+  addCustomLabelSearchQuery: query => dispatch(addCustomLabelSearchQuery(query)),
   addMemberSearchQuery: query => dispatch(addMemberSearchQuery(query)),
   addDueDateSearchQuery: query => dispatch(addDueDateSearchQuery(query)),
   resetSearchQuery: () => dispatch(resetSearchQuery()),
