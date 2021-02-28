@@ -28,17 +28,27 @@ const leaveAllCards = async (boardID, email) => {
   for (let list of lists) {
     let shouldUpdate = false;
     for (let card of list.cards) {
-      let memberIdx = card.members.findIndex(member => member.email === email);
-      if (memberIdx !== -1) {
-        card.members.splice(memberIdx, 1);
+      const members = card.members.filter(member => member.email !== email);
+      const votes = card.votes.filter(vote => vote.email !== email);
+      if (members.length !== card.members.length) {
+        card.members = members;
         shouldUpdate = true;
       }
-      if (list.isVoting) {
-        let voteIdx = card.votes.findIndex(vote => vote.email === email);
-        if (voteIdx !== -1) {
-          card.votes.splice(voteIdx, 1);
-          shouldUpdate = true;
-        }
+      if (votes.length !== card.votes.length) {
+        card.votes = votes;
+        shouldUpdate = true;
+      }
+    }
+    for (let card of list.archivedCards) {
+      const members = card.members.filter(member => member.email !== email);
+      const votes = card.votes.filter(vote => vote.email !== email);
+      if (members.length !== card.members.length) {
+        card.members = members;
+        shouldUpdate = true;
+      }
+      if (votes.length !== card.votes.length) {
+        card.votes = votes;
+        shouldUpdate = true;
       }
     }
     // only need to update list if cards changed

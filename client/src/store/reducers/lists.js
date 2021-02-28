@@ -602,24 +602,32 @@ const toggleCommentLike = (state, action) => {
 const deleteBoardMember = (state, action) => {
   // remove member from any cards they are a member of
   let currentCard = state.currentCard;
-  const lists = state.lists.map((list, i) => {
-    const cards = list.cards.map(card => {
-      const updatedCard = {
-        ...card,
-        members: card.members.filter(member => member.email !== action.email),
-        votes: card.votes.filter(vote => vote.email !== action.email)
-      };
-      if (state.shownCardID === card.cardID) {
-        currentCard = { ...updatedCard, listIsVoting: list.isVoting };
-      }
-      return updatedCard;
-    });
-    return { ...list, cards };
-  });
+
+  const updateCard = card => {
+    const members = card.members.filter(member => member.email !== action.email);
+    const votes = card.votes.filter(vote => vote.email !== action.email);
+    if (members.length === card.members.length && votes.length === card.votes.length) { return card; }
+    if (state.shownCardID === card.cardID) {
+      currentCard = { ...currentCard, members, votes };
+    }
+    return { ...card, members, votes };
+  };
+
+  const lists = state.lists.map(list => ({
+    ...list,
+    cards: list.cards.map(card => updateCard(card))
+  }));
+
+  const archivedLists = state.archivedLists.map(list => ({
+    ...list,
+    cards: list.cards.map(card => updateCard(card))
+  }));
+
+  const allArchivedCards = state.allArchivedCards.map(card => updateCard(card));
 
   const filteredLists = getFilteredLists(state, lists);
 
-  return { ...state, lists, filteredLists, currentCard };
+  return { ...state, lists, filteredLists, currentCard, archivedLists, allArchivedCards };
 };
 
 const checkForQuery = searchQueries => {
@@ -835,22 +843,31 @@ const deleteCardCustomLabel = (state, action) => {
 
 const deleteCustomLabel = (state, action) => {
   let currentCard = state.currentCard;
-  const lists = state.lists.map(list => {
-    const cards = list.cards.map(card => {
-      const updatedCard = {
-        ...card,
-        customLabels: card.customLabels.filter(id => id !== action.labelID)
-      };
-      if (state.shownCardID === card.cardID) {
-        currentCard = { ...updatedCard, listIsVoting: list.isVoting };
-      }
-      return updatedCard.customLabels.length !== card.customLabels.length ? updatedCard : card;
-    });
-    return { ...list, cards };
-  });
+
+  const updateCard = card => {
+    const customLabels = card.customLabels.filter(id => id !== action.labelID);
+    if (customLabels.length === card.customLabels.length) { return card; }
+    if (state.shownCardID === card.cardID) {
+      currentCard = { ...currentCard, customLabels };
+    }
+    return { ...card, customLabels };
+  };
+
+  const lists = state.lists.map(list => ({
+    ...list,
+    cards: list.cards.map(card => updateCard(card))
+  }));
+
+  const archivedLists = state.archivedLists.map(list => ({
+    ...list,
+    cards: list.cards.map(card => updateCard(card))
+  }));
+
+  const allArchivedCards = state.allArchivedCards.map(card => updateCard(card));
+
   const filteredLists = getFilteredLists(state, lists);
 
-  return { ...state, lists, filteredLists, currentCard };
+  return { ...state, lists, filteredLists, currentCard, archivedLists, allArchivedCards };
 };
 
 export default reducer;

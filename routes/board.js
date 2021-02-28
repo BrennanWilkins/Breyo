@@ -599,9 +599,16 @@ router.delete('/customLabel/:boardID/:labelID',
       for (let list of lists) {
         let shouldUpdate = false;
         for (let card of list.cards) {
-          const idx = card.customLabels.indexOf(labelID);
-          if (idx !== -1) {
-            card.customLabels.splice(idx, 1);
+          const customLabels = card.customLabels.filter(id => id !== labelID);
+          if (customLabels.length !== card.customLabels.length) {
+            card.customLabels = customLabels;
+            shouldUpdate = true;
+          }
+        }
+        for (let card of list.archivedCards) {
+          const customLabels = card.customLabels.filter(id => id !== labelID);
+          if (customLabels.length !== card.customLabels.length) {
+            card.customLabels = customLabels;
             shouldUpdate = true;
           }
         }

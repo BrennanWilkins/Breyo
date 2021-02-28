@@ -15,13 +15,16 @@ const CardLabels = props => {
 
   return (
     <div className={classes.Labels}>
-      {props.customLabels.map(labelID => (
-        <div key={labelID} className={`${classes.Label} ${labelsHovered ? classes.DarkenLabel : ''} ${expandLabels ? classes.ExpandLabel : ''}`}
-        onClick={clickHandler} onMouseEnter={() => setLabelsHovered(true)} onMouseLeave={() => setLabelsHovered(false)}
-        style={{ background: props.customLabelsByID[labelID].color }}>
-          <div className={classes.LabelTitle}><span>{props.customLabelsByID[labelID].title}</span></div>
-        </div>
-      ))}
+      {props.customLabels.map(labelID => {
+        const label = props.customLabelsByID[labelID];
+        return (
+          <div key={labelID} className={`${classes.Label} ${labelsHovered ? classes.DarkenLabel : ''} ${expandLabels ? classes.ExpandLabel : ''}`}
+          onClick={clickHandler} onMouseEnter={() => setLabelsHovered(true)} onMouseLeave={() => setLabelsHovered(false)}
+          style={{ background: label.color }}>
+            <div className={classes.LabelTitle}><span>{label.title}</span></div>
+          </div>
+        );
+      })}
       {LABEL_COLORS.filter(color => props.labels.includes(color)).map(color => (
         <div key={color} className={`${classes.Label} ${labelsHovered ? classes.DarkenLabel : ''} ${expandLabels ? classes.ExpandLabel : ''}`}
         onClick={clickHandler} onMouseEnter={() => setLabelsHovered(true)} onMouseLeave={() => setLabelsHovered(false)}
