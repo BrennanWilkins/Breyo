@@ -6,7 +6,7 @@
   position: absolute;
   padding: 5px 5px 10px 5px;
   box-sizing: border-box;
-  width: 200px;
+  width: 300px;
   z-index: 2;
 }
 .Container {
@@ -25,28 +25,135 @@
   }
 }
 .Color {
-  width: 85%;
+  width: 80%;
   height: 30px;
   border-radius: 4px;
   margin: 5px auto;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
 }
-.Color span {
+.Color span, .SelectColor span {
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0;
   left: 0;
   color: white;
-  font-size: 16px;
+  font-size: 15px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding-right: 10px;
+  justify-content: flex-start;
   box-sizing: border-box;
+  font-weight: 500;
+  padding: 0 10px;
 }
-.Color:hover span {
-  background: rgb(0,0,0,0.1);
+.LabelTitle {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 92%;
+}
+.Color svg {
+  font-size: 16px;
+  margin-left: auto;
+}
+.SelectColor span {
+  padding: 0;
+  justify-content: center;
+  font-size: 18px;
+}
+.Color span:hover, .SelectColor:hover span {
+  background: rgba(0,0,0,0.1);
+}
+.ShowCreateBtn {
+  display: block;
+  width: 80%;
+  margin: 20px auto 0;
+}
+.BackBtn {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+}
+.SelectColors {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-left: 2px;
+}
+.SelectColor {
+  width: 50px;
+  height: 32.5px;
+  border-radius: 4px;
+  margin: 3px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.InputLabel {
+  font-weight: 500;
+  font-size: 13.5px;
+  margin: 10px 0 0 5px;
+}
+.TitleInput {
+  margin: 3px 0 0 5px;
+  width: calc(100% - 10px);
+}
+.CreateBtn {
+  padding: 8px 13px;
+  margin: 15px 0 0 5px;
+  color: white;
+  background: rgb(var(--green));
+  font-size: 15px;
+}
+.CreateBtn:hover, .EditBtn:hover {
+  background: rgba(var(--green), 0.85);
+}
+.CreateBtn:active, .EditBtn:active {
+  background: rgb(19, 150, 25);
+}
+.CreateBtn:disabled {
+  background: rgb(200,200,200);
+  cursor: default;
+}
+.EditBtns {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+  margin-top: 15px;
+}
+.EditBtn {
+  color: white;
+  width: 100px;
+  background: rgb(var(--green));
+  font-size: 15px;
+}
+.DeleteBtn {
+  color: white;
+  width: 100px;
+  background: rgb(219, 55, 29);
+  font-size: 15px;
+}
+.DeleteBtn:hover, .DeleteBtn:active {
+  background: rgb(213, 5, 5);
+}
+.ShowEditBtn {
+  position: absolute;
+  right: -28px;
+  top: 2.5px;
+  border-radius: 4px;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.ShowEditBtn svg {
+  width: 15px;
+  height: 15px;
+}
+.ShowEditBtn:hover {
+  background: rgb(238,238,238);
 }
