@@ -1,5 +1,6 @@
 .Container {
   margin: 10px;
+  max-width: 100%;
 }
 .Title {
   color: rgb(var(--darkGray));
@@ -15,7 +16,21 @@
   width: 40px;
   height: 32px;
   border-radius: 4px;
-  margin-right: 4px;
+  margin: 0 4px 4px 0;
+}
+.CustomLabel {
+  height: 32px;
+  border-radius: 4px;
+  margin: 0 4px 4px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 32px;
+  color: white;
+  padding: 0 8px;
+  box-sizing: border-box;
+  font-weight: 500;
+  font-size: 15px;
 }
 .Btn {
   position: relative;

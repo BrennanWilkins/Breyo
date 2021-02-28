@@ -43,7 +43,8 @@ const CardDetails = props => {
             {props.currentCard.listIsVoting && <CardVotes votes={props.currentCard.votes} showVotingModal={showVotingModal}
               close={() => setShowVotingModal(false)} open={() => setShowVotingModal(true)} />}
             {props.currentCard.members.length > 0 && <CardMembers members={props.currentCard.members} />}
-            {props.currentCard.labels.length > 0 && <CardLabels labels={props.currentCard.labels} />}
+            {(props.currentCard.labels.length > 0 || props.currentCard.customLabels.length > 0) &&
+              <CardLabels labels={props.currentCard.labels} customLabels={props.currentCard.customLabels} />}
             {!!props.currentCard.dueDate &&
               <CardDueDate currentDueDate={props.currentCard.dueDate} />}
           </div>
