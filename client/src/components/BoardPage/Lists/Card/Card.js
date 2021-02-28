@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import classes from './Card.module.css';
 import { editIcon } from '../../../UI/icons';
 import { Draggable } from 'react-beautiful-dnd';
-import { LABEL_COLORS } from '../../../../utils/backgrounds';
 import CardMembers from './CardMembers';
 import CardBtns from './CardBtns';
+import CardLabels from './CardLabels';
 
 const Card = props => {
   const accountBtnClickHandler = (e, email, fullName) => {
@@ -26,9 +26,7 @@ const Card = props => {
     <Draggable draggableId={props.cardID} index={props.index}>
       {(provided, snapshot) => (
         <div className={classes.Card} onClick={() => props.showDetails(props.cardID)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-          {props.labels.length > 0 && <div className={classes.Labels}>
-            {LABEL_COLORS.filter(color => props.labels.includes(color)).map(color => <div key={color} style={{background: color}}></div>)}
-          </div>}
+          {(props.labels.length > 0 || props.customLabels.length > 0) && <CardLabels labels={props.labels} customLabels={props.customLabels} />}
           <div className={classes.EditIcon}>{editIcon}</div>
           <div className={classes.Title}>{props.title}</div>
           <CardBtns dueDate={props.dueDate} hasDesc={props.desc !== ''} checklists={props.checklists} commentLength={props.comments.length}
@@ -54,7 +52,8 @@ Card.propTypes = {
   setShownMember: PropTypes.func.isRequired,
   desc: PropTypes.string.isRequired,
   isVoting: PropTypes.bool.isRequired,
-  votes: PropTypes.array.isRequired
+  votes: PropTypes.array.isRequired,
+  customLabels: PropTypes.array.isRequired
 };
 
 export default React.memo(Card);
