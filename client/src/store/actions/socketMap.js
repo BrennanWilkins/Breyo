@@ -60,7 +60,12 @@ const socketMap = {
   'post/card/vote': actionTypes.TOGGLE_CARD_VOTE,
   'post/list/limit': actionTypes.SET_LIST_LIMIT,
   'delete/list/limit': actionTypes.REMOVE_LIST_LIMIT,
-  'put/list/sort': actionTypes.SORT_LIST
+  'put/list/sort': actionTypes.SORT_LIST,
+  'post/board/customLabel': actionTypes.CREATE_NEW_CUSTOM_LABEL,
+  'put/board/customLabel': actionTypes.UPDATE_CUSTOM_LABEL,
+  'delete/board/customLabel': actionTypes.DELETE_CUSTOM_LABEL,
+  'post/card/customLabel': actionTypes.ADD_CARD_CUSTOM_LABEL,
+  'delete/card/customLabel': actionTypes.DELETE_CARD_CUSTOM_LABEL
 };
 
 export default socketMap;

@@ -84,6 +84,9 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SORT_LIST: return sortList(state, action);
     case actionTypes.SET_VOTING_RESULTS_ID: return { ...state, votingResultsListID: action.listID };
     case actionTypes.CLOSE_VOTING_RESULTS: return { ...state, votingResultsListID: null };
+    case actionTypes.ADD_CARD_CUSTOM_LABEL: return addCardCustomLabel(state, action);
+    case actionTypes.DELETE_CARD_CUSTOM_LABEL: return deleteCardCustomLabel(state, action);
+    case actionTypes.DELETE_CUSTOM_LABEL: return deleteCustomLabel(state, action);
     default: return state;
   }
 };
@@ -162,7 +165,8 @@ const formatCardData = (card, fromList) => ({
     value: field.value,
     fieldID: field._id
   })),
-  votes: fromList ? [] : card.votes
+  votes: fromList ? [] : card.votes,
+  customLabels: card.customLabels
 });
 
 const setListData = (state, action) => ({
@@ -188,7 +192,7 @@ const addList = (state, action) => {
 
 const addCard = (state, action) => {
   const card = { title: action.title, desc: '', checklists: [], dueDate: null, labels: [],
-  cardID: action.cardID, members: [], comments: [], roadmapLabel: null, customFields: [], votes: [] };
+  cardID: action.cardID, members: [], comments: [], roadmapLabel: null, customFields: [], votes: [], customLabels: [] };
 
   const lists = state.lists.map(list => list.listID === action.listID ? { ...list, cards: [...list.cards, card] } : list);
 
@@ -791,6 +795,38 @@ const sortList = (state, action) => {
   const lists = state.lists.map(list => list.listID === action.listID ? { ...list, cards: action.cards.map(card => formatCardData(card)) } : list);
   const filteredLists = getFilteredLists(state, lists);
   return { ...state, lists, filteredLists };
+};
+
+const addCardCustomLabel = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  card.customLabels = [...card.customLabels, action.labelID];
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const deleteCardCustomLabel = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  card.customLabels = card.customLabels.filter(label => label !== action.labelID);
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const deleteCustomLabel = (state, action) => {
+  let currentCard = state.currentCard;
+  const lists = state.lists.map(list => {
+    const cards = list.cards.map(card => {
+      const updatedCard = {
+        ...card,
+        customLabels: card.customLabels.filter(id => id !== action.labelID)
+      };
+      if (state.shownCardID === card.cardID) {
+        currentCard = { ...updatedCard, listIsVoting: list.isVoting };
+      }
+      return updatedCard.customLabels.length !== card.customLabels.length ? updatedCard : card;
+    });
+    return { ...list, cards };
+  });
+  const filteredLists = getFilteredLists(state, lists);
+
+  return { ...state, lists, filteredLists, currentCard };
 };
 
 export default reducer;

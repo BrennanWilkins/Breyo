@@ -75,6 +75,13 @@ export const updateActiveBoard = data => (dispatch, getState) => {
     if (member.email === creator.email) { creator.avatar = member.avatar; }
   }
 
+  const allCustomLabelsIDs = [];
+  const customLabelsByID = {};
+  for (let label of data.customLabels) {
+    customLabelsByID[label._id] = { color: label.color, title: label.title };
+    allCustomLabelsIDs.push(label._id);
+  }
+
   let team = { teamID, title: '', url: null };
   if (teamID && !data.team) {
     const teamData = state.user.teams.byID[teamID];
@@ -95,7 +102,8 @@ export const updateActiveBoard = data => (dispatch, getState) => {
     axios.defaults.headers.common['x-auth-token'] = data.token;
   }
 
-  const boardPayload = { isStarred, creator, userIsAdmin, title, members, color, boardID, desc, team, avatars };
+  const boardPayload = { isStarred, creator, userIsAdmin, title, members, color, boardID, desc, team, avatars,
+    customLabels: { allIDs: allCustomLabelsIDs, byID: customLabelsByID } };
   dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload: boardPayload });
 
   let allArchivedCards = [];
@@ -279,3 +287,37 @@ export const setShownRoadmapList = listID => ({ type: actionTypes.SET_SHOWN_ROAD
 export const toggleCreateBoard = () => ({ type: actionTypes.TOGGLE_CREATE_BOARD });
 
 export const openCreateTeamBoard = (teamID, teamTitle) => ({ type: actionTypes.TOGGLE_CREATE_BOARD, open: true, teamID, teamTitle });
+
+export const createCustomLabel = (color, title) => async (dispatch, getState) => {
+  try {
+    const payload = { boardID: getState().board.boardID, color, title };
+    const res = await axios.post('/board/customLabel', payload);
+    payload.labelID = res.data.labelID;
+    dispatch({ type: actionTypes.CREATE_NEW_CUSTOM_LABEL, ...payload });
+    sendUpdate('post/board/customLabel', payload);
+  } catch (err) {
+    dispatch(addNotif('There was an error while creating your label.'));
+  }
+};
+
+export const updateCustomLabel = (labelID, color, title) => async (dispatch, getState) => {
+  try {
+    const payload = { boardID: getState().board.boardID, labelID, color, title };
+    dispatch({ type: actionTypes.UPDATE_CUSTOM_LABEL, ...payload });
+    await axios.put('/board/customLabel', payload);
+    sendUpdate('put/board/customLabel', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
+
+export const deleteCustomLabel = labelID => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    dispatch({ type: actionTypes.DELETE_CUSTOM_LABEL, labelID });
+    await axios.delete(`/board/customLabel/${boardID}/${labelID}`);
+    sendUpdate('delete/board/customLabel', { labelID });
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};

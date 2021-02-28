@@ -15,6 +15,7 @@ const initialState = {
   createBoardTeamID: null,
   createBoardTeamTitle: null,
   avatars: {},
+  customLabels: { allIDs: [], byID: {} },
   team: { teamID: null, title: '', url: null }
 };
 
@@ -38,6 +39,9 @@ const reducer = (state = initialState, action) => {
     case actionTypes.TOGGLE_CREATE_BOARD: return toggleCreateBoard(state, action);
     case actionTypes.CHANGE_BOARD_TEAM: return changeBoardTeam(state, action);
     case actionTypes.SET_SHOWN_BOARD_VIEW: return { ...state, shownView: action.view };
+    case actionTypes.CREATE_NEW_CUSTOM_LABEL: return createCustomLabel(state, action);
+    case actionTypes.UPDATE_CUSTOM_LABEL: return updateCustomLabel(state, action);
+    case actionTypes.DELETE_CUSTOM_LABEL: return deleteCustomLabel(state, action);
     default: return state;
   }
 };
@@ -53,7 +57,8 @@ const updateActiveBoard = (state, action) => ({
   isStarred: action.payload.isStarred,
   userIsAdmin: action.payload.userIsAdmin,
   team: action.payload.team,
-  avatars: action.payload.avatars
+  avatars: action.payload.avatars,
+  customLabels: action.payload.customLabels
 });
 
 const toggleIsAdmin = (state, action, isAdmin) => ({
@@ -86,5 +91,23 @@ const changeBoardTeam = (state, action) => ({
     url: !state.team.url ? null : action.team.url
   }
 });
+
+const createCustomLabel = (state, action) => {
+  const allIDs = [...state.customLabels.allIDs, action.labelID];
+  const byID = { ...state.customLabels.byID, [action.labelID] : { title: action.title, color: action.color } };
+  return { ...state, customLabels: { byID, allIDs } };
+};
+
+const updateCustomLabel = (state, action) => {
+  const byID = { ...state.customLabels.byID, [action.labelID] : { title: action.title, color: action.color } };
+  return { ...state, customLabels: { ...state.customLabels, byID } };
+};
+
+const deleteCustomLabel = (state, action) => {
+  const byID = { ...state.customLabels.byID };
+  delete byID[action.labelID];
+  const allIDs = state.customLabels.allIDs.filter(id => id !== action.labelID);
+  return { ...state, customLabels: { byID, allIDs } };
+};
 
 export default reducer;

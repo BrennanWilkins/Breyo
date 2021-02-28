@@ -452,3 +452,27 @@ export const toggleCardVote = () => async (dispatch, getState) => {
     dispatch(serverErr());
   }
 };
+
+export const addCardCustomLabel = labelID => async (dispatch, getState) => {
+  try {
+    const { boardID, listID, cardID } = getCardState(getState);
+    const payload = { boardID, listID, cardID, labelID };
+    dispatch({ type: actionTypes.ADD_CARD_CUSTOM_LABEL, ...payload });
+    await axios.post('/card/customLabel', payload);
+    sendUpdate('post/card/customLabel', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
+
+export const deleteCardCustomLabel = labelID => async (dispatch, getState) => {
+  try {
+    const { boardID, listID, cardID } = getCardState(getState);
+    const payload = { listID, cardID, labelID };
+    dispatch({ type: actionTypes.DELETE_CARD_CUSTOM_LABEL, ...payload });
+    await axios.delete(`/card/customLabel/${boardID}/${listID}/${cardID}/${labelID}`);
+    sendUpdate('delete/card/customLabel', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};

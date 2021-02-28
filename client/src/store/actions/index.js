@@ -2,7 +2,8 @@ export { login, logout, loginErr, signupErr, signup, authReset, autoLogin } from
 export { createBoard, toggleIsStarred, updateActiveBoard, updateBoardTitle, sendInvite,
 addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc, deleteBoard, acceptInvite,
 rejectInvite, leaveBoard, openRoadmap, setShownRoadmapList, setShownBoardView, openRoadmapList,
-toggleCreateBoard, openCreateTeamBoard, createTeamBoard } from './board';
+toggleCreateBoard, openCreateTeamBoard, createTeamBoard, createCustomLabel, updateCustomLabel,
+deleteCustomLabel } from './board';
 export { addNotif, deleteNotif } from './notifications';
 export { updateListTitle, addList, copyList, archiveList, recoverList, deleteList,
 archiveAllCards, moveAllCards, toggleVoting, setListLimit, removeListLimit, sortList,
@@ -14,7 +15,7 @@ deleteChecklistItem, copyCard, archiveCard, recoverCard, deleteCard, addCardMemb
 removeCardMember, removeCardMemberCurrentCard, addComment, updateComment, deleteComment,
 editChecklistTitle, setCardDetailsInitial, changeRoadmapLabel, toggleCommentLike,
 addCustomField, updateCustomFieldTitle, updateCustomFieldValue, deleteCustomField,
-toggleCardVote } from './card';
+toggleCardVote, addCardCustomLabel, deleteCardCustomLabel } from './card';
 export { dndHandler, manualMoveCardHandler, checklistDndHandler, customFieldDndHandler } from './dndActions';
 export { getRecentCardActivity, resetCardActivity, setShownMemberActivity, deleteBoardActivity,
 getAllCardActivity, fetchFirstPageBoardActivity, fetchAllBoardActivity,
