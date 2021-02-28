@@ -49,13 +49,21 @@ const labelsByTitle = {
   '#4815AA': 'purple'
 };
 
-const getCardsByLabel = lists => {
+const getCardsByLabel = (lists, customLabelsByID) => {
   const labels = {};
-  lists.forEach(list => list.cards.forEach(card => card.labels.forEach(label => {
-    labels[label] = !labels[label] ? 1 : labels[label] + 1;
-  })));
+  const customLabels = {};
+  for (let list of lists) {
+    for (let card of list.cards) {
+      card.labels.forEach(label => labels[label] = !labels[label] ? 1 : labels[label] + 1);
+      card.customLabels.forEach(labelID => customLabels[labelID] = !customLabels[labelID] ? 1 : customLabels[labelID] + 1);
+    }
+  }
   const data = [];
-  for (let label in labels) { data.push({ title: labelsByTitle[label], fill: label, cards: labels[label] }); }
+  for (let label in labels) { data.push({ title: labelsByTitle[label] + ' (default)', fill: label, cards: labels[label] }); }
+  for (let labelID in customLabels) {
+    const customLabel = customLabelsByID[labelID];
+    data.push({ title: customLabel.title, fill: customLabel.color, cards: customLabels[labelID] });
+  }
   return data;
 };
 
@@ -75,7 +83,7 @@ const BoardOverview = props => {
     setCardsPerList(props.lists.map(list => ({ title: list.title, cards: list.cards.length })));
     setCardsByDueDate(getDueDateTypes(props.lists));
     setCardsByMember(getCardsByMember(props.lists));
-    setCardsByLabel(getCardsByLabel(props.lists));
+    setCardsByLabel(getCardsByLabel(props.lists, props.customLabelsByID));
   }, []);
 
   const changeModeHandler = (mode, chartType) => {
@@ -119,11 +127,13 @@ const BoardOverview = props => {
 
 BoardOverview.propTypes = {
   menuShown: PropTypes.bool.isRequired,
-  lists: PropTypes.array.isRequired
+  lists: PropTypes.array.isRequired,
+  customLabelsByID: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
-  lists: state.lists.lists
+  lists: state.lists.lists,
+  customLabelsByID: state.board.customLabels.byID
 });
 
 export default connect(mapStateToProps)(BoardOverview);
