@@ -104,7 +104,7 @@ export const rejectTeamInvite = teamID => async dispatch => {
 export const leaveTeam = push => async (dispatch, getState) => {
   try {
     const teamID = getState().team.teamID;
-    const res = await axios.put(`/team/leave/${teamID}`);
+    const res = await axios.put('/team/leave', { teamID });
     setToken(res.data.token);
     push('/');
   } catch (err) {

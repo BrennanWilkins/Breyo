@@ -294,12 +294,12 @@ router.delete('/invites/:teamID',
 );
 
 // leave a team
-router.put('/leave/:teamID',
-  validate([param('teamID').isMongoId()]),
+router.put('/leave',
+  validate([body('teamID').isMongoId()]),
   useIsTeamMember,
   async (req, res) => {
     try {
-      const teamID = req.params.teamID;
+      const teamID = req.body.teamID;
       const [team, user] = await Promise.all([Team.findById(teamID), User.findById(req.userID)]);
       if (!team || !user) { throw 'No team or user data found'; }
 

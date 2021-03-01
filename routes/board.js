@@ -377,7 +377,7 @@ router.put('/invites/:boardID',
       user.boards.push(boardID);
       board.members.push(user._id);
 
-      const actionData = { msg: null, boardMsg: 'was added to this board', cardID: null, listID: null, boardID: board._id, email: user.email, fullName: user.fullName };
+      const actionData = { msg: null, boardMsg: 'was added to this board', cardID: null, listID: null, boardID, email: user.email, fullName: user.fullName };
 
       const [token, newActivity] = await Promise.all([
         signNewToken(user, req.header('x-auth-token')),
@@ -459,12 +459,12 @@ router.delete('/:boardID',
 );
 
 // leave a board
-router.put('/leave/:boardID',
-  validate([param('boardID').isMongoId()]),
+router.put('/leave',
+  validate([body('boardID').isMongoId()]),
   useIsMember,
   async (req, res) => {
     try {
-      const boardID = req.params.boardID;
+      const boardID = req.body.boardID;
       const board = await Board.findById(boardID);
       if (!board) { throw 'No board data found'; }
 

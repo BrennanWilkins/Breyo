@@ -254,7 +254,7 @@ export const leaveBoard = push => async (dispatch, getState) => {
     const state = getState();
     const boardID = state.board.boardID;
     const email = state.user.email;
-    const res = await axios.put(`/board/leave/${boardID}`);
+    const res = await axios.put('/board/leave', { boardID });
     addRecentActivity(res.data.newActivity);
     sendUpdate('put/board/memberLeft', { email });
     dispatch({ type: actionTypes.LEAVE_BOARD, boardID });
