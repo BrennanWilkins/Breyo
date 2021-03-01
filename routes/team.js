@@ -115,7 +115,7 @@ router.post('/',
 
 // authorization: team admin
 // edit a teams info
-router.put('/:teamID',
+router.put('/info/:teamID',
   validate(
     [body('title').isLength({ min: 1, max: 100 }),
     body('desc').isLength({ max: 400 }),
