@@ -86,6 +86,11 @@ export const connectSocket = () => {
   socket.connect();
 };
 
+export const connectAndGetSocket = () => {
+  connectSocket();
+  return socket;
+};
+
 export const closeSocket = () => {
   if (!socket) { return; }
   socket.close();

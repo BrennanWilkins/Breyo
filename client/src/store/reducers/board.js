@@ -68,7 +68,8 @@ const toggleIsAdmin = (state, action, isAdmin) => ({
 
 const addBoardMember = (state, action) => ({
   ...state,
-  members: [...state.members, { email: action.email, fullName: action.fullName, isAdmin: false }]
+  members: [...state.members, { email: action.email, fullName: action.fullName, isAdmin: false, avatar: action.avatar }],
+  avatars: { ...state.avatars, [action.email]: action.avatar }
 });
 
 const deleteBoardMember = (state, action) => ({

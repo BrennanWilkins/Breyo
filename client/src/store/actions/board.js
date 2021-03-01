@@ -1,7 +1,7 @@
 import { instance as axios, setToken } from '../../axios';
 import * as actionTypes from './actionTypes';
 import { addNotif, serverErr } from './notifications';
-import { sendUpdate, initSocket, connectSocket } from './socket';
+import { sendUpdate, initSocket, connectAndGetSocket } from './socket';
 import { addRecentActivity } from './activity';
 
 export const createBoard = (title, color) => async dispatch => {
@@ -214,19 +214,23 @@ export const deleteBoard = push => async (dispatch, getState) => {
 export const acceptInvite = (boardID, push) => async (dispatch, getState) => {
   try {
     const state = getState();
-    const email = state.user.email;
-    const fullName = state.user.fullName;
+    const { email, fullName, avatar } = state.user;
     const res = await axios.put(`/board/invites/${boardID}`);
     const { token, board, newActivity } = res.data;
     setToken(token);
-    // manually connect socket
+
+    dispatch({ type: actionTypes.JOIN_BOARD, board });
+    // manually connect socket and once joined send update to other members
     initSocket(boardID);
-    connectSocket();
+    const socket = connectAndGetSocket();
+    socket.on('joined', () => {
+      // remove listener once joined
+      socket.off('joined');
+      addRecentActivity(newActivity);
+      sendUpdate('post/board/newMember', { email, fullName, avatar });
+    });
     // automatically send user to the board
     push(`/board/${boardID}`);
-    dispatch({ type: actionTypes.JOIN_BOARD, board });
-    addRecentActivity(newActivity);
-    sendUpdate('post/board/newMember', { email, fullName });
   } catch (err) {
     if (err?.response?.status === 400) {
       dispatch({ type: actionTypes.REMOVE_INVITE, boardID });
