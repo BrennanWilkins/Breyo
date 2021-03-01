@@ -1,4 +1,4 @@
-import { instance as axios } from '../../axios';
+import { instance as axios, setToken } from '../../axios';
 import * as actionTypes from './actionTypes';
 import { addNotif, serverErr } from './notifications';
 import { sendUpdate, initSocket, connectSocket } from './socket';
@@ -8,8 +8,7 @@ export const createBoard = (title, color) => async dispatch => {
   try {
     const res = await axios.post('/board', { title, color });
     const { token, board } = res.data;
-    axios.defaults.headers.common['x-auth-token'] = token;
-    localStorage['token'] = token;
+    setToken(token);
     dispatch({ type: actionTypes.CREATE_BOARD, board });
   } catch (err) {
     const errMsg = err?.response?.data?.msg || 'Your board could not be created.';
@@ -21,8 +20,7 @@ export const createTeamBoard = (title, color, teamID) => async dispatch => {
   try {
     const res = await axios.post('/board/teamBoard', { title, color, teamID });
     const { token, board } = res.data;
-    axios.defaults.headers.common['x-auth-token'] = token;
-    localStorage['token'] = token;
+    setToken(token);
     dispatch({ type: actionTypes.CREATE_BOARD, board });
   } catch (err) {
     dispatch(addNotif('Your board could not be created.'));
@@ -97,10 +95,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
     dispatch({ type: actionTypes.UPDATE_USER_BOARDS, invites: data.invites, boards: data.boards, teamInvites: data.teamInvites });
   }
 
-  if (data.token) {
-    localStorage['token'] = data.token;
-    axios.defaults.headers.common['x-auth-token'] = data.token;
-  }
+  if (data.token) { setToken(data.token); }
 
   const boardPayload = { isStarred, creator, userIsAdmin, title, members, color, boardID, desc, team, avatars,
     customLabels: { allIDs: allCustomLabelsIDs, byID: customLabelsByID } };
@@ -223,8 +218,7 @@ export const acceptInvite = (boardID, push) => async (dispatch, getState) => {
     const fullName = state.user.fullName;
     const res = await axios.put(`/board/invites/${boardID}`);
     const { token, board, newActivity } = res.data;
-    axios.defaults.headers.common['x-auth-token'] = token;
-    localStorage['token'] = token;
+    setToken(token);
     // manually connect socket
     initSocket(boardID);
     connectSocket();

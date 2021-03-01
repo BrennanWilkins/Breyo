@@ -1,4 +1,4 @@
-import { instance as axios } from '../../axios';
+import { instance as axios, setToken, removeToken } from '../../axios';
 import * as actionTypes from './actionTypes';
 
 const loginDispatch = payload => ({ type: actionTypes.LOGIN, payload });
@@ -32,15 +32,13 @@ export const signup = payload => async dispatch => {
 };
 
 export const authSuccess = data => dispatch => {
-  axios.defaults.headers.common['x-auth-token'] = data.token;
-  localStorage['token'] = data.token;
+  setToken(data.token);
   dispatch(loginDispatch(data));
 };
 
 export const logout = () => dispatch => {
-  // delete all local storage items & remove token from instance header on logout
-  delete axios.defaults.headers.common['x-auth-token'];
-  localStorage.removeItem('token');
+  // reset redux store & remove token from local storage/instance header on logout
+  removeToken();
   dispatch({ type: actionTypes.LOGOUT });
 };
 

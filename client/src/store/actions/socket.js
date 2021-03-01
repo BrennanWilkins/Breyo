@@ -1,4 +1,4 @@
-import { instance as axios } from '../../axios';
+import { instance as axios, baseURL, setToken } from '../../axios';
 import io from 'socket.io-client';
 import store from '../../store';
 import * as actionTypes from './actionTypes';
@@ -9,9 +9,7 @@ let socket = null;
 
 export const initSocket = boardID => {
   if (socket) { return; }
-  // const url = 'http://localhost:9000/';
-  const url = 'https://breyo.herokuapp.com';
-  const newSocket = io(url, {
+  const newSocket = io(baseURL, {
     query: { token: axios.defaults.headers.common['x-auth-token'] }
   });
 
@@ -41,7 +39,7 @@ export const initSocket = boardID => {
       if (email === userEmail) {
         // user was added as admin, fetch new token
         const res = await axios.put('/board/admins/promoteUser', { boardID: state.board.boardID });
-        axios.defaults.headers.common['x-auth-token'] = res.data.token;
+        setToken(res.data.token);
         store.dispatch({ type: actionTypes.PROMOTE_SELF, boardID });
       }
     } catch (err) { store.dispatch(serverErr()); }
@@ -56,7 +54,7 @@ export const initSocket = boardID => {
       if (email === userEmail) {
         // user was demoted as admin, fetch new token
         const res = await axios.put('/board/admins/demoteUser', { boardID: state.board.boardID });
-        axios.defaults.headers.common['x-auth-token'] = res.data.token;
+        setToken(res.data.token);
         store.dispatch({ type: actionTypes.DEMOTE_SELF, boardID });
       }
     } catch (err) { store.dispatch(serverErr()); }

@@ -1,13 +1,12 @@
 import * as actionTypes from './actionTypes';
-import { instance as axios } from '../../axios';
+import { instance as axios, setToken } from '../../axios';
 import { addNotif, serverErr } from './notifications';
 import { sendUpdate } from './socket';
 
 export const createTeam = payload => dispatch => {
   const { title, teamID, url, token, push } = payload;
   const team = { title, teamID, url, boards: [], isAdmin: true };
-  axios.defaults.headers.common['x-auth-token'] = token;
-  localStorage['token'] = token;
+  setToken(token);
   dispatch({ type: actionTypes.CREATE_TEAM, team });
   push('/team/' + url);
 };
@@ -22,8 +21,7 @@ export const getActiveTeam = (url, push) => async (dispatch, getState) => {
     data.team.userIsAdmin = isAdmin;
 
     if (data.token) {
-      axios.defaults.headers.common['x-auth-token'] = data.token;
-      localStorage['token'] = data.token;
+      setToken(data.token);
       dispatch({ type: actionTypes.UPDATE_USER_TEAMS, teams: data.teams, adminTeams: data.adminTeams });
     }
 
@@ -86,8 +84,7 @@ export const acceptTeamInvite = (teamID, push) => async dispatch => {
   try {
     const res = await axios.put(`/team/invites/${teamID}`);
     const { token, team } = res.data;
-    axios.defaults.headers.common['x-auth-token'] = token;
-    localStorage['token'] = token;
+    setToken(token);
     team.isAdmin = false;
     dispatch({ type: actionTypes.JOIN_TEAM, team });
     push('/team/' + team.url);
@@ -108,9 +105,7 @@ export const leaveTeam = push => async (dispatch, getState) => {
   try {
     const teamID = getState().team.teamID;
     const res = await axios.put(`/team/leave/${teamID}`);
-    const token = res.data.token;
-    axios.defaults.headers.common['x-auth-token'] = token;
-    localStorage['token'] = token;
+    setToken(res.data.token);
     push('/');
   } catch (err) {
     const errMsg = err?.response?.data?.msg || 'There was an error while leaving the team.';
