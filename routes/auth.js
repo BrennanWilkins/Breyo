@@ -38,6 +38,13 @@ const signNewToken = async (user, oldToken) => {
   return token;
 };
 
+const signInitialToken = async user => {
+  // create jwt token that expires in 7 days when logging in
+  const jwtPayload = getJWTPayload(user);
+  const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
+  return token;
+};
+
 // login
 router.post('/',
   validate([body('email').isEmail(), body('password').notEmpty()], 'Email and password cannot be empty.'),
@@ -55,9 +62,7 @@ router.post('/',
 
       user.boards = formatUserBoards(user);
 
-      // create jwt token that expires in 7 days
-      const jwtPayload = getJWTPayload(user);
-      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
+      const token = await signInitialToken(user);
 
       if (user.recoverPassID) { await User.updateOne({ _id: req.userID }, { recoverPassID: null }); }
 
@@ -98,9 +103,7 @@ router.post('/signup',
       await user.save();
 
       // signup was successful, login
-      // create jwt token that expires in 7 days
-      const jwtPayload = getJWTPayload(user);
-      const token = await jwt.sign({ user: jwtPayload }, config.get('AUTH_KEY'), { expiresIn: '7d' });
+      const token = await signInitialToken(user);
 
       res.status(200).json({ token, email, fullName, invites: [], boards: [], teams: [], teamInvites: [], adminTeams: [] });
     } catch(err) { res.status(500).json({ msg: 'There was an error while logging in.' }); }
