@@ -25,7 +25,7 @@ const BoardTeamModal = props => {
     <div ref={modalRef} className={classes.Container}>
       <ModalTitle title={showChangeTeam ? 'Change Team' : props.team.title} close={props.close} light />
       {showChangeTeam && <div className={classes.BackBtn}><BackBtn back={() => setShowChangeTeam(false)} /></div>}
-      {props.team.url ?
+      {props.teams.byID[props.team.teamID] ?
         showChangeTeam ?
           <div className={classes.Select}>
             <div className={classes.Label}>This board is part of</div>

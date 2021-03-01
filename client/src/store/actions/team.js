@@ -134,8 +134,8 @@ export const addToTeam = teamID => async (dispatch, getState) => {
     const boardID = state.board.boardID;
     const team = state.user.teams.byID[teamID];
     await axios.put('/board/addToTeam', { boardID, teamID });
-    dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team });
-    sendUpdate('put/board/changeTeam', { team });
+    dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team, boardID });
+    sendUpdate('put/board/changeTeam', { team, boardID });
   } catch (err) {
     const errMsg = err?.response?.status === 403 ? 'You must be an admin of this board to add it to a team.' :
     'There was an error while adding the board to the team.';
