@@ -5,7 +5,7 @@ const useIsMember = (req, res, next) => {
     req.userMembers[req.params.boardID] :
     req.userMembers[req.body.boardID];
 
-  if (!isMember) { return res.status(401).json({ msg: 'MUST BE MEMBER' }); }
+  if (!isMember) { return res.status(403); }
   next();
 };
 

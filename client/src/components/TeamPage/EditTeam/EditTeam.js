@@ -45,13 +45,8 @@ const EditTeam = props => {
       props.close();
     } catch (err) {
       setLoading(false);
-      const msg = err?.response?.data?.msg;
-      if (msg) {
-        const status = err.response?.status;
-        if (status === 400) { setErrMsg(msg); }
-        else if (status === 401) { setErrMsg('You must be an admin to edit the team details.'); }
-      }
-      else { setErrMsg('There was an error while connecting to the server.'); }
+      setErrMsg(err?.response?.status === 403 ? 'You must be an admin to edit the team details.' :
+      (err?.response?.data?.msg || 'There was an error while updating the team details.'));
     }
   };
 

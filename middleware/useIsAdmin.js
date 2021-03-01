@@ -5,7 +5,7 @@ const useIsAdmin = (req, res, next) => {
     req.userAdmins[req.params.boardID] :
     req.userAdmins[req.body.boardID];
 
-  if (!isAdmin) { return res.status(401).json({ msg: 'MUST BE ADMIN' }); }
+  if (!isAdmin) { return res.status(403); }
   next();
 };
 

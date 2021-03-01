@@ -23,3 +23,9 @@ export const addNotif = notif => (dispatch, getState) => {
 export const serverErr = () => dispatch => {
   dispatch(addNotif('There was an error while connecting to the server. Your changes may not be saved.'));
 };
+
+export const permissionErr = err => dispatch => {
+  const errMsg = err?.response?.status === 403 ? 'You must be an admin to change member permissions.' :
+  (err?.response?.data?.msg || 'There was an error while demoting the team member.');
+  dispatch(addNotif(errMsg));
+};

@@ -5,7 +5,7 @@ const useIsTeamMember = (req, res, next) => {
     req.userTeams[req.params.teamID] :
     req.userTeams[req.body.teamID];
 
-  if (!isTeamMember) { return res.status(401).json({ msg: 'MUST BE TEAM MEMBER' }); }
+  if (!isTeamMember) { return res.status(403); }
   next();
 };
 

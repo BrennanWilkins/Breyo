@@ -1,6 +1,6 @@
 import { instance as axios, setToken } from '../../axios';
 import * as actionTypes from './actionTypes';
-import { addNotif, serverErr } from './notifications';
+import { addNotif, serverErr, permissionErr } from './notifications';
 import { sendUpdate, initSocket, connectAndGetSocket } from './socket';
 import { addRecentActivity } from './activity';
 
@@ -146,10 +146,11 @@ export const sendInvite = (email, boardID) => async dispatch => {
   try {
     await axios.post('/board/invites', { email, boardID });
   } catch (err) {
-    const errMsg = err?.response?.data?.msg || 'There was an error while sending your invite.';
+    const errMsg = err?.response?.status === 403 ? 'You must be a board admin to invite other users.' :
+    (err?.response?.data?.msg || 'There was an error while sending your invite.');
     dispatch(addNotif(errMsg));
   }
-}
+};
 
 export const addAdmin = (email, boardID) => async dispatch => {
   try {
@@ -158,7 +159,7 @@ export const addAdmin = (email, boardID) => async dispatch => {
     sendUpdate('post/board/admins', email);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    dispatch(addNotif('There was an error while changing user permissions.'));
+    dispatch(permissionErr(err));
   }
 };
 
@@ -169,7 +170,7 @@ export const removeAdmin = (email, boardID) => async dispatch => {
     sendUpdate('delete/board/admins', email);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
-    dispatch(addNotif('There was an error while changing user permissions.'));
+    dispatch(permissionErr(err));
   }
 };
 
@@ -207,7 +208,9 @@ export const deleteBoard = push => async (dispatch, getState) => {
     dispatch({ type: actionTypes.DELETE_BOARD, boardID });
     push('/');
   } catch (err) {
-    dispatch(addNotif('There was an error while deleting the board.'));
+    const errMsg = err?.response?.status === 403 ? 'You must be a board admin to delete this board.' :
+    'There was an error while deleting the board.';
+    dispatch(addNotif(errMsg));
   }
 };
 

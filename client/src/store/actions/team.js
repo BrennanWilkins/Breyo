@@ -1,6 +1,6 @@
 import * as actionTypes from './actionTypes';
 import { instance as axios, setToken } from '../../axios';
-import { addNotif, serverErr } from './notifications';
+import { addNotif, serverErr, permissionErr } from './notifications';
 import { sendUpdate } from './socket';
 
 export const createTeam = payload => dispatch => {
@@ -122,7 +122,9 @@ export const changeBoardTeam = (oldTeamID, newTeamID) => async (dispatch, getSta
     dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team });
     sendUpdate('put/board/changeTeam', { team });
   } catch (err) {
-    dispatch(addNotif('There was an error while moving the board.'));
+    const errMsg = err?.response?.status === 403 ? 'You must be an admin of this board to change its team' :
+    'There was an error while moving the board.';
+    dispatch(addNotif(errMsg));
   }
 };
 
@@ -135,7 +137,9 @@ export const addToTeam = teamID => async (dispatch, getState) => {
     dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team });
     sendUpdate('put/board/changeTeam', { team });
   } catch (err) {
-    dispatch(addNotif('There was an error while adding the board to the team.'));
+    const errMsg = err?.response?.status === 403 ? 'You must be an admin of this board to add it to a team.' :
+    'There was an error while adding the board to the team.';
+    dispatch(addNotif(errMsg));
   }
 };
 
@@ -146,9 +150,7 @@ export const promoteTeamMember = email => async (dispatch, getState) => {
     await axios.post(`/team/admins/${teamID}`, { email });
     dispatch({ type: actionTypes.PROMOTE_TEAM_MEMBER, teamID, email });
   } catch (err) {
-    if (err?.response?.status === 401) { return dispatch(addNotif('You must be an admin to change member permissions.')); }
-    const errMsg = err?.response?.data?.msg || 'There was an error while promoting the team member.';
-    dispatch(addNotif(errMsg));
+    dispatch(permissionErr(err));
   }
 };
 
@@ -163,8 +165,6 @@ export const demoteTeamMember = email => async (dispatch, getState) => {
     }
     dispatch({ type: actionTypes.DEMOTE_TEAM_MEMBER, teamID, email });
   } catch (err) {
-    if (err?.response?.status === 401) { return dispatch(addNotif('You must be an admin to change member permissions.')); }
-    const errMsg = err?.response?.data?.msg || 'There was an error while demoting the team member.';
-    dispatch(addNotif(errMsg));
+    dispatch(permissionErr(err));
   }
 };

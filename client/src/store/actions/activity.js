@@ -55,7 +55,9 @@ export const deleteBoardActivity = () => async (dispatch, getState) => {
     dispatch({ type: actionTypes.DELETE_BOARD_ACTIVITY });
     sendUpdate('delete/activity');
   } catch (err) {
-    dispatch(addNotif('There was an error while deleting the board\'s activity history.'));
+    const errMsg = err?.response?.status === 403 ? `You must be an admin to delete the board's activity history` :
+     `There was an error while deleting the board's activity history.`;
+    dispatch(addNotif(errMsg));
   }
 };
 

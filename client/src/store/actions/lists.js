@@ -86,7 +86,8 @@ export const deleteList = (listID, boardID) => async dispatch => {
     sendUpdate('delete/list/archive', { listID });
     sendUpdate('put/activity/board/deleteList', { activity, listID });
   } catch(err) {
-    dispatch(serverErr());
+    dispatch(addNotif(err?.response?.status === 403 ? 'You must be an admin to delete lists.' :
+    'There was an error while deleting the list.'));
   }
 };
 
