@@ -64,7 +64,7 @@ export const initBoardSocket = boardID => {
     } catch (err) { store.dispatch(serverErr()); }
   });
 
-  newSocket.on('delete/board', data => {
+  newSocket.on('delete/board', () => {
     window.location.replace('/');
     store.dispatch(addNotif('This board has been deleted.'));
   });
@@ -123,6 +123,16 @@ export const initTeamSocket = teamID => {
       store.dispatch(addNotif('Connection to server lost, attempting to re-establish...'));
       newSocket.connect();
     }
+  });
+
+  newSocket.on('put/team/info', data => {
+    const { payload } = JSON.parse(data);
+
+    // if team page url has changed then reload page with new url
+    if (payload.url !== window.location.pathname.slice(6)) {
+      return window.location.replace(`/team/${payload.url}${window.location.search}`);
+    }
+    store.dispatch({ type: actionTypes.EDIT_TEAM, payload });
   });
 
   for (let route in teamSocketMap) {

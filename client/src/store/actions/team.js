@@ -1,7 +1,7 @@
 import * as actionTypes from './actionTypes';
 import { instance as axios, setToken } from '../../axios';
 import { addNotif, serverErr, permissionErr } from './notifications';
-import { sendBoardUpdate, initTeamSocket, connectTeamSocket } from '../../socket/socket';
+import { sendBoardUpdate, initTeamSocket, connectTeamSocket, sendTeamUpdate } from '../../socket/socket';
 
 export const createTeam = payload => dispatch => {
   const { title, teamID, url, token, push } = payload;
@@ -37,7 +37,10 @@ export const getActiveTeam = (url, push) => async (dispatch, getState) => {
   }
 };
 
-export const editTeam = payload => ({ type: actionTypes.EDIT_TEAM, payload });
+export const editTeam = payload => dispatch => {
+  dispatch({ type: actionTypes.EDIT_TEAM, payload });
+  sendTeamUpdate('put/team/info', { payload });
+};
 
 export const changeTeamLogo = (img, teamID) => async dispatch => {
   const errHandler = msg => dispatch(addNotif(msg));

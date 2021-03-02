@@ -34,9 +34,9 @@ const TeamPage = props => {
     <div className={classes.Container}>
       <TeamHeader />
       <div className={classes.Btns}>
-        <Link to={`/team/${props.match.params.url}/?view=boards`} className={mode === 'boards' ? classes.Active : classes.Btn}>Boards</Link>
-        <Link to={`/team/${props.match.params.url}/?view=members`} className={mode === 'members' ? classes.Active : classes.Btn}>Members</Link>
-        <Link to={`/team/${props.match.params.url}/?view=settings`} className={mode === 'settings' ? classes.Active : classes.Btn}>Settings</Link>
+        <Link to={`/team/${props.match.params.url}?view=boards`} className={mode === 'boards' ? classes.Active : classes.Btn}>Boards</Link>
+        <Link to={`/team/${props.match.params.url}?view=members`} className={mode === 'members' ? classes.Active : classes.Btn}>Members</Link>
+        <Link to={`/team/${props.match.params.url}?view=settings`} className={mode === 'settings' ? classes.Active : classes.Btn}>Settings</Link>
       </div>
       {mode === 'boards' ? <TeamBoards /> : mode === 'members' ? <TeamMembers /> : <TeamSettings />}
     </div>

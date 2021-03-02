@@ -7,6 +7,7 @@ import { instance as axios } from '../../../axios';
 import { connect } from 'react-redux';
 import { editTeam } from '../../../store/actions';
 import { useHistory } from 'react-router';
+import { useDidUpdate } from '../../../utils/customHooks';
 
 const EditTeam = props => {
   const history = useHistory();
@@ -32,6 +33,12 @@ const EditTeam = props => {
   }, [url]);
 
   useEffect(() => setErrMsg(''), [url, desc, title]);
+
+  useDidUpdate(() => {
+    // update state if socket sent to update info
+    if (desc !== props.desc) { setDesc(props.desc); }
+    if (title !== props.title) { setTitle(props.title); }
+  }, [props.desc, props.title]);
 
   const submitHandler = async e => {
     e.preventDefault();
