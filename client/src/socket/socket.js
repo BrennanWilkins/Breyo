@@ -65,9 +65,8 @@ export const initBoardSocket = boardID => {
   });
 
   newSocket.on('delete/board', data => {
-    const { boardID } = JSON.parse(data);
-    store.dispatch({ type: actionTypes.DELETE_BOARD, boardID });
-    window.location.reload();
+    window.location.replace('/');
+    store.dispatch(addNotif('This board has been deleted.'));
   });
 
   for (let route in boardSocketMap) {

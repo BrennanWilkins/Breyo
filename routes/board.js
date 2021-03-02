@@ -444,11 +444,12 @@ router.delete('/:boardID',
   async (req, res) => {
     try {
       const boardID = req.params.boardID;
-      const board = await Board.findByIdAndDelete(boardID).select('members');
+      const board = await Board.findById(boardID).select('members admins').lean();
       if (!board) { throw 'No board data found'; }
       if (!board.admins.includes(req.userID)) { throw 'User must be admin to delete board.'; }
 
       await Promise.all([
+        Board.deleteOne({ _id: boardID }),
         User.updateMany({ _id: { $in: board.members }}, { $pull: { boards: board._id, adminBoards: boardID, starredBoards: boardID } }),
         List.deleteMany({ boardID }),
         Activity.deleteMany({ boardID })
