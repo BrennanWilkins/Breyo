@@ -49,7 +49,9 @@ export const changeTeamLogo = (img, teamID) => async dispatch => {
 
   reader.onloadend = () => {
     axios.put(`/team/logo/${teamID}`, { logo: reader.result }).then(res => {
-      dispatch({ type: actionTypes.CHANGE_TEAM_LOGO, logo: res.data.logoURL, teamID });
+      const payload = { logo: res.data.logoURL, teamID };
+      dispatch({ type: actionTypes.CHANGE_TEAM_LOGO, ...payload });
+      sendTeamUpdate('put/team/logo', payload);
     }).catch(err => {
       if (err?.response?.status === 413) { return errHandler('That image is too large to upload.'); }
       errHandler('There was an error while uploading your logo.');
@@ -62,6 +64,7 @@ export const removeTeamLogo = teamID => async dispatch => {
   try {
     await axios.delete('/team/logo/' + teamID);
     dispatch({ type: actionTypes.REMOVE_TEAM_LOGO, teamID });
+    sendTeamUpdate('delete/team/logo', { teamID });
   } catch (err) {
     dispatch(addNotif('There was an error while removing the logo.'));
   }
