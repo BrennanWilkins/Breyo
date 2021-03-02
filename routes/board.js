@@ -7,6 +7,7 @@ const validate = require('../middleware/validate');
 const useIsAdmin = require('../middleware/useIsAdmin');
 const useIsMember = require('../middleware/useIsMember');
 const useIsTeamMember = require('../middleware/useIsTeamMember');
+const useIsTeamAdmin = require('../middleware/useIsTeamAdmin');
 const List = require('../models/list');
 const { addActivity } = require('./activity');
 const Activity = require('../models/activity');
@@ -500,11 +501,10 @@ router.put('/changeTeam',
     try {
       const { boardID, teamID, newTeamID } = req.body;
       const [board, newTeam] = await Promise.all([Board.findById(boardID), Team.findById(newTeamID)]);
-      if (!board || !newTeam) {
-        throw 'Board or team data not found';
-      }
+      if (!board || !newTeam) { throw 'Board or team data not found'; }
+      if (board.teamID === newTeamID) { throw 'Board already in part of this team.'; }
       if (!newTeam.members.find(member => String(member) === req.userID)) {
-        throw 'User must be member of team board is moving to';
+        return res.status(400).json({ msg: 'You must be a member of the team the board is moving to.' });
       }
 
       board.teamID = newTeamID;
@@ -531,6 +531,27 @@ router.put('/addToTeam',
       if (board.teamID) { return res.status(400).json({ msg: 'This board is already part of a team.' }); }
 
       board.teamID = teamID;
+      await board.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: board admin, team admin
+router.put('/removeFromTeam/:teamID',
+  validate([body('boardID').isMongoId(), param('teamID').isMongoId()]),
+  useIsTeamAdmin,
+  useIsAdmin,
+  async (req, res) => {
+    try {
+      const [board, team] = await Promise.all([Board.findById(req.body.boardID), Team.findById(req.params.teamID).select('admins').lean()]);
+      if (!board || !team) { throw 'Board or team data not found'; }
+      if (!team.admins.includes(req.userID)) {
+        return res.status(400).json({ msg: 'You must be an admin of the team to remove a board.' });
+      }
+
+      board.teamID = null;
       await board.save();
 
       res.sendStatus(200);
