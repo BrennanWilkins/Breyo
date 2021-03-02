@@ -160,6 +160,11 @@ export const connectTeamSocket = () => {
   teamSocket.connect();
 };
 
+export const connectAndGetTeamSocket = () => {
+  connectTeamSocket();
+  return teamSocket;
+};
+
 export const closeTeamSocket = () => {
   if (!teamSocket) { return; }
   teamSocket.close();

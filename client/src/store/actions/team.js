@@ -1,7 +1,8 @@
 import * as actionTypes from './actionTypes';
 import { instance as axios, setToken } from '../../axios';
 import { addNotif, serverErr, permissionErr } from './notifications';
-import { sendBoardUpdate, initTeamSocket, connectTeamSocket, sendTeamUpdate } from '../../socket/socket';
+import { sendBoardUpdate, initTeamSocket, connectTeamSocket,
+  connectAndGetTeamSocket, sendTeamUpdate } from '../../socket/socket';
 
 export const createTeam = payload => dispatch => {
   const { title, teamID, url, token, push } = payload;
@@ -93,14 +94,27 @@ export const inviteTeamMembers = emails => async (dispatch, getState) => {
   }
 };
 
-export const acceptTeamInvite = (teamID, push) => async dispatch => {
+export const acceptTeamInvite = (teamID, push) => async (dispatch, getState) => {
   try {
     const res = await axios.put(`/team/invites/${teamID}`);
     const { token, team } = res.data;
-    setToken(token);
     team.isAdmin = false;
+    const state = getState();
+    const { email, fullName, avatar } = state.user;
+    const member = { email, fullName, avatar, isAdmin: false };
+    setToken(token);
+
     dispatch({ type: actionTypes.JOIN_TEAM, team });
-    push('/team/' + team.url);
+    // manually connect socket and once joined send update to other members
+    initTeamSocket(teamID);
+    const socket = connectAndGetTeamSocket();
+    socket.on('joined', () => {
+      // remove listener once joined
+      socket.off('joined');
+      sendTeamUpdate('post/team/newMember', { member });
+    });
+    // automatically send user to the board
+    push(`/team/${team.url}`);
   } catch (err) {
     const errMsg = err?.response?.data?.msg || 'There was an error while joining the team.';
     dispatch(addNotif(errMsg));

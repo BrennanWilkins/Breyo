@@ -4,7 +4,8 @@ import * as actionTypes from '../store/actions/actionTypes';
 const socketMap = {
   'put/team/logo': actionTypes.CHANGE_TEAM_LOGO,
   'delete/team/logo': actionTypes.REMOVE_TEAM_LOGO,
-  'delete/team': actionTypes.DELETE_TEAM
+  'delete/team': actionTypes.DELETE_TEAM,
+  'post/team/newMember': actionTypes.ADD_TEAM_MEMBER
 };
 
 export default socketMap;
