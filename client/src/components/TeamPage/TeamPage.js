@@ -8,12 +8,18 @@ import { getActiveTeam } from '../../store/actions';
 import TeamBoards from './TeamBoards/TeamBoards';
 import TeamMembers from './TeamMembers/TeamMembers';
 import TeamSettings from './TeamSettings/TeamSettings';
+import { closeTeamSocket } from '../../socket/socket';
 
 const TeamPage = props => {
   const [mode, setMode] = useState('boards');
 
   useEffect(() => {
     props.getActiveTeam(props.match.params.url, props.history.push);
+
+    return () => {
+      // close team socket connection on navigating away
+      closeTeamSocket();
+    };
   }, [props.match.params.url]);
 
   useEffect(() => {

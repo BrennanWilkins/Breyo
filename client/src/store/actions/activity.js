@@ -1,18 +1,18 @@
 import * as actionTypes from './actionTypes';
 import { instance as axios } from '../../axios';
 import { addNotif } from './notifications';
-import { sendUpdate } from './socket';
+import { sendBoardUpdate } from '../../socket/socket';
 import store from '../../store';
 
 export const addRecentActivity = newActivity => {
   store.dispatch({ type: actionTypes.ADD_RECENT_ACTIVITY, newActivity });
-  sendUpdate('post/activity', { newActivity });
+  sendBoardUpdate('post/activity', { newActivity });
 };
 
 export const addRecentActivities = activities => {
   for (let newActivity of activities) {
     store.dispatch({ type: actionTypes.ADD_RECENT_ACTIVITY, newActivity });
-    sendUpdate('post/activity', { newActivity });
+    sendBoardUpdate('post/activity', { newActivity });
   }
 };
 
@@ -53,7 +53,7 @@ export const deleteBoardActivity = () => async (dispatch, getState) => {
     const boardID = getState().board.boardID;
     await axios.delete(`/activity/${boardID}`);
     dispatch({ type: actionTypes.DELETE_BOARD_ACTIVITY });
-    sendUpdate('delete/activity');
+    sendBoardUpdate('delete/activity');
   } catch (err) {
     const errMsg = err?.response?.status === 403 ? `You must be an admin to delete the board's activity history` :
      `There was an error while deleting the board's activity history.`;

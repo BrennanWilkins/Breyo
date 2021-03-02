@@ -1,7 +1,7 @@
 import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
 import { addNotif, serverErr } from './notifications';
-import { sendUpdate } from './socket';
+import { sendBoardUpdate } from '../../socket/socket';
 import { addRecentActivity } from './activity';
 
 export const getCardState = getState => {
@@ -16,7 +16,7 @@ export const addCard = (title, listID) => async (dispatch, getState) => {
     const res = await axios.post('/card', { title, boardID, listID });
     const payload = { title, listID, cardID: res.data.cardID };
     dispatch({ type: actionTypes.ADD_CARD, ...payload });
-    sendUpdate('post/card', payload);
+    sendBoardUpdate('post/card', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -61,7 +61,7 @@ export const updateCardTitle = title => async (dispatch, getState) => {
     const payload = { title, cardID, listID };
     dispatch({ type: actionTypes.UPDATE_CARD_TITLE, ...payload });
     const res = await axios.put('/card/title', { ...payload, boardID });
-    sendUpdate('put/card/title', payload);
+    sendBoardUpdate('put/card/title', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -74,7 +74,7 @@ export const updateCardDesc = desc => async (dispatch, getState) => {
     const payload = { desc, cardID, listID };
     dispatch({ type: actionTypes.UPDATE_CARD_DESC, ...payload });
     await axios.put('/card/desc', { ...payload, boardID });
-    sendUpdate('put/card/desc', payload);
+    sendBoardUpdate('put/card/desc', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -86,7 +86,7 @@ export const addCardLabel = color => async (dispatch, getState) => {
     const payload = { color, cardID, listID };
     dispatch({ type: actionTypes.ADD_CARD_LABEL, ...payload });
     await axios.post('/card/label', { ...payload, boardID });
-    sendUpdate('post/card/label', payload);
+    sendBoardUpdate('post/card/label', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -98,7 +98,7 @@ export const removeCardLabel = color => async (dispatch, getState) => {
     const payload = { color, cardID, listID };
     dispatch({ type: actionTypes.REMOVE_CARD_LABEL, ...payload });
     await axios.put('/card/label/remove', { ...payload, boardID });
-    sendUpdate('put/card/label/remove', payload);
+    sendBoardUpdate('put/card/label/remove', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -111,11 +111,11 @@ export const changeRoadmapLabel = color => async (dispatch, getState) => {
       const payload = { color, cardID, listID };
       dispatch({ type: actionTypes.ADD_ROADMAP_LABEL, ...payload });
       await axios.post('/card/roadmapLabel', { ...payload, boardID });
-      sendUpdate('post/card/roadmapLabel', payload);
+      sendBoardUpdate('post/card/roadmapLabel', payload);
     } else {
       dispatch({ type: actionTypes.REMOVE_ROADMAP_LABEL, cardID, listID });
       await axios.delete(`/card/roadmapLabel/${cardID}/${listID}/${boardID}`);
-      sendUpdate('delete/card/roadmapLabel', { cardID, listID });
+      sendBoardUpdate('delete/card/roadmapLabel', { cardID, listID });
     }
   } catch (err) {
     dispatch(serverErr());
@@ -127,7 +127,7 @@ export const toggleDueDateIsComplete = () => async (dispatch, getState) => {
     const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.TOGGLE_DUE_DATE, cardID, listID });
     const res = await axios.put('/card/dueDate/isComplete', { cardID, listID, boardID });
-    sendUpdate('put/card/dueDate/isComplete', { cardID, listID });
+    sendBoardUpdate('put/card/dueDate/isComplete', { cardID, listID });
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -140,7 +140,7 @@ export const addDueDate = (startDate, dueDate) => async (dispatch, getState) => 
     const payload = { startDate, dueDate, cardID, listID };
     dispatch({ type: actionTypes.ADD_DUE_DATE, ...payload });
     const res = await axios.post('/card/dueDate', { ...payload, boardID });
-    sendUpdate('post/card/dueDate', payload);
+    sendBoardUpdate('post/card/dueDate', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -152,7 +152,7 @@ export const removeDueDate = () => async (dispatch, getState) => {
     const { boardID, listID, cardID } = getCardState(getState);
     dispatch({ type: actionTypes.REMOVE_DUE_DATE, cardID, listID });
     const res = await axios.delete(`/card/dueDate/${cardID}/${listID}/${boardID}`);
-    sendUpdate('delete/card/dueDate', { cardID, listID });
+    sendBoardUpdate('delete/card/dueDate', { cardID, listID });
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -165,7 +165,7 @@ export const addChecklist = title => async (dispatch, getState) => {
     const res = await axios.post('/card/checklist', { title, cardID, listID, boardID });
     const payload = { title, checklistID: res.data.checklistID, cardID, listID };
     dispatch({ type: actionTypes.ADD_CHECKLIST, ...payload });
-    sendUpdate('post/card/checklist', payload);
+    sendBoardUpdate('post/card/checklist', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(addNotif('Your checklist could not be created.'));
@@ -178,7 +178,7 @@ export const deleteChecklist = checklistID => async (dispatch, getState) => {
     const payload = { checklistID, cardID, listID };
     const res = await axios.delete(`/card/checklist/${checklistID}/${cardID}/${listID}/${boardID}`);
     dispatch({ type: actionTypes.DELETE_CHECKLIST, ...payload });
-    sendUpdate('delete/card/checklist', payload);
+    sendBoardUpdate('delete/card/checklist', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -191,7 +191,7 @@ export const editChecklistTitle = (title, checklistID) => async (dispatch, getSt
     const payload = { title, checklistID, cardID, listID };
     dispatch({ type: actionTypes.EDIT_CHECKLIST_TITLE, ...payload });
     const res = await axios.put('/card/checklist/title', { ...payload, boardID });
-    sendUpdate('put/card/checklist/title', payload);
+    sendBoardUpdate('put/card/checklist/title', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -204,7 +204,7 @@ export const addChecklistItem = (title, checklistID) => async (dispatch, getStat
     const res = await axios.post('/card/checklist/item', { title, checklistID, cardID, listID, boardID });
     const payload = { title, itemID: res.data.itemID, checklistID, cardID, listID };
     dispatch({ type: actionTypes.ADD_CHECKLIST_ITEM, ...payload });
-    sendUpdate('post/card/checklist/item', payload);
+    sendBoardUpdate('post/card/checklist/item', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -216,7 +216,7 @@ export const toggleChecklistItemIsComplete = (itemID, checklistID) => async (dis
     const payload = { itemID, checklistID, cardID, listID };
     dispatch({ type: actionTypes.TOGGLE_CHECKLIST_ITEM, ...payload });
     const res = await axios.put('/card/checklist/item/isComplete', { ...payload, boardID });
-    sendUpdate('put/card/checklist/item/isComplete', payload);
+    sendBoardUpdate('put/card/checklist/item/isComplete', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -229,7 +229,7 @@ export const editChecklistItem = (title, itemID, checklistID) => async (dispatch
     const payload = { title, itemID, checklistID, cardID, listID };
     dispatch({ type: actionTypes.EDIT_CHECKLIST_ITEM, ...payload });
     await axios.put('/card/checklist/item/title', { ...payload, boardID });
-    sendUpdate('put/card/checklist/item/title', payload);
+    sendBoardUpdate('put/card/checklist/item/title', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -241,7 +241,7 @@ export const deleteChecklistItem = (itemID, checklistID) => async (dispatch, get
     const payload = { itemID, checklistID, cardID, listID };
     await axios.put('/card/checklist/item/delete', { ...payload, boardID });
     dispatch({ type: actionTypes.DELETE_CHECKLIST_ITEM, ...payload });
-    sendUpdate('put/card/checklist/item/delete', payload);
+    sendBoardUpdate('put/card/checklist/item/delete', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -253,7 +253,7 @@ export const copyCard = (title, keepChecklists, keepLabels, destListID, destInde
     const res = await axios.post('/card/copy', { title, keepChecklists, keepLabels, cardID, sourceListID: listID, destListID, destIndex, boardID });
     const payload = { card: res.data.card, sourceListID: listID, destListID, destIndex };
     dispatch({ type: actionTypes.COPY_CARD, ...payload });
-    sendUpdate('post/card/copy', payload);
+    sendBoardUpdate('post/card/copy', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(addNotif('There was an error while copying the card.'));
@@ -265,7 +265,7 @@ export const archiveCard = () => async (dispatch, getState) => {
     const { boardID, listID, cardID } = getCardState(getState);
     const res = await axios.post('/card/archive', { cardID, listID, boardID });
     dispatch({ type: actionTypes.ARCHIVE_CARD, cardID, listID });
-    sendUpdate('post/card/archive', { cardID, listID });
+    sendBoardUpdate('post/card/archive', { cardID, listID });
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -281,7 +281,7 @@ export const recoverCard = (cardID, listID, boardID) => async dispatch => {
       dispatch({ type: actionTypes.ARCHIVE_CARD, ...payload });
       throw err;
     });
-    sendUpdate('put/card/archive/recover', payload);
+    sendBoardUpdate('put/card/archive/recover', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -294,8 +294,8 @@ export const deleteCard = (cardID, listID, boardID) => async dispatch => {
     const res = await axios.delete(`/card/archive/${cardID}/${listID}/${boardID}`);
     const { activity } = res.data;
     dispatch({ type: actionTypes.UPDATE_BOARD_ACTIVITY_DELETE_CARD, activity });
-    sendUpdate('put/activity/board/deleteCard', { activity, cardID });
-    sendUpdate('delete/card/archive', { cardID, listID });
+    sendBoardUpdate('put/activity/board/deleteCard', { activity, cardID });
+    sendBoardUpdate('delete/card/archive', { cardID, listID });
   } catch (err) {
     dispatch(serverErr());
   }
@@ -307,7 +307,7 @@ export const addCardMember = (email, fullName) => async (dispatch, getState) => 
     const payload = { email, fullName, cardID, listID };
     dispatch({ type: actionTypes.ADD_CARD_MEMBER, ...payload });
     const res = await axios.post('/card/members', { email, cardID, listID, boardID });
-    sendUpdate('post/card/members', payload);
+    sendBoardUpdate('post/card/members', payload);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -318,7 +318,7 @@ const removeCardMemberHelper = async (dispatch, email, cardID, listID, boardID) 
   const payload = { email, cardID, listID };
   dispatch({ type: actionTypes.REMOVE_CARD_MEMBER, ...payload });
   const res = await axios.delete(`/card/members/${email}/${cardID}/${listID}/${boardID}`);
-  sendUpdate('delete/card/members', payload);
+  sendBoardUpdate('delete/card/members', payload);
   addRecentActivity(res.data.newActivity);
 };
 
@@ -347,7 +347,7 @@ export const addComment = msg => async (dispatch, getState) => {
     const { commentID, cardTitle, date } = res.data;
     const payload = { msg, commentID, cardID, date, listID, email: state.user.email, fullName: state.user.fullName };
     dispatch({ type: actionTypes.ADD_COMMENT, payload, cardTitle });
-    sendUpdate('post/card/comments', { payload, cardTitle });
+    sendBoardUpdate('post/card/comments', { payload, cardTitle });
   } catch (err) {
     dispatch(serverErr());
   }
@@ -359,7 +359,7 @@ export const updateComment = (msg, commentID) => async (dispatch, getState) => {
     const payload = { msg, commentID, cardID, listID };
     dispatch({ type: actionTypes.UPDATE_COMMENT, ...payload });
     await axios.put('/card/comments', { ...payload, boardID });
-    sendUpdate('put/card/comments', payload);
+    sendBoardUpdate('put/card/comments', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -371,7 +371,7 @@ export const deleteComment = commentID => async (dispatch, getState) => {
     const payload = { commentID, cardID, listID };
     dispatch({ type: actionTypes.DELETE_COMMENT, ...payload });
     await axios.delete(`/card/comments/${commentID}/${cardID}/${listID}/${boardID}`);
-    sendUpdate('delete/card/comments', payload);
+    sendBoardUpdate('delete/card/comments', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -384,7 +384,7 @@ export const toggleCommentLike = commentID => async (dispatch, getState) => {
     const payload = { commentID, cardID, listID, email };
     dispatch({ type: actionTypes.TOGGLE_COMMENT_LIKE, ...payload });
     await axios.put('/card/comments/like', { commentID, cardID, listID, boardID });
-    sendUpdate('put/card/comments/like', payload);
+    sendBoardUpdate('put/card/comments/like', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -397,7 +397,7 @@ export const addCustomField = (fieldType, fieldTitle) => async (dispatch, getSta
     const res = await axios.post('/card/customField', payload);
     payload.fieldID = res.data.fieldID;
     dispatch({ type: actionTypes.ADD_CUSTOM_FIELD, ...payload });
-    sendUpdate('post/card/customField', payload);
+    sendBoardUpdate('post/card/customField', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -409,7 +409,7 @@ export const updateCustomFieldTitle = (fieldID, fieldTitle) => async (dispatch, 
     const payload = { boardID, listID, cardID, fieldID, fieldTitle };
     dispatch({ type: actionTypes.UPDATE_CUSTOM_FIELD_TITLE, ...payload });
     await axios.put('/card/customField/title', payload);
-    sendUpdate('put/card/customField/title', payload);
+    sendBoardUpdate('put/card/customField/title', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -421,7 +421,7 @@ export const updateCustomFieldValue = (fieldID, value) => async (dispatch, getSt
     const payload = { boardID, listID, cardID, fieldID, value };
     dispatch({ type: actionTypes.UPDATE_CUSTOM_FIELD_VALUE, ...payload });
     await axios.put('/card/customField/value', payload);
-    sendUpdate('put/card/customField/value', payload);
+    sendBoardUpdate('put/card/customField/value', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -433,7 +433,7 @@ export const deleteCustomField = fieldID => async (dispatch, getState) => {
     const payload = { listID, cardID, fieldID };
     dispatch({ type: actionTypes.DELETE_CUSTOM_FIELD, ...payload });
     await axios.delete(`/card/customField/${fieldID}/${cardID}/${listID}/${boardID}`);
-    sendUpdate('delete/card/customField', payload);
+    sendBoardUpdate('delete/card/customField', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -447,7 +447,7 @@ export const toggleCardVote = () => async (dispatch, getState) => {
     const payload = { boardID, listID, cardID, email, fullName };
     dispatch({ type: actionTypes.TOGGLE_CARD_VOTE, ...payload });
     await axios.post('/card/vote', { boardID, listID, cardID });
-    sendUpdate('post/card/vote', payload);
+    sendBoardUpdate('post/card/vote', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -459,7 +459,7 @@ export const addCardCustomLabel = labelID => async (dispatch, getState) => {
     const payload = { boardID, listID, cardID, labelID };
     dispatch({ type: actionTypes.ADD_CARD_CUSTOM_LABEL, ...payload });
     await axios.post('/card/customLabel', payload);
-    sendUpdate('post/card/customLabel', payload);
+    sendBoardUpdate('post/card/customLabel', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -471,7 +471,7 @@ export const deleteCardCustomLabel = labelID => async (dispatch, getState) => {
     const payload = { listID, cardID, labelID };
     dispatch({ type: actionTypes.DELETE_CARD_CUSTOM_LABEL, ...payload });
     await axios.delete(`/card/customLabel/${boardID}/${listID}/${cardID}/${labelID}`);
-    sendUpdate('delete/card/customLabel', payload);
+    sendBoardUpdate('delete/card/customLabel', payload);
   } catch (err) {
     dispatch(serverErr());
   }

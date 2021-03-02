@@ -1,6 +1,6 @@
 import { instance as axios } from '../../axios';
 import * as actionTypes from './actionTypes';
-import { sendUpdate } from './socket';
+import { sendBoardUpdate } from '../../socket/socket';
 import { serverErr } from './notifications';
 import { getCardState } from './card';
 
@@ -17,7 +17,7 @@ export const dndHandler = (source, destination, draggableID, boardID) => async (
         dispatch({ type: actionTypes.MOVE_LIST, sourceIndex: destIndex, destIndex: sourceIndex });
         throw err;
       });
-      sendUpdate('put/list/moveList', { sourceIndex, destIndex });
+      sendBoardUpdate('put/list/moveList', { sourceIndex, destIndex });
     } else if (sourceID === targetID) {
       // if cards are currently being filtered, then need to find the true unfiltered sourceIndex for the card
       if (state.lists.cardsAreFiltered) {
@@ -31,7 +31,7 @@ export const dndHandler = (source, destination, draggableID, boardID) => async (
         dispatch({ type: actionTypes.MOVE_CARD_SAME_LIST, sourceIndex: destIndex, destIndex: sourceIndex, listID: sourceID });
         throw err;
       });
-      sendUpdate('put/card/moveCard/sameList', payload);
+      sendBoardUpdate('put/card/moveCard/sameList', payload);
     } else if (sourceID !== targetID) {
       // if cards are currently being filtered, then need to find the true unfiltered sourceIndex for the card
       if (state.lists.cardsAreFiltered) {
@@ -45,7 +45,7 @@ export const dndHandler = (source, destination, draggableID, boardID) => async (
         dispatch({ type: actionTypes.MOVE_CARD_DIFF_LIST, sourceIndex: destIndex, destIndex: sourceIndex, sourceID: targetID, destID: sourceID });
         throw err;
       });
-      sendUpdate('put/card/moveCard/diffList', payload);
+      sendBoardUpdate('put/card/moveCard/diffList', payload);
     }
   } catch (err) { dispatch(serverErr()); }
 };
@@ -57,12 +57,12 @@ export const manualMoveCardHandler = (sourceID, destID, sourceIndex, destIndex) 
       const payload = { sourceIndex, destIndex, listID: sourceID };
       await axios.put('/card/moveCard/sameList', { ...payload, boardID });
       dispatch({ type: actionTypes.MOVE_CARD_SAME_LIST, ...payload });
-      sendUpdate('put/card/moveCard/sameList', payload);
+      sendBoardUpdate('put/card/moveCard/sameList', payload);
     } else {
       await axios.put('/card/moveCard/diffList', { sourceIndex, destIndex, sourceID, targetID: destID, boardID });
       const payload = { sourceIndex, destIndex, sourceID, destID };
       dispatch({ type: actionTypes.MOVE_CARD_DIFF_LIST, ...payload });
-      sendUpdate('put/card/moveCard/diffList', payload);
+      sendBoardUpdate('put/card/moveCard/diffList', payload);
     }
   } catch (err) { dispatch(serverErr()); }
 };
@@ -77,7 +77,7 @@ export const checklistDndHandler = (sourceIndex, destIndex, checklistID) => asyn
       dispatch({ type: actionTypes.MOVE_CHECKLIST_ITEM, sourceIndex: destIndex, destIndex: sourceIndex, checklistID, cardID, listID });
       throw err;
     });
-    sendUpdate('put/card/checklist/moveItem', payload);
+    sendBoardUpdate('put/card/checklist/moveItem', payload);
   } catch (err) { dispatch(serverErr()); }
 };
 
@@ -91,6 +91,6 @@ export const customFieldDndHandler = (sourceIndex, destIndex) => async (dispatch
       dispatch({ type: actionTypes.MOVE_CUSTOM_FIELD, sourceIndex: destIndex, destIndex: sourceIndex, cardID, listID });
       throw err;
     });
-    sendUpdate('put/card/customField/move', payload);
+    sendBoardUpdate('put/card/customField/move', payload);
   } catch (err) { dispatch(serverErr()); }
 };

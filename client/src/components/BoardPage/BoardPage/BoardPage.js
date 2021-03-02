@@ -4,7 +4,7 @@ import classes from './BoardPage.module.css';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import BoardNavBar from '../BoardNavBar/BoardNavBar';
-import { initSocket, connectSocket, closeSocket }  from '../../../store/actions/socket';
+import { initBoardSocket, connectBoardSocket, closeBoardSocket }  from '../../../socket/socket';
 import { instance as axios } from '../../../axios';
 import { addNotif, updateActiveBoard, setCardDetails, setShownMemberActivity,
   setCardDetailsInitial, setShownBoardView } from '../../../store/actions';
@@ -24,12 +24,12 @@ const BoardPage = props => {
 
   useEffect(() => {
     // initalize new socket connection on new board load
-    initSocket(props.match.params.boardID);
-    connectSocket();
+    initBoardSocket(props.match.params.boardID);
+    connectBoardSocket();
 
     return () => {
       // close socket connection on navigating away
-      closeSocket();
+      closeBoardSocket();
     };
   }, [props.match.params.boardID]);
 

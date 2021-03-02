@@ -1,7 +1,7 @@
 import { instance as axios, setToken } from '../../axios';
 import * as actionTypes from './actionTypes';
 import { addNotif, serverErr, permissionErr } from './notifications';
-import { sendUpdate, initSocket, connectAndGetSocket } from './socket';
+import { sendBoardUpdate, initBoardSocket, connectAndGetBoardSocket } from '../../socket/socket';
 import { addRecentActivity } from './activity';
 
 export const createBoard = (title, color) => async dispatch => {
@@ -134,7 +134,7 @@ export const updateBoardTitle = (title, boardID) => async dispatch => {
   try {
     const payload = { title, boardID };
     const res = await axios.put('/board/title', payload);
-    sendUpdate('put/board/title', payload);
+    sendBoardUpdate('put/board/title', payload);
     dispatch({ type: actionTypes.UPDATE_BOARD_TITLE, ...payload });
     addRecentActivity(res.data.newActivity);
   } catch (err) {
@@ -156,7 +156,7 @@ export const addAdmin = (email, boardID) => async dispatch => {
   try {
     const res = await axios.post('/board/admins', { email, boardID });
     dispatch({ type: actionTypes.ADD_ADMIN, email, boardID });
-    sendUpdate('post/board/admins', email);
+    sendBoardUpdate('post/board/admins', email);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(permissionErr(err));
@@ -167,7 +167,7 @@ export const removeAdmin = (email, boardID) => async dispatch => {
   try {
     const res = await axios.delete(`/board/admins/${email}/${boardID}`);
     dispatch({ type: actionTypes.REMOVE_ADMIN, email, boardID });
-    sendUpdate('delete/board/admins', email);
+    sendBoardUpdate('delete/board/admins', email);
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(permissionErr(err));
@@ -182,7 +182,7 @@ export const updateColor = color => async (dispatch, getState) => {
     const payload = { color, boardID };
     dispatch({ type: actionTypes.UPDATE_COLOR, ...payload });
     await axios.put('/board/color', payload);
-    sendUpdate('put/board/color', payload);
+    sendBoardUpdate('put/board/color', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -193,7 +193,7 @@ export const updateBoardDesc = desc => async (dispatch, getState) => {
     const boardID = getState().board.boardID;
     dispatch({ type: actionTypes.UPDATE_BOARD_DESC, desc });
     const res = await axios.put('/board/desc', { desc, boardID });
-    sendUpdate('put/board/desc', { desc });
+    sendBoardUpdate('put/board/desc', { desc });
     addRecentActivity(res.data.newActivity);
   } catch (err) {
     dispatch(serverErr());
@@ -204,7 +204,7 @@ export const deleteBoard = push => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
     await axios.delete('/board/' + boardID);
-    sendUpdate('delete/board', { boardID });
+    sendBoardUpdate('delete/board', { boardID });
     dispatch({ type: actionTypes.DELETE_BOARD, boardID });
     push('/');
   } catch (err) {
@@ -224,13 +224,13 @@ export const acceptInvite = (boardID, push) => async (dispatch, getState) => {
 
     dispatch({ type: actionTypes.JOIN_BOARD, board });
     // manually connect socket and once joined send update to other members
-    initSocket(boardID);
-    const socket = connectAndGetSocket();
+    initBoardSocket(boardID);
+    const socket = connectAndGetBoardSocket();
     socket.on('joined', () => {
       // remove listener once joined
       socket.off('joined');
       addRecentActivity(newActivity);
-      sendUpdate('post/board/newMember', { email, fullName, avatar });
+      sendBoardUpdate('post/board/newMember', { email, fullName, avatar });
     });
     // automatically send user to the board
     push(`/board/${boardID}`);
@@ -259,7 +259,7 @@ export const leaveBoard = push => async (dispatch, getState) => {
     const email = state.user.email;
     const res = await axios.put('/board/leave', { boardID });
     addRecentActivity(res.data.newActivity);
-    sendUpdate('put/board/memberLeft', { email });
+    sendBoardUpdate('put/board/memberLeft', { email });
     dispatch({ type: actionTypes.LEAVE_BOARD, boardID });
     push('/');
   } catch (err) {
@@ -295,7 +295,7 @@ export const createCustomLabel = (color, title) => async (dispatch, getState) =>
     const res = await axios.post('/board/customLabel', payload);
     payload.labelID = res.data.labelID;
     dispatch({ type: actionTypes.CREATE_NEW_CUSTOM_LABEL, ...payload });
-    sendUpdate('post/board/customLabel', payload);
+    sendBoardUpdate('post/board/customLabel', payload);
   } catch (err) {
     dispatch(addNotif('There was an error while creating your label.'));
   }
@@ -306,7 +306,7 @@ export const updateCustomLabel = (labelID, color, title) => async (dispatch, get
     const payload = { boardID: getState().board.boardID, labelID, color, title };
     dispatch({ type: actionTypes.UPDATE_CUSTOM_LABEL, ...payload });
     await axios.put('/board/customLabel', payload);
-    sendUpdate('put/board/customLabel', payload);
+    sendBoardUpdate('put/board/customLabel', payload);
   } catch (err) {
     dispatch(serverErr());
   }
@@ -317,7 +317,7 @@ export const deleteCustomLabel = labelID => async (dispatch, getState) => {
     const boardID = getState().board.boardID;
     dispatch({ type: actionTypes.DELETE_CUSTOM_LABEL, labelID });
     await axios.delete(`/board/customLabel/${boardID}/${labelID}`);
-    sendUpdate('delete/board/customLabel', { labelID });
+    sendBoardUpdate('delete/board/customLabel', { labelID });
   } catch (err) {
     dispatch(serverErr());
   }

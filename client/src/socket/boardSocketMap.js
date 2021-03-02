@@ -1,6 +1,6 @@
-import * as actionTypes from './actionTypes';
+import * as actionTypes from '../store/actions/actionTypes';
 
-// map of socket type to respective actionType
+// map of socket type to respective actionType for board socket
 const socketMap = {
   'put/board/title': actionTypes.UPDATE_BOARD_TITLE,
   'put/board/color': actionTypes.UPDATE_COLOR,
