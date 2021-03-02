@@ -3,7 +3,8 @@ const routes = [
   'put/team/logo',
   'delete/team/logo',
   'delete/team',
-  'post/team/newMember'
+  'post/team/newMember',
+  'put/team/memberLeft'
 ];
 
 module.exports = routes;

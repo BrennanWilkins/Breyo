@@ -22,6 +22,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DEMOTE_TEAM_MEMBER: return toggleTeamAdmin(state, action, false);
     case actionTypes.DEMOTE_SELF_TEAM_MEMBER: return { ...state, userIsAdmin: false };
     case actionTypes.ADD_TEAM_MEMBER: return addTeamMember(state, action);
+    case actionTypes.DELETE_TEAM_MEMBER: return deleteTeamMember(state, action);
     default: return state;
   }
 };
@@ -60,6 +61,11 @@ const toggleTeamAdmin = (state, action, isAdmin) => ({
 const addTeamMember = (state, action) => ({
   ...state,
   members: [...state.members, action.member]
+});
+
+const deleteTeamMember = (state, action) => ({
+  ...state,
+  members: state.members.filter(({ email }) => email !== action.email)
 });
 
 export default reducer;
