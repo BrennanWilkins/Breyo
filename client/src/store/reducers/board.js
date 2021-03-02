@@ -38,6 +38,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SET_SHOWN_ROADMAP_LIST: return { ...state, shownRoadmapListID: action.listID };
     case actionTypes.TOGGLE_CREATE_BOARD: return toggleCreateBoard(state, action);
     case actionTypes.CHANGE_BOARD_TEAM: return changeBoardTeam(state, action);
+    case actionTypes.REMOVE_BOARD_FROM_TEAM: return removeBoardFromTeam(state, action);
     case actionTypes.SET_SHOWN_BOARD_VIEW: return { ...state, shownView: action.view };
     case actionTypes.CREATE_NEW_CUSTOM_LABEL: return createCustomLabel(state, action);
     case actionTypes.UPDATE_CUSTOM_LABEL: return updateCustomLabel(state, action);
@@ -91,6 +92,11 @@ const changeBoardTeam = (state, action) => ({
     title: action.team.title,
     url: !state.team.url ? null : action.team.url
   }
+});
+
+const removeBoardFromTeam = (state, action) => ({
+  ...state,
+  team: { teamID: null, title: '', url: null }
 });
 
 const createCustomLabel = (state, action) => {

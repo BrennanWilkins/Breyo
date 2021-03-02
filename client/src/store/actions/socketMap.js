@@ -65,7 +65,8 @@ const socketMap = {
   'put/board/customLabel': actionTypes.UPDATE_CUSTOM_LABEL,
   'delete/board/customLabel': actionTypes.DELETE_CUSTOM_LABEL,
   'post/card/customLabel': actionTypes.ADD_CARD_CUSTOM_LABEL,
-  'delete/card/customLabel': actionTypes.DELETE_CARD_CUSTOM_LABEL
+  'delete/card/customLabel': actionTypes.DELETE_CARD_CUSTOM_LABEL,
+  'put/board/removeFromTeam': actionTypes.REMOVE_BOARD_FROM_TEAM
 };
 
 export default socketMap;

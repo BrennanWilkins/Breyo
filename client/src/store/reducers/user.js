@@ -41,6 +41,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.UPDATE_USER_TEAMS: return updateUserTeams(state, action);
     case actionTypes.DEMOTE_SELF_TEAM_MEMBER: return demoteSelfTeamMember(state, action);
     case actionTypes.CHANGE_BOARD_TEAM: return changeBoardTeam(state, action);
+    case actionTypes.REMOVE_BOARD_FROM_TEAM: return removeBoardFromTeam(state, action);
     default: return state;
   }
 };
@@ -189,6 +190,14 @@ const changeBoardTeam = (state, action) => ({
   ...state,
   boards: {
     byID: { ...state.boards.byID, [action.boardID]: { ...state.boards.byID[action.boardID], teamID: action.team.teamID } },
+    allIDs: state.boards.allIDs
+  }
+});
+
+const removeBoardFromTeam = (state, action) => ({
+  ...state,
+  boards: {
+    byID: { ...state.boards.byID, [action.boardID]: { ...state.boards.byID[action.boardID], teamID: null } },
     allIDs: state.boards.allIDs
   }
 });

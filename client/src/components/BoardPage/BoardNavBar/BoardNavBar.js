@@ -28,6 +28,11 @@ const BoardNavBar = props => {
     else { setDarkMode(''); }
   }, [props.color]);
 
+  useEffect(() => {
+    if (showAddToTeam) { setShowAddToTeam(false); }
+    if (showBoardTeamModal && !props.team.teamID) { setShowBoardTeamModal(false); }
+  }, [props.team.teamID]);
+
   return (
     <div className={`${classes.NavBar} ${darkMode === 'darker' ? classes.DarkenBtns2 : darkMode === 'dark' ? classes.DarkenBtns : ''}`}
     style={props.menuShown ? {width: 'calc(100% - 350px)'} : null}>

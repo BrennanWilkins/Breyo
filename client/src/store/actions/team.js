@@ -119,11 +119,11 @@ export const changeBoardTeam = (oldTeamID, newTeamID) => async (dispatch, getSta
     const boardID = state.board.boardID;
     await axios.put('/board/changeTeam', { boardID, teamID: oldTeamID, newTeamID });
     const team = state.user.teams.byID[newTeamID];
-    dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team });
-    sendUpdate('put/board/changeTeam', { team });
+    dispatch({ type: actionTypes.CHANGE_BOARD_TEAM, team, boardID });
+    sendUpdate('put/board/changeTeam', { team, boardID });
   } catch (err) {
     const errMsg = err?.response?.status === 403 ? 'You must be an admin of this board to change its team' :
-    'There was an error while moving the board.';
+    (err?.response?.data?.msg || 'There was an error while moving the board.');
     dispatch(addNotif(errMsg));
   }
 };
@@ -139,6 +139,21 @@ export const addToTeam = teamID => async (dispatch, getState) => {
   } catch (err) {
     const errMsg = err?.response?.status === 403 ? 'You must be an admin of this board to add it to a team.' :
     'There was an error while adding the board to the team.';
+    dispatch(addNotif(errMsg));
+  }
+};
+
+export const removeBoardFromTeam = () => async (dispatch, getState) => {
+  try {
+    const state = getState();
+    const boardID = state.board.boardID;
+    const teamID = state.board.team.teamID;
+    await axios.put(`/board/removeFromTeam/${teamID}`, { boardID });
+    dispatch({ type: actionTypes.REMOVE_BOARD_FROM_TEAM, boardID });
+    sendUpdate('put/board/removeFromTeam', { boardID });
+  } catch (err) {
+    const errMsg = err?.response?.status === 403 ? 'You must be an admin of both the board and its team to remove it from its team.' :
+    (err?.response?.data?.msg || 'There was an error while removing the board from its team.');
     dispatch(addNotif(errMsg));
   }
 };
