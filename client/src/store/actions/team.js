@@ -75,9 +75,11 @@ export const deleteTeam = push => async (dispatch, getState) => {
     const teamID = getState().team.teamID;
     await axios.delete('/team/' + teamID);
     dispatch({ type: actionTypes.DELETE_TEAM, teamID });
+    sendTeamUpdate('delete/team', { teamID });
     push('/');
   } catch (err) {
-    dispatch(addNotif('There was an error while deleting your team.'));
+    dispatch(addNotif(err?.response?.status === 403 ? 'You must be an admin of the team to delete it.' :
+    'There was an error while deleting your team.'));
   }
 };
 

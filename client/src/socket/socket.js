@@ -11,29 +11,29 @@ let boardSocket = null;
 
 export const initBoardSocket = boardID => {
   if (boardSocket) { return; }
-  const newSocket = io(baseURL + '/boards', {
+  const newBoardSocket = io(baseURL + '/boards', {
     query: { token: axios.defaults.headers.common['x-auth-token'] }
   });
 
-  newSocket.on('connect', () => {
-    newSocket.emit('join', boardID);
+  newBoardSocket.on('connect', () => {
+    newBoardSocket.emit('join', boardID);
   });
 
-  newSocket.on('connect_error', error => {
+  newBoardSocket.on('connect_error', error => {
     if (error.message === 'Unauthorized') {
-      newSocket.close();
+      newBoardSocket.close();
     }
   });
 
-  newSocket.on('disconnect', reason => {
+  newBoardSocket.on('disconnect', reason => {
     if (reason === 'io server disconnect') {
       store.dispatch(addNotif('Connection to server lost, attempting to re-establish...'));
-      newSocket.connect();
+      newBoardSocket.connect();
     }
   });
 
   // manually handle this route to check if user needs new jwt token
-  newSocket.on('post/board/admins', async data => {
+  newBoardSocket.on('post/board/admins', async data => {
     try {
       const email = JSON.parse(data);
       store.dispatch({ type: actionTypes.ADD_ADMIN, email });
@@ -49,7 +49,7 @@ export const initBoardSocket = boardID => {
   });
 
   // manually handle this route to check if user needs new jwt token
-  newSocket.on('delete/board/admins', async data => {
+  newBoardSocket.on('delete/board/admins', async data => {
     try {
       const email = JSON.parse(data);
       store.dispatch({ type: actionTypes.REMOVE_ADMIN, email });
@@ -64,19 +64,19 @@ export const initBoardSocket = boardID => {
     } catch (err) { store.dispatch(serverErr()); }
   });
 
-  newSocket.on('delete/board', () => {
-    window.location.replace('/');
+  newBoardSocket.on('delete/board', () => {
     store.dispatch(addNotif('This board has been deleted.'));
+    window.location.replace('/');
   });
 
   for (let route in boardSocketMap) {
-    newSocket.on(route, data => {
+    newBoardSocket.on(route, data => {
       const payload = JSON.parse(data);
       store.dispatch({ type: boardSocketMap[route], ...payload });
     });
   }
 
-  boardSocket = newSocket;
+  boardSocket = newBoardSocket;
 };
 
 export const sendBoardUpdate = (type, data) => {
@@ -104,28 +104,28 @@ let teamSocket = null;
 
 export const initTeamSocket = teamID => {
   if (teamSocket) { return; }
-  const newSocket = io(baseURL + '/teams', {
+  const newTeamSocket = io(baseURL + '/teams', {
     query: { token: axios.defaults.headers.common['x-auth-token'] }
   });
 
-  newSocket.on('connect', () => {
-    newSocket.emit('join', teamID);
+  newTeamSocket.on('connect', () => {
+    newTeamSocket.emit('join', teamID);
   });
 
-  newSocket.on('connect_error', error => {
+  newTeamSocket.on('connect_error', error => {
     if (error.message === 'Unauthorized') {
-      newSocket.close();
+      newTeamSocket.close();
     }
   });
 
-  newSocket.on('disconnect', reason => {
+  newTeamSocket.on('disconnect', reason => {
     if (reason === 'io server disconnect') {
       store.dispatch(addNotif('Connection to server lost, attempting to re-establish...'));
-      newSocket.connect();
+      newTeamSocket.connect();
     }
   });
 
-  newSocket.on('put/team/info', data => {
+  newTeamSocket.on('put/team/info', data => {
     const { payload } = JSON.parse(data);
 
     // if team page url has changed then reload page with new url
@@ -135,14 +135,19 @@ export const initTeamSocket = teamID => {
     store.dispatch({ type: actionTypes.EDIT_TEAM, payload });
   });
 
+  newTeamSocket.on('delete/team', () => {
+    store.dispatch(addNotif('This team has been deleted.'));
+    window.location.replace('/');
+  });
+
   for (let route in teamSocketMap) {
-    newSocket.on(route, data => {
+    newTeamSocket.on(route, data => {
       const payload = JSON.parse(data);
       store.dispatch({ type: teamSocketMap[route], ...payload });
     });
   }
 
-  teamSocket = newSocket;
+  teamSocket = newTeamSocket;
 };
 
 export const sendTeamUpdate = (type, data) => {

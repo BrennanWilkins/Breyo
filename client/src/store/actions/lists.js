@@ -133,8 +133,8 @@ export const setListLimit = (listID, limit) => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
     const payload = { boardID, listID, limit };
-    const res = await axios.put('/list/limit', payload);
     dispatch({ type: actionTypes.SET_LIST_LIMIT, ...payload });
+    const res = await axios.put('/list/limit', payload);
     addRecentActivity(res.data.newActivity);
     sendBoardUpdate('put/list/limit', payload);
   } catch (err) {
@@ -145,8 +145,8 @@ export const setListLimit = (listID, limit) => async (dispatch, getState) => {
 export const removeListLimit = listID => async (dispatch, getState) => {
   try {
     const boardID = getState().board.boardID;
-    const res = await axios.delete(`/list/limit/${boardID}/${listID}`);
     dispatch({ type: actionTypes.REMOVE_LIST_LIMIT, listID });
+    const res = await axios.delete(`/list/limit/${boardID}/${listID}`);
     addRecentActivity(res.data.newActivity);
     sendBoardUpdate('delete/list/limit', { listID });
   } catch (err) {

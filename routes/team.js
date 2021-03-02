@@ -156,7 +156,7 @@ router.delete('/:teamID',
       const teamID = req.params.teamID;
       const team = await Team.findById(teamID);
       if (!team) { throw 'Team data not found'; }
-      if (!team.admins.includes(req.userID)) { throw 'User must be admin'; }
+      if (!team.admins.includes(req.userID)) { return res.sendStatus(403); }
 
       await Promise.all([
         team.remove(),
