@@ -131,7 +131,7 @@ router.put('/info/:teamID',
 
       // only check url if its different
       if (url !== '' && url !== team.url) {
-        const urlIsValid = validateURL(url);
+        const urlIsValid = await validateURL(url);
         if (urlIsValid !== '') { return res.status(400).json({ msg: urlIsValid }); }
       }
 

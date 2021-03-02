@@ -6,8 +6,10 @@ import { checkURL } from '../../../utils/teamValidation';
 import { instance as axios } from '../../../axios';
 import { connect } from 'react-redux';
 import { editTeam } from '../../../store/actions';
+import { useHistory } from 'react-router';
 
 const EditTeam = props => {
+  const history = useHistory();
   const [title, setTitle] = useState(props.title);
   const [desc, setDesc] = useState(props.desc);
   const [url, setUrl] = useState(props.url);
@@ -23,7 +25,7 @@ const EditTeam = props => {
       if (urlIsInvalid) { return setUrlErrMsg(urlIsInvalid); }
       axios.get('/team/checkURL/' + url).then(res => {
         if (res.data.isTaken) { setUrlErrMsg('That URL is already taken.'); }
-      });
+      }).catch(err => setUrlErrMsg('There was an error while checking if that URL is taken.'));
     }, 1000);
 
     return () => clearTimeout(timer);
@@ -42,6 +44,8 @@ const EditTeam = props => {
       await axios.put(`/team/info/${props.teamID}`, { title, desc, url });
       const payload = { title, desc, url, teamID: props.teamID };
       props.editTeam(payload);
+      // if url changed then reload team page w new url
+      if (url !== props.url) { history.replace(`/team/${url}${history.location.search}`); }
       props.close();
     } catch (err) {
       setLoading(false);
