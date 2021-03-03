@@ -13,7 +13,6 @@ const initialState = {
   shownRoadmapListID: null,
   showCreateBoard: false,
   createBoardTeamID: null,
-  createBoardTeamTitle: null,
   avatars: {},
   customLabels: { allIDs: [], byID: {} },
   team: { teamID: null, title: '', url: null }
@@ -37,6 +36,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.LOGOUT: return { ...initialState };
     case actionTypes.SET_SHOWN_ROADMAP_LIST: return { ...state, shownRoadmapListID: action.listID };
     case actionTypes.TOGGLE_CREATE_BOARD: return toggleCreateBoard(state, action);
+    case actionTypes.SET_CREATE_BOARD_TEAM: return setCreateBoardTeam(state, action);
     case actionTypes.CHANGE_BOARD_TEAM: return changeBoardTeam(state, action);
     case actionTypes.REMOVE_BOARD_FROM_TEAM: return removeBoardFromTeam(state, action);
     case actionTypes.SET_SHOWN_BOARD_VIEW: return { ...state, shownView: action.view };
@@ -81,8 +81,12 @@ const deleteBoardMember = (state, action) => ({
 const toggleCreateBoard = (state, action) => ({
   ...state,
   createBoardTeamID: action.teamID || null,
-  createBoardTeamTitle: action.teamTitle || null,
   showCreateBoard: !state.showCreateBoard
+});
+
+const setCreateBoardTeam = (state, action) => ({
+  ...state,
+  createBoardTeamID: action.teamID || null,
 });
 
 const changeBoardTeam = (state, action) => ({

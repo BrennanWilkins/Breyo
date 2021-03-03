@@ -1,7 +1,7 @@
 .Container {
   width: 300px;
   top: 0;
-  left: 265px;
+  left: 310px;
   background: rgb(252,252,252);
   padding: 5px;
   max-height: calc(100vh - 70px);
@@ -69,7 +69,7 @@
 .Option:hover .HideOverlay {
   opacity: 1;
 }
-@media (max-width: 740px) {
+@media (max-width: 795px) {
   .Container {
     left: 0;
   }

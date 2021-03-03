@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import classes from './CreateBoard.module.css';
 import { useModalToggle } from '../../../utils/customHooks';
 import Button, { CloseBtn } from '../../UI/Buttons/Buttons';
-import { checkIcon, dotsIcon, teamIcon, personIcon } from '../../UI/icons';
+import { checkIcon, dotsIcon, teamIcon, personIcon, chevronIcon } from '../../UI/icons';
 import { connect } from 'react-redux';
-import { createBoard, createTeamBoard } from '../../../store/actions';
+import { createBoard, createTeamBoard, changeCreateBoardTeam } from '../../../store/actions';
 import { COLORS, PHOTO_IDS, getPhotoURL } from '../../../utils/backgrounds';
 import BackgroundModal from './BackgroundModal/BackgroundModal';
 
@@ -14,8 +14,11 @@ const CreateBoard = props => {
   const [boardBackground, setBoardBackground] = useState(COLORS[0]);
   const [options, setOptions] = useState([]);
   const [showMore, setShowMore] = useState(false);
+  const [showTeamSelect, setShowTeamSelect] = useState(false);
   const modalRef = useRef();
+  const selectRef = useRef();
   useModalToggle(props.show && !showMore, modalRef, props.close);
+  useModalToggle(showTeamSelect, selectRef, () => setShowTeamSelect(false));
 
   useEffect(() => {
     if (props.show) {
@@ -43,17 +46,43 @@ const CreateBoard = props => {
     setBoardBackground(option);
   };
 
+  const showTeamSelectHandler = () => {
+    if (!props.teams.allIDs.length) { return; }
+    setShowTeamSelect(true);
+  };
+
+  const selectTeamHandler = teamID => {
+    props.changeCreateBoardTeam(teamID);
+    setShowTeamSelect(false);
+  };
+
   return (
     <div className={props.show ? classes.ShowModal : classes.HideModal} ref={modalRef}>
       <div className={classes.ModalContainer}>
-        <div className={classes.ModalLeft} style={boardBackground[0] === '#' ? { background: boardBackground } :
-        { backgroundImage: getPhotoURL(boardBackground, 250) }}>
-          <div className={classes.InputDiv}>
-            <input className={classes.Input} value={boardTitle}
-            onChange={e => setBoardTitle(e.target.value)} placeholder="Board title" />
-            <CloseBtn close={props.close} color="white" />
+        <div className={classes.ModalLeft}
+        style={boardBackground[0] === '#' ? { background: boardBackground } : { backgroundImage: getPhotoURL(boardBackground, 250) }}>
+          <input className={classes.Input} value={boardTitle}
+          onChange={e => setBoardTitle(e.target.value)} placeholder="Board title" />
+          <CloseBtn className={classes.CloseBtn} close={props.close} color="white" />
+          <div className={classes.BoardTeam} onClick={showTeamSelectHandler}>
+            <div className={classes.TeamIcon}>{props.teamID ? teamIcon : personIcon}</div>
+            <div className={classes.TeamTitle}>{props.teamID ? props.teams.byID[props.teamID].title : 'Personal'}</div>
+            {props.teams.allIDs.length ? <div className={classes.Chevron}>{chevronIcon}</div> : null}
           </div>
-          <div className={classes.BoardTeam}>{props.teamID ? teamIcon : personIcon}<div>{props.teamTitle || 'Personal'}</div></div>
+          {showTeamSelect &&
+            <div className={classes.TeamSelect} ref={selectRef}>
+              {props.teams.allIDs.map(teamID => (
+                <div className={classes.SelectOption} key={teamID} onClick={() => selectTeamHandler(teamID)}>
+                  <div>{props.teams.byID[teamID].title}</div>
+                  {props.teamID === teamID && checkIcon}
+                </div>
+              ))}
+              <div className={classes.SelectOption} onClick={() => selectTeamHandler(null)}>
+                <div>Personal (no team)</div>
+                {!props.teamID && checkIcon}
+              </div>
+            </div>
+          }
         </div>
         <div className={classes.BackgroundSelect}>
           {options.map(option => (
@@ -81,17 +110,20 @@ CreateBoard.propTypes = {
   createBoard: PropTypes.func.isRequired,
   teamID: PropTypes.string,
   teamTitle: PropTypes.string,
-  createTeamBoard: PropTypes.func.isRequired
+  createTeamBoard: PropTypes.func.isRequired,
+  teams: PropTypes.object.isRequired,
+  changeCreateBoardTeam: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
   teamID: state.board.createBoardTeamID,
-  teamTitle: state.board.createBoardTeamTitle
+  teams: state.user.teams
 });
 
 const mapDispatchToProps = dispatch => ({
   createBoard: (title, color) => dispatch(createBoard(title, color)),
-  createTeamBoard: (title, color, teamID) => dispatch(createTeamBoard(title, color, teamID))
+  createTeamBoard: (title, color, teamID) => dispatch(createTeamBoard(title, color, teamID)),
+  changeCreateBoardTeam: teamID => dispatch(changeCreateBoardTeam(teamID))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateBoard);

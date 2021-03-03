@@ -3,7 +3,7 @@ export { createBoard, toggleIsStarred, updateActiveBoard, updateBoardTitle, send
 addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc, deleteBoard, acceptInvite,
 rejectInvite, leaveBoard, openRoadmap, setShownRoadmapList, setShownBoardView, openRoadmapList,
 toggleCreateBoard, openCreateTeamBoard, createTeamBoard, createCustomLabel, updateCustomLabel,
-deleteCustomLabel } from './board';
+deleteCustomLabel, changeCreateBoardTeam } from './board';
 export { addNotif, deleteNotif } from './notifications';
 export { updateListTitle, addList, copyList, archiveList, recoverList, deleteList,
 archiveAllCards, moveAllCards, toggleVoting, setListLimit, removeListLimit, sortList,

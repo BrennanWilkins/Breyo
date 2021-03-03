@@ -32,7 +32,7 @@ const BoardList = props => {
       {props.createPersonal && <div className={classes.CreateBoard} onClick={props.toggleCreateBoard}>
         <div className={classes.CreateText}>Create a new board</div>
       </div>}
-      {props.teamID && <div className={classes.CreateBoard} onClick={() => props.openCreateTeamBoard(props.teamID, props.teamTitle)}>
+      {props.teamID && <div className={classes.CreateBoard} onClick={() => props.openCreateTeamBoard(props.teamID)}>
         <div className={classes.CreateText}>Create a new board</div>
       </div>}
     </div>
@@ -52,7 +52,7 @@ BoardList.propTypes = {
 const mapDispatchToProps = dispatch => ({
   toggleIsStarred: boardID => dispatch(toggleIsStarred(boardID)),
   toggleCreateBoard: () => dispatch(toggleCreateBoard()),
-  openCreateTeamBoard: (teamID, teamTitle) => dispatch(openCreateTeamBoard(teamID, teamTitle))
+  openCreateTeamBoard: teamID => dispatch(openCreateTeamBoard(teamID))
 });
 
 export default connect(null, mapDispatchToProps)(BoardList);

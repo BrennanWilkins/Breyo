@@ -23,4 +23,10 @@
   top: 0;
   left: 0;
   background: rgba(0,0,0,0.5);
+  opacity: 0;
+  animation: fadeIn 150ms forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

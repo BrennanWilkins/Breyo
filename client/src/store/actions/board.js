@@ -291,7 +291,9 @@ export const setShownRoadmapList = listID => ({ type: actionTypes.SET_SHOWN_ROAD
 
 export const toggleCreateBoard = () => ({ type: actionTypes.TOGGLE_CREATE_BOARD });
 
-export const openCreateTeamBoard = (teamID, teamTitle) => ({ type: actionTypes.TOGGLE_CREATE_BOARD, open: true, teamID, teamTitle });
+export const openCreateTeamBoard = teamID => ({ type: actionTypes.TOGGLE_CREATE_BOARD, teamID });
+
+export const changeCreateBoardTeam = teamID => ({ type: actionTypes.SET_CREATE_BOARD_TEAM, teamID });
 
 export const createCustomLabel = (color, title) => async (dispatch, getState) => {
   try {

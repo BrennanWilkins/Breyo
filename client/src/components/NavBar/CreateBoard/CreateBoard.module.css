@@ -1,8 +1,8 @@
 .ShowModal, .HideModal {
   position: fixed;
   top: 60px;
-  width: 400px;
-  left: calc(50% - 200px);
+  width: 450px;
+  left: calc(50% - 225px);
   z-index: 2;
   transition: 300ms;
 }
@@ -21,8 +21,8 @@
   font-weight: bold;
   color: white;
   font-size: 16px;
-  width: 190px;
-  margin: 5px;
+  width: 240px;
+  margin: 10px;
 }
 .Input:focus, .Input:hover {
   background: rgb(255,255,255,0.5);
@@ -30,25 +30,29 @@
 .Input::placeholder {
   color: rgb(255,255,255,0.7);
 }
+.CloseBtn {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.CloseBtn svg {
+  width: 22px;
+  height: 22px;
+}
 .ModalContainer {
   display: flex;
   justify-content: center;
   align-items: flex-start;
 }
 .ModalLeft {
-  width: 250px;
+  width: 300px;
   height: 115px;
   border-radius: 4px;
   background-size: cover;
-}
-.InputDiv {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 5px;
+  position: relative;
 }
 .BackgroundSelect {
-  width: 150px;
+  width: 130px;
   height: 120px;
   display: flex;
   justify-content: center;
@@ -86,18 +90,18 @@
 }
 .ConfirmBtn {
   margin-top: 5px;
+  padding-left: 5px;
 }
 .ConfirmBtn button {
   background: rgb(57,167,50);
   padding: 15px;
-  margin-left: 0;
 }
 .ConfirmBtn button:hover, .ConfirmBtn button:active {
   background: rgb(var(--green));
 }
 .ConfirmBtn button:disabled {
   cursor: default;
-  background: rgb(106,106,106);
+  background: rgb(113,113,113);
 }
 .ShowMore {
   background: rgb(240,240,240);
@@ -116,27 +120,86 @@
   display: inline-flex;
   align-items: center;
   margin: 0 15px 0 10px;
-  font-size: 15px;
-  padding: 4px 7px 4px 4px;
+  font-size: 14.5px;
+  padding: 4px 6px;
   cursor: pointer;
   transition: background 250ms;
   min-width: 0;
 }
-.BoardTeam div {
+.TeamTitle {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 190px;
+  max-width: 225px;
 }
 .BoardTeam:hover {
   background: rgb(255,255,255,0.4);
 }
-.BoardTeam svg {
+.TeamIcon, .Chevron {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.TeamIcon svg {
   margin-right: 4px;
   font-size: 16px;
   min-width: 16px;
 }
-@media (max-width: 405px) {
+.Chevron svg {
+  margin-left: 5px;
+  font-size: 13px;
+  min-width: 13px;
+}
+.TeamSelect {
+  position: absolute;
+  top: 75px;
+  left: 10px;
+  width: 250px;
+  border-radius: 4px;
+  background: rgb(252,252,252);
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-size: 14.5px;
+  padding: 8px 0;
+  box-sizing: border-box;
+  max-height: min(calc(100vh - 140px), 350px);
+  z-index: 2;
+}
+.TeamSelect::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.TeamSelect::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.TeamSelect::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}
+.SelectOption {
+  padding: 6px 5px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.SelectOption div {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.SelectOption svg {
+  padding-left: 2px;
+  margin: 0 2px 0 auto;
+  min-width: 16px;
+  font-size: 16px;
+}
+.SelectOption:hover {
+  background: rgb(240,240,240);
+}
+@media (max-width: 470px) {
   .ModalContainer {
     display: flex;
     flex-direction: column;
