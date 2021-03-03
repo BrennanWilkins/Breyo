@@ -21,6 +21,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.PROMOTE_TEAM_MEMBER: return toggleTeamAdmin(state, action, true);
     case actionTypes.DEMOTE_TEAM_MEMBER: return toggleTeamAdmin(state, action, false);
     case actionTypes.DEMOTE_SELF_TEAM_MEMBER: return { ...state, userIsAdmin: false };
+    case actionTypes.PROMOTE_SELF_TEAM_MEMBER: return { ...state, userIsAdmin: true };
     case actionTypes.ADD_TEAM_MEMBER: return addTeamMember(state, action);
     case actionTypes.DELETE_TEAM_MEMBER: return deleteTeamMember(state, action);
     default: return state;

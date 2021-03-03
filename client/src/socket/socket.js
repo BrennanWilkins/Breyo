@@ -135,6 +135,37 @@ export const initTeamSocket = teamID => {
     window.location.replace('/');
   });
 
+  // manually handle this route to check if user needs new jwt token
+  newTeamSocket.on('post/team/admins', data => {
+    const email = JSON.parse(data);
+    store.dispatch({ type: actionTypes.PROMOTE_TEAM_MEMBER, email });
+    const state = store.getState();
+    const teamID = state.team.teamID;
+    if (email === state.user.email) {
+      // user was added as admin, fetch new token
+      axios.get('/auth/newToken').then(res => {
+        setToken(res.data.token);
+        store.dispatch({ type: actionTypes.PROMOTE_SELF_TEAM_MEMBER, teamID });
+      }).catch(err => store.dispatch(serverErr()));
+    }
+  });
+
+  // manually handle this route to check if user needs new jwt token
+  newTeamSocket.on('delete/team/admins', data => {
+    const email = JSON.parse(data);
+    store.dispatch({ type: actionTypes.DEMOTE_TEAM_MEMBER, email });
+    const state = store.getState();
+    const teamID = state.team.teamID;
+    if (email === state.user.email) {
+      // user was demoted from admin to member, fetch new token
+      // reload page if error as user would still have admin privileges
+      axios.get('/auth/newToken').then(res => {
+        setToken(res.data.token);
+        store.dispatch({ type: actionTypes.DEMOTE_SELF_TEAM_MEMBER, teamID });
+      }).catch(err => window.location.reload());
+    }
+  });
+
   for (let route in teamSocketMap) {
     newTeamSocket.on(route, data => {
       const payload = JSON.parse(data);

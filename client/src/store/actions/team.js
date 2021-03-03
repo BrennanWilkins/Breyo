@@ -17,16 +17,17 @@ export const getActiveTeam = (url, push) => async (dispatch, getState) => {
     const state = getState();
     const teamID = state.user.teams.allIDs.find(teamID => state.user.teams.byID[teamID].url === url);
     if (!teamID) { throw 'No teamID found'; }
-    const isAdmin = state.user.teams.byID[teamID].isAdmin;
     const res = await axios.get('/team/' + teamID);
     const { data } = res.data;
-    data.team.userIsAdmin = isAdmin;
 
+    let userIsAdmin = state.user.teams.byID[teamID].isAdmin;
     if (data.token) {
       setToken(data.token);
       dispatch({ type: actionTypes.UPDATE_USER_TEAMS, teams: data.teams, adminTeams: data.adminTeams });
+      userIsAdmin = data.adminTeams.includes(teamID);
     }
 
+    data.team.userIsAdmin = userIsAdmin;
     dispatch({ type: actionTypes.SET_ACTIVE_TEAM, team: data.team });
 
     // initalize new socket connection on new team page load
@@ -194,6 +195,7 @@ export const promoteTeamMember = email => async (dispatch, getState) => {
     const teamID = state.team.teamID;
     await axios.post(`/team/admins/${teamID}`, { email });
     dispatch({ type: actionTypes.PROMOTE_TEAM_MEMBER, teamID, email });
+    sendTeamUpdate('post/team/admins', email);
   } catch (err) {
     dispatch(permissionErr(err));
   }
@@ -206,9 +208,12 @@ export const demoteTeamMember = email => async (dispatch, getState) => {
     const userEmail = state.user.email;
     await axios.delete(`/team/admins/${teamID}/${email}`);
     if (userEmail === email) {
+      const res = await axios.get('/auth/newToken');
+      setToken(res.data.token);
       dispatch({ type: actionTypes.DEMOTE_SELF_TEAM_MEMBER, teamID });
     }
     dispatch({ type: actionTypes.DEMOTE_TEAM_MEMBER, teamID, email });
+    sendTeamUpdate('delete/team/admins', email);
   } catch (err) {
     dispatch(permissionErr(err));
   }

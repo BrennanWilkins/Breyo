@@ -39,7 +39,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.REJECT_TEAM_INVITE: return rejectTeamInvite(state, action);
     case actionTypes.JOIN_BOARD: return joinBoard(state, action);
     case actionTypes.UPDATE_USER_TEAMS: return updateUserTeams(state, action);
-    case actionTypes.DEMOTE_SELF_TEAM_MEMBER: return demoteSelfTeamMember(state, action);
+    case actionTypes.DEMOTE_SELF_TEAM_MEMBER: return changeTeamMembership(state, action, false);
+    case actionTypes.PROMOTE_SELF_TEAM_MEMBER: return changeTeamMembership(state, action, true);
     case actionTypes.CHANGE_BOARD_TEAM: return changeBoardTeam(state, action);
     case actionTypes.REMOVE_BOARD_FROM_TEAM: return removeBoardFromTeam(state, action);
     default: return state;
@@ -181,8 +182,8 @@ const updateUserTeams = (state, action) => {
   return { ...state, teams: { byID: teamsByID, allIDs: allTeamIDs } };
 };
 
-const demoteSelfTeamMember = (state, action) => {
-  const teamsByID = { ...state.teams.byID, [action.teamID]: { ...state.teams.byID[action.teamID], isAdmin: false } };
+const changeTeamMembership = (state, action, isAdmin) => {
+  const teamsByID = { ...state.teams.byID, [action.teamID]: { ...state.teams.byID[action.teamID], isAdmin } };
   return { ...state, teams: { byID: teamsByID, allIDs: state.teams.allIDs } };
 };
 
