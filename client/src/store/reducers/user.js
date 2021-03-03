@@ -24,8 +24,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.TOGGLE_IS_STARRED: return toggleIsStarred(state, action);
     case actionTypes.UPDATE_USER_DATA: return updateUserData(state, action);
     case actionTypes.UPDATE_USER_BOARDS: return updateUserBoards(state, action);
-    case actionTypes.DEMOTE_SELF: return changeUserMembership(state, action, false);
-    case actionTypes.PROMOTE_SELF: return changeUserMembership(state, action, true);
+    case actionTypes.DEMOTE_SELF: return changeBoardMembership(state, action, false);
+    case actionTypes.PROMOTE_SELF: return changeBoardMembership(state, action, true);
     case actionTypes.DELETE_BOARD: return deleteBoard(state, action);
     case actionTypes.REMOVE_INVITE: return removeInvite(state, action);
     case actionTypes.LEAVE_BOARD: return deleteBoard(state, action);
@@ -114,7 +114,7 @@ const updateUserBoards = (state, action) => {
   return { ...state, invites: action.invites, teamInvites: action.teamInvites, boards: { byID: boardsByID, allIDs: allBoardIDs } };
 };
 
-const changeUserMembership = (state, action, isAdmin) => {
+const changeBoardMembership = (state, action, isAdmin) => {
   const boardsByID = { ...state.boards.byID, [action.boardID]: { ...state.boards.byID[action.boardID], isAdmin } };
   return { ...state, boards: { byID: boardsByID, allIDs: state.boards.allIDs } };
 };

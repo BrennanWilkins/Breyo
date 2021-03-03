@@ -128,6 +128,18 @@ router.get('/',
   }
 );
 
+// returns new token if user's token not up to date
+router.get('/newToken',
+  auth,
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.userID).lean();
+      const token = await signNewToken(user, req.header('x-auth-token'));
+      res.status(200).json({ token });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 router.post('/changePass',
   auth,
   validate(

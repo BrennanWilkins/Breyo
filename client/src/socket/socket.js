@@ -33,35 +33,30 @@ export const initBoardSocket = boardID => {
   });
 
   // manually handle this route to check if user needs new jwt token
-  newBoardSocket.on('post/board/admins', async data => {
-    try {
-      const email = JSON.parse(data);
-      store.dispatch({ type: actionTypes.ADD_ADMIN, email });
-      const state = store.getState();
-      const userEmail = state.user.email;
-      if (email === userEmail) {
-        // user was added as admin, fetch new token
-        const res = await axios.put('/board/admins/promoteUser', { boardID: state.board.boardID });
+  newBoardSocket.on('post/board/admins', data => {
+    const email = JSON.parse(data);
+    store.dispatch({ type: actionTypes.ADD_ADMIN, email });
+    if (email === store.getState().user.email) {
+      // user was added as admin, fetch new token
+      axios.get('/auth/newToken').then(res => {
         setToken(res.data.token);
         store.dispatch({ type: actionTypes.PROMOTE_SELF, boardID });
-      }
-    } catch (err) { store.dispatch(serverErr()); }
+      }).catch(err => store.dispatch(serverErr()));
+    }
   });
 
   // manually handle this route to check if user needs new jwt token
-  newBoardSocket.on('delete/board/admins', async data => {
-    try {
-      const email = JSON.parse(data);
-      store.dispatch({ type: actionTypes.REMOVE_ADMIN, email });
-      const state = store.getState();
-      const userEmail = state.user.email;
-      if (email === userEmail) {
-        // user was demoted as admin, fetch new token
-        const res = await axios.put('/board/admins/demoteUser', { boardID: state.board.boardID });
+  newBoardSocket.on('delete/board/admins', data => {
+    const email = JSON.parse(data);
+    store.dispatch({ type: actionTypes.REMOVE_ADMIN, email });
+    if (email === store.getState().user.email) {
+      // user was demoted from admin to member, fetch new token
+      // reload page if error as user would still have admin privileges
+      axios.get('/auth/newToken').then(res => {
         setToken(res.data.token);
         store.dispatch({ type: actionTypes.DEMOTE_SELF, boardID });
-      }
-    } catch (err) { store.dispatch(serverErr()); }
+      }).catch(err => window.location.reload());
+    }
   });
 
   newBoardSocket.on('delete/board', () => {

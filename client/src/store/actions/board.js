@@ -174,7 +174,11 @@ export const removeAdmin = (email, boardID) => async dispatch => {
   }
 };
 
-export const demoteSelf = boardID => ({ type: actionTypes.DEMOTE_SELF, boardID });
+export const demoteSelf = boardID => dispatch => {
+  dispatch({ type: actionTypes.DEMOTE_SELF, boardID });
+  axios.get('/auth/newToken').then(res => setToken(res.data.token))
+  .catch(err => dispatch(serverErr()));
+};
 
 export const updateColor = color => async (dispatch, getState) => {
   try {

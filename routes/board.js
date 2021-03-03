@@ -270,36 +270,6 @@ router.post('/admins',
   }
 );
 
-// user receives new token on permission change to admin
-router.put('/admins/promoteUser',
-  validate([body('boardID').isMongoId()]),
-  async (req, res) => {
-    try {
-      const isAlreadyAdmin = req.userAdmins[req.body.boardID];
-      if (isAlreadyAdmin) { throw 'User already an admin'; }
-      const user = await User.findById(req.userID).lean();
-      const token = await signNewToken(user, req.header('x-auth-token'));
-      res.status(200).json({ token });
-    } catch (err) { res.sendStatus(500); }
-  }
-);
-
-// user receives new token on permission change from admin to member
-router.put('/admins/demoteUser',
-  validate([body('boardID').isMongoId()]),
-  async (req, res) => {
-    try {
-      const { boardID } = req.body;
-      const isAdmin = req.userAdmins[boardID];
-      const isMember = req.userMembers[boardID];
-      if (!isAdmin && isMember) { throw 'User already demoted'; }
-      const user = await User.findById(req.userID).lean();
-      const token = await signNewToken(user, req.header('x-auth-token'));
-      res.status(200).json({ token });
-    } catch (err) { res.sendStatus(500); }
-  }
-);
-
 // authorization: board admin
 // change user permission from admin to member
 router.delete('/admins/:email/:boardID',
