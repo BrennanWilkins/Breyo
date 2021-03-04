@@ -1,0 +1,57 @@
+.NavBar {
+  width: 100%;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+.DateBtns {
+  display: flex;
+  align-items: center;
+}
+.Btn {
+  background: rgb(242,242,242);
+  margin: 0 4px;
+  height: 30px;
+  line-height: 30px;
+}
+.Btn:hover {
+  background: rgb(235,235,235);
+}
+.Btn:active {
+  background: rgba(254, 190, 183, 0.7);
+}
+.Btn svg {
+  font-size: 11px;
+  margin-left: 8px;
+}
+.PrevBtn, .NextBtn {
+  margin: 0;
+  padding: 7px 8px;
+}
+.PrevBtn svg {
+  transform: rotate(90deg);
+  font-size: 14px;
+  margin: 0;
+}
+.NextBtn svg {
+  transform: rotate(-90deg);
+  font-size: 14px;
+  margin: 0;
+}
+.Sep {
+  width: 1px;
+  background: rgb(240,240,240);
+  height: 16px;
+  margin: 0 7px 0 10px;
+}
+.Relative {
+  position: relative;
+}
+.CurrRange {
+  font-weight: 500;
+  width: 90px;
+  margin-right: 10px;
+  text-align: center;
+}

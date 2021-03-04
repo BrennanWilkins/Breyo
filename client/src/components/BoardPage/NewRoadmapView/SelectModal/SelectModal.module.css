@@ -1,0 +1,29 @@
+.Container {
+  position: absolute;
+  z-index: 2;
+  top: 33px;
+  left: 4px;
+  padding: 5px 0;
+  background: white;
+  box-sizing: border-box;
+  box-shadow: var(--box-shadow4);
+  border-radius: 4px;
+  border: 1px solid rgb(227, 227, 227);
+  width: 140px;
+}
+.Option {
+  cursor: pointer;
+  padding: 6px 9px 6px 5px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+}
+.Option svg {
+  margin-left: auto;
+}
+.Option:hover {
+  background: rgb(245,245,245);
+}
+.Option:active {
+  background: rgba(254, 190, 183, 0.7);
+}

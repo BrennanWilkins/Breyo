@@ -1,0 +1,39 @@
+.Container {
+  min-width: 220px;
+  width: 220px;
+  height: calc(100% - 50px);
+  position: sticky;
+  top: 50px;
+  left: 0;
+  border-right: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  background: white;
+}
+.Lane {
+  font-weight: 500;
+  min-height: 100px;
+  padding: 10px;
+  box-sizing: border-box;
+  font-size: 15px;
+  border-bottom: 1px solid #eee;
+}
+.Title {
+  display: flex;
+  align-items: center;
+}
+.TitleText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.Avatar {
+  min-width: 32px;
+  margin-left: 0;
+}
+.Label {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  min-width: 30px;
+  margin-right: 10px;
+}

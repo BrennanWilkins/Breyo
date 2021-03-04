@@ -1,0 +1,14 @@
+.Container {
+  width: 100%;
+  height: 100%;
+  transition: width 250ms;
+  position: relative;
+  background: white;
+  overflow: hidden;
+}
+.RoadmapContainer {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+}

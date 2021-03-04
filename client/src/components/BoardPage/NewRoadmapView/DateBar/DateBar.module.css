@@ -1,0 +1,30 @@
+.DateBar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.Date {
+  flex: 1 1 0;
+  font-size: 13px;
+  text-align: center;
+  min-width: 55px;
+  height: 100%;
+  border-left: 1px solid #ddd;
+  background: rgb(247,247,247);
+}
+.DateTop {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 50px;
+  border-bottom: 1px solid #ddd;
+  background: white;
+}
+.Highlight {
+  color: rgb(var(--red));
+  background: rgba(var(--red), 0.2);
+}
+.DateVal {
+  font-weight: 500;
+}
