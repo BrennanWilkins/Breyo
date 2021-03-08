@@ -107,7 +107,7 @@
   right: 0;
   padding: 3px;
   border-radius: 25px;
-  z-index: 10;
+  z-index: 3;
 }
 .CloseBtnCircle svg {
   width: 30px !important;

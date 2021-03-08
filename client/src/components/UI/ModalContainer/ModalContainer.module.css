@@ -5,7 +5,7 @@
   background: white;
   position: absolute;
   box-sizing: border-box;
-  z-index: 2;
+  z-index: 4;
 }
 .ContainerAfter::after {
   content: "";
