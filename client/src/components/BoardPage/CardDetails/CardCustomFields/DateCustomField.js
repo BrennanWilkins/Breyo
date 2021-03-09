@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import classes from './CardCustomFields.module.css';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
@@ -22,7 +22,7 @@ const DateCustomField = props => {
     <div className={classes.DateContainer}>
       <div className={`CustomDateField ${classes.DateField}`}>
         <DatePicker selected={selectedDate} onChange={changeHandler} showTimeSelect
-        showPopperArrow={false} showTimeSelect dateFormat="MM/dd/yyyy h:mm aa" className={classes.DateInput} />
+        showPopperArrow={false} dateFormat="MM/dd/yyyy h:mm aa" className={classes.DateInput} />
       </div>
     </div>
   );

@@ -12,20 +12,18 @@ import { format, startOfMonth, endOfMonth, getYear, startOfYear,
   differenceInDays, differenceInCalendarMonths } from 'date-fns';
 
 const calcRows = cards => {
-  cards = cards.sort((a,b) => a.left - b.left);
-  const rows = {};
-  for (let i = 0; i < cards.length; i++) { rows[i] = []; }
+  cards.sort((a,b) => a.left - b.left);
+  const rows = [...Array(cards.length)].map(_ => []);
   for (let card of cards) {
-    for (let row in rows) {
-      const overlappingCard = rows[row].find(rowCard => rowCard.left + rowCard.width > card.left);
-      if (!overlappingCard) { rows[row].push(card); break; }
+    for (let i = 0; i < rows.length; i++) {
+      // if card does not overlap w another card on the row then add to row else check next row
+      const overlappingCard = rows[i].length ? rows[i].find(rowCard => rowCard.left + rowCard.width > card.left) : false;
+      if (!overlappingCard) { rows[i].push(card); break; }
     }
   }
   const finalCards = [];
-  for (let row in rows) {
-    for (let card of rows[row]) {
-      finalCards.push({ ...card, top: row * 50 });
-    }
+  for (let i = 0; i < rows.length; i++) {
+    finalCards.push(...rows[i].map(card => ({ ...card, top: i * 50 })));
   }
   return finalCards;
 };
@@ -71,8 +69,10 @@ const getCardsByLabel = (lists, customLabels) => {
       }
     }
   }
-  return customLabels.allIDs.map(labelID => ({ labelID, cards: labels[labelID],
-    title: customLabels.byID[labelID].title, color: customLabels.byID[labelID].color }));
+  return customLabels.allIDs.map(labelID => {
+    const { title, color } = customLabels.byID[labelID];
+    return { labelID, cards: labels[labelID], title, color };
+  });
 };
 
 const getLaneCards = (field, dateRange, dateWidth, isList) => {
