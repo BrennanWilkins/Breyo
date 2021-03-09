@@ -84,9 +84,12 @@ const getLaneCards = (field, dateRange, dateWidth, isList) => {
   }).map(card => (
     calcWidthLeft(isList ? { ...card, listID: field.listID } : card, dateRange.startDate, dateWidth, dateRange.type)
   )));
+  // roadmap lane height min 100px
   const height = cards.length ? Math.max(cards[cards.length - 1].top + 70, 100) : 100;
   return { cards, height };
 };
+
+const getUnassignedCards = cards => cards.filter(card => !card.dueDate || !card.dueDate.startDate || !card.dueDate.dueDate);
 
 const RoadmapContainer = props => {
   const [roadmapMode, setRoadmapMode] = useState('List');
@@ -242,24 +245,27 @@ const RoadmapContainer = props => {
       let totHeight = 50;
       setLanes(props.lists.map(list => {
         const { cards, height } = getLaneCards(list, dateRange, dateWidth, true);
+        const unassignedCards = getUnassignedCards(list.cards.map(card => ({ ...card, listID: list.listID })));
         totHeight += height;
-        return { title: list.title, id: list.listID, cards, height: height + 'px' };
+        return { title: list.title, id: list.listID, cards, unassignedCards, height: height + 'px' };
       }));
       setTotalHeight(totHeight + 'px');
     } else if (roadmapMode === 'Member') {
       let totHeight = 50;
       setLanes(getCardsByMember(props.lists, props.members).map(member => {
         const { cards, height } = getLaneCards(member, dateRange, dateWidth);
+        const unassignedCards = getUnassignedCards(member.cards);
         totHeight += height;
-        return { ...member, id: member.email, cards, height: height + 'px' };
+        return { ...member, id: member.email, cards, unassignedCards, height: height + 'px' };
       }));
       setTotalHeight(totHeight + 'px');
     } else {
       let totHeight = 50;
       setLanes(getCardsByLabel(props.lists, props.customLabels).map(label => {
         const { cards, height } = getLaneCards(label, dateRange, dateWidth);
+        const unassignedCards = getUnassignedCards(label.cards);
         totHeight += height;
-        return { title: label.title, color: label.color, id: label.labelID, cards, height: height + 'px' };
+        return { title: label.title, color: label.color, id: label.labelID, cards, unassignedCards, height: height + 'px' };
       }));
       setTotalHeight(totHeight + 'px');
     }
