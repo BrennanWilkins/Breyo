@@ -1,13 +1,15 @@
 .Container {
   min-width: 220px;
   width: 220px;
-  height: calc(100% - 50px);
   position: sticky;
-  top: 50px;
+  top: 0;
   left: 0;
-  border-right: 1px solid #ddd;
-  border-top: 1px solid #ddd;
   background: white;
+  z-index: 2;
+  border-top: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  margin: 49px -1px 0 0;
+  box-sizing: border-box;
 }
 .Lane {
   font-weight: 500;
@@ -15,7 +17,7 @@
   padding: 10px;
   box-sizing: border-box;
   font-size: 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgb(230, 230, 230);
 }
 .Title {
   display: flex;

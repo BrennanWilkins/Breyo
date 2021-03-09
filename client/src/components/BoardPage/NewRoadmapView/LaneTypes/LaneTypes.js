@@ -1,59 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import classes from './LaneTypes.module.css';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { AccountBtn } from '../../../UI/Buttons/Buttons';
 
-const LaneTypes = props => {
-  const [lanes, setLanes] = useState([]);
-
-  useEffect(() => {
-    if (props.mode === 'List') {
-      setLanes(props.lists.map(list => (
-        <div key={list.listID} className={classes.Lane}>
-          <div className={classes.Title}>
-            <div className={classes.TitleText}>{list.title}</div>
+const LaneTypes = props => (
+  <div className={classes.Container} style={{ minHeight: props.totalHeight }}>
+    {
+      props.mode === 'List' ?
+        props.lanes.map(({ id, height, title }, i) => (
+          <div key={id} style={{ height }} className={classes.Lane}>
+            <div className={classes.Title}>
+              <div className={classes.TitleText}>{title}</div>
+            </div>
           </div>
-        </div>
-      )));
-    } else if (props.mode === 'Member') {
-      setLanes(props.members.map(member => (
-        <div key={member.email} className={classes.Lane}>
-          <div className={classes.Title}>
-            <AccountBtn className={classes.Avatar} avatar={member.avatar}>{member.fullName[0]}</AccountBtn>
-            <div className={classes.TitleText}>{member.fullName}</div>
+        ))
+      : props.mode === 'Member' ?
+        props.lanes.map(({ id, height, fullName, avatar }) => (
+          <div key={id} style={{ height }} className={classes.Lane}>
+            <div className={classes.Title}>
+              <AccountBtn className={classes.Avatar} avatar={avatar}>{fullName ? fullName[0] : ''}</AccountBtn>
+              <div className={classes.TitleText}>{fullName}</div>
+            </div>
           </div>
-        </div>
-      )));
-    } else {
-      setLanes(props.customLabels.allIDs.map(labelID => (
-        <div key={labelID} className={classes.Lane}>
-          <div className={classes.Title}>
-            <div className={classes.Label} style={{ background: props.customLabels.byID[labelID].color }} />
-            <div className={classes.TitleText}>{props.customLabels.byID[labelID].title}</div>
+        ))
+      :
+        props.lanes.map(({ id, height, color, title }) => (
+          <div key={id} style={{ height }} className={classes.Lane}>
+            <div className={classes.Title}>
+              <div className={classes.Label} style={{ background: color || null }} />
+              <div className={classes.TitleText}>{title}</div>
+            </div>
           </div>
-        </div>
-      )));
+        ))
     }
-  }, [props.mode]);
-
-  return <div className={classes.Container}>{lanes}</div>;
-};
+  </div>
+);
 
 LaneTypes.propTypes = {
   mode: PropTypes.string.isRequired,
-  lists: PropTypes.array.isRequired,
-  members: PropTypes.array.isRequired,
-  customLabels: PropTypes.shape({
-    allIDs: PropTypes.array.isRequired,
-    byID: PropTypes.object.isRequired
-  })
+  lanes: PropTypes.array.isRequired,
+  totalHeight: PropTypes.string.isRequired
 };
 
-const mapStateToProps = state => ({
-  lists: state.lists.lists,
-  members: state.board.members,
-  customLabels: state.board.customLabels
-});
-
-export default connect(mapStateToProps)(LaneTypes);
+export default LaneTypes;

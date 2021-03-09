@@ -1,0 +1,14 @@
+.Container {
+  position: absolute;
+  width: 100%;
+  top: 50px;
+  left: 220px;
+}
+.Lane {
+  width: 100%;
+  position: relative;
+  border-bottom: 1px solid #ddd;
+  min-height: 100px;
+  box-sizing: border-box;
+  overflow: hidden;
+}

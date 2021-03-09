@@ -1,6 +1,5 @@
-.DateBar {
+.DateBars {
   width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
 }
@@ -9,9 +8,10 @@
   font-size: 13px;
   text-align: center;
   min-width: 55px;
-  height: 100%;
+  height: calc(100% + 10px);
   border-left: 1px solid #ddd;
   background: rgb(247,247,247);
+  box-sizing: border-box;
 }
 .DateTop {
   display: flex;
@@ -20,10 +20,23 @@
   height: 50px;
   border-bottom: 1px solid #ddd;
   background: white;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-right: 1px solid #ddd;
+  box-sizing: border-box;
+  margin-right: -1px;
 }
 .Highlight {
   color: rgb(var(--red));
   background: rgba(var(--red), 0.2);
+}
+.Highlight .DateTop {
+  margin-left: -1px;
+  border-left: 1px solid #ddd;
+}
+.WkndHighlight {
+  background: rgb(240,240,240);
 }
 .DateVal {
   font-weight: 500;

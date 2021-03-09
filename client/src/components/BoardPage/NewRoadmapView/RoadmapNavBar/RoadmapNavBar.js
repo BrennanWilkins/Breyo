@@ -6,7 +6,6 @@ import { chevronIcon } from '../../../UI/icons';
 import SelectModal from '../SelectModal/SelectModal';
 
 const RoadmapNavBar = props => {
-  const [showDateSelect, setShowDateSelect] = useState(false);
   const [showRangeSelect, setShowRangeSelect] = useState(false);
   const [showModeSelect, setShowModeSelect] = useState(false);
 
