@@ -9,6 +9,14 @@
   width: 300px;
   z-index: 2;
 }
+.Container::after, .MiddleContainer::after {
+  content: "";
+  position: absolute;
+  height: 20px;
+  width: 1px;
+  visibility: hidden;
+  bottom: -20px;
+}
 .Container {
   top: 25px;
   right: 0;
@@ -26,7 +34,7 @@
 }
 .Colors {
   width: 100%;
-  max-height: 400px;
+  min-height: 200px;
   overflow-x: hidden;
   overflow-y: auto;
 }

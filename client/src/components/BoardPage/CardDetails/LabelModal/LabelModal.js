@@ -18,6 +18,7 @@ const LabelModal = props => {
   const [titleInput, setTitleInput] = useState('');
   const [selectedColor, setSelectedColor] = useState(LABEL_COLORS[0]);
   const [shownEditLabelID, setShownEditLabelID] = useState('');
+  const [maxHeight, setMaxHeight] = useState('400px');
 
   const backHandler = () => {
     setLabelMode('');
@@ -68,8 +69,12 @@ const LabelModal = props => {
   };
 
   useLayoutEffect(() => {
+    const rect = modalRef.current.getBoundingClientRect();
+    if (rect.bottom > window.innerHeight) {
+      setMaxHeight(window.innerHeight - rect.top - 120 + 'px');
+    }
     if (!props.openFromMiddle) { return; }
-    if (modalRef.current.getBoundingClientRect().right + 5 >= window.innerWidth) {
+    if (rect.right + 5 >= window.innerWidth) {
       modalRef.current.style.right = '0';
     } else {
       modalRef.current.style.left = '-1px';
@@ -113,7 +118,7 @@ const LabelModal = props => {
         </>
         :
         <>
-          <div className={classes.Colors}>
+          <div className={classes.Colors} style={{ maxHeight }}>
             {props.customLabels.map(labelID => {
               const label = props.customLabelsByID[labelID];
               return (
