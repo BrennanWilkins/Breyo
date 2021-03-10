@@ -6,10 +6,9 @@ import DateBars from '../DateBars/DateBars';
 import LaneTypes from '../LaneTypes/LaneTypes';
 import RoadmapLanes from '../RoadmapLanes/RoadmapLanes';
 import { connect } from 'react-redux';
-import { format, startOfMonth, endOfMonth, getYear, startOfYear,
-  endOfYear, startOfWeek, endOfWeek, isThisWeek, isThisMonth, isThisYear,
-  addWeeks, subWeeks, addMonths, subMonths, addYears, subYears, getDaysInMonth,
-  differenceInDays, differenceInCalendarMonths } from 'date-fns';
+import { startOfMonth, endOfMonth, startOfYear, endOfYear, startOfWeek, endOfWeek,
+  isThisWeek, isThisMonth, isThisYear, addWeeks, subWeeks, addMonths, subMonths,
+  addYears, subYears, getDaysInMonth, differenceInDays, differenceInCalendarMonths } from 'date-fns';
 
 const calcRows = cards => {
   cards.sort((a,b) => a.left - b.left);
@@ -91,11 +90,49 @@ const getLaneCards = (field, dateRange, dateWidth, isList) => {
 
 const getUnassignedCards = cards => cards.filter(card => !card.dueDate || !card.dueDate.startDate || !card.dueDate.dueDate);
 
+const moveRangeHelper = (dateRange, isAdding) => {
+  switch (dateRange.type) {
+    case 'Week': {
+      let startDate = isAdding ? addWeeks(dateRange.startDate, 1) : subWeeks(dateRange.startDate, 1);
+      return { type: 'Week', startDate, endDate: endOfWeek(startDate) };
+    }
+    case 'Month': {
+      let startDate = isAdding ? addMonths(dateRange.startDate, 1) : subMonths(dateRange.startDate, 1);
+      return { type: 'Month', startDate, endDate: endOfMonth(startDate) };
+    }
+    case 'Year': {
+      let startDate = isAdding ? addYears(dateRange.startDate, 1) : subYears(dateRange.startDate, 1);
+      return { type: 'Year', startDate, endDate: endOfYear(startDate) };
+    }
+    default: return;
+  }
+};
+
+const setRangeHelper = (type, date) => {
+  switch (type) {
+    case 'Week': return {
+      type: 'Week',
+      startDate: startOfWeek(date),
+      endDate: endOfWeek(date)
+    };
+    case 'Month': return {
+      type: 'Month',
+      startDate: startOfMonth(date),
+      endDate: endOfMonth(date)
+    };
+    case 'Year': return {
+      type: 'Year',
+      startDate: startOfYear(date),
+      endDate: endOfYear(date)
+    };
+    default: return;
+  }
+};
+
 const RoadmapContainer = props => {
   const [roadmapMode, setRoadmapMode] = useState('List');
   const [dateRange, setDateRange] = useState({
     type: 'Month',
-    currRangeFormatted: format(new Date(), 'MMM yyyy'),
     startDate: startOfMonth(new Date()),
     endDate: endOfMonth(new Date())
   });
@@ -132,113 +169,22 @@ const RoadmapContainer = props => {
 
   const changeRangeTypeHandler = type => {
     if (type === dateRange.type) { return; }
-    if (type === 'Week') {
-      setDateRange({
-        type: 'Week',
-        currRangeFormatted: format(dateRange.startDate, 'MMM yyyy'),
-        startDate: startOfWeek(dateRange.startDate),
-        endDate: endOfWeek(dateRange.startDate)
-      });
-    } else if (type === 'Month') {
-      setDateRange({
-        type: 'Month',
-        currRangeFormatted: format(dateRange.startDate, 'MMM yyyy'),
-        startDate: startOfMonth(dateRange.startDate),
-        endDate: endOfMonth(dateRange.startDate)
-      });
-    } else {
-      setDateRange({
-        type: 'Year',
-        currRangeFormatted: String(getYear(dateRange.startDate)),
-        startDate: startOfYear(dateRange.startDate),
-        endDate: endOfYear(dateRange.startDate)
-      });
-    }
+    setDateRange(setRangeHelper(type, dateRange.startDate));
   };
 
   const moveToTodayHandler = () => {
-    if (dateRange.type === 'Week') {
-      if (isThisWeek(dateRange.startDate)) { return; }
-      setDateRange({
-        type: 'Week',
-        currRangeFormatted: format(new Date(), 'MMM yyyy'),
-        startDate: startOfWeek(new Date()),
-        endDate: endOfWeek(new Date())
-      });
-    } else if (dateRange.type === 'Month') {
-      if (isThisMonth(dateRange.startDate)) { return; }
-      setDateRange({
-        type: 'Month',
-        currRangeFormatted: format(new Date(), 'MMM yyyy'),
-        startDate: startOfMonth(new Date()),
-        endDate: endOfMonth(new Date())
-      });
-    } else {
-      if (isThisYear(dateRange.startDate)) { return; }
-      setDateRange({
-        type: 'Year',
-        currRangeFormatted: String(getYear(new Date())),
-        startDate: startOfYear(new Date()),
-        endDate: endOfYear(new Date())
-      });
-    }
+    // check if today's date is already in current date range
+    let start = dateRange.startDate;
+    if ((dateRange.type === 'Week' && isThisWeek(start)) ||
+        (dateRange.type === 'Month' && isThisMonth(start)) ||
+        (dateRange.type === 'Year' && isThisYear(start))) { return; }
+
+    setDateRange(setRangeHelper(dateRange.type, new Date()));
   };
 
-  const subRangeHandler = () => {
-    if (dateRange.type === 'Week') {
-      let startDate = subWeeks(dateRange.startDate, 1);
-      setDateRange({
-        type: 'Week',
-        currRangeFormatted: format(startDate, 'MMM yyyy'),
-        startDate,
-        endDate: endOfWeek(startDate)
-      });
-    } else if (dateRange.type === 'Month') {
-      let startDate = subMonths(dateRange.startDate, 1);
-      setDateRange({
-        type: 'Month',
-        currRangeFormatted: format(startDate, 'MMM yyyy'),
-        startDate,
-        endDate: endOfMonth(startDate)
-      });
-    } else {
-      let startDate = subYears(dateRange.startDate, 1);
-      setDateRange({
-        type: 'Year',
-        currRangeFormatted: String(getYear(startDate)),
-        startDate,
-        endDate: endOfYear(startDate)
-      });
-    }
-  };
+  const subRangeHandler = () => setDateRange(moveRangeHelper(dateRange, false));
 
-  const addRangeHandler = () => {
-    if (dateRange.type === 'Week') {
-      let startDate = addWeeks(dateRange.startDate, 1);
-      setDateRange({
-        type: 'Week',
-        currRangeFormatted: format(startDate, 'MMM yyyy'),
-        startDate,
-        endDate: endOfWeek(startDate)
-      });
-    } else if (dateRange.type === 'Month') {
-      let startDate = addMonths(dateRange.startDate, 1);
-      setDateRange({
-        type: 'Month',
-        currRangeFormatted: format(startDate, 'MMM yyyy'),
-        startDate,
-        endDate: endOfMonth(startDate)
-      });
-    } else {
-      let startDate = addYears(dateRange.startDate, 1);
-      setDateRange({
-        type: 'Year',
-        currRangeFormatted: String(getYear(startDate)),
-        startDate,
-        endDate: endOfYear(startDate)
-      });
-    }
-  };
+  const addRangeHandler = () => setDateRange(moveRangeHelper(dateRange, true));
 
   useEffect(() => {
     if (roadmapMode === 'List') {
@@ -273,7 +219,7 @@ const RoadmapContainer = props => {
 
   return (
     <div className={classes.Container} style={props.menuShown ? {width: 'calc(100% - 350px)'} : null}>
-      <RoadmapNavBar roadmapMode={roadmapMode} rangeType={dateRange.type} formattedRange={dateRange.currRangeFormatted}
+      <RoadmapNavBar roadmapMode={roadmapMode} rangeType={dateRange.type} startDate={dateRange.startDate}
       changeMode={mode => setRoadmapMode(mode)} changeRangeType={changeRangeTypeHandler} moveToToday={moveToTodayHandler}
       subRange={subRangeHandler} addRange={addRangeHandler} />
       <div className={classes.RoadmapContainer}>

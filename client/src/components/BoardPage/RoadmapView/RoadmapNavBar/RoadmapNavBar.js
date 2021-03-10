@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import classes from './RoadmapNavBar.module.css';
 import PropTypes from 'prop-types';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import { chevronIcon } from '../../../UI/icons';
 import SelectModal from '../SelectModal/SelectModal';
+import { format, getYear } from 'date-fns';
 
 const RoadmapNavBar = props => {
   const [showRangeSelect, setShowRangeSelect] = useState(false);
@@ -19,9 +20,16 @@ const RoadmapNavBar = props => {
     props.changeRangeType(type);
   };
 
+  const formattedRange = useMemo(() => {
+    if (props.rangeType === 'Year') {
+      return String(getYear(props.startDate));
+    }
+    return format(props.startDate, 'MMM yyyy');
+  }, [props.rangeType, props.startDate]);
+
   return (
     <div className={classes.NavBar}>
-      <div className={classes.CurrRange}>{props.formattedRange}</div>
+      <div className={classes.CurrRange}>{formattedRange}</div>
       <div className={classes.DateBtns}>
         <ActionBtn className={`${classes.Btn} ${classes.PrevBtn}`} clicked={props.subRange}>{chevronIcon}</ActionBtn>
         <ActionBtn className={classes.Btn} clicked={props.moveToToday}>Today</ActionBtn>
@@ -49,7 +57,7 @@ const RoadmapNavBar = props => {
 RoadmapNavBar.propTypes = {
   roadmapMode: PropTypes.string.isRequired,
   rangeType: PropTypes.string.isRequired,
-  formattedRange: PropTypes.string.isRequired,
+  startDate: PropTypes.instanceOf(Date),
   changeMode: PropTypes.func.isRequired,
   changeRangeType: PropTypes.func.isRequired,
   moveToToday: PropTypes.func.isRequired,
