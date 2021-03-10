@@ -111,7 +111,6 @@ router.post('/copy',
           }))
         })),
         labels: card.labels,
-        roadmapLabel: card.roadmapLabel,
         dueDate: card.dueDate,
         members: card.members,
         customFields: card.customFields.map(field => ({

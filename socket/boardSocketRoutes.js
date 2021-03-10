@@ -45,8 +45,6 @@ const routes = [
   'delete/activity',
   'post/board/newMember',
   'put/board/memberLeft',
-  'delete/card/roadmapLabel',
-  'post/card/roadmapLabel',
   'delete/board',
   'put/card/checklist/moveItem',
   'put/board/changeTeam',

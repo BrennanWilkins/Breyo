@@ -36,7 +36,6 @@ const CardSchema = new Schema({
   dueDate: {},
   members: [],
   comments: [CommentSchema],
-  roadmapLabel: String,
   customFields: [cardCustomFieldSchema],
   votes: []
 });

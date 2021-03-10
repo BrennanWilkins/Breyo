@@ -38,7 +38,7 @@ router.post('/',
       const list = await getListAndValidate(boardID, listID);
 
       const card = { title, desc: '', checklists: [], labels: [], dueDate: null, members: [],
-      comments: [], roadmapLabel: null, customFields: [], votes: [], customLabels: [] };
+      comments: [], customFields: [], votes: [], customLabels: [] };
       list.cards.push(card);
       const cardID = list.cards[list.cards.length - 1]._id;
 
@@ -121,41 +121,6 @@ router.put('/label/remove',
       const labelIndex = card.labels.indexOf(color);
       if (labelIndex === -1) { throw 'Label not found in cards labels'; }
       card.labels.splice(labelIndex, 1);
-      await list.save();
-
-      res.sendStatus(200);
-    } catch (err) { res.sendStatus(500); }
-  }
-);
-
-// add roadmap label to card
-router.post('/roadmapLabel',
-  validate([...areAllMongo(['listID', 'boardID', 'cardID'], 'body'), body('color').notEmpty()]),
-  useIsMember,
-  async (req, res) => {
-    try {
-      const { color, cardID, listID, boardID } = req.body;
-      if (!LABEL_COLORS.includes(color)) { throw 'Invalid label color'; }
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
-
-      card.roadmapLabel = color;
-      await list.save();
-
-      res.sendStatus(200);
-    } catch (err) { res.sendStatus(500); }
-  }
-);
-
-// remove roadmap label from card
-router.delete('/roadmapLabel/:cardID/:listID/:boardID',
-  validate(areAllMongo(['listID', 'boardID', 'cardID'], 'params')),
-  useIsMember,
-  async (req, res) => {
-    try {
-      const { listID, cardID, boardID } = req.params;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
-
-      card.roadmapLabel = null;
       await list.save();
 
       res.sendStatus(200);
@@ -467,7 +432,6 @@ router.post('/copy',
       const newCard = {
         title,
         labels: keepLabels ? sourceCard.labels : [],
-        roadmapLabel: keepLabels ? sourceCard.roadmapLabel : null,
         checklists: keepChecklists ? sourceCard.checklists.map(checklist => ({
           items: checklist.items.map(item => ({ title: item.title, isComplete: item.isComplete })),
           title: checklist.title
