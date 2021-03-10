@@ -9,7 +9,7 @@ const RoadmapLanes = props => (
       <div key={id} style={{ height }} className={classes.Lane}>
         {cards.map(({ card, width, left, top }) => (
           <RoadmapCard key={card.cardID} style={{ top: top + 'px', width: width + 'px', left: left + 'px' }} title={card.title}
-          listID={card.listID} boardID={props.boardID} cardID={card.cardID} members={card.members} />
+          listID={card.listID} cardID={card.cardID} members={card.members} />
         ))}
       </div>
     ))}
@@ -17,7 +17,6 @@ const RoadmapLanes = props => (
 );
 
 RoadmapLanes.propTypes = {
-  boardID: PropTypes.string.isRequired,
   lanes: PropTypes.array.isRequired,
   totalWidth: PropTypes.number
 };

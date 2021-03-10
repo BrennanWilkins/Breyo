@@ -279,7 +279,7 @@ const RoadmapContainer = props => {
       <div className={classes.RoadmapContainer}>
         <LaneTypes mode={roadmapMode} lanes={lanes} totalHeight={totalHeight} />
         <DateBars rangeType={dateRange.type} startDate={dateRange.startDate} endDate={dateRange.endDate} dateWidth={dateWidth} totalHeight={totalHeight} />
-        <RoadmapLanes lanes={lanes} boardID={props.boardID} totalWidth={totalWidth} />
+        <RoadmapLanes lanes={lanes} totalWidth={totalWidth} />
       </div>
     </div>
   );
@@ -292,15 +292,13 @@ RoadmapContainer.propTypes = {
     byID: PropTypes.object.isRequired,
     allIDs: PropTypes.array.isRequired
   }),
-  lists: PropTypes.array.isRequired,
-  boardID: PropTypes.string.isRequired
+  lists: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
   lists: state.lists.lists,
   members: state.board.members,
-  customLabels: state.board.customLabels,
-  boardID: state.board.boardID
+  customLabels: state.board.customLabels
 });
 
 export default connect(mapStateToProps)(RoadmapContainer);

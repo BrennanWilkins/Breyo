@@ -2,6 +2,7 @@
   width: 100%;
   display: flex;
   align-items: center;
+  border-top: 1px solid white;
 }
 .Date {
   flex: 1 1 0;
@@ -40,4 +41,8 @@
 }
 .DateVal {
   font-weight: 500;
+}
+.Day {
+  text-transform: uppercase;
+  font-size: 11.5px;
 }

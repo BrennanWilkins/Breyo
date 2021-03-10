@@ -19,7 +19,7 @@ const DateBars = props => (
         <div style={{ width: props.dateWidth }} key={String(date)}
         className={`${classes.Date} ${isToday(date) ? classes.Highlight : isWeekend(date) ? classes.WkndHighlight : ''}`}>
           <div className={classes.DateTop}>
-            <div>{format(date, 'EEE')}</div>
+            <div className={classes.Day}>{format(date, 'EEE')}</div>
             <div className={classes.DateVal}>{format(date, 'LLL d')}</div>
           </div>
         </div>
