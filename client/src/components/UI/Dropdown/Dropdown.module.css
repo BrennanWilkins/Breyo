@@ -6,7 +6,7 @@
 }
 @keyframes slideOut {
   from { max-height: 0; }
-  to { max-height: 400px; }
+  to { max-height: 450px; }
 }
 .Hide {
   display: none;

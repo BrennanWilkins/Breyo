@@ -11,6 +11,7 @@ const HelpPage = () => {
   const ref6 = useRef();
   const ref7 = useRef();
   const ref8 = useRef();
+  const ref9 = useRef();
 
   const navigate = ref => {
     window.scrollTo({ top: ref.current.getBoundingClientRect().top + window.pageYOffset - 90, behavior: 'smooth' });
@@ -26,6 +27,7 @@ const HelpPage = () => {
       case 6: return navigate(ref6);
       case 7: return navigate(ref7);
       case 8: return navigate(ref8);
+      case 9: return navigate(ref9);
       default: return;
     }
   };
@@ -62,10 +64,15 @@ const HelpPage = () => {
         </div>
         <div ref={ref6}>
           <h2>Roadmaps</h2>
-          <p>The view your cards in the roadmap view, click on 'Roadmaps' on the board's page.
-          To add a card to the roadmap, add a start or due date to the card. You can add a roadmap label for the card in the card details modal.</p>
+          <p>The roadmap allows you to view the board's cards in a Gantt-chart style view, and can be arranged by lists, members, or labels.</p>
+          <p>The view your cards in the roadmap view, click on 'Roadmaps' at the top right of the board page.
+          To add a card to the roadmap, add a start or due date to the card.</p>
         </div>
         <div ref={ref7}>
+          <h2>Board overview</h2>
+          <p>You can see several statistics on the cards in the board in either bar or pie chart form by clicking on 'Overview' at the top right of the board page.</p>
+        </div>
+        <div ref={ref8}>
           <h2>Card features</h2>
           <h3>Adding members to a card</h3>
           <p>To add a board member to a card, open the card details modal then click on 'Members' to add or remove members.</p>
@@ -83,7 +90,7 @@ const HelpPage = () => {
           <h3>Comments</h3>
           <p>You can add, edit, or delete a comment at the bottom of the card details modal.</p>
         </div>
-        <div ref={ref8}>
+        <div ref={ref9}>
           <h2>Teams</h2>
           <p>Teams allow you to organize your project or organization across a collection of boards and team members.</p>
           <p>To create a team, click on the plus icon button at the top right of the navigation menu.
