@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import classes from './CardOptions.module.css';
 import PropTypes from 'prop-types';
 import { checklistIcon, labelIcon, clockIcon, copyIcon, archiveIcon, personIcon,
-  roadmapIcon, arrowIcon, customFieldIcon, voteIcon } from '../../../UI/icons';
+  arrowIcon, customFieldIcon, voteIcon } from '../../../UI/icons';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
 import LabelModal from '../LabelModal/LabelModal';
 import DueDateModal from '../DueDateModal/DueDateModal';
 import ChecklistModal from '../ChecklistModal/ChecklistModal';
 import CopyCardModal from '../CopyCardModal/CopyCardModal';
 import AddCardMember from '../AddCardMember/AddCardMember';
-import RoadmapLabelModal from '../RoadmapLabelModal/RoadmapLabelModal';
 import ManualMoveModal from '../ManualMoveModal/ManualMoveModal';
 import CustomFieldModal from '../CustomFieldModal/CustomFieldModal';
 
@@ -31,10 +30,6 @@ const CardOptions = props => {
         <ActionBtn className={classes.Btn} clicked={() => setShownModal('date')}>{clockIcon}Due Date</ActionBtn>
         {shownModal === 'custom' && <CustomFieldModal close={closeHandler} />}
         <ActionBtn className={`${classes.Btn} ${classes.CustomFieldBtn}`} clicked={() => setShownModal('custom')}>{customFieldIcon}Custom Field</ActionBtn>
-        <span className={classes.RoadmapBtnContainer}>
-          <ActionBtn className={`${classes.Btn} ${classes.RoadmapBtn}`} clicked={() => setShownModal('roadmap')}>{roadmapIcon}Roadmap Label</ActionBtn>
-          {shownModal === 'roadmap' && <RoadmapLabelModal close={closeHandler} />}
-        </span>
       </span>
       <div className={classes.Title2}>ACTIONS</div>
       <span className={classes.BtnContainer2}>

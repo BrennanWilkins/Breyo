@@ -46,8 +46,6 @@ const socketMap = {
   'delete/activity': actionTypes.DELETE_BOARD_ACTIVITY,
   'post/board/newMember': actionTypes.ADD_BOARD_MEMBER,
   'put/board/memberLeft': actionTypes.DELETE_BOARD_MEMBER,
-  'post/card/roadmapLabel': actionTypes.ADD_ROADMAP_LABEL,
-  'delete/card/roadmapLabel': actionTypes.REMOVE_ROADMAP_LABEL,
   'put/card/checklist/moveItem': actionTypes.MOVE_CHECKLIST_ITEM,
   'put/board/changeTeam': actionTypes.CHANGE_BOARD_TEAM,
   'put/card/comments/like': actionTypes.TOGGLE_COMMENT_LIKE,

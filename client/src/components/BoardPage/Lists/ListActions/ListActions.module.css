@@ -7,7 +7,7 @@
   padding: 5px 5px 10px 5px;
   box-sizing: border-box;
   width: 275px;
-  z-index: 2;
+  z-index: 4;
   cursor: default;
   overflow: hidden;
   margin-top: -5px;
@@ -158,7 +158,7 @@
   padding: 0 5px;
   text-align: center;
 }
-@media (max-height: 530px) {
+@media (max-height: 510px) {
   .Container {
     left: auto !important;
     right: 10px !important;

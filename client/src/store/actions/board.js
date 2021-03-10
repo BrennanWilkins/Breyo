@@ -271,23 +271,7 @@ export const leaveBoard = push => async (dispatch, getState) => {
   }
 };
 
-export const openRoadmap = () => (dispatch, getState) => {
-  const state = getState();
-  if (!state.board.shownRoadmapListID && state.lists.lists.length) {
-    const listID = state.lists.lists[0].listID;
-    dispatch({ type: actionTypes.SET_SHOWN_ROADMAP_LIST, listID });
-  }
-  dispatch({ type: actionTypes.SET_SHOWN_BOARD_VIEW, view: 'roadmap' });
-};
-
 export const setShownBoardView = view => ({ type: actionTypes.SET_SHOWN_BOARD_VIEW, view });
-
-export const openRoadmapList = listID => dispatch => {
-  dispatch({ type: actionTypes.SET_SHOWN_BOARD_VIEW, view: 'roadmap' });
-  dispatch({ type: actionTypes.SET_SHOWN_ROADMAP_LIST, listID });
-};
-
-export const setShownRoadmapList = listID => ({ type: actionTypes.SET_SHOWN_ROADMAP_LIST, listID });
 
 export const toggleCreateBoard = () => ({ type: actionTypes.TOGGLE_CREATE_BOARD });
 

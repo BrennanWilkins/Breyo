@@ -10,7 +10,6 @@ const initialState = {
   isStarred: false,
   userIsAdmin: false,
   shownView: 'lists',
-  shownRoadmapListID: null,
   showCreateBoard: false,
   createBoardTeamID: null,
   avatars: {},
@@ -34,7 +33,6 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ADD_BOARD_MEMBER: return addBoardMember(state, action);
     case actionTypes.DELETE_BOARD_MEMBER: return deleteBoardMember(state, action);
     case actionTypes.LOGOUT: return { ...initialState };
-    case actionTypes.SET_SHOWN_ROADMAP_LIST: return { ...state, shownRoadmapListID: action.listID };
     case actionTypes.TOGGLE_CREATE_BOARD: return toggleCreateBoard(state, action);
     case actionTypes.SET_CREATE_BOARD_TEAM: return setCreateBoardTeam(state, action);
     case actionTypes.CHANGE_BOARD_TEAM: return changeBoardTeam(state, action);

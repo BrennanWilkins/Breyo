@@ -32,8 +32,6 @@ const reducer = (state = initialState, action) => {
     case actionTypes.UPDATE_CARD_DESC: return updateCardDesc(state, action);
     case actionTypes.ADD_CARD_LABEL: return addCardLabel(state, action);
     case actionTypes.REMOVE_CARD_LABEL: return removeCardLabel(state, action);
-    case actionTypes.ADD_ROADMAP_LABEL: return addRoadmapLabel(state, action);
-    case actionTypes.REMOVE_ROADMAP_LABEL: return removeRoadmapLabel(state, action);
     case actionTypes.TOGGLE_DUE_DATE: return toggleDueDate(state, action);
     case actionTypes.ADD_DUE_DATE: return addDueDate(state, action);
     case actionTypes.REMOVE_DUE_DATE: return removeDueDate(state, action);
@@ -153,7 +151,6 @@ const formatCardData = (card, fromList) => ({
   })),
   dueDate: card.dueDate,
   labels: card.labels,
-  roadmapLabel: card.roadmapLabel,
   title: card.title,
   desc: card.desc,
   comments: fromList ? [] : card.comments.map(comment => {
@@ -194,7 +191,7 @@ const addList = (state, action) => {
 
 const addCard = (state, action) => {
   const card = { title: action.title, desc: '', checklists: [], dueDate: null, labels: [],
-  cardID: action.cardID, members: [], comments: [], roadmapLabel: null, customFields: [], votes: [], customLabels: [] };
+  cardID: action.cardID, members: [], comments: [], customFields: [], votes: [], customLabels: [] };
 
   const lists = state.lists.map(list => list.listID === action.listID ? { ...list, cards: [...list.cards, card] } : list);
 
@@ -234,18 +231,6 @@ const addCardLabel = (state, action) => {
 const removeCardLabel = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
   card.labels = card.labels.filter(label => label !== action.color);
-  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
-};
-
-const addRoadmapLabel = (state, action) => {
-  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  card.roadmapLabel = action.color;
-  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
-};
-
-const removeRoadmapLabel = (state, action) => {
-  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  card.roadmapLabel = null;
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 

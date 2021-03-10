@@ -1,9 +1,8 @@
 export { login, logout, loginErr, signupErr, signup, authReset, autoLogin } from './auth';
 export { createBoard, toggleIsStarred, updateActiveBoard, updateBoardTitle, sendInvite,
 addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc, deleteBoard, acceptInvite,
-rejectInvite, leaveBoard, openRoadmap, setShownRoadmapList, setShownBoardView, openRoadmapList,
-toggleCreateBoard, openCreateTeamBoard, createTeamBoard, createCustomLabel, updateCustomLabel,
-deleteCustomLabel, changeCreateBoardTeam } from './board';
+rejectInvite, leaveBoard, setShownBoardView, toggleCreateBoard, openCreateTeamBoard,
+createTeamBoard, createCustomLabel, updateCustomLabel, deleteCustomLabel, changeCreateBoardTeam } from './board';
 export { addNotif, deleteNotif } from './notifications';
 export { updateListTitle, addList, copyList, archiveList, recoverList, deleteList,
 archiveAllCards, moveAllCards, toggleVoting, setListLimit, removeListLimit, sortList,
@@ -13,7 +12,7 @@ removeCardLabel, toggleDueDateIsComplete, addDueDate, removeDueDate, addChecklis
 deleteChecklist, addChecklistItem, toggleChecklistItemIsComplete, editChecklistItem,
 deleteChecklistItem, copyCard, archiveCard, recoverCard, deleteCard, addCardMember,
 removeCardMember, removeCardMemberCurrentCard, addComment, updateComment, deleteComment,
-editChecklistTitle, setCardDetailsInitial, changeRoadmapLabel, toggleCommentLike,
+editChecklistTitle, setCardDetailsInitial, toggleCommentLike,
 addCustomField, updateCustomFieldTitle, updateCustomFieldValue, deleteCustomField,
 toggleCardVote, addCardCustomLabel, deleteCardCustomLabel } from './card';
 export { dndHandler, manualMoveCardHandler, checklistDndHandler, customFieldDndHandler } from './dndActions';

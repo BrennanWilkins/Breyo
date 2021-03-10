@@ -3,11 +3,9 @@ import classes from './ListActions.module.css';
 import { useModalToggle } from '../../../../utils/customHooks';
 import PropTypes from 'prop-types';
 import { BackBtn, CloseBtn } from '../../../UI/Buttons/Buttons';
-import { copyList, archiveList, archiveAllCards, openRoadmapList, toggleVoting,
-  setVotingResultsID } from '../../../../store/actions';
+import { copyList, archiveList, archiveAllCards, toggleVoting, setVotingResultsID } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import MoveCards from './MoveCards';
-import { roadmapIcon } from '../../../UI/icons';
 import CopyList from './CopyList';
 import ListLimit from './ListLimit';
 import SortList from './SortList';
@@ -37,7 +35,6 @@ const ListActions = props => {
 
   const defaultContent = (
     <div className={classes.Options}>
-      <div onClick={() => props.openRoadmapList(props.listID)}>{roadmapIcon} Roadmap</div>
       <div onClick={() => props.toggleVoting(props.listID)}>{props.isVoting ? 'Close voting on this list' : 'Start a vote on this list'}</div>
       {props.isVoting && <div onClick={votingResHandler}>Voting results</div>}
       <div onClick={() => setShownView('copy')}>Copy list</div>
@@ -85,7 +82,6 @@ ListActions.propTypes = {
   archiveAllCards: PropTypes.func.isRequired,
   top: PropTypes.number.isRequired,
   left: PropTypes.number.isRequired,
-  openRoadmapList: PropTypes.func.isRequired,
   isVoting: PropTypes.bool.isRequired,
   toggleVoting: PropTypes.func.isRequired,
   limit: PropTypes.number,
@@ -96,7 +92,6 @@ const mapDispatchToProps = dispatch => ({
   copyList: (title, listID) => dispatch(copyList(title, listID)),
   archiveList: listID => dispatch(archiveList(listID)),
   archiveAllCards: listID => dispatch(archiveAllCards(listID)),
-  openRoadmapList: listID => dispatch(openRoadmapList(listID)),
   toggleVoting: listID => dispatch(toggleVoting(listID)),
   setVotingResultsID: listID => dispatch(setVotingResultsID(listID))
 });

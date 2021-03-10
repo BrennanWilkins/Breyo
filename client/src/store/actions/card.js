@@ -104,24 +104,6 @@ export const removeCardLabel = color => async (dispatch, getState) => {
   }
 };
 
-export const changeRoadmapLabel = color => async (dispatch, getState) => {
-  try {
-    const { boardID, listID, cardID } = getCardState(getState);
-    if (color) {
-      const payload = { color, cardID, listID };
-      dispatch({ type: actionTypes.ADD_ROADMAP_LABEL, ...payload });
-      await axios.post('/card/roadmapLabel', { ...payload, boardID });
-      sendBoardUpdate('post/card/roadmapLabel', payload);
-    } else {
-      dispatch({ type: actionTypes.REMOVE_ROADMAP_LABEL, cardID, listID });
-      await axios.delete(`/card/roadmapLabel/${cardID}/${listID}/${boardID}`);
-      sendBoardUpdate('delete/card/roadmapLabel', { cardID, listID });
-    }
-  } catch (err) {
-    dispatch(serverErr());
-  }
-};
-
 export const toggleDueDateIsComplete = () => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID } = getCardState(getState);

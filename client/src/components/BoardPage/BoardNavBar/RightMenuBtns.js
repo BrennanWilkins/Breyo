@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import QueryCountBtn from '../../UI/QueryCountBtn/QueryCountBtn';
 import { dotsIcon, roadmapIcon, boardIcon, pieChartIcon, chevronIcon } from '../../UI/icons';
-import { openRoadmap, setShownBoardView, resetSearchQuery } from '../../../store/actions';
+import { setShownBoardView, resetSearchQuery } from '../../../store/actions';
 import Button from '../../UI/Buttons/Buttons';
 import { useModalToggle } from '../../../utils/customHooks';
 
@@ -16,8 +16,7 @@ const RightMenuBtns = props => {
   const viewHandler = view => {
     setShowViewModal(false);
     if (view === props.shownView) { return; }
-    if (view === 'roadmap') { props.openRoadmap(); }
-    else { props.setShownBoardView(view); }
+    props.setShownBoardView(view);
     if (view !== 'lists') { props.resetSearchQuery(); }
   };
 
@@ -59,7 +58,6 @@ const RightMenuBtns = props => {
 
 RightMenuBtns.propTypes = {
   cardsAreFiltered: PropTypes.bool.isRequired,
-  openRoadmap: PropTypes.func.isRequired,
   menuShown: PropTypes.bool.isRequired,
   openMenu: PropTypes.func.isRequired,
   openSearch: PropTypes.func.isRequired,
@@ -74,7 +72,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  openRoadmap: () => dispatch(openRoadmap()),
   setShownBoardView: view => dispatch(setShownBoardView(view)),
   resetSearchQuery: () => dispatch(resetSearchQuery())
 });
