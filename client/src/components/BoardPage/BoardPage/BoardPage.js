@@ -7,7 +7,7 @@ import BoardNavBar from '../BoardNavBar/BoardNavBar';
 import { initBoardSocket, connectBoardSocket, closeBoardSocket }  from '../../../socket/socket';
 import { instance as axios } from '../../../axios';
 import { addNotif, updateActiveBoard, setCardDetails, setShownMemberActivity,
-  setCardDetailsInitial, setShownBoardView } from '../../../store/actions';
+  setCardDetailsInitial,resetBoardView } from '../../../store/actions';
 import Spinner from '../../UI/Spinner/Spinner';
 import ListContainer from '../Lists/ListContainer/ListContainer';
 import { useDidUpdate } from '../../../utils/customHooks';
@@ -147,7 +147,7 @@ const mapDispatchToProps = dispatch => ({
   setCardDetails: (cardID, listID) => dispatch(setCardDetails(cardID, listID)),
   setCardDetailsInitial: (cardID, listID, push) => dispatch(setCardDetailsInitial(cardID, listID, push)),
   closeMemberActivity: () => dispatch(setShownMemberActivity(null)),
-  resetView: () => dispatch(setShownBoardView('lists'))
+  resetView: () => dispatch(resetBoardView())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(BoardPage));

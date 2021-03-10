@@ -6,6 +6,7 @@ import DateBars from '../DateBars/DateBars';
 import LaneTypes from '../LaneTypes/LaneTypes';
 import RoadmapLanes from '../RoadmapLanes/RoadmapLanes';
 import { connect } from 'react-redux';
+import { setRoadmapDateRange, setRoadmapMode } from '../../../../store/actions';
 import { startOfMonth, endOfMonth, startOfYear, endOfYear, startOfWeek, endOfWeek,
   isThisWeek, isThisMonth, isThisYear, addWeeks, subWeeks, addMonths, subMonths,
   addYears, subYears, getDaysInMonth, differenceInDays, differenceInCalendarMonths } from 'date-fns';
@@ -130,12 +131,6 @@ const setRangeHelper = (type, date) => {
 };
 
 const RoadmapContainer = props => {
-  const [roadmapMode, setRoadmapMode] = useState('List');
-  const [dateRange, setDateRange] = useState({
-    type: 'Month',
-    startDate: startOfMonth(new Date()),
-    endDate: endOfMonth(new Date())
-  });
   const [dateWidth, setDateWidth] = useState(55);
   const [totalWidth, setTotalWidth] = useState(null);
   const [totalHeight, setTotalHeight] = useState('100%');
@@ -145,11 +140,11 @@ const RoadmapContainer = props => {
     let totalWidth = window.innerWidth - 220;
     if (props.menuShown) { totalWidth -= 350; }
     let dateWidth, datesWidth;
-    if (dateRange.type === 'Month') {
-      let days = getDaysInMonth(dateRange.startDate);
+    if (props.dateRange.type === 'Month') {
+      let days = getDaysInMonth(props.dateRange.startDate);
       dateWidth = Math.max(55, totalWidth / days);
       datesWidth = dateWidth * days;
-    } else if (dateRange.type === 'Week') {
+    } else if (props.dateRange.type === 'Week') {
       dateWidth = Math.max(55, totalWidth / 7);
       datesWidth = dateWidth * 7;
     } else {
@@ -158,7 +153,7 @@ const RoadmapContainer = props => {
     }
     setDateWidth(dateWidth);
     setTotalWidth(datesWidth);
-  }, [props.menuShown, dateRange]);
+  }, [props.menuShown, props.dateRange]);
 
   useEffect(() => {
     calcWidthHandler();
@@ -168,63 +163,59 @@ const RoadmapContainer = props => {
   }, [calcWidthHandler]);
 
   const changeRangeTypeHandler = type => {
-    if (type === dateRange.type) { return; }
-    setDateRange(setRangeHelper(type, dateRange.startDate));
+    if (type === props.dateRange.type) { return; }
+    props.setDateRange(setRangeHelper(type, props.dateRange.startDate));
   };
 
   const moveToTodayHandler = () => {
     // check if today's date is already in current date range
-    let start = dateRange.startDate;
-    if ((dateRange.type === 'Week' && isThisWeek(start)) ||
-        (dateRange.type === 'Month' && isThisMonth(start)) ||
-        (dateRange.type === 'Year' && isThisYear(start))) { return; }
+    const { startDate, type } = props.dateRange;
+    if ((type === 'Week' && isThisWeek(startDate)) ||
+        (type === 'Month' && isThisMonth(startDate)) ||
+        (type === 'Year' && isThisYear(startDate))) { return; }
 
-    setDateRange(setRangeHelper(dateRange.type, new Date()));
+    props.setDateRange(setRangeHelper(type, new Date()));
   };
 
-  const subRangeHandler = () => setDateRange(moveRangeHelper(dateRange, false));
+  const subRangeHandler = () => props.setDateRange(moveRangeHelper(props.dateRange, false));
 
-  const addRangeHandler = () => setDateRange(moveRangeHelper(dateRange, true));
+  const addRangeHandler = () => props.setDateRange(moveRangeHelper(props.dateRange, true));
 
   useEffect(() => {
-    if (roadmapMode === 'List') {
-      let totHeight = 50;
+    let totHeight = 50;
+    if (props.roadmapMode === 'List') {
       setLanes(props.lists.map(list => {
-        const { cards, height } = getLaneCards(list, dateRange, dateWidth, true);
+        const { cards, height } = getLaneCards(list, props.dateRange, dateWidth, true);
         const unassignedCards = getUnassignedCards(list.cards.map(card => ({ ...card, listID: list.listID })));
         totHeight += height;
         return { title: list.title, id: list.listID, cards, unassignedCards, height: height + 'px' };
       }));
-      setTotalHeight(totHeight + 'px');
-    } else if (roadmapMode === 'Member') {
-      let totHeight = 50;
+    } else if (props.roadmapMode === 'Member') {
       setLanes(getCardsByMember(props.lists, props.members).map(member => {
-        const { cards, height } = getLaneCards(member, dateRange, dateWidth);
+        const { cards, height } = getLaneCards(member, props.dateRange, dateWidth);
         const unassignedCards = getUnassignedCards(member.cards);
         totHeight += height;
         return { ...member, id: member.email, cards, unassignedCards, height: height + 'px' };
       }));
-      setTotalHeight(totHeight + 'px');
     } else {
-      let totHeight = 50;
       setLanes(getCardsByLabel(props.lists, props.customLabels).map(label => {
-        const { cards, height } = getLaneCards(label, dateRange, dateWidth);
+        const { cards, height } = getLaneCards(label, props.dateRange, dateWidth);
         const unassignedCards = getUnassignedCards(label.cards);
         totHeight += height;
         return { title: label.title, color: label.color, id: label.labelID, cards, unassignedCards, height: height + 'px' };
       }));
-      setTotalHeight(totHeight + 'px');
     }
-  }, [props.lists, props.members, props.customLabels, dateRange, roadmapMode, dateWidth]);
+    setTotalHeight(totHeight + 'px');
+  }, [props.lists, props.members, props.customLabels, props.dateRange, props.roadmapMode, dateWidth]);
 
   return (
     <div className={classes.Container} style={props.menuShown ? {width: 'calc(100% - 350px)'} : null}>
-      <RoadmapNavBar roadmapMode={roadmapMode} rangeType={dateRange.type} startDate={dateRange.startDate}
-      changeMode={mode => setRoadmapMode(mode)} changeRangeType={changeRangeTypeHandler} moveToToday={moveToTodayHandler}
+      <RoadmapNavBar roadmapMode={props.roadmapMode} rangeType={props.dateRange.type} startDate={props.dateRange.startDate}
+      changeMode={mode => props.setRoadmapMode(mode)} changeRangeType={changeRangeTypeHandler} moveToToday={moveToTodayHandler}
       subRange={subRangeHandler} addRange={addRangeHandler} />
       <div className={classes.RoadmapContainer}>
-        <LaneTypes mode={roadmapMode} lanes={lanes} totalHeight={totalHeight} />
-        <DateBars rangeType={dateRange.type} startDate={dateRange.startDate} endDate={dateRange.endDate} dateWidth={dateWidth} totalHeight={totalHeight} />
+        <LaneTypes mode={props.roadmapMode} lanes={lanes} totalHeight={totalHeight} />
+        <DateBars rangeType={props.dateRange.type} startDate={props.dateRange.startDate} endDate={props.dateRange.endDate} dateWidth={dateWidth} totalHeight={totalHeight} />
         <RoadmapLanes lanes={lanes} totalWidth={totalWidth} />
       </div>
     </div>
@@ -238,13 +229,28 @@ RoadmapContainer.propTypes = {
     byID: PropTypes.object.isRequired,
     allIDs: PropTypes.array.isRequired
   }),
-  lists: PropTypes.array.isRequired
+  lists: PropTypes.array.isRequired,
+  setDateRange: PropTypes.func.isRequired,
+  setRoadmapMode: PropTypes.func.isRequired,
+  roadmapMode: PropTypes.string.isRequired,
+  dateRange: PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    startDate: PropTypes.instanceOf(Date),
+    endDate: PropTypes.instanceOf(Date)
+  })
 };
 
 const mapStateToProps = state => ({
   lists: state.lists.lists,
   members: state.board.members,
-  customLabels: state.board.customLabels
+  customLabels: state.board.customLabels,
+  dateRange: state.roadmap.dateRange,
+  roadmapMode: state.roadmap.roadmapMode
 });
 
-export default connect(mapStateToProps)(RoadmapContainer);
+const mapDispatchToProps = dispatch => ({
+  setDateRange: dateRange => dispatch(setRoadmapDateRange(dateRange)),
+  setRoadmapMode: mode => dispatch(setRoadmapMode(mode))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(RoadmapContainer);

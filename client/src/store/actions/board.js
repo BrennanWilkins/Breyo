@@ -273,6 +273,11 @@ export const leaveBoard = push => async (dispatch, getState) => {
 
 export const setShownBoardView = view => ({ type: actionTypes.SET_SHOWN_BOARD_VIEW, view });
 
+export const resetBoardView = () => dispatch => {
+  dispatch({ type: actionTypes.SET_SHOWN_BOARD_VIEW, view: 'lists' });
+  dispatch({ type: actionTypes.RESET_ROADMAP_SETTINGS });
+};
+
 export const toggleCreateBoard = () => ({ type: actionTypes.TOGGLE_CREATE_BOARD });
 
 export const openCreateTeamBoard = teamID => ({ type: actionTypes.TOGGLE_CREATE_BOARD, teamID });

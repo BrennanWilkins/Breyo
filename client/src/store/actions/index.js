@@ -2,7 +2,8 @@ export { login, logout, loginErr, signupErr, signup, authReset, autoLogin } from
 export { createBoard, toggleIsStarred, updateActiveBoard, updateBoardTitle, sendInvite,
 addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc, deleteBoard, acceptInvite,
 rejectInvite, leaveBoard, setShownBoardView, toggleCreateBoard, openCreateTeamBoard,
-createTeamBoard, createCustomLabel, updateCustomLabel, deleteCustomLabel, changeCreateBoardTeam } from './board';
+createTeamBoard, createCustomLabel, updateCustomLabel, deleteCustomLabel, changeCreateBoardTeam,
+resetBoardView } from './board';
 export { addNotif, deleteNotif } from './notifications';
 export { updateListTitle, addList, copyList, archiveList, recoverList, deleteList,
 archiveAllCards, moveAllCards, toggleVoting, setListLimit, removeListLimit, sortList,
@@ -25,3 +26,4 @@ export { createTeam, getActiveTeam, editTeam, changeTeamLogo, removeTeamLogo,
 deleteTeam, inviteTeamMembers, acceptTeamInvite, rejectTeamInvite, leaveTeam,
 changeBoardTeam, addToTeam, promoteTeamMember, demoteTeamMember, removeBoardFromTeam } from './team';
 export { getUserData, deleteAccount, deleteAvatar, changeAvatar } from './user';
+export { setRoadmapMode, setRoadmapDateRange } from './roadmap';
