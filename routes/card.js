@@ -162,6 +162,8 @@ router.post('/dueDate',
 
       if (isNaN(new Date(dueDate).getDate())) { throw 'Invalid due date format'; }
       if (startDate !== null && isNaN(new Date(startDate).getDate())) { throw 'Invalid start date format'; }
+      if ((startDate && dueDate) && (new Date(startDate) > new Date(dueDate))) { throw 'Start date must be before due date'; }
+
       card.dueDate = { dueDate, startDate, isComplete: false };
 
       // format date in action & show year in date if not current year

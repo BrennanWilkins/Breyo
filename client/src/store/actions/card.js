@@ -118,6 +118,9 @@ export const toggleDueDateIsComplete = () => async (dispatch, getState) => {
 
 export const addDueDate = (startDate, dueDate) => async (dispatch, getState) => {
   try {
+    if ((startDate && dueDate) && (new Date(startDate) > new Date(dueDate))) {
+      return dispatch(addNotif('The card start date must be before the due date.'));
+    }
     const { boardID, listID, cardID } = getCardState(getState);
     const payload = { startDate, dueDate, cardID, listID };
     dispatch({ type: actionTypes.ADD_DUE_DATE, ...payload });
