@@ -44,12 +44,14 @@ const calcWidthLeft = (card, startDate, dateWidth, rangeType) => {
 
 const getCardsByMember = (lists, boardMembers) => {
   const members = {};
-  for (let member of boardMembers) { members[member.email] = []; }
   for (let list of lists) {
     for (let card of list.cards) {
-      if (card.members.length) {
-        for (let member of card.members) {
+      if (!card.members.length) { continue; }
+      for (let member of card.members) {
+        if (members[member.email]) {
           members[member.email].push({ ...card, listID: list.listID });
+        } else {
+          members[member.email] = [{ ...card, listID: list.listID }];
         }
       }
     }
@@ -59,19 +61,21 @@ const getCardsByMember = (lists, boardMembers) => {
 
 const getCardsByLabel = (lists, customLabels) => {
   const labels = {};
-  for (let labelID of customLabels.allIDs) { labels[labelID] = []; }
   for (let list of lists) {
     for (let card of list.cards) {
-      if (card.customLabels.length) {
-        for (let labelID of card.customLabels) {
-          labels[labelID].push({ ...card, listID: list.listID });
+      if (!card.customLabels.length) { continue; }
+      for (let labelID of card.customLabels) {
+        if (labels[labelID]) {
+          labels[labelID].push({ ...card, listID: list.listID })
+        } else {
+          labels[labelID] = [{ ...card, listID: list.listID }];
         }
       }
     }
   }
   return customLabels.allIDs.map(labelID => {
     const { title, color } = customLabels.byID[labelID];
-    return { labelID, cards: labels[labelID], title, color };
+    return { labelID, cards: labels[labelID] || [], title, color };
   });
 };
 
@@ -139,18 +143,10 @@ const RoadmapContainer = props => {
   const calcWidthHandler = useCallback(() => {
     let totalWidth = window.innerWidth - 220;
     if (props.menuShown) { totalWidth -= 350; }
-    let dateWidth, datesWidth;
-    if (props.dateRange.type === 'Month') {
-      let days = getDaysInMonth(props.dateRange.startDate);
-      dateWidth = Math.max(55, totalWidth / days);
-      datesWidth = dateWidth * days;
-    } else if (props.dateRange.type === 'Week') {
-      dateWidth = Math.max(55, totalWidth / 7);
-      datesWidth = dateWidth * 7;
-    } else {
-      dateWidth = Math.max(55, totalWidth / 12);
-      datesWidth = dateWidth * 12;
-    }
+    const { type, startDate } = props.dateRange;
+    const divisor = type === 'Month' ? getDaysInMonth(startDate) : type === 'Week' ? 7 : 12;
+    const dateWidth = Math.max(55, totalWidth / divisor);
+    const datesWidth = dateWidth * divisor;
     setDateWidth(dateWidth);
     setTotalWidth(datesWidth);
   }, [props.menuShown, props.dateRange]);
@@ -215,7 +211,8 @@ const RoadmapContainer = props => {
       subRange={subRangeHandler} addRange={addRangeHandler} />
       <div className={classes.RoadmapContainer}>
         <LaneTypes mode={props.roadmapMode} lanes={lanes} totalHeight={totalHeight} />
-        <DateBars rangeType={props.dateRange.type} startDate={props.dateRange.startDate} endDate={props.dateRange.endDate} dateWidth={dateWidth} totalHeight={totalHeight} />
+        <DateBars rangeType={props.dateRange.type} startDate={props.dateRange.startDate} endDate={props.dateRange.endDate}
+        dateWidth={dateWidth} totalHeight={totalHeight} />
         <RoadmapLanes lanes={lanes} totalWidth={totalWidth} />
       </div>
     </div>

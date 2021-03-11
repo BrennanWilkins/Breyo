@@ -2,17 +2,20 @@
   width: 100%;
   display: flex;
   align-items: center;
-  border-top: 1px solid white;
+  border-top: 2px solid white;
+  height: calc(100% - 2px);
+  position: relative;
+  top: -2px;
 }
 .Date {
   flex: 1 1 0;
   font-size: 13px;
   text-align: center;
   min-width: 55px;
-  height: calc(100% + 10px);
   border-left: 1px solid #ddd;
   background: rgb(247,247,247);
   box-sizing: border-box;
+  height: 100%;
 }
 .DateTop {
   display: flex;

@@ -6,19 +6,19 @@ import { eachMonthOfInterval, eachDayOfInterval, format, isThisMonth, isToday, i
 const DateBars = props => (
   <div className={classes.DateBars} style={{ minHeight: props.totalHeight }}>
     {props.rangeType === 'Year' ?
-      eachMonthOfInterval({ start: props.startDate, end: props.endDate }).map((date, i) => (
+      eachMonthOfInterval({ start: props.startDate, end: props.endDate }).map((date, i, arr) => (
         <div style={{ width: props.dateWidth }} key={String(date)}
         className={`${classes.Date} ${isThisMonth(date) ? classes.Highlight : ''}`}>
-          <div className={classes.DateTop}>
+          <div className={classes.DateTop} style={i === arr.length - 1 ? { borderRight: '0', marginRight: '0' } : null}>
             <div className={classes.DateVal}>{format(date, 'LLL')}</div>
           </div>
         </div>
       ))
       :
-      eachDayOfInterval({ start: props.startDate, end: props.endDate }).map((date, i) => (
+      eachDayOfInterval({ start: props.startDate, end: props.endDate }).map((date, i, arr) => (
         <div style={{ width: props.dateWidth }} key={String(date)}
         className={`${classes.Date} ${isToday(date) ? classes.Highlight : isWeekend(date) ? classes.WkndHighlight : ''}`}>
-          <div className={classes.DateTop}>
+          <div className={classes.DateTop} style={i === arr.length - 1 ? { borderRight: '0', marginRight: '0' } : null}>
             <div className={classes.Day}>{format(date, 'EEE')}</div>
             <div className={classes.DateVal}>{format(date, 'LLL d')}</div>
           </div>
