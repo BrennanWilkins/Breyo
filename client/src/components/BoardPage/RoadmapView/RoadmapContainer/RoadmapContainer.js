@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { setRoadmapDateRange, setRoadmapMode } from '../../../../store/actions';
 import { startOfMonth, endOfMonth, startOfYear, endOfYear, startOfWeek, endOfWeek,
   isThisWeek, isThisMonth, isThisYear, addWeeks, subWeeks, addMonths, subMonths,
-  addYears, subYears, getDaysInMonth, differenceInDays, differenceInCalendarMonths } from 'date-fns';
+  addYears, subYears, getDaysInMonth, differenceInCalendarDays, differenceInCalendarMonths } from 'date-fns';
 
 const calcRows = cards => {
   cards.sort((a,b) => a.left - b.left);
@@ -36,8 +36,8 @@ const calcWidthLeft = (card, startDate, dateWidth, rangeType) => {
     width = (Math.abs(differenceInCalendarMonths(cardStart, cardDue)) + 1) * dateWidth - 3;
     left = differenceInCalendarMonths(cardStart, startDate) * dateWidth + 1;
   } else {
-    width = (Math.abs(differenceInDays(cardStart, cardDue)) + 2) * dateWidth - 3;
-    left = differenceInDays(cardStart, startDate) * dateWidth + 1;
+    width = (Math.abs(differenceInCalendarDays(cardStart, cardDue)) + 1) * dateWidth - 3;
+    left = differenceInCalendarDays(cardStart, startDate) * dateWidth + 1;
   }
   return { card, width, left };
 };
