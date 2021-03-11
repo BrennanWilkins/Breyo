@@ -2,13 +2,15 @@ import React, { useState, useMemo } from 'react';
 import classes from './RoadmapNavBar.module.css';
 import PropTypes from 'prop-types';
 import { ActionBtn } from '../../../UI/Buttons/Buttons';
-import { chevronIcon } from '../../../UI/icons';
+import { chevronIcon, infoIcon } from '../../../UI/icons';
 import SelectModal from '../SelectModal/SelectModal';
 import { format, getYear } from 'date-fns';
+import InfoModal from '../InfoModal/InfoModal';
 
 const RoadmapNavBar = props => {
   const [showRangeSelect, setShowRangeSelect] = useState(false);
   const [showModeSelect, setShowModeSelect] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
   const changeModeHandler = mode => {
     setShowModeSelect(false);
@@ -50,6 +52,8 @@ const RoadmapNavBar = props => {
           optionSelected={changeModeHandler} active={props.roadmapMode} />
         }
       </div>
+      <div className={classes.InfoBtn} onClick={() => setShowInfoModal(true)}>{infoIcon}</div>
+      {showInfoModal && <InfoModal close={() => setShowInfoModal(false)} />}
     </div>
   );
 };
