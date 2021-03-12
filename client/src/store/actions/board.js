@@ -52,7 +52,8 @@ const formatCardData = card => {
     items: checklist.items.map(item => ({
       itemID: item._id,
       title: item.title,
-      isComplete: item.isComplete
+      isComplete: item.isComplete,
+      member: item.member
     }))
   }));
 

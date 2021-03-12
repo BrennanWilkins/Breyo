@@ -461,3 +461,27 @@ export const deleteCardCustomLabel = labelID => async (dispatch, getState) => {
     dispatch(serverErr());
   }
 };
+
+export const changeChecklistItemMember = (member, itemID, checklistID) => async (dispatch, getState) => {
+  try {
+    const { boardID, listID, cardID } = getCardState(getState);
+    const payload = { boardID, listID, cardID, itemID, checklistID };
+    dispatch({ type: actionTypes.CHANGE_CHECKLIST_ITEM_MEMBER, ...payload, member });
+    await axios.put('/card/checklist/item/member', { ...payload, email: member.email });
+    sendBoardUpdate('put/card/checklist/item/member', { ...payload, member });
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
+
+export const removeChecklistItemMember = (itemID, checklistID) => async (dispatch, getState) => {
+  try {
+    const { boardID, listID, cardID } = getCardState(getState);
+    const payload = { boardID, listID, cardID, itemID, checklistID };
+    dispatch({ type: actionTypes.REMOVE_CHECKLIST_ITEM_MEMBER, ...payload });
+    await axios.put('/card/checklist/item/removeMember', payload);
+    sendBoardUpdate('put/card/checklist/item/removeMember', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
