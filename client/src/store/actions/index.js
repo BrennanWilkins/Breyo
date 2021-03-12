@@ -26,4 +26,4 @@ export { createTeam, getActiveTeam, editTeam, changeTeamLogo, removeTeamLogo,
 deleteTeam, inviteTeamMembers, acceptTeamInvite, rejectTeamInvite, leaveTeam,
 changeBoardTeam, addToTeam, promoteTeamMember, demoteTeamMember, removeBoardFromTeam } from './team';
 export { getUserData, deleteAccount, deleteAvatar, changeAvatar } from './user';
-export { setRoadmapMode, setRoadmapDateRange } from './roadmap';
+export { setRoadmapMode, setRoadmapDateRange, resizeCardHandler } from './roadmap';
