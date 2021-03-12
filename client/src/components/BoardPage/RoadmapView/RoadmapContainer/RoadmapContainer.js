@@ -33,11 +33,11 @@ const calcWidthLeft = (card, startDate, dateWidth, rangeType) => {
   let cardDue = new Date(card.dueDate.dueDate);
   let width, left;
   if (rangeType === 'Year') {
-    width = (Math.abs(differenceInCalendarMonths(cardStart, cardDue)) + 1) * dateWidth - 3;
-    left = differenceInCalendarMonths(cardStart, startDate) * dateWidth + 1;
+    width = (Math.abs(differenceInCalendarMonths(cardStart, cardDue)) + 1) * dateWidth - 1;
+    left = differenceInCalendarMonths(cardStart, startDate) * dateWidth;
   } else {
-    width = (Math.abs(differenceInCalendarDays(cardStart, cardDue)) + 1) * dateWidth - 3;
-    left = differenceInCalendarDays(cardStart, startDate) * dateWidth + 1;
+    width = (Math.abs(differenceInCalendarDays(cardStart, cardDue)) + 1) * dateWidth - 1;
+    left = differenceInCalendarDays(cardStart, startDate) * dateWidth;
   }
   return { card, width, left };
 };

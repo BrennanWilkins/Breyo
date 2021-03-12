@@ -8,7 +8,6 @@
   top: -2px;
 }
 .Date {
-  flex: 1 1 0;
   font-size: 13px;
   text-align: center;
   min-width: 55px;
@@ -34,10 +33,6 @@
 .Highlight {
   color: rgb(var(--red));
   background: rgba(var(--red), 0.2);
-}
-.Highlight .DateTop {
-  margin-left: -1px;
-  border-left: 1px solid #ddd;
 }
 .WkndHighlight {
   background: rgb(240,240,240);
