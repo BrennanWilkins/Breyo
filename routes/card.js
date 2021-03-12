@@ -280,7 +280,7 @@ router.post('/checklist/item',
 
       const checklist = card.checklists.id(checklistID);
       if (!checklist) { throw 'No checklist data found'; }
-      checklist.items.push({ title, isComplete: false });
+      checklist.items.push({ title, isComplete: false, member: null });
       const itemID = checklist.items[checklist.items.length - 1]._id;
 
       await list.save();
@@ -330,6 +330,57 @@ router.put('/checklist/item/title',
       const item = checklist.items.id(req.body.itemID);
       if (!item) { throw 'Checklist item not found'; }
       item.title = req.body.title;
+
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// add a member to a checklist item
+router.put('/checklist/item/member',
+  validate([...areAllMongo(['listID', 'boardID', 'cardID', 'checklistID', 'itemID'], 'body'), body('email').isEmail()]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, checklistID, itemID, email } = req.body;
+      const [[list, card], user] = await Promise.all([
+        getListAndValidate(boardID, listID, cardID),
+        User.findOne({ email }).select('fullName boards').lean()
+      ]);
+
+      if (!user) { throw 'User data not found'; }
+      if (!user.boards.find(id => String(id) === boardID)) { throw 'User must be member of board'; }
+
+      const checklist = card.checklists.id(checklistID);
+      if (!checklist) { throw 'Card checklist not found'; }
+
+      const item = checklist.items.id(itemID);
+      if (!item) { throw 'Checklist item not found'; }
+      if (item.member && item.member.email === email) { throw 'User already assigned to this item'; }
+      item.member = { email, fullName: user.fullName };
+
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { console.log(err); res.sendStatus(500); }
+  }
+);
+
+// remove a member from a checklist item
+router.put('/checklist/item/removeMember',
+  validate(areAllMongo(['listID', 'boardID', 'cardID', 'checklistID', 'itemID'], 'body')),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, checklistID, itemID } = req.body;
+      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+
+      const checklist = card.checklists.id(checklistID);
+      if (!checklist) { throw 'Card checklist not found'; }
+
+      const item = checklist.items.id(itemID);
+      if (!item) { throw 'Checklist item not found'; }
+      item.member = null;
 
       await list.save();
       res.sendStatus(200);
@@ -435,7 +486,7 @@ router.post('/copy',
         title,
         labels: keepLabels ? sourceCard.labels : [],
         checklists: keepChecklists ? sourceCard.checklists.map(checklist => ({
-          items: checklist.items.map(item => ({ title: item.title, isComplete: item.isComplete })),
+          items: checklist.items.map(item => ({ title: item.title, isComplete: item.isComplete, member: item.member })),
           title: checklist.title
         })) : [],
         customFields: sourceCard.customFields.map(field => ({

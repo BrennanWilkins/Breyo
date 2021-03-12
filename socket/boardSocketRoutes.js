@@ -64,7 +64,9 @@ const routes = [
   'delete/board/customLabel',
   'post/card/customLabel',
   'delete/card/customLabel',
-  'put/board/removeFromTeam'
+  'put/board/removeFromTeam',
+  'put/card/checklist/item/member',
+  'put/card/checklist/item/removeMember'
 ];
 
 module.exports = routes;
