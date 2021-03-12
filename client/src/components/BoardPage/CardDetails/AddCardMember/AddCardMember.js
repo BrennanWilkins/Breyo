@@ -57,7 +57,8 @@ const AddCardMember = props => {
       {shownMembers.map((member, i) => (
         <div key={member.email} className={classes.Member} onClick={() => memberHandler(i)}>
           <AccountBtn avatar={member.avatar}>{member.fullName[0]}</AccountBtn>
-          {member.fullName}{member.isMember && checkIcon}
+          <div className={classes.Name}>{member.fullName}</div>
+          {member.isMember && checkIcon}
         </div>
       ))}
     </div>

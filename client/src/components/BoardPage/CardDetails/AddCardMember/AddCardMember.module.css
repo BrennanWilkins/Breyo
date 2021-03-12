@@ -63,6 +63,7 @@
   background: rgb(254, 190, 183);
 }
 .Member button {
+  min-width: 32px;
   background: rgb(230,230,230);
 }
 .Member button:hover {
@@ -72,8 +73,15 @@
   margin-left: auto;
   margin-right: 5px;
   font-size: 16px;
+  min-width: 16px;
 }
 .Input {
   width: 97%;
   margin: 10px auto;
+}
+.Name {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
