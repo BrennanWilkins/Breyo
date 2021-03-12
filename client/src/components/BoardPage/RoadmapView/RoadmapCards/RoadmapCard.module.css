@@ -8,9 +8,9 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  padding: 0 5px;
   box-sizing: border-box;
   overflow: hidden;
+  padding: 0 8px;
 }
 .Card:hover {
   background: rgb(253,253,253);

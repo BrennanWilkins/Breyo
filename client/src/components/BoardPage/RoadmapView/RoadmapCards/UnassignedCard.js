@@ -13,9 +13,9 @@ const RoadmapCard = props => {
   };
 
   return (
-    <div style={props.style || null} className={props.className || classes.Card} onClick={showCardHandler}>
+    <div className={props.className} onClick={showCardHandler}>
       <div className={classes.Title}>{props.title}</div>
-      {(!props.style || props.style.width.slice(0, -2) > 175) && <div className={classes.Members}>
+      {<div className={classes.Members}>
         {props.members.slice(0,3).map(member => (
           <AccountBtn key={member.email} avatar={props.avatars[member.email]}>{member.fullName[0]}</AccountBtn>
         ))}
@@ -26,8 +26,7 @@ const RoadmapCard = props => {
 };
 
 RoadmapCard.propTypes = {
-  style: PropTypes.object,
-  className: PropTypes.string,
+  className: PropTypes.string.isRequired,
   cardID: PropTypes.string.isRequired,
   listID: PropTypes.string.isRequired,
   boardID: PropTypes.string.isRequired,

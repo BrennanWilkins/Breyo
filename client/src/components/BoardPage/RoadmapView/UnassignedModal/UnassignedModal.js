@@ -3,7 +3,7 @@ import classes from './UnassignedModal.module.css';
 import PropTypes from 'prop-types';
 import { useModalToggle } from '../../../../utils/customHooks';
 import { CloseBtn } from '../../../UI/Buttons/Buttons';
-import RoadmapCard from '../RoadmapCard/RoadmapCard';
+import RoadmapCard from '../RoadmapCards/UnassignedCard';
 
 const UnassignedModal = props => {
   const modalRef = useRef();

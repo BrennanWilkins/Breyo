@@ -213,7 +213,7 @@ const RoadmapContainer = props => {
         <LaneTypes mode={props.roadmapMode} lanes={lanes} totalHeight={totalHeight} />
         <DateBars rangeType={props.dateRange.type} startDate={props.dateRange.startDate} endDate={props.dateRange.endDate}
         dateWidth={dateWidth} totalHeight={totalHeight} />
-        <RoadmapLanes lanes={lanes} totalWidth={totalWidth} />
+        <RoadmapLanes lanes={lanes} totalWidth={totalWidth} dateWidth={dateWidth} />
       </div>
     </div>
   );
