@@ -1,0 +1,64 @@
+.Container {
+  width: 275px;
+  top: 70px;
+  right: 15px;
+}
+.Members {
+  max-height: 400px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.Members::-webkit-scrollbar-track {
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Members::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+  background: rgb(225, 225, 225);
+}
+.Members::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  background: rgb(197, 197, 197);
+}
+.SubTitle {
+  color: rgb(var(--darkGray));
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 0 5px;
+}
+.Member {
+  padding: 5px;
+  background: rgb(248, 248, 248);
+  color: rgb(83, 83, 83);
+  font-size: 14px;
+  margin: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.Member:hover {
+  background: rgb(244,244,244);
+}
+.Member:active {
+  background: rgb(254, 190, 183);
+}
+.Member button {
+  background: rgb(230,230,230);
+  min-width: 32px;
+}
+.Member button:hover {
+  background: rgb(220,220,220);
+}
+.Member svg {
+  margin-left: auto;
+  margin-right: 5px;
+  font-size: 16px;
+  min-width: 16px;
+}
+.Name {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

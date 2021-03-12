@@ -12,7 +12,7 @@
 .Title, .TitleCompleted {
   margin-left: 20px;
   font-size: 14px;
-  max-width: calc(100% - 100px);
+  max-width: calc(100% - 125px);
   word-wrap: break-word;
 }
 .TitleCompleted {
@@ -27,10 +27,10 @@
 .CloseBtn:hover {
   color: black;
 }
-.Container:hover .CloseBtn, .Container:hover .EditBtn {
+.Container:hover .CloseBtn, .Container:hover .Btn {
   display: inline-flex;
 }
-.EditBtn {
+.Btn {
   color: rgb(var(--darkGray));
   width: 26px;
   height: 26px;
@@ -39,10 +39,9 @@
   align-items: center;
   font-size: 15px;
   display: none;
-  margin-right: 6px;
-  cursor: pointer;
+  margin-right: 3px;
 }
-.EditBtn:hover {
+.Btn:hover {
   color: black;
   background: rgba(0,0,0,0.05);
 }
@@ -52,6 +51,7 @@
   align-items: center;
   position: absolute;
   right: 5px;
+  cursor: pointer;
 }
 .EditItem {
   width: 100%;
@@ -64,4 +64,14 @@
   padding: 7px;
   width: 100%;
   overflow-y: auto;
+}
+.AccountBtn {
+  width: 25px;
+  height: 25px;
+  min-width: 25px;
+  margin: 0 3px 0 0;
+  background: rgb(225,225,225);
+}
+.AccountBtn:hover {
+  background: rgb(212,212,212);
 }

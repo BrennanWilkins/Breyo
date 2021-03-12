@@ -12,6 +12,7 @@ import { deleteChecklist, toggleChecklistItemIsComplete, deleteChecklistItem,
 editChecklistItem, checklistDndHandler } from '../../../../store/actions';
 import EditChecklistTitle from './EditChecklistTitle/EditChecklistTitle';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import ChangeItemMemberModal from './ChangeItemMemberModal/ChangeItemMemberModal';
 
 const CardChecklist = props => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -20,6 +21,7 @@ const CardChecklist = props => {
   const [hideCompleted, setHideCompleted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showEditTitle, setShowEditTitle] = useState(false);
+  const [showChangeMember, setShowChangeMember] = useState(null);
 
   useEffect(() => {
     if (hideCompleted) { setFilteredItems(props.items.filter(item => !item.isComplete)); }
@@ -60,10 +62,14 @@ const CardChecklist = props => {
     props.dndHandler(sourceIndex, destIndex, props.checklistID);
   };
 
+  const showChangeMemberHandler = (itemID, currMember) => {
+    setShowChangeMember({ itemID, currMember });
+  };
+
   const shownItems = hideCompleted ? filteredItems : props.items;
 
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
       <div className={classes.TitleContainer}>
         <div className={classes.TitleLeft} style={showEditTitle ? { width: '100%'} : null}>
           <span className={classes.Icon}>{checklistIcon}</span>
@@ -88,7 +94,9 @@ const CardChecklist = props => {
                 <Item key={item.itemID} {...item} index={i} itemID={item.itemID}
                   toggleItemComplete={() => toggleItemCompleteHandler(item.itemID)}
                   deleteItem={() => deleteItemHandler(item.itemID)}
-                  editItem={title => editItemHandler(title, item.itemID)} />
+                  editItem={title => editItemHandler(title, item.itemID)}
+                  memberAvatar={item.member ? props.avatars[item.member.email] : null}
+                  showChangeMember={showChangeMemberHandler} />
               ))}
               {provided.placeholder}
             </div>
@@ -97,6 +105,7 @@ const CardChecklist = props => {
       </DragDropContext>
       {!showAddItem && <div className={classes.AddBtn}><ActionBtn clicked={() => setShowAddItem(true)}>Add an item</ActionBtn></div>}
       {showAddItem && <AddItem close={() => setShowAddItem(false)} checklistID={props.checklistID} />}
+      {!!showChangeMember && <ChangeItemMemberModal {...showChangeMember} close={() => setShowChangeMember(null)} checklistID={props.checklistID} />}
     </div>
   );
 };
@@ -109,8 +118,13 @@ CardChecklist.propTypes = {
   toggleItem: PropTypes.func.isRequired,
   deleteItem: PropTypes.func.isRequired,
   editItem: PropTypes.func.isRequired,
-  dndHandler: PropTypes.func.isRequired
+  dndHandler: PropTypes.func.isRequired,
+  avatars: PropTypes.object.isRequired
 };
+
+const mapStateToProps = state => ({
+  avatars: state.board.avatars
+});
 
 const mapDispatchToProps = dispatch => ({
   delete: checklistID => dispatch(deleteChecklist(checklistID)),
@@ -120,4 +134,4 @@ const mapDispatchToProps = dispatch => ({
   dndHandler: (sourceIndex, destIndex, checklistID) => dispatch(checklistDndHandler(sourceIndex, destIndex, checklistID))
 });
 
-export default connect(null, mapDispatchToProps)(CardChecklist);
+export default connect(mapStateToProps, mapDispatchToProps)(CardChecklist);

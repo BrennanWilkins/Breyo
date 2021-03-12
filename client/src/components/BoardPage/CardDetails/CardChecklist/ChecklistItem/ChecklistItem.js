@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import classes from './ChecklistItem.module.css';
 import { Checkbox } from '../../../../UI/Inputs/Inputs';
 import PropTypes from 'prop-types';
-import { CloseBtn } from '../../../../UI/Buttons/Buttons';
-import { editIcon } from '../../../../UI/icons';
+import { CloseBtn, AccountBtn } from '../../../../UI/Buttons/Buttons';
+import { editIcon, personPlusIcon } from '../../../../UI/icons';
 import { Draggable } from 'react-beautiful-dnd';
 import EditChecklistItem from './EditChecklistItem';
 
@@ -24,7 +24,18 @@ const ChecklistItem = props => {
           {!showEdit ? <>
           <span className={props.isComplete ? classes.TitleCompleted : classes.Title}>{props.title}</span>
           <div className={classes.Btns}>
-            <span className={classes.EditBtn} onClick={() => setShowEdit(true)}>{editIcon}</span>
+            <span className={classes.Btn} onClick={() => setShowEdit(true)}>{editIcon}</span>
+            {props.member ?
+              <AccountBtn clicked={() => props.showChangeMember(props.itemID, props.member.email)}
+              className={classes.AccountBtn} avatar={props.memberAvatar}>
+                {props.member.fullName[0]}
+              </AccountBtn>
+              :
+              <span className={classes.Btn} style={{ fontSize: '16px' }}
+              onClick={() => props.showChangeMember(props.itemID, null)}>
+                {personPlusIcon}
+              </span>
+            }
             <CloseBtn className={classes.CloseBtn} close={props.deleteItem} />
           </div></> :
           <EditChecklistItem close={() => setShowEdit(false)} editItem={props.editItem} title={props.title} />}
@@ -41,7 +52,10 @@ ChecklistItem.propTypes = {
   editItem: PropTypes.func.isRequired,
   deleteItem: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
-  itemID: PropTypes.string.isRequired
+  itemID: PropTypes.string.isRequired,
+  showChangeMember: PropTypes.func.isRequired,
+  member: PropTypes.object,
+  memberAvatar: PropTypes.string
 };
 
 export default ChecklistItem;
