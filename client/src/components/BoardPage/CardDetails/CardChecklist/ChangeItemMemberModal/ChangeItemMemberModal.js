@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import classes from './ChangeItemMemberModal.module.css';
 import ModalContainer from '../../../../UI/ModalContainer/ModalContainer';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { AccountBtn } from '../../../../UI/Buttons/Buttons';
+import { AccountBtn, ActionBtn } from '../../../../UI/Buttons/Buttons';
 import { checkIcon } from '../../../../UI/icons';
 import { changeChecklistItemMember, removeChecklistItemMember } from '../../../../../store/actions';
+import { Input } from '../../../../UI/Inputs/Inputs';
 
 const ChangeItemMemberModal = props => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [shownMembers, setShownMembers] = useState([]);
+
+  useEffect(() => {
+    if (!searchQuery) { setShownMembers(props.members); }
+    setShownMembers(props.members.filter(member => member.fullName.toLowerCase().includes(searchQuery.toLowerCase())));
+  }, [searchQuery]);
+
   const changeMemberHandler = member => {
     if (member.email === props.currMember) {
       props.removeMember(props.itemID, props.checklistID);
@@ -17,11 +26,17 @@ const ChangeItemMemberModal = props => {
     props.close();
   };
 
+  const removeMemberHandler = () => {
+    props.removeMember(props.itemID, props.checklistID);
+    props.close();
+  };
+
   return (
     <ModalContainer className={classes.Container} title="Assign Member" close={props.close}>
+      <Input className={classes.Input} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search board members by name" />
       <div className={classes.SubTitle}>BOARD MEMBERS</div>
       <div className={classes.Members}>
-        {props.members.map(member => (
+        {shownMembers.map(member => (
           <div key={member.email} className={classes.Member} onClick={() => changeMemberHandler(member)}>
             <AccountBtn avatar={props.avatars[member.email]}>{member.fullName[0]}</AccountBtn>
             <div className={classes.Name}>{member.fullName}</div>
@@ -29,6 +44,7 @@ const ChangeItemMemberModal = props => {
           </div>
         ))}
       </div>
+      <ActionBtn disabled={!props.currMember} clicked={removeMemberHandler} className={classes.RemoveBtn}>Remove Member</ActionBtn>
     </ModalContainer>
   );
 };

@@ -2,6 +2,7 @@
   width: 275px;
   top: 70px;
   right: 15px;
+  padding: 5px 5px 10px;
 }
 .Members {
   max-height: 400px;
@@ -61,4 +62,18 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.RemoveBtn {
+  display: block;
+  width: calc(100% - 10px);
+  margin: 10px auto 0;
+}
+.RemoveBtn:disabled {
+  background: rgb(247,247,247);
+  cursor: default;
+  color: rgb(152,152,152);
+}
+.Input {
+  width: 97%;
+  margin: 10px auto;
 }
