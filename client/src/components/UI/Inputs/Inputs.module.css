@@ -9,11 +9,12 @@
   align-items: center;
   font-size: 15px;
   cursor: pointer;
+  color: white;
 }
 .CheckboxCheck {
   border: 2px solid rgb(var(--red));
   background: rgb(var(--red));
-  color: white;
+  transition: all 200ms;
 }
 .CheckboxCheck:hover {
   filter: brightness(110%);

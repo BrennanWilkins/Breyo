@@ -17,12 +17,15 @@ const CardLabels = props => {
         {props.customLabels.map(labelID => {
           const label = props.customLabelsByID[labelID];
           return (
-            <div key={labelID} title={label.title} className={classes.CustomLabel} style={{ background: label.color }}>
+            <div key={labelID} title={label.title} onClick={() => setShowLabelModal(true)}
+            className={classes.CustomLabel} style={{ background: label.color }}>
               {label.title}
             </div>
           );
         })}
-        {LABEL_COLORS.filter(color => props.labels.includes(color)).map(color => <div key={color} className={classes.Label} style={{background: color}} />)}
+        {LABEL_COLORS.filter(color => props.labels.includes(color)).map(color => (
+          <div key={color} className={classes.Label} onClick={() => setShowLabelModal(true)} style={{background: color}} />
+        ))}
         <div className={classes.Btn}>
           <ActionBtn className={classes.AddBtn} clicked={() => setShowLabelModal(true)}>{plusIcon}</ActionBtn>
           {showLabelModal && <LabelModal openFromMiddle close={() => setShowLabelModal(false)} />}
