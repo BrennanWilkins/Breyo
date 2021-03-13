@@ -22,11 +22,20 @@ const EditChecklistTitle = props => {
 
   useEffect(() => inputRef.current.select(), []);
 
+  const inputHandler = e => {
+    if (e.target.value.length > 200) { return; }
+    setTitleInput(e.target.value);
+  };
+
+  const keyPressHandler = e => {
+    if (e.key === 'Enter') { submitHandler(e); }
+  };
+
   return (
     <div ref={editRef} className={classes.Container}>
       <form onSubmit={submitHandler}>
-        <TextArea maxRows="5" ref={inputRef} value={titleInput} onChange={e => setTitleInput(e.target.value)} className={classes.Input}
-        onKeyPress={e => { if (e.key === 'Enter') { submitHandler(e); }}} />
+        <TextArea ref={inputRef} value={titleInput} onChange={inputHandler} className={classes.Input}
+        onKeyPress={keyPressHandler}  />
         <SubmitBtns disabled={!titleInput} text="Save" close={props.close} />
       </form>
     </div>

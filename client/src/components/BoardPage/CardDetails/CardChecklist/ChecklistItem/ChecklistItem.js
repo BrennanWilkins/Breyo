@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import classes from './ChecklistItem.module.css';
 import { Checkbox } from '../../../../UI/Inputs/Inputs';
 import PropTypes from 'prop-types';
@@ -9,10 +9,16 @@ import EditChecklistItem from './EditChecklistItem';
 
 const ChecklistItem = props => {
   const [showEdit, setShowEdit] = useState(false);
+  const checkboxRef = useRef();
 
   const getDragStyle = (isDragging, otherStyles) => {
     if (isDragging) { return { background: 'rgb(235, 235, 235)', ...otherStyles }; }
     else { return otherStyles; }
+  };
+
+  const checkboxClickHandler = () => {
+    props.toggleItemComplete();
+    if (showEdit) { setShowEdit(false); }
   };
 
   return (
@@ -20,9 +26,9 @@ const ChecklistItem = props => {
       {(provided, snapshot) => (
         <div className={classes.Container} ref={provided.innerRef}
         {...provided.draggableProps} {...provided.dragHandleProps} style={getDragStyle(snapshot.isDragging, provided.draggableProps.style)}>
-          <Checkbox checked={props.isComplete} clicked={props.toggleItemComplete} />
+          <Checkbox cbRef={checkboxRef} checked={props.isComplete} clicked={checkboxClickHandler} />
           {!showEdit ? <>
-          <span className={props.isComplete ? classes.TitleCompleted : classes.Title}>{props.title}</span>
+          <span onClick={() => setShowEdit(true)} className={props.isComplete ? classes.TitleCompleted : classes.Title}>{props.title}</span>
           <div className={classes.Btns}>
             <span className={classes.Btn} onClick={() => setShowEdit(true)}>{editIcon}</span>
             {props.member ?
@@ -38,7 +44,7 @@ const ChecklistItem = props => {
             }
             <CloseBtn className={classes.CloseBtn} close={props.deleteItem} />
           </div></> :
-          <EditChecklistItem close={() => setShowEdit(false)} editItem={props.editItem} title={props.title} />}
+          <EditChecklistItem checkboxRef={checkboxRef} close={() => setShowEdit(false)} editItem={props.editItem} title={props.title} />}
         </div>
       )}
     </Draggable>

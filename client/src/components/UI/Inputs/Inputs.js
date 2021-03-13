@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { isEmail, getEmails } from '../../../utils/authValidation';
 
 export const Checkbox = props => (
-  <div className={props.checked ? classes.CheckboxCheck : classes.Checkbox} onClick={props.clicked}>{checkIcon}</div>
+  <div ref={props.cbRef || undefined} className={props.checked ? classes.CheckboxCheck : classes.Checkbox} onClick={props.clicked}>{checkIcon}</div>
 );
 
 export const FileInput = props => {
