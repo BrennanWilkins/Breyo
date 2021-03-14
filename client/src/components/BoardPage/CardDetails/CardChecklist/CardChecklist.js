@@ -12,7 +12,7 @@ import { deleteChecklist, toggleChecklistItemIsComplete, deleteChecklistItem,
 editChecklistItem, checklistDndHandler } from '../../../../store/actions';
 import EditChecklistTitle from './EditChecklistTitle/EditChecklistTitle';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import ChangeItemMemberModal from './ChangeItemMemberModal/ChangeItemMemberModal';
+import ItemMemberModal from './ItemMemberModal/ItemMemberModal';
 
 const CardChecklist = props => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -62,10 +62,6 @@ const CardChecklist = props => {
     props.dndHandler(sourceIndex, destIndex, props.checklistID);
   };
 
-  const showChangeMemberHandler = (itemID, currMember) => {
-    setShowChangeMember({ itemID, currMember });
-  };
-
   const shownItems = hideCompleted ? filteredItems : props.items;
 
   return (
@@ -90,13 +86,13 @@ const CardChecklist = props => {
         <Droppable droppableId={props.checklistID} direction="vertical" type="list">
           {(provided, snapshot) => (
             <div ref={provided.innerRef}>
-              {shownItems.map((item, i) => (
-                <Item key={item.itemID} {...item} index={i} itemID={item.itemID}
-                  toggleItemComplete={() => toggleItemCompleteHandler(item.itemID)}
-                  deleteItem={() => deleteItemHandler(item.itemID)}
-                  editItem={title => editItemHandler(title, item.itemID)}
+              {shownItems.map(({ itemID, ...item }, i) => (
+                <Item key={itemID} {...item} index={i} itemID={itemID}
+                  toggleItemComplete={() => toggleItemCompleteHandler(itemID)}
+                  deleteItem={() => deleteItemHandler(itemID)}
+                  editItem={title => editItemHandler(title, itemID)}
                   memberAvatar={item.member ? props.avatars[item.member.email] : null}
-                  showChangeMember={showChangeMemberHandler} />
+                  showChangeMember={() => setShowChangeMember({ itemID, currMember: item.member })}
               ))}
               {provided.placeholder}
             </div>
@@ -105,7 +101,7 @@ const CardChecklist = props => {
       </DragDropContext>
       {!showAddItem && <div className={classes.AddBtn}><ActionBtn clicked={() => setShowAddItem(true)}>Add an item</ActionBtn></div>}
       {showAddItem && <AddItem close={() => setShowAddItem(false)} checklistID={props.checklistID} />}
-      {!!showChangeMember && <ChangeItemMemberModal {...showChangeMember} close={() => setShowChangeMember(null)} checklistID={props.checklistID} />}
+      {!!showChangeMember && <ItemMemberModal {...showChangeMember} close={() => setShowChangeMember(null)} checklistID={props.checklistID} />}
     </div>
   );
 };

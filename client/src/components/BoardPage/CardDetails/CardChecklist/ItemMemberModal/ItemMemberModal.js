@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import classes from './ChangeItemMemberModal.module.css';
+import classes from './ItemMemberModal.module.css';
 import ModalContainer from '../../../../UI/ModalContainer/ModalContainer';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -8,21 +8,20 @@ import { checkIcon } from '../../../../UI/icons';
 import { changeChecklistItemMember, removeChecklistItemMember } from '../../../../../store/actions';
 import { Input } from '../../../../UI/Inputs/Inputs';
 
-const ChangeItemMemberModal = props => {
+const ItemMemberModal = props => {
   const [searchQuery, setSearchQuery] = useState('');
   const [shownMembers, setShownMembers] = useState([]);
 
   useEffect(() => {
-    if (!searchQuery) { setShownMembers(props.members); }
-    setShownMembers(props.members.filter(member => member.fullName.toLowerCase().includes(searchQuery.toLowerCase())));
+    if (!searchQuery) { setShownMembers(props.currMember ? props.members.filter(({ email }) => email !== props.currMember.email) : props.members); }
+    setShownMembers(props.members.filter(member => {
+      if (props.currMember?.email === member.email) { return false; }
+      return member.fullName.toLowerCase().includes(searchQuery.toLowerCase());
+    }));
   }, [searchQuery]);
 
   const changeMemberHandler = member => {
-    if (member.email === props.currMember) {
-      props.removeMember(props.itemID, props.checklistID);
-    } else {
-      props.changeMember({ email: member.email, fullName: member.fullName }, props.itemID, props.checklistID);
-    }
+    props.changeMember({ email: member.email, fullName: member.fullName }, props.itemID, props.checklistID);
     props.close();
   };
 
@@ -34,13 +33,20 @@ const ChangeItemMemberModal = props => {
   return (
     <ModalContainer className={classes.Container} title="Assign Member" close={props.close}>
       <Input className={classes.Input} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search board members by name" />
+      {!!props.currMember && <>
+        <div className={classes.SubTitle}>ASSIGNED MEMBER</div>
+        <div className={classes.Member}>
+          <AccountBtn avatar={props.avatars[props.currMember.email]}>{props.currMember.fullName[0]}</AccountBtn>
+          <div className={classes.Name}>{props.currMember.fullName}</div>
+          {checkIcon}
+        </div>
+      </>}
       <div className={classes.SubTitle}>BOARD MEMBERS</div>
       <div className={classes.Members}>
         {shownMembers.map(member => (
           <div key={member.email} className={classes.Member} onClick={() => changeMemberHandler(member)}>
             <AccountBtn avatar={props.avatars[member.email]}>{member.fullName[0]}</AccountBtn>
             <div className={classes.Name}>{member.fullName}</div>
-            {props.currMember === member.email && checkIcon}
           </div>
         ))}
       </div>
@@ -49,13 +55,15 @@ const ChangeItemMemberModal = props => {
   );
 };
 
-ChangeItemMemberModal.propTypes = {
+ItemMemberModal.propTypes = {
   close: PropTypes.func.isRequired,
   itemID: PropTypes.string.isRequired,
-  currMember: PropTypes.string,
+  currMember: PropTypes.object,
   checklistID: PropTypes.string.isRequired,
   changeMember: PropTypes.func.isRequired,
-  removeMember: PropTypes.func.isRequired
+  removeMember: PropTypes.func.isRequired,
+  members: PropTypes.array.isRequired,
+  avatars: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -68,4 +76,4 @@ const mapDispatchToProps = dispatch => ({
   removeMember: (itemID, checklistID) => dispatch(removeChecklistItemMember(itemID, checklistID))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ChangeItemMemberModal);
+export default connect(mapStateToProps, mapDispatchToProps)(ItemMemberModal);
