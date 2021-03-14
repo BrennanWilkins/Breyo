@@ -13,6 +13,7 @@ editChecklistItem, checklistDndHandler } from '../../../../store/actions';
 import EditChecklistTitle from './EditChecklistTitle/EditChecklistTitle';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import ItemMemberModal from './ItemMemberModal/ItemMemberModal';
+import ItemDueDateModal from './ItemDueDateModal/ItemDueDateModal';
 
 const CardChecklist = props => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -22,6 +23,7 @@ const CardChecklist = props => {
   const [progress, setProgress] = useState(0);
   const [showEditTitle, setShowEditTitle] = useState(false);
   const [showChangeMember, setShowChangeMember] = useState(null);
+  const [showChangeDueDate, setShowChangeDueDate] = useState(null);
 
   useEffect(() => {
     if (hideCompleted) { setFilteredItems(props.items.filter(item => !item.isComplete)); }
@@ -93,6 +95,7 @@ const CardChecklist = props => {
                   editItem={title => editItemHandler(title, itemID)}
                   memberAvatar={item.member ? props.avatars[item.member.email] : null}
                   showChangeMember={() => setShowChangeMember({ itemID, currMember: item.member })}
+                  showChangeDueDate={() => setShowChangeDueDate({ itemID, dueDate: item.dueDate })} />
               ))}
               {provided.placeholder}
             </div>
@@ -102,6 +105,7 @@ const CardChecklist = props => {
       {!showAddItem && <div className={classes.AddBtn}><ActionBtn clicked={() => setShowAddItem(true)}>Add an item</ActionBtn></div>}
       {showAddItem && <AddItem close={() => setShowAddItem(false)} checklistID={props.checklistID} />}
       {!!showChangeMember && <ItemMemberModal {...showChangeMember} close={() => setShowChangeMember(null)} checklistID={props.checklistID} />}
+      {!!showChangeDueDate && <ItemDueDateModal {...showChangeDueDate} close={() => setShowChangeDueDate(null)} checklistID={props.checklistID} />}
     </div>
   );
 };

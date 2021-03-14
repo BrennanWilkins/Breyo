@@ -3,9 +3,10 @@ import classes from './ChecklistItem.module.css';
 import { Checkbox } from '../../../../UI/Inputs/Inputs';
 import PropTypes from 'prop-types';
 import { CloseBtn, AccountBtn } from '../../../../UI/Buttons/Buttons';
-import { editIcon, personPlusIcon } from '../../../../UI/icons';
+import { editIcon, personPlusIcon, clockIcon } from '../../../../UI/icons';
 import { Draggable } from 'react-beautiful-dnd';
 import EditChecklistItem from './EditChecklistItem';
+import { format } from 'date-fns';
 
 const ChecklistItem = props => {
   const [showEdit, setShowEdit] = useState(false);
@@ -31,14 +32,17 @@ const ChecklistItem = props => {
           <span onClick={() => setShowEdit(true)} className={props.isComplete ? classes.TitleCompleted : classes.Title}>{props.title}</span>
           <div className={classes.Btns}>
             <span className={classes.Btn} onClick={() => setShowEdit(true)}>{editIcon}</span>
+            <span className={props.dueDate ? classes.DueDate : classes.Btn} onClick={props.showChangeDueDate}>
+              {clockIcon}{!!props.dueDate && format(new Date(props.dueDate), 'MMM d')}
+            </span>
             {props.member ?
-              <AccountBtn clicked={() => props.showChangeMember(props.itemID, props.member.email)}
+              <AccountBtn clicked={props.showChangeMember}
               className={classes.AccountBtn} avatar={props.memberAvatar}>
                 {props.member.fullName[0]}
               </AccountBtn>
               :
               <span className={classes.Btn} style={{ fontSize: '16px' }}
-              onClick={() => props.showChangeMember(props.itemID, null)}>
+              onClick={props.showChangeMember}>
                 {personPlusIcon}
               </span>
             }
@@ -61,7 +65,9 @@ ChecklistItem.propTypes = {
   itemID: PropTypes.string.isRequired,
   showChangeMember: PropTypes.func.isRequired,
   member: PropTypes.object,
-  memberAvatar: PropTypes.string
+  memberAvatar: PropTypes.string,
+  dueDate: PropTypes.string,
+  showChangeDueDate: PropTypes.func.isRequired
 };
 
 export default ChecklistItem;

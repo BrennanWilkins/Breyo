@@ -9,6 +9,9 @@
 .CustomDateField .react-datepicker-popper {
   transform: translate3d(0px, -240px, 0px) !important;
 }
+.ItemDatePicker .react-datepicker-popper {
+  transform: translate3d(15px, 90px, 0) !important;
+}
 .react-datepicker__day--in-selecting-range {
   background: rgb(var(--red), 0.6) !important;
   color: white !important;

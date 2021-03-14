@@ -12,7 +12,7 @@
 .Title, .TitleCompleted {
   margin-left: 20px;
   font-size: 14px;
-  max-width: calc(100% - 125px);
+  max-width: calc(100% - 210px);
   word-wrap: break-word;
 }
 .TitleCompleted {
@@ -22,16 +22,13 @@
 .CloseBtn {
   display: none;
   margin: 0;
-  color: rgb(var(--darkGray));
-}
-.CloseBtn:hover {
-  color: black;
+  color: rgb(100,100,100);
 }
 .Container:hover .CloseBtn, .Container:hover .Btn {
   display: inline-flex;
 }
-.Btn {
-  color: rgb(var(--darkGray));
+.Btn, .DueDate {
+  color: rgb(100,100,100);
   width: 26px;
   height: 26px;
   border-radius: 4px;
@@ -40,10 +37,19 @@
   font-size: 15px;
   display: none;
   margin-right: 3px;
-}
-.Btn:hover {
-  color: black;
   background: rgba(0,0,0,0.05);
+}
+.DueDate {
+  font-size: 14px;
+  display: inline-flex;
+  width: 75px;
+}
+.DueDate svg {
+  margin-right: 3px;
+}
+.Btn:hover, .DueDate:hover, .CloseBtn:hover {
+  color: black;
+  background: rgba(0,0,0,0.085);
 }
 .Btns {
   display: inline-flex;
