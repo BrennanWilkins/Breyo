@@ -3,6 +3,7 @@
   align-items: center;
   font-weight: 500;
   max-width: 100%;
+  margin-top: 5px;
 }
 .TitleLeft span {
   cursor: pointer;
@@ -22,7 +23,7 @@
 .TitleContainer {
   display: flex;
   align-items: center;
-  margin: 20px 15px 10px 0;
+  margin: 15px 15px 10px 0;
   flex-wrap: wrap;
 }
 .AddBtn {

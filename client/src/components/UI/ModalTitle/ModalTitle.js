@@ -5,7 +5,7 @@ import { CloseBtn } from '../Buttons/Buttons';
 
 const ModalTitle = props => (
   <div className={props.light ? classes.LightTitle : props.lighter ? classes.LighterTitle : classes.Title}>
-    {props.title}
+    <div className={classes.InnerTitle}>{props.title}</div>
     <CloseBtn className={classes.CloseBtn} close={props.close} />
   </div>
 );

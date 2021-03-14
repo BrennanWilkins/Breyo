@@ -24,7 +24,6 @@
 .Field {
   margin: 0 20px 20px 0;
   min-width: 165px;
-  position: relative;
 }
 .FieldTitle {
   color: rgb(var(--darkGray));
@@ -39,7 +38,7 @@
 .Input {
   max-width: 100%;
 }
-.Input input, .DateInput {
+.Input input, .DateValue {
   margin-top: 5px;
   min-width: 140px;
   padding: 6px 7px;
@@ -51,11 +50,12 @@
   box-sizing: border-box;
   max-width: calc(100% - 20px);
 }
-.DateInput {
+.DateValue {
+  display: inline-block;
   max-width: none;
   height: 32px;
 }
-.Input input:hover, .DateInput:hover {
+.Input input:hover, .DateValue:hover {
   background: rgb(221, 221, 221);
 }
 .Input input:focus {
@@ -79,13 +79,14 @@
 .DateModalUp, .DateModalDown {
   width: 360px;
   height: 390px;
-  left: 0;
 }
 .DateModalUp {
   bottom: 35px;
+  left: 0;
 }
 .DateModalDown {
-  top: 55px;
+  top: 15px;
+  left: 15px;
 }
 .DateTitle svg {
   margin: 0 6px 0 3px;

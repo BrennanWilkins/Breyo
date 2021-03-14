@@ -8,11 +8,11 @@ const DateCustomField = props => {
   const [selectedDate, setSelectedDate] = useState(props.value ? new Date(props.value) : new Date());
   const [showDateModal, setShowDateModal] = useState(false);
   const shownDate = useMemo(() => props.value ? formatDate(new Date(props.value)) : null, [props.value]);
-  const containerRef = useRef();
+  const valueRef = useRef();
   const [showModalDown, setShowModalDown] = useState(false);
 
   const showDateModalHandler = () => {
-    if (containerRef.current.getBoundingClientRect().top < 390) {
+    if (valueRef.current.getBoundingClientRect().top < 390) {
       setShowModalDown(true);
     }
     setShowDateModal(true);
@@ -31,8 +31,8 @@ const DateCustomField = props => {
   };
 
   return (
-    <div ref={containerRef}>
-      <div className={classes.DateInput} onClick={showDateModalHandler}>{shownDate}</div>
+    <div style={showModalDown ? null : { position: 'relative' }}>
+      <div ref={valueRef} className={classes.DateValue} onClick={showDateModalHandler}>{shownDate}</div>
       {showDateModal &&
         <DatePickerModal className={showModalDown ? classes.DateModalDown : classes.DateModalUp}
         title={props.title} close={() => setShowDateModal(false)}
