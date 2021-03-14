@@ -6,10 +6,7 @@
 .react-datepicker-popper {
   transform: translate3d(5px, 70px, 0px) !important;
 }
-.CustomDateField .react-datepicker-popper {
-  transform: translate3d(0px, -240px, 0px) !important;
-}
-.ItemDatePicker .react-datepicker-popper {
+.NoStartDatePicker .react-datepicker-popper {
   transform: translate3d(15px, 90px, 0) !important;
 }
 .react-datepicker__day--in-selecting-range {

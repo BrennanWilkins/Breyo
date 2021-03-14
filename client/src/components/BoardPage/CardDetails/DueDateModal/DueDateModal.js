@@ -3,8 +3,6 @@ import classes from './DueDateModal.module.css';
 import PropTypes from 'prop-types';
 import Button, { CloseBtn } from '../../../UI/Buttons/Buttons';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import './calendarStyles.css';
 import { connect } from 'react-redux';
 import { addDueDate, removeDueDate } from '../../../../store/actions';
 import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
