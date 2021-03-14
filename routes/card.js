@@ -21,11 +21,25 @@ const getListAndValidate = async (boardID, listID, cardID) => {
   const list = await List.findOne({ _id: listID, boardID });
   if (!list) { throw 'List data not found'; }
   if (list.isArchived) { throw 'Cannot update a card in an archived list.'; }
+  // if no cardID supplied then only return list
   if (!cardID) { return list; }
 
   const card = list.cards.id(cardID);
   if (!card) { throw 'Card data not found'; }
   return [list, card];
+};
+
+const getChecklistAndValidate = async ids => {
+  const [list, card] = await getListAndValidate(ids.boardID, ids.listID, ids.cardID);
+
+  const checklist = card.checklists.id(ids.checklistID);
+  if (!checklist) { throw 'Card checklist not found'; }
+  // if no itemID supplied then dont find a checklist item
+  if (!ids.itemID) { return { list, card, checklist }; }
+
+  const item = checklist.items.id(ids.itemID);
+  if (!item) { throw 'Checklist item not found'; }
+  return { list, card, checklist, item };
 };
 
 // create a new card
@@ -230,9 +244,7 @@ router.delete('/checklist/:checklistID/:cardID/:listID/:boardID',
   async (req, res) => {
     try {
       const { listID, boardID, cardID, checklistID } = req.params;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
-
-      const checklist = card.checklists.id(checklistID);
+      const { list, card, checklist } = await getChecklistAndValidate({ listID, boardID, cardID, checklistID });
       checklist.remove();
 
       const actionData = { msg: `removed checklist ${checklist.title} from this card`, boardMsg: `removed checklist ${checklist.title} from **(link)${card.title}**`,
@@ -252,10 +264,8 @@ router.put('/checklist/title',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, checklistID, title } = req.body;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+      const { list, card, checklist } = await getChecklistAndValidate({ boardID, listID, cardID, checklistID });
 
-      const checklist = card.checklists.id(checklistID);
-      if (!checklist) { throw 'No checklist data found'; }
       const oldTitle = checklist.title;
       checklist.title = title;
 
@@ -276,11 +286,9 @@ router.post('/checklist/item',
   async (req, res) => {
     try {
       const { listID, cardID, checklistID, boardID, title } = req.body;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+      const { list, checklist } = await getChecklistAndValidate({ boardID, listID, cardID, checklistID });
 
-      const checklist = card.checklists.id(checklistID);
-      if (!checklist) { throw 'No checklist data found'; }
-      checklist.items.push({ title, isComplete: false, member: null });
+      checklist.items.push({ title, isComplete: false, member: null, dueDate: null });
       const itemID = checklist.items[checklist.items.length - 1]._id;
 
       await list.save();
@@ -297,12 +305,8 @@ router.put('/checklist/item/isComplete',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, checklistID, itemID } = req.body;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+      const { list, card, checklist, item } = await getChecklistAndValidate({ boardID, listID, cardID, checklistID, itemID });
 
-      const checklist = card.checklists.id(checklistID);
-      if (!checklist) { throw 'Card checklist not found'; }
-      const item = checklist.items.id(itemID);
-      if (!item) { throw 'Checklist item not found'; }
       item.isComplete = !item.isComplete;
 
       const cardMsg = item.isComplete ? `completed ${item.title} in checklist ${checklist.title}` : `marked ${item.title} incomplete in checklist ${checklist.title}`;
@@ -322,14 +326,9 @@ router.put('/checklist/item/title',
   useIsMember,
   async (req, res) => {
     try {
-      const [list, card] = await getListAndValidate(req.body.boardID, req.body.listID, req.body.cardID);
-
-      const checklist = card.checklists.id(req.body.checklistID);
-      if (!checklist) { throw 'Card checklist not found'; }
-
-      const item = checklist.items.id(req.body.itemID);
-      if (!item) { throw 'Checklist item not found'; }
-      item.title = req.body.title;
+      const { boardID, listID, cardID, checklistID, itemID, title } = req.body;
+      const { list, item } = await getChecklistAndValidate({ boardID, listID, cardID, checklistID, itemID });
+      item.title = title;
 
       await list.save();
       res.sendStatus(200);
@@ -344,19 +343,14 @@ router.put('/checklist/item/member',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, checklistID, itemID, email } = req.body;
-      const [[list, card], user] = await Promise.all([
-        getListAndValidate(boardID, listID, cardID),
+      const [{ list, item }, user] = await Promise.all([
+        getChecklistAndValidate({ boardID, listID, cardID, checklistID, itemID }),
         User.findOne({ email }).select('fullName boards').lean()
       ]);
 
       if (!user) { throw 'User data not found'; }
       if (!user.boards.find(id => String(id) === boardID)) { throw 'User must be member of board'; }
 
-      const checklist = card.checklists.id(checklistID);
-      if (!checklist) { throw 'Card checklist not found'; }
-
-      const item = checklist.items.id(itemID);
-      if (!item) { throw 'Checklist item not found'; }
       if (item.member && item.member.email === email) { throw 'User already assigned to this item'; }
       item.member = { email, fullName: user.fullName };
 
@@ -373,14 +367,44 @@ router.put('/checklist/item/removeMember',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, checklistID, itemID } = req.body;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
+      const { list, item } = await getChecklistAndValidate({ boardID, listID, cardID, checklistID, itemID });
 
-      const checklist = card.checklists.id(checklistID);
-      if (!checklist) { throw 'Card checklist not found'; }
-
-      const item = checklist.items.id(itemID);
-      if (!item) { throw 'Checklist item not found'; }
       item.member = null;
+
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// add a due date for a checklist item
+router.put('/checklist/item/dueDate',
+  validate([...areAllMongo(['listID', 'boardID', 'cardID', 'checklistID', 'itemID'], 'body'), body('dueDate').notEmpty()]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, checklistID, itemID, dueDate } = req.body;
+      if (isNaN(new Date(dueDate).getDate())) { throw 'Invalid due date format'; }
+      const { list, item } = await getChecklistAndValidate({ boardID, listID, cardID, checklistID, itemID });
+
+      item.dueDate = dueDate;
+
+      await list.save();
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// remove a due date for a checklist item
+router.put('/checklist/item/removeDueDate',
+  validate(areAllMongo(['listID', 'boardID', 'cardID', 'checklistID', 'itemID'], 'body')),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, listID, cardID, checklistID, itemID } = req.body;
+      const { list, item } = await getChecklistAndValidate({ boardID, listID, cardID, checklistID, itemID });
+
+      item.dueDate = null;
 
       await list.save();
       res.sendStatus(200);
@@ -394,9 +418,9 @@ router.put('/checklist/item/delete',
   useIsMember,
   async (req, res) => {
     try {
-      const [list, card] = await getListAndValidate(req.body.boardID, req.body.listID, req.body.cardID);
-
-      card.checklists.id(req.body.checklistID).items.id(req.body.itemID).remove();
+      const { boardID, listID, cardID, checklistID, itemID } = req.body;
+      const { list, item } = await getChecklistAndValidate({ boardID, listID, cardID, checklistID, itemID });
+      item.remove();
 
       await list.save();
       res.sendStatus(200);
@@ -486,7 +510,7 @@ router.post('/copy',
         title,
         labels: keepLabels ? sourceCard.labels : [],
         checklists: keepChecklists ? sourceCard.checklists.map(checklist => ({
-          items: checklist.items.map(item => ({ title: item.title, isComplete: item.isComplete, member: item.member })),
+          items: checklist.items.map(item => ({ title: item.title, isComplete: item.isComplete, member: item.member, dueDate: item.dueDate })),
           title: checklist.title
         })) : [],
         customFields: sourceCard.customFields.map(field => ({
@@ -720,10 +744,7 @@ router.put('/checklist/moveItem',
   async (req, res) => {
     try {
       const { boardID, cardID, listID, checklistID, sourceIndex, destIndex } = req.body;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
-
-      const checklist = card.checklists.id(checklistID);
-      if (!checklist) { throw 'Checklist not found'; }
+      const { list, checklist } = await getChecklistAndValidate({ boardID, listID, cardID, checklistID });
       if (destIndex >= checklist.items.length || sourceIndex >= checklist.items.length) {
         throw 'Invalid source or dest index';
       }

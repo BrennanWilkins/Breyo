@@ -108,7 +108,8 @@ router.post('/copy',
           items: checklist.items.map(item => ({
             title: item.title,
             isComplete: item.isComplete,
-            member: item.member
+            member: item.member,
+            dueDate: item.dueDate
           }))
         })),
         labels: card.labels,

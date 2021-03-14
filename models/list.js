@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 const ItemSchema = new Schema({
   title: String,
   isComplete: Boolean,
-  member: {}
+  member: {},
+  dueDate: String
 });
 
 const ChecklistSchema = new Schema({
