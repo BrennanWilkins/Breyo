@@ -26,6 +26,9 @@
 .NoDesc:hover {
   background: rgb(221, 221, 221);
 }
+.NoDesc:active {
+  background: rgb(254, 190, 183);
+}
 .DescText {
   margin: 5px 0 10px 45px;
   padding: 10px 0;
@@ -72,5 +75,6 @@
   background: rgb(var(--green));
 }
 .SaveBtn:disabled {
-  background: rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.07);
+  cursor: default;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import classes from './CardDesc.module.css';
 import PropTypes from 'prop-types';
 import { descIcon } from '../../../UI/icons';
@@ -13,20 +13,18 @@ const CardDesc = props => {
   const [showEdit, setShowEdit] = useState(false);
   const [descInput, setDescInput] = useState(props.currentDesc);
   const [showFormattingHelp, setShowFormattingHelp] = useState(false);
-  const descRef = useRef();
-
-  useEffect(() => setDescInput(props.currentDesc), [props.currentDesc]);
 
   const formattedDesc = useMemo(() => parseToJSX(props.currentDesc), [props.currentDesc]);
-
-  useEffect(() => {
-    if (showEdit) { descRef.current.focus(); }
-  }, [showEdit]);
 
   const saveDescHandler = () => {
     if (descInput.length > 600) { setShowEdit(false); return setDescInput(props.currentDesc); }
     props.updateCardDesc(descInput);
     setShowEdit(false);
+  };
+
+  const inputChangeHandler = e => {
+    if (e.target.value.length > 600) { return; }
+    setDescInput(e.target.value);
   };
 
   return (
@@ -35,22 +33,23 @@ const CardDesc = props => {
         {descIcon}Description
         {!showEdit && props.currentDesc.length > 0 && <ActionBtn className={classes.EditBtn} clicked={() => setShowEdit(true)}>Edit</ActionBtn>}
       </div>
-      {showEdit ?
-        <>
-          <TextArea className={classes.Input} minRows="2" maxRows="50" value={descInput} onChange={e => setDescInput(e.target.value)}
-          ref={descRef} placeholder="Add a description for this card" />
-          <div className={classes.Btns}>
-            <div className={classes.LeftBtns}>
-              <Button className={classes.SaveBtn} clicked={saveDescHandler} disabled={descInput === props.currentDesc}>Save</Button>
-              <CloseBtn className={classes.CloseBtn} close={() => { setShowEdit(false); setDescInput(props.currentDesc); }} />
+      {
+        showEdit ?
+          <>
+            <TextArea className={classes.Input} minRows="2" value={descInput} onChange={inputChangeHandler}
+            placeholder="Add a description for this card" autoFocus />
+            <div className={classes.Btns}>
+              <div className={classes.LeftBtns}>
+                <Button className={classes.SaveBtn} clicked={saveDescHandler} disabled={descInput === props.currentDesc}>Save</Button>
+                <CloseBtn className={classes.CloseBtn} close={() => { setShowEdit(false); setDescInput(props.currentDesc); }} />
+              </div>
+              <ActionBtn clicked={() => setShowFormattingHelp(true)}>Formatting help</ActionBtn>
             </div>
-            <ActionBtn clicked={() => setShowFormattingHelp(true)}>Formatting help</ActionBtn>
-          </div>
-        </>
+          </>
         : props.currentDesc.length === 0 ?
-        <div className={classes.NoDesc} onClick={() => setShowEdit(true)}>Add a description for this card</div>
+          <div className={classes.NoDesc} onClick={() => setShowEdit(true)}>Add a description for this card</div>
         :
-        <div className={classes.DescText}>{formattedDesc}</div>
+          <div className={classes.DescText}>{formattedDesc}</div>
       }
       {showFormattingHelp && <FormattingModal close={() => setShowFormattingHelp(false)} />}
     </div>
