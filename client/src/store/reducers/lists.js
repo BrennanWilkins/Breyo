@@ -594,11 +594,14 @@ const deleteBoardMember = (state, action) => {
   const updateCard = card => {
     const members = card.members.filter(member => member.email !== action.email);
     const votes = card.votes.filter(vote => vote.email !== action.email);
-    if (members.length === card.members.length && votes.length === card.votes.length) { return card; }
+    const checklists = card.checklists.map(checklist => ({
+      ...checklist,
+      items: checklist.items.map(item => ({ ...item, member: item.member?.email === action.email ? null : item.member }))
+    }));
     if (state.shownCardID === card.cardID) {
       currentCard = { ...currentCard, members, votes };
     }
-    return { ...card, members, votes };
+    return { ...card, members, votes, checklists };
   };
 
   const lists = state.lists.map(list => ({

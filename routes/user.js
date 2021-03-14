@@ -38,6 +38,14 @@ const leaveAllCards = async (boardID, email) => {
         card.votes = votes;
         shouldUpdate = true;
       }
+      for (let checklist of card.checklists) {
+        for (let item of checklist.items) {
+          if (item.member && item.member.email === email) {
+            item.member = null;
+            shouldUpdate = true;
+          }
+        }
+      }
     }
     for (let card of list.archivedCards) {
       const members = card.members.filter(member => member.email !== email);
@@ -49,6 +57,14 @@ const leaveAllCards = async (boardID, email) => {
       if (votes.length !== card.votes.length) {
         card.votes = votes;
         shouldUpdate = true;
+      }
+      for (let checklist of card.checklists) {
+        for (let item of checklist.items) {
+          if (item.member && item.member.email === email) {
+            item.member = null;
+            shouldUpdate = true;
+          }
+        }
       }
     }
     // only need to update list if cards changed
