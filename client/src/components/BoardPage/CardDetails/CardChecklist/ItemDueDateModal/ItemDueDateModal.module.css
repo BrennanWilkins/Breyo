@@ -2,58 +2,5 @@
   width: 275px;
   top: 70px;
   right: 15px;
-  padding: 5px;
   height: 390px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-}
-.DatePicker {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  height: 100%;
-}
-.DatePicker * {
-  outline: none;
-}
-.Btns {
-  margin: auto auto 5px;
-  display: flex;
-  justify-content: space-between;
-  box-sizing: border-box;
-  width: 100%;
-}
-.Btns button {
-  font-weight: 400;
-  width: 80px;
-  padding: 8px 0;
-  font-size: 15px;
-}
-.SaveBtn button {
-  background: rgba(var(--green), 0.8);
-}
-.SaveBtn button:hover, .SaveBtn button:active {
-  background: rgb(var(--green));
-}
-.RemoveBtn button {
-  background: rgb(219, 55, 29);
-}
-.RemoveBtn button:hover, .RemoveBtn button:active {
-  background: rgb(213, 5, 5);
-}
-.Input {
-  border: 2px solid rgb(var(--lightGray));
-  border-radius: 4px;
-  padding: 7px;
-  background: rgb(244, 244, 244);
-  margin: 0 0 5px 40px;
-  transition: background 250ms;
-}
-.Input:hover {
-  background: rgb(235,235,235);
-}
-.Input:focus {
-  border: 2px solid rgb(var(--red));
-  background: white;
 }

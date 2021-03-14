@@ -41,6 +41,11 @@ const CustomFieldModal = props => {
     isDragging ? { background: 'rgb(241, 241, 241)', ...otherStyles } : otherStyles
   );
 
+  const updateTitleHandler = (fieldID, titleInput) => {
+    props.updateTitle(fieldID, titleInput);
+    setShowEditTitle('');
+  };
+
   return (
     <ModalContainer close={props.close} className={classes.Container} title="Custom Fields">
       {showAddField ?
@@ -71,7 +76,7 @@ const CustomFieldModal = props => {
                             }
                             <div className={classes.Btns}>
                               {isActive ?
-                                <div className={classes.SaveBtn} onClick={() => props.updateTitle(fieldID, titleInput)}>{checkIcon}</div>
+                                <div className={classes.SaveBtn} onClick={() => updateTitleHandler(fieldID, titleInput)}>{checkIcon}</div>
                                 :
                                 <div className={classes.EditBtn} onClick={() => showEditHandler(fieldID, fieldTitle)}>{editIcon}</div>
                               }

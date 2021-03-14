@@ -23,7 +23,7 @@ const CardCustomFields = props => (
             fieldType === 'Text' ? <TextCustomField value={value} updateValue={val => props.updateValue(fieldID, val)} /> :
             fieldType === 'Number' ? <TextCustomField isNumber value={value} updateValue={val => props.updateValue(fieldID, val)} /> :
             fieldType === 'Checkbox' ? <CheckboxCustomField value={value} updateValue={val => props.updateValue(fieldID, val)} /> :
-            <DateCustomField value={value} updateValue={val => props.updateValue(fieldID, val)} />
+            <DateCustomField value={value} updateValue={val => props.updateValue(fieldID, val)} title={fieldTitle} />
           }
         </div>
       ))}

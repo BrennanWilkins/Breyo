@@ -1,36 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import classes from './CardCustomFields.module.css';
 import PropTypes from 'prop-types';
-import DatePicker from 'react-datepicker';
-import { useDidUpdate } from '../../../../utils/customHooks';
+import DatePickerModal from '../../../UI/DatePickerModal/DatePickerModal';
+import formatDate from '../../../../utils/formatDate';
 
 const DateCustomField = props => {
-  const [selectedDate, setSelectedDate] = useState(props.value ? new Date(props.value) : null);
+  const [selectedDate, setSelectedDate] = useState(props.value ? new Date(props.value) : new Date());
+  const [showDateModal, setShowDateModal] = useState(false);
+  const shownDate = useMemo(() => props.value ? formatDate(new Date(props.value)) : null, [props.value]);
+  const containerRef = useRef();
+  const [showModalDown, setShowModalDown] = useState(false);
 
-  useDidUpdate(() => setSelectedDate(props.value ? new Date(props.value) : null), [props.value]);
+  const showDateModalHandler = () => {
+    if (containerRef.current.getBoundingClientRect().top < 390) {
+      setShowModalDown(true);
+    }
+    setShowDateModal(true);
+    setSelectedDate(props.value ? new Date(props.value) : new Date());
+  };
 
-  const changeHandler = date => {
-    setSelectedDate(date);
-    if (date === props.value) { return; }
-    if (!date) { return props.updateValue(null); }
-    let formatted = date.toISOString();
-    if (formatted === props.value) { return; }
-    props.updateValue(formatted);
+  const saveHandler = () => {
+    if (!selectedDate) { return; }
+    props.updateValue(String(selectedDate));
+    setShowDateModal(false);
+  };
+
+  const removeHandler = () => {
+    props.updateValue(null);
+    setShowDateModal(false);
   };
 
   return (
-    <div className={classes.DateContainer}>
-      <div className={`CustomDateField ${classes.DateField}`}>
-        <DatePicker selected={selectedDate} onChange={changeHandler} showTimeSelect
-        showPopperArrow={false} dateFormat="MM/dd/yyyy h:mm aa" className={classes.DateInput} />
-      </div>
+    <div ref={containerRef}>
+      <div className={classes.DateInput} onClick={showDateModalHandler}>{shownDate}</div>
+      {showDateModal &&
+        <DatePickerModal className={showModalDown ? classes.DateModalDown : classes.DateModalUp}
+        title={props.title} close={() => setShowDateModal(false)}
+        changeDueDate={saveHandler} removeDueDate={removeHandler} selectedDate={selectedDate}
+        onChange={date => setSelectedDate(date)} showTimeSelect />
+      }
     </div>
   );
 };
 
 DateCustomField.propTypes = {
   value: PropTypes.string,
-  updateValue: PropTypes.func.isRequired
+  updateValue: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired
 };
 
 export default DateCustomField;

@@ -52,12 +52,13 @@
   max-width: calc(100% - 20px);
 }
 .DateInput {
-  width: calc(100% - 30px);
+  max-width: none;
+  height: 32px;
 }
 .Input input:hover, .DateInput:hover {
   background: rgb(221, 221, 221);
 }
-.Input input:focus, .DateInput:focus {
+.Input input:focus {
   border: 2px solid rgb(var(--red));
   background: white;
 }
@@ -75,17 +76,16 @@
   display: flex;
   align-items: center;
 }
-.DateContainer {
-  position: relative;
-  width: 120px;
-  height: 35px;
+.DateModalUp, .DateModalDown {
+  width: 360px;
+  height: 390px;
+  left: 0;
 }
-.DateField {
-  position: absolute;
-  width: 330px;
+.DateModalUp {
+  bottom: 35px;
 }
-.DateContainer * {
-  outline: none;
+.DateModalDown {
+  top: 55px;
 }
 .DateTitle svg {
   margin: 0 6px 0 3px;
