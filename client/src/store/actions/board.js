@@ -53,7 +53,8 @@ const formatCardData = card => {
       itemID: item._id,
       title: item.title,
       isComplete: item.isComplete,
-      member: item.member
+      member: item.member,
+      dueDate: item.dueDate
     }))
   }));
 

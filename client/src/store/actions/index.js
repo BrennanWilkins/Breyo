@@ -16,7 +16,7 @@ removeCardMember, removeCardMemberCurrentCard, addComment, updateComment, delete
 editChecklistTitle, setCardDetailsInitial, toggleCommentLike,
 addCustomField, updateCustomFieldTitle, updateCustomFieldValue, deleteCustomField,
 toggleCardVote, addCardCustomLabel, deleteCardCustomLabel, changeChecklistItemMember,
-removeChecklistItemMember } from './card';
+removeChecklistItemMember, changeChecklistItemDueDate, removeChecklistItemDueDate } from './card';
 export { dndHandler, manualMoveCardHandler, checklistDndHandler, customFieldDndHandler } from './dndActions';
 export { getRecentCardActivity, resetCardActivity, setShownMemberActivity, deleteBoardActivity,
 getAllCardActivity, fetchFirstPageBoardActivity, fetchAllBoardActivity,

@@ -485,3 +485,27 @@ export const removeChecklistItemMember = (itemID, checklistID) => async (dispatc
     dispatch(serverErr());
   }
 };
+
+export const changeChecklistItemDueDate = (dueDate, itemID, checklistID) => async (dispatch, getState) => {
+  try {
+    const { boardID, listID, cardID } = getCardState(getState);
+    const payload = { boardID, listID, cardID, itemID, checklistID, dueDate };
+    dispatch({ type: actionTypes.CHANGE_CHECKLIST_ITEM_DUE_DATE, ...payload });
+    await axios.put('/card/checklist/item/dueDate', payload);
+    sendBoardUpdate('put/card/checklist/item/dueDate', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
+
+export const removeChecklistItemDueDate = (itemID, checklistID) => async (dispatch, getState) => {
+  try {
+    const { boardID, listID, cardID } = getCardState(getState);
+    const payload = { boardID, listID, cardID, itemID, checklistID };
+    dispatch({ type: actionTypes.REMOVE_CHECKLIST_ITEM_DUE_DATE, ...payload });
+    await axios.put('/card/checklist/item/removeDueDate', payload);
+    sendBoardUpdate('put/card/checklist/item/removeDueDate', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};

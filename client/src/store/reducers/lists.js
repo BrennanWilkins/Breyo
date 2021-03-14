@@ -89,6 +89,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.DELETE_CUSTOM_LABEL: return deleteCustomLabel(state, action);
     case actionTypes.CHANGE_CHECKLIST_ITEM_MEMBER: return changeChecklistItemMember(state, action);
     case actionTypes.REMOVE_CHECKLIST_ITEM_MEMBER: return removeChecklistItemMember(state, action);
+    case actionTypes.CHANGE_CHECKLIST_ITEM_DUE_DATE: return changeChecklistItemDueDate(state, action);
+    case actionTypes.REMOVE_CHECKLIST_ITEM_DUE_DATE: return removeChecklistItemDueDate(state, action);
     default: return state;
   }
 };
@@ -149,7 +151,8 @@ const formatCardData = (card, fromList) => ({
       itemID: item._id,
       title: item.title,
       isComplete: item.isComplete,
-      member: item.member
+      member: item.member,
+      dueDate: item.dueDate
     }))
   })),
   dueDate: card.dueDate,
@@ -279,7 +282,7 @@ const editChecklistTitle = (state, action) => {
 const addChecklistItem = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
   const { checklists, checklistIndex, checklist, items } = findChecklistItems(card, action.checklistID);
-  items.push({ title: action.title, isComplete: false, itemID: action.itemID, member: null });
+  items.push({ title: action.title, isComplete: false, itemID: action.itemID, member: null, dueDate: null });
   checklist.items = items;
   checklists[checklistIndex] = checklist;
   card.checklists = checklists;
@@ -310,7 +313,7 @@ const editChecklistItem = (state, action) => {
 
 const deleteChecklistItem = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const { checklists, checklistIndex, checklist, items } = findChecklistItems(card, action.checklistID);
+  const { checklists, checklistIndex, checklist } = findChecklistItems(card, action.checklistID);
   checklist.items = checklist.items.filter(item => item.itemID !== action.itemID);
   checklists[checklistIndex] = checklist;
   card.checklists = checklists;
@@ -877,6 +880,28 @@ const removeChecklistItemMember = (state, action) => {
   const { checklists, checklistIndex, checklist, items } = findChecklistItems(card, action.checklistID);
   const itemIndex = items.findIndex(item => item.itemID === action.itemID);
   items[itemIndex].member = null;
+  checklist.items = items;
+  checklists[checklistIndex] = checklist;
+  card.checklists = checklists;
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const changeChecklistItemDueDate = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  const { checklists, checklistIndex, checklist, items } = findChecklistItems(card, action.checklistID);
+  const itemIndex = items.findIndex(item => item.itemID === action.itemID);
+  items[itemIndex].dueDate = action.dueDate;
+  checklist.items = items;
+  checklists[checklistIndex] = checklist;
+  card.checklists = checklists;
+  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const removeChecklistItemDueDate = (state, action) => {
+  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
+  const { checklists, checklistIndex, checklist, items } = findChecklistItems(card, action.checklistID);
+  const itemIndex = items.findIndex(item => item.itemID === action.itemID);
+  items[itemIndex].dueDate = null;
   checklist.items = items;
   checklists[checklistIndex] = checklist;
   card.checklists = checklists;
