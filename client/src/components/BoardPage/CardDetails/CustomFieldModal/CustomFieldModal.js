@@ -3,7 +3,7 @@ import classes from './CustomFieldModal.module.css';
 import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 import PropTypes from 'prop-types';
 import { plusIcon } from '../../../UI/icons';
-import { BackBtn } from '../../../UI/Buttons/Buttons';
+import { BackBtn, DeleteBtn } from '../../../UI/Buttons/Buttons';
 import AddCustomField from './AddCustomField/AddCustomField';
 import { connect } from 'react-redux';
 import { xIcon, editIcon, checkIcon } from '../../../UI/icons';
@@ -15,15 +15,21 @@ const CustomFieldModal = props => {
   const [showAddField, setShowAddField] = useState(false);
   const [titleInput, setTitleInput] = useState('');
   const [showEditTitle, setShowEditTitle] = useState('');
+  const [showDeleteField, setShowDeleteField] = useState(null);
 
   const showEditHandler = (fieldID, fieldTitle) => {
     setShowEditTitle(fieldID);
     setTitleInput(fieldTitle);
   };
 
-  const deleteHandler = fieldID => {
+  const deleteHandler = (fieldID, fieldTitle) => {
     if (showEditTitle) { return setShowEditTitle(''); }
-    props.deleteField(fieldID);
+    setShowDeleteField({ fieldID, fieldTitle });
+  };
+
+  const deleteFieldHandler = () => {
+    props.deleteField(showDeleteField.fieldID);
+    setShowDeleteField(null);
   };
 
   const showAddFieldHandler = () => {
@@ -46,12 +52,21 @@ const CustomFieldModal = props => {
     setShowEditTitle('');
   };
 
+  const backHandler = () => {
+    setShowAddField(false);
+    setShowDeleteField(null);
+  };
+
   return (
-    <ModalContainer close={props.close} className={classes.Container} title="Custom Fields">
+    <ModalContainer close={props.close} className={classes.Container} title={!!showDeleteField ? `Delete ${showDeleteField.fieldTitle}?` : 'Custom Fields'}>
+      {(!!showDeleteField || showAddField) && <div className={classes.BackBtn}><BackBtn back={backHandler} /></div>}
       {showAddField ?
+        <AddCustomField close={() => setShowAddField(false)} />
+        :
+        showDeleteField ?
         <>
-          <div className={classes.BackBtn}><BackBtn back={() => setShowAddField(false)} /></div>
-          <AddCustomField close={() => setShowAddField(false)} />
+          <p className={classes.SubTitle}>Are you sure you want to delete this field?</p>
+          <DeleteBtn clicked={deleteFieldHandler}>Delete</DeleteBtn>
         </>
         :
         <>
@@ -80,7 +95,7 @@ const CustomFieldModal = props => {
                                 :
                                 <div className={classes.EditBtn} onClick={() => showEditHandler(fieldID, fieldTitle)}>{editIcon}</div>
                               }
-                              <div className={classes.DeleteBtn} onClick={() => deleteHandler(fieldID)}>{xIcon}</div>
+                              <div className={classes.DeleteBtn} onClick={() => deleteHandler(fieldID, fieldTitle)}>{xIcon}</div>
                             </div>
                           </div>
                         )}

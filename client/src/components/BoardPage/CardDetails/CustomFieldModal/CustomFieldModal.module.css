@@ -106,3 +106,7 @@
   outline: none;
   box-sizing: border-box;
 }
+.SubTitle {
+  text-align: center;
+  font-size: 15px;
+}
