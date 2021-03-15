@@ -11,19 +11,6 @@
   max-height: 300px;
   overflow: auto;
 }
-.Modal::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Modal::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Modal::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
-}
 .Container {
   top: 105px;
   right: 0;

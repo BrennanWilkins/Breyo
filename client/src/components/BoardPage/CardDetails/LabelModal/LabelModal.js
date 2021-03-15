@@ -113,7 +113,7 @@ const LabelModal = props => {
         </>
         :
         <>
-          <div className={classes.Colors}>
+          <div className={`StyledScrollbar ${classes.Colors}`}>
             {props.customLabels.map(labelID => {
               const label = props.customLabelsByID[labelID];
               return (

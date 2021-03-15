@@ -42,7 +42,7 @@ const ItemMemberModal = props => {
         </div>
       </>}
       <div className={classes.SubTitle}>BOARD MEMBERS</div>
-      <div className={classes.Members}>
+      <div className={`StyledScrollbar ${classes.Members}`}>
         {shownMembers.map(member => (
           <div key={member.email} className={classes.Member} onClick={() => changeMemberHandler(member)}>
             <AccountBtn avatar={props.avatars[member.email]}>{member.fullName[0]}</AccountBtn>

@@ -96,7 +96,7 @@ const BoardOverview = props => {
   };
 
   return (
-    <div className={`${classes.Container} ${props.menuShown ? classes.ContainerSmall : ''}`}>
+    <div className={`StyledScrollbar ${classes.Container} ${props.menuShown ? classes.ContainerSmall : ''}`}>
       <OverviewCard title="Cards per list" changeMode={mode => changeModeHandler(mode, 'list')}>
         {
           !cardsPerList.length ? <p className={classes.NoData}>There are no lists in this board.</p> :

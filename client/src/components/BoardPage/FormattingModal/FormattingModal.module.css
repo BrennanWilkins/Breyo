@@ -7,19 +7,6 @@
   overflow-y: auto;
   margin-bottom: 5px;
 }
-.Container::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Container::-webkit-scrollbar {
-  width: 8px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Container::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
-}
 .Option {
   padding: 18px 5px;
   margin: 0 10px;

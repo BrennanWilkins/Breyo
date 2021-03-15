@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import ModalContainer from '../../UI/ModalContainer/ModalContainer';
 
 const FormattingModal = props => (
-  <ModalContainer className={classes.Container} close={props.close} title="Formatting Help" lighter>
+  <ModalContainer className={`StyledScrollbar ${classes.Container}`} close={props.close} title="Formatting Help" lighter>
     <div className={classes.Option}>
       <div>Bold</div>
       <span>*This text will be bold*{arrowIcon}</span>

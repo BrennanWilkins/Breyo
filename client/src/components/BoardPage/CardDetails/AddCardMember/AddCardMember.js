@@ -50,7 +50,7 @@ const AddCardMember = props => {
   const shownMembers = searchQuery ? filteredMembers : boardMembers;
 
   return (
-    <div ref={modalRef} className={`${classes.Modal} ${props.fromList ? classes.FromListContainer : classes.Container}`}>
+    <div ref={modalRef} className={`StyledScrollbar ${classes.Modal} ${props.fromList ? classes.FromListContainer : classes.Container}`}>
       <ModalTitle close={props.close} title="Members" />
       <Input className={classes.Input} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search board members by name" />
       <div className={classes.SubTitle}>BOARD MEMBERS</div>

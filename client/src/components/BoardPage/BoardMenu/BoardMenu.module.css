@@ -19,19 +19,6 @@
   visibility: hidden;
   transition: transform 250ms, opacity 0ms 250ms, visibility 0ms 250ms;
 }
-.Menu::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Menu::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Menu::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
-}
 .Title {
   position: relative;
   text-align: center;

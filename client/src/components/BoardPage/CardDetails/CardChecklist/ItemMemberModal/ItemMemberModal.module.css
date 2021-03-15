@@ -1,6 +1,6 @@
 .Container {
   width: 275px;
-  top: 70px;
+  top: 80px;
   right: 15px;
   padding: 5px 5px 10px;
 }
@@ -8,19 +8,6 @@
   max-height: 400px;
   overflow-x: hidden;
   overflow-y: auto;
-}
-.Members::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Members::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Members::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
 }
 .SubTitle {
   color: rgb(var(--darkGray));

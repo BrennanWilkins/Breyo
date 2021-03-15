@@ -1,21 +1,5 @@
 .Invites {
-  overflow-x: hidden;
-  overflow-y: auto;
-  max-height: 340px;
   margin: 0 10px;
-}
-.Invites::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Invites::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Invites::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
 }
 .NoInvites {
   color: rgb(112, 112, 112);

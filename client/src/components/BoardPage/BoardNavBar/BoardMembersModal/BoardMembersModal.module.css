@@ -11,19 +11,6 @@
   max-height: 400px;
   overflow: auto;
 }
-.Container::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Container::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Container::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
-}
 .Input {
   width: 96%;
   margin: 0 auto 10px;

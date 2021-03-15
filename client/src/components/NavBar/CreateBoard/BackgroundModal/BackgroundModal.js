@@ -7,7 +7,7 @@ import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 
 const BackgroundModal = props => (
   <ModalContainer className={classes.Container} close={props.close} title="Board Background">
-    <div className={classes.Options}>
+    <div className={`StyledScrollbar ${classes.Options}`}>
       <div className={classes.ColorTitle}>Colors</div>
       <div className={classes.OptionSelect}>
         {COLORS.map(color => (

@@ -24,19 +24,6 @@
     opacity: 1;
   }
 }
-.Modal::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Modal::-webkit-scrollbar {
-  width: 8px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Modal::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
-}
 .Title {
   position: relative;
   text-align: center;

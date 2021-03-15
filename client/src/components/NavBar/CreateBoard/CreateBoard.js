@@ -70,7 +70,7 @@ const CreateBoard = props => {
             {props.teams.allIDs.length ? <div className={classes.Chevron}>{chevronIcon}</div> : null}
           </div>
           {showTeamSelect &&
-            <div className={classes.TeamSelect} ref={selectRef}>
+            <div className={`StyledScrollbar ${classes.TeamSelect}`} ref={selectRef}>
               {props.teams.allIDs.map(teamID => (
                 <div className={classes.SelectOption} key={teamID} onClick={() => selectTeamHandler(teamID)}>
                   <div>{props.teams.byID[teamID].title}</div>

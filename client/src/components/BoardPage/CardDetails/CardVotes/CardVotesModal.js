@@ -13,7 +13,7 @@ const CardVotesModal = props => {
 
   return (
     <ModalContainer className={classes.Modal} title="Voters" close={props.close}>
-      <div className={classes.Voters}>
+      <div className={`StyledScrollbar ${classes.Voters}`}>
         {props.votes.map(vote => (
           <div className={classes.Voter} key={vote.email}>
             <AccountBtn clicked={() => setShownMember(vote.email)} className={classes.AccountBtn} avatar={props.avatars[vote.email]}>

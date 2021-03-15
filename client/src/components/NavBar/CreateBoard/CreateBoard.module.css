@@ -165,19 +165,6 @@
   max-height: min(calc(100vh - 140px), 350px);
   z-index: 2;
 }
-.TeamSelect::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.TeamSelect::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.TeamSelect::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
-}
 .SelectOption {
   padding: 6px 5px;
   box-sizing: border-box;

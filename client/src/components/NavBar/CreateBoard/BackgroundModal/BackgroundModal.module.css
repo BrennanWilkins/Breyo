@@ -23,19 +23,6 @@
   overflow-x: hidden;
   overflow-y: auto;
 }
-.Options::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Options::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Options::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
-}
 .OptionSelect {
   display: flex;
   align-items: center;

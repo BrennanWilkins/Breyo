@@ -52,7 +52,7 @@ const ListActions = props => {
     shownView === 'limit' ? 'Set List Limit' : shownView === 'sort' ? 'Sort List' : 'List Actions';
 
   return (
-    <div ref={modalRef} className={classes.Container} style={{ left: `${left}px`, top: `${top}px` }}>
+    <div ref={modalRef} className={`StyledScrollbar ${classes.Container}`} style={{ left: `${left}px`, top: `${top}px` }}>
       <div className={classes.Title}>
         <span className={shownView ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={() => setShownView('')} /></span>
         {modalTitle}

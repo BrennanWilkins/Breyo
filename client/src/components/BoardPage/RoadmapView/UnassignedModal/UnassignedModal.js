@@ -14,7 +14,7 @@ const UnassignedModal = props => {
       <div className={classes.Title}>{props.title}</div>
       <CloseBtn className={classes.CloseBtn} close={props.close} />
       <div className={classes.Info}>Add a start and due date to schedule a card.</div>
-      <div className={classes.Cards}>
+      <div className={`StyledScrollbar ${classes.Cards}`}>
         {props.cards.map(card => (
           <RoadmapCard key={card.cardID} className={classes.Card} cardID={card.cardID}
           listID={card.listID} members={card.members} title={card.title} />

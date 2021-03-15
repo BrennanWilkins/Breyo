@@ -44,19 +44,6 @@
   overflow-x: hidden;
   overflow-y: auto;
 }
-.Cards::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(215,215,215);
-}
-.Cards::-webkit-scrollbar {
-  width: 9px;
-  border-radius: 15px;
-  background: rgb(215,215,215);
-}
-.Cards::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(195,195,195);
-}
 .Card {
   width: 100%;
   box-shadow: var(--cardShadow);

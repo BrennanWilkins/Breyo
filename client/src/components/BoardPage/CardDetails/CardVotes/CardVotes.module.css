@@ -53,19 +53,6 @@
   max-height: 300px;
   overflow-y: auto;
 }
-.Voters::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Voters::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Voters::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
-}
 .AccountBtn {
   width: 29px;
   height: 29px;

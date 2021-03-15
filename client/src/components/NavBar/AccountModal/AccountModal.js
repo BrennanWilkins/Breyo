@@ -17,7 +17,7 @@ const AccountModal = props => {
   const totInvites = props.invites.length + props.teamInvites.length;
 
   return (
-    <div ref={modalRef} className={classes.Modal}>
+    <div ref={modalRef} className={`StyledScrollbar ${classes.Modal}`}>
       <div className={classes.Title}>
         <span className={showInvites ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={() => setShowInvites(false)} /></span>
         {showInvites ? 'Invites' : 'Account'}

@@ -30,7 +30,7 @@ const BoardMenu = props => {
   <MainMenu showSearch={() => props.setShowSearch(true)} setViewMode={mode => setViewMode(mode)} />;
 
   return (
-    <div className={props.show ? classes.Menu : `${classes.Menu} ${classes.HideMenu}`}>
+    <div className={`StyledScrollbar ${classes.Menu} ${!props.show ? classes.HideMenu : ''}`}>
       <div className={classes.Title}>
         <span className={(viewMode || props.showSearch) ? classes.ShowBackBtn : classes.HideBackBtn}><BackBtn back={resetState} /></span>
         {title}

@@ -30,7 +30,7 @@ const BoardMembersModal = props => {
   const members = searchQuery ? filteredMembers : props.members;
 
   return (
-    <div ref={modalRef} className={classes.Container}>
+    <div ref={modalRef} className={`StyledScrollbar ${classes.Container}`}>
       <ModalTitle title={showPermission ? 'Change Permissions' : shownMember ? 'Member' : 'Board Members'} close={props.close} />
       {shownMember && <div className={classes.BackBtn}><BackBtn back={backHandler} /></div>}
       {shownMember ?

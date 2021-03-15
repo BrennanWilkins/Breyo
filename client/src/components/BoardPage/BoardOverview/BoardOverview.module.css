@@ -14,19 +14,6 @@
 .ContainerSmall {
   width: calc(100% - 350px);
 }
-.Container::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Container::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Container::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
-}
 .DataCard {
   background: white;
   border-radius: 4px;

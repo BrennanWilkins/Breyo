@@ -38,19 +38,6 @@
   overflow-y: auto;
   max-height: 290px;
 }
-.Colors::-webkit-scrollbar-track {
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Colors::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 15px;
-  background: rgb(225, 225, 225);
-}
-.Colors::-webkit-scrollbar-thumb {
-  border-radius: 15px;
-  background: rgb(197, 197, 197);
-}
 .Color {
   width: 80%;
   height: 30px;
