@@ -11,15 +11,9 @@
   padding: 0 20px;
 }
 .LeaveBtn {
-  display: block;
-  background: rgb(219, 55, 29);
-  color: white;
   margin: 20px auto 10px;
   width: 96%;
   max-width: 300px;
-}
-.LeaveBtn:hover, .LeaveBtn:active {
-  background: rgb(213, 5, 5);
 }
 .CannotLeave {
   margin: 20px 0;

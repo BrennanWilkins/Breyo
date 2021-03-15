@@ -155,15 +155,10 @@
   color: white;
   width: 100px;
   font-size: 15px;
+  margin: 0;
 }
 .EditBtn {
   background: rgb(var(--green));
-}
-.DeleteBtn {
-  background: rgb(219, 55, 29);
-}
-.DeleteBtn:hover, .DeleteBtn:active {
-  background: rgb(213, 5, 5);
 }
 .ShowEditBtn {
   position: absolute;

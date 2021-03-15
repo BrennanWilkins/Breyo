@@ -6,15 +6,3 @@
   text-align: center;
   font-size: 15px;
 }
-.DeleteBtn {
-  background: rgb(219, 55, 29);
-  font-weight: 400;
-  font-size: 15px;
-  padding: 5px 10px;
-  display: flex;
-  width: calc(100% - 20px);
-  margin: 0 auto;
-}
-.DeleteBtn:hover, .DeleteBtn:active {
-  background: rgb(213, 5, 5);
-}

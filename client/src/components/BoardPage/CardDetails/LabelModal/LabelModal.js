@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { addCardLabel, removeCardLabel, createCustomLabel, addCardCustomLabel,
   deleteCardCustomLabel, updateCustomLabel, deleteCustomLabel } from '../../../../store/actions';
 import ModalTitle from '../../../UI/ModalTitle/ModalTitle';
-import { ActionBtn, BackBtn } from '../../../UI/Buttons/Buttons';
+import { ActionBtn, BackBtn, DeleteBtn } from '../../../UI/Buttons/Buttons';
 import { Input } from '../../../UI/Inputs/Inputs';
 
 const LabelModal = props => {
@@ -108,7 +108,7 @@ const LabelModal = props => {
           {createLabel}
           <div className={classes.EditBtns}>
             <ActionBtn disabled={!titleInput || titleInput.length > 100} clicked={editCustomLabelHandler} className={classes.EditBtn}>Save</ActionBtn>
-            <ActionBtn clicked={deleteCustomLabelHandler} className={classes.DeleteBtn}>Delete</ActionBtn>
+            <DeleteBtn clicked={deleteCustomLabelHandler}>Delete</DeleteBtn>
           </div>
         </>
         :

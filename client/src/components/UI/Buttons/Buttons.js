@@ -33,4 +33,8 @@ export const ActionBtn = props => (
   <button disabled={props.disabled} className={`${classes.ActionBtn} ${props.className || ''}`} onClick={props.clicked}>{props.children}</button>
 );
 
+export const DeleteBtn = props => (
+  <button disabled={props.disabled} className={`${classes.DeleteBtn} ${props.className || ''}`} onClick={props.clicked}>{props.children}</button>
+);
+
 export default Button;

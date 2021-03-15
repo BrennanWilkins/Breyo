@@ -5,7 +5,7 @@ import { leaveTeam } from '../../../../store/actions';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router';
 import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
-import { ActionBtn } from '../../../UI/Buttons/Buttons';
+import { DeleteBtn } from '../../../UI/Buttons/Buttons';
 
 const LeaveTeamModal = props => {
   const history = useHistory();
@@ -23,7 +23,7 @@ const LeaveTeamModal = props => {
       <div className={classes.CannotLeave}>There must be at least one other admin to leave this team.</div>
       : <>
         <p>Leaving a team will not cause you to be removed from any of the team's boards.</p>
-        <ActionBtn className={classes.LeaveBtn} clicked={leaveHandler}>LEAVE TEAM</ActionBtn>
+        <DeleteBtn className={classes.LeaveBtn} clicked={leaveHandler}>LEAVE TEAM</DeleteBtn>
       </>}
     </ModalContainer>
   );

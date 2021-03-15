@@ -47,18 +47,13 @@
   width: 80px;
   padding: 8px 0;
   font-size: 15px;
+  margin: 0;
 }
-.SaveBtn button {
+.SaveBtn {
   background: rgba(var(--green), 0.8);
 }
-.SaveBtn button:hover, .SaveBtn button:active {
+.SaveBtn:hover, .SaveBtn:active {
   background: rgb(var(--green));
-}
-.RemoveBtn button {
-  background: rgb(219, 55, 29);
-}
-.RemoveBtn button:hover, .RemoveBtn button:active {
-  background: rgb(213, 5, 5);
 }
 .Labels {
   position: absolute;

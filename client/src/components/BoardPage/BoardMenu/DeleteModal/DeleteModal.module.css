@@ -14,16 +14,7 @@
   left: calc(50% - 145px);
 }
 .DeleteBtn {
-  background: rgb(219, 55, 29);
-  color: white;
   width: calc(100% - 25px);
-}
-.DeleteBtn:hover, .DeleteBtn:active {
-  background: rgb(213, 5, 5);
-}
-.DeleteBtn:disabled {
-  background: rgb(200,200,200);
-  cursor: not-allowed;
 }
 .Input {
   margin: 15px auto;

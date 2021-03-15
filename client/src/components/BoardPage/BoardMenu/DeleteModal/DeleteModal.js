@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import classes from './DeleteModal.module.css';
 import PropTypes from 'prop-types';
-import { ActionBtn } from '../../../UI/Buttons/Buttons';
+import { DeleteBtn } from '../../../UI/Buttons/Buttons';
 import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 import { Input } from '../../../UI/Inputs/Inputs';
 
@@ -36,9 +36,9 @@ const DeleteModal = props => {
         <>
           <p>{text} Type "{props.confirmText}" below to confirm.</p>
           <Input className={classes.Input} value={confirmInput} onChange={e => setConfirmInput(e.target.value)} />
-          <ActionBtn disabled={confirmInput !== props.confirmText} className={classes.DeleteBtn} clicked={props.delete}>
+          <DeleteBtn disabled={confirmInput !== props.confirmText} className={classes.DeleteBtn} clicked={props.delete}>
             {props.mode === 'leave' ? 'LEAVE' : 'DELETE'}
-          </ActionBtn>
+          </DeleteBtn>
         </>
         :
         <p>{disabledText}</p>

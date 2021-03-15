@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import classes from './DueDateModal.module.css';
 import PropTypes from 'prop-types';
-import Button, { CloseBtn } from '../../../UI/Buttons/Buttons';
+import Button, { CloseBtn, DeleteBtn } from '../../../UI/Buttons/Buttons';
 import DatePicker from 'react-datepicker';
 import { connect } from 'react-redux';
 import { addDueDate, removeDueDate } from '../../../../store/actions';
@@ -50,8 +50,8 @@ const DueDateModal = props => {
         endDate={selectedDueDate} className={classes.Input} />
       </div>
       <div className={classes.Btns}>
-        <span className={classes.SaveBtn}><Button clicked={saveHandler}>Save</Button></span>
-        <span className={classes.RemoveBtn}><Button clicked={removeHandler}>Remove</Button></span>
+        <Button className={classes.SaveBtn} clicked={saveHandler}>Save</Button>
+        <DeleteBtn clicked={removeHandler}>Remove</DeleteBtn>
       </div>
     </ModalContainer>
   );

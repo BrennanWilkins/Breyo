@@ -1,4 +1,4 @@
-.Button, .AccountBtn {
+.Button, .AccountBtn, .DeleteBtn {
   height: 32px;
   padding: 0 6px;
   outline: none;
@@ -8,7 +8,7 @@
   font-size: 16px;
   font-family: 'Roboto', -apple-system, sans-serif;
 }
-.Button {
+.Button, .DeleteBtn {
   line-height: 32px;
   display: inline-flex;
   justify-content: center;
@@ -142,4 +142,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.DeleteBtn {
+  background: rgb(219, 55, 29);
+  font-weight: 400;
+  font-size: 15px;
+  padding: 5px 10px;
+  display: flex;
+  width: calc(100% - 20px);
+  margin: 0 auto;
+}
+.DeleteBtn:hover, .DeleteBtn:active {
+  background: rgb(213, 5, 5);
+}
+.DeleteBtn:disabled {
+  background: rgb(200,200,200);
+  cursor: not-allowed;
 }

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { deleteAccount } from '../../../../store/actions';
 import { Input } from '../../../UI/Inputs/Inputs';
 import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
-import { ActionBtn } from '../../../UI/Buttons/Buttons';
+import { DeleteBtn } from '../../../UI/Buttons/Buttons';
 
 const DeleteAccntModal = props => {
   const [password, setPassword] = useState('');
@@ -18,7 +18,7 @@ const DeleteAccntModal = props => {
       </div>
       <p>To confirm, please enter your password below.</p>
       <Input className={classes.Input} type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      <ActionBtn className={classes.DeleteBtn} clicked={() => props.deleteAccount(password)} disabled={!password}>DELETE MY ACCOUNT</ActionBtn>
+      <DeleteBtn className={classes.DeleteBtn} clicked={() => props.deleteAccount(password)} disabled={!password}>DELETE MY ACCOUNT</DeleteBtn>
     </ModalContainer>
   );
 };

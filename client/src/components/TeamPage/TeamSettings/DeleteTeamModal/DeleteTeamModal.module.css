@@ -16,17 +16,7 @@
   margin: 10px auto;
 }
 .DeleteBtn {
-  display: block;
-  background: rgb(219, 55, 29);
-  color: white;
   margin: 20px auto;
   width: 96%;
   max-width: 300px;
-}
-.DeleteBtn:hover, .DeleteBtn:active {
-  background: rgb(213, 5, 5);
-}
-.DeleteBtn:disabled {
-  background: rgb(200,200,200);
-  cursor: not-allowed;
 }
