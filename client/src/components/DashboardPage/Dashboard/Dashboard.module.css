@@ -1,8 +1,15 @@
 .Container {
-  margin: 100px auto 0;
-  padding: 10px;
-  width: 80%;
-  max-width: 850px;
+  padding-top: 70px;
+  padding-bottom: 10px;
+  padding-left: max(5%, calc(50% - 435px));
+  padding-right: max(5%, calc(50% - 435px));
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: fixed;
+  top: 40px;
+  height: calc(100vh - 40px);
 }
 .Title {
   font-weight: bold;

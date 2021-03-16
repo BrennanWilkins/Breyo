@@ -1,24 +1,20 @@
 import React from 'react';
 import classes from './TeamNavBar.module.css';
 import { teamIcon, boardIcon, settingsIcon, personIcon } from '../../UI/icons';
-import { useHistory } from 'react-router';
 import PropTypes from 'prop-types';
 import { ActionBtn } from '../../UI/Buttons/Buttons';
+import { Link } from 'react-router-dom';
 
-const TeamNavBar = props => {
-  const history = useHistory();
-
-  return (
-    <div className={classes.Container}>
-      <div className={classes.Title}>{teamIcon}<div>{props.title}</div></div>
-      <div className={classes.Btns}>
-        <ActionBtn clicked={() => history.push(`/team/${props.url}/?view=boards`)}>{boardIcon} Boards</ActionBtn>
-        <ActionBtn clicked={() => history.push(`/team/${props.url}/?view=members`)}>{personIcon} Members</ActionBtn>
-        <ActionBtn clicked={() => history.push(`/team/${props.url}/?view=settings`)}>{settingsIcon} Settings</ActionBtn>
-      </div>
+const TeamNavBar = props => (
+  <div className={classes.Container}>
+    <div className={classes.Title}>{teamIcon}<div>{props.title}</div></div>
+    <div className={classes.Btns}>
+      <Link to={`/team/${props.url}/?view=boards`}><ActionBtn>{boardIcon} Boards</ActionBtn></Link>
+      <Link to={`/team/${props.url}/?view=members`}><ActionBtn>{personIcon} Members</ActionBtn></Link>
+      <Link to={`/team/${props.url}/?view=settings`}><ActionBtn>{settingsIcon} Settings</ActionBtn></Link>
     </div>
-  );
-};
+  </div>
+);
 
 TeamNavBar.propTypes = {
   teamID: PropTypes.string.isRequired,
