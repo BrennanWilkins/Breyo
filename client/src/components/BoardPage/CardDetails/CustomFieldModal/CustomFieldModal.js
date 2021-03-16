@@ -4,11 +4,12 @@ import ModalContainer from '../../../UI/ModalContainer/ModalContainer';
 import PropTypes from 'prop-types';
 import { plusIcon } from '../../../UI/icons';
 import { BackBtn, DeleteBtn } from '../../../UI/Buttons/Buttons';
-import AddCustomField from './AddCustomField/AddCustomField';
+import CreateCustomField from './CreateCustomField/CreateCustomField';
 import { connect } from 'react-redux';
 import { xIcon, editIcon, checkIcon } from '../../../UI/icons';
 import { fieldIcons } from '../../../../utils/customFieldUtils';
-import { deleteCustomField, updateCustomFieldTitle, customFieldDndHandler } from '../../../../store/actions';
+import { deleteCustomField, deleteCustomFieldFromCard, updateCustomFieldTitle,
+  customFieldDndHandler, addCustomField } from '../../../../store/actions';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 const CustomFieldModal = props => {
@@ -17,12 +18,14 @@ const CustomFieldModal = props => {
   const [showEditTitle, setShowEditTitle] = useState('');
   const [showDeleteField, setShowDeleteField] = useState(null);
 
-  const showEditHandler = (fieldID, fieldTitle) => {
+  const showEditHandler = (e, fieldID, fieldTitle) => {
+    e.stopPropagation();
     setShowEditTitle(fieldID);
     setTitleInput(fieldTitle);
   };
 
-  const deleteHandler = (fieldID, fieldTitle) => {
+  const deleteHandler = (e, fieldID, fieldTitle) => {
+    e.stopPropagation();
     if (showEditTitle) { return setShowEditTitle(''); }
     setShowDeleteField({ fieldID, fieldTitle });
   };
@@ -47,7 +50,8 @@ const CustomFieldModal = props => {
     isDragging ? { background: 'rgb(241, 241, 241)', ...otherStyles } : otherStyles
   );
 
-  const updateTitleHandler = (fieldID, titleInput) => {
+  const updateTitleHandler = (e, fieldID, titleInput) => {
+    e.stopPropagation();
     props.updateTitle(fieldID, titleInput);
     setShowEditTitle('');
   };
@@ -57,15 +61,21 @@ const CustomFieldModal = props => {
     setShowDeleteField(null);
   };
 
+  const toggleCustomFieldHandler = (fieldID, fieldType, isIncluded) => {
+    if (showEditTitle) { return; }
+    if (isIncluded) { props.deleteFieldFromCard(fieldID); }
+    else { props.addCustomField(fieldID, fieldType); }
+  };
+
   return (
     <ModalContainer close={props.close} className={classes.Container} title={!!showDeleteField ? `Delete ${showDeleteField.fieldTitle}?` : 'Custom Fields'}>
       {(!!showDeleteField || showAddField) && <div className={classes.BackBtn}><BackBtn back={backHandler} /></div>}
       {showAddField ?
-        <AddCustomField close={() => setShowAddField(false)} />
+        <CreateCustomField close={() => setShowAddField(false)} />
         :
         showDeleteField ?
         <>
-          <p className={classes.SubTitle}>Are you sure you want to delete this field?</p>
+          <p className={classes.SubTitle}>Are you sure you want to delete this field? This will cause it to be deleted from all cards.</p>
           <DeleteBtn clicked={deleteFieldHandler}>Delete</DeleteBtn>
         </>
         :
@@ -74,14 +84,17 @@ const CustomFieldModal = props => {
             <Droppable droppableId="fields" direction="vertical" type="list">
               {(provided, snapshot) => (
                 <div ref={provided.innerRef}>
-                  {props.customFields.map(({ fieldID, fieldType, fieldTitle }, i) => {
+                  {props.allFields.map((fieldID, i) => {
+                    const { fieldTitle, fieldType } = props.customFieldsByID[fieldID];
                     const isActive = showEditTitle === fieldID;
+                    const isIncluded = !!props.cardCustomFields.find(field => field.fieldID === fieldID);
                     return (
                       <Draggable draggableId={fieldID} index={i} key={fieldID}>
                         {(provided, snapshot) => (
                           <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}
                           style={getDragStyle(snapshot.isDragging, provided.draggableProps.style)}
-                          className={`${classes.Option} ${fieldType === 'Date' ? classes.DateField : ''} ${isActive ? classes.ActiveOption : ''}`}>
+                          className={`${classes.Option} ${fieldType === 'Date' ? classes.DateField : ''} ${isActive ? classes.ActiveOption : ''}`}
+                          onClick={() => toggleCustomFieldHandler(fieldID, fieldType, isIncluded)}>
                             <span className={classes.FieldIcon}>{fieldIcons[fieldType]}</span>
                             {isActive ?
                               <input className={classes.TitleInput} value={titleInput} autoFocus onFocus={e => e.target.select()}
@@ -91,12 +104,13 @@ const CustomFieldModal = props => {
                             }
                             <div className={classes.Btns}>
                               {isActive ?
-                                <div className={classes.SaveBtn} onClick={() => updateTitleHandler(fieldID, titleInput)}>{checkIcon}</div>
+                                <div className={classes.SaveBtn} onClick={e => updateTitleHandler(e, fieldID, titleInput)}>{checkIcon}</div>
                                 :
-                                <div className={classes.EditBtn} onClick={() => showEditHandler(fieldID, fieldTitle)}>{editIcon}</div>
+                                <div className={classes.EditBtn} onClick={e => showEditHandler(e, fieldID, fieldTitle)}>{editIcon}</div>
                               }
-                              <div className={classes.DeleteBtn} onClick={() => deleteHandler(fieldID, fieldTitle)}>{xIcon}</div>
+                              <div className={classes.DeleteBtn} onClick={e => deleteHandler(e, fieldID, fieldTitle)}>{xIcon}</div>
                             </div>
+                            {(isIncluded && !showEditTitle) && <span className={classes.CheckIcon}>{checkIcon}</span>}
                           </div>
                         )}
                       </Draggable>
@@ -116,19 +130,27 @@ const CustomFieldModal = props => {
 
 CustomFieldModal.propTypes = {
   close: PropTypes.func.isRequired,
-  customFields: PropTypes.array.isRequired,
+  cardCustomFields: PropTypes.array.isRequired,
   deleteField: PropTypes.func.isRequired,
   updateTitle: PropTypes.func.isRequired,
-  moveField: PropTypes.func.isRequired
+  moveField: PropTypes.func.isRequired,
+  allFields: PropTypes.array.isRequired,
+  customFieldsByID: PropTypes.object.isRequired,
+  deleteFieldFromCard: PropTypes.func.isRequired,
+  addCustomField: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  customFields: state.lists.currentCard.customFields
+  cardCustomFields: state.lists.currentCard.customFields,
+  allFields: state.board.customFields.allIDs,
+  customFieldsByID: state.board.customFields.byID
 });
 
 const mapDispatchToProps = dispatch => ({
   updateTitle: (fieldID, title) => dispatch(updateCustomFieldTitle(fieldID, title)),
   deleteField: fieldID => dispatch(deleteCustomField(fieldID)),
+  addCustomField: (fieldID, fieldType) => dispatch(addCustomField(fieldID, fieldType)),
+  deleteFieldFromCard: fieldID => dispatch(deleteCustomFieldFromCard(fieldID)),
   moveField: (sourceIndex, destIndex) => dispatch(customFieldDndHandler(sourceIndex, destIndex))
 });
 

@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import classes from './AddCustomField.module.css';
+import classes from './CreateCustomField.module.css';
 import PropTypes from 'prop-types';
 import Select from '../../../../UI/Select/Select';
 import { Input } from '../../../../UI/Inputs/Inputs';
 import { ActionBtn } from '../../../../UI/Buttons/Buttons';
 import { fieldIcons } from '../../../../../utils/customFieldUtils';
-import { addCustomField } from '../../../../../store/actions';
+import { createCustomField } from '../../../../../store/actions';
 import { connect } from 'react-redux';
 
-const AddCustomField = props => {
+const CreateCustomField = props => {
   const [fieldType, setFieldType] = useState('Text');
   const [fieldTitle, setFieldTitle] = useState('');
 
   const saveHandler = () => {
     if (fieldTitle.length > 150) { return; }
-    props.addCustomField(fieldType, fieldTitle);
+    props.createCustomField(fieldType, fieldTitle);
     props.close();
   };
 
@@ -46,13 +46,13 @@ const AddCustomField = props => {
   );
 };
 
-AddCustomField.propTypes = {
+CreateCustomField.propTypes = {
   close: PropTypes.func.isRequired,
-  addCustomField: PropTypes.func.isRequired
+  createCustomField: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
-  addCustomField: (fieldType, fieldTitle) => dispatch(addCustomField(fieldType, fieldTitle))
+  createCustomField: (fieldType, fieldTitle) => dispatch(createCustomField(fieldType, fieldTitle))
 });
 
-export default connect(null, mapDispatchToProps)(AddCustomField);
+export default connect(null, mapDispatchToProps)(CreateCustomField);

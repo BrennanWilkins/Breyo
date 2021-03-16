@@ -5,7 +5,11 @@ const initialState = {
   members: [],
   color: 'rgb(250, 250, 250)',
   boardID: '',
-  creator: { email: '', fullName: '', avatar: null },
+  creator: {
+    email: '',
+    fullName: '',
+    avatar: null
+  },
   desc: '',
   isStarred: false,
   userIsAdmin: false,
@@ -13,8 +17,19 @@ const initialState = {
   showCreateBoard: false,
   createBoardTeamID: null,
   avatars: {},
-  customLabels: { allIDs: [], byID: {} },
-  team: { teamID: null, title: '', url: null }
+  customLabels: {
+    allIDs: [],
+    byID: {}
+  },
+  customFields: {
+    allIDs: [],
+    byID: {}
+  },
+  team: {
+    teamID: null,
+    title: '',
+    url: null
+  }
 };
 
 const reducer = (state = initialState, action) => {
@@ -41,6 +56,10 @@ const reducer = (state = initialState, action) => {
     case actionTypes.CREATE_NEW_CUSTOM_LABEL: return createCustomLabel(state, action);
     case actionTypes.UPDATE_CUSTOM_LABEL: return updateCustomLabel(state, action);
     case actionTypes.DELETE_CUSTOM_LABEL: return deleteCustomLabel(state, action);
+    case actionTypes.CREATE_CUSTOM_FIELD: return createCustomField(state, action);
+    case actionTypes.UPDATE_CUSTOM_FIELD_TITLE: return updateCustomFieldTitle(state, action);
+    case actionTypes.DELETE_CUSTOM_FIELD: return deleteCustomField(state, action);
+    case actionTypes.MOVE_CUSTOM_FIELD: return moveCustomField(state, action);
     default: return state;
   }
 };
@@ -57,7 +76,8 @@ const updateActiveBoard = (state, action) => ({
   userIsAdmin: action.payload.userIsAdmin,
   team: action.payload.team,
   avatars: action.payload.avatars,
-  customLabels: action.payload.customLabels
+  customLabels: action.payload.customLabels,
+  customFields: action.payload.customFields
 });
 
 const toggleIsAdmin = (state, action, isAdmin) => ({
@@ -117,6 +137,31 @@ const deleteCustomLabel = (state, action) => {
   delete byID[action.labelID];
   const allIDs = state.customLabels.allIDs.filter(id => id !== action.labelID);
   return { ...state, customLabels: { byID, allIDs } };
+};
+
+const createCustomField = (state, action) => {
+  const allIDs = [...state.customFields.allIDs, action.fieldID];
+  const byID = { ...state.customFields.byID, [action.fieldID] : { fieldTitle: action.fieldTitle, fieldType: action.fieldType } };
+  return { ...state, customFields: { byID, allIDs } };
+};
+
+const updateCustomFieldTitle = (state, action) => {
+  const byID = { ...state.customFields.byID, [action.fieldID] : { ...state.customFields.byID[action.fieldID], fieldTitle: action.fieldTitle } };
+  return { ...state, customFields: { ...state.customFields, byID } };
+};
+
+const deleteCustomField = (state, action) => {
+  const byID = { ...state.customFields.byID };
+  delete byID[action.fieldID];
+  const allIDs = state.customFields.allIDs.filter(id => id !== action.fieldID);
+  return { ...state, customFields: { byID, allIDs } };
+};
+
+const moveCustomField = (state, action) => {
+  const allIDs = [...state.customFields.allIDs];
+  const field = allIDs.splice(action.sourceIndex, 1)[0];
+  allIDs.splice(action.destIndex, 0, field);
+  return { ...state, customFields: { byID: state.customFields.byID, allIDs } };
 };
 
 export default reducer;

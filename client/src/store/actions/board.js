@@ -58,8 +58,6 @@ const formatCardData = card => {
     }))
   }));
 
-  customFields = customFields.map(({ _id, fieldTitle, value, fieldType }) => ({ fieldID: _id, fieldTitle, fieldType, value }));
-
   return { cardID, comments, checklists, customFields, ...restCard };
 };
 
@@ -82,6 +80,13 @@ export const updateActiveBoard = data => (dispatch, getState) => {
     allCustomLabelsIDs.push(label._id);
   }
 
+  const allCustomFieldIDs = [];
+  const customFieldsByID = {};
+  for (let field of data.customFields) {
+    allCustomFieldIDs.push(field._id);
+    customFieldsByID[field._id] = { fieldType: field.fieldType, fieldTitle: field.fieldTitle };
+  }
+
   let team = { teamID, title: '', url: null };
   if (teamID && !data.team) {
     const teamData = state.user.teams.byID[teamID];
@@ -100,7 +105,7 @@ export const updateActiveBoard = data => (dispatch, getState) => {
   if (data.token) { setToken(data.token); }
 
   const boardPayload = { isStarred, creator, userIsAdmin, title, members, color, boardID, desc, team, avatars,
-    customLabels: { allIDs: allCustomLabelsIDs, byID: customLabelsByID } };
+    customLabels: { allIDs: allCustomLabelsIDs, byID: customLabelsByID }, customFields: { allIDs: allCustomFieldIDs, byID: customFieldsByID } };
   dispatch({ type: actionTypes.UPDATE_ACTIVE_BOARD, payload: boardPayload });
 
   let allArchivedCards = [];
@@ -315,6 +320,42 @@ export const deleteCustomLabel = labelID => async (dispatch, getState) => {
     dispatch({ type: actionTypes.DELETE_CUSTOM_LABEL, labelID });
     await axios.delete(`/board/customLabel/${boardID}/${labelID}`);
     sendBoardUpdate('delete/board/customLabel', { labelID });
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
+
+export const createCustomField = (fieldType, fieldTitle) => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    const payload = { fieldType, fieldTitle, boardID };
+    const res = await axios.post('/board/customField', payload);
+    payload.fieldID = res.data.fieldID;
+    dispatch({ type: actionTypes.CREATE_CUSTOM_FIELD, ...payload });
+    sendBoardUpdate('post/board/customField', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
+
+export const updateCustomFieldTitle = (fieldID, fieldTitle) => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    const payload = { fieldID, fieldTitle, boardID };
+    dispatch({ type: actionTypes.UPDATE_CUSTOM_FIELD_TITLE, ...payload });
+    await axios.put('/board/customField/title', payload);
+    sendBoardUpdate('put/board/customField/title', payload);
+  } catch (err) {
+    dispatch(serverErr());
+  }
+};
+
+export const deleteCustomField = fieldID => async (dispatch, getState) => {
+  try {
+    const boardID = getState().board.boardID;
+    dispatch({ type: actionTypes.DELETE_CUSTOM_FIELD, fieldID });
+    await axios.delete(`/board/customField/${boardID}/${fieldID}`);
+    sendBoardUpdate('delete/board/customField', { fieldID });
   } catch (err) {
     dispatch(serverErr());
   }

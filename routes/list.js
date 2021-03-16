@@ -115,11 +115,7 @@ router.post('/copy',
         labels: card.labels,
         dueDate: card.dueDate,
         members: card.members,
-        customFields: card.customFields.map(field => ({
-          fieldType: field.fieldType,
-          fieldTitle: field.fieldTitle,
-          value: field.value
-        })),
+        customFields: card.customFields,
         comments: [],
         votes: [],
         customLabels: card.customLabels

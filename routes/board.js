@@ -95,7 +95,7 @@ router.post('/',
 
       // user is admin of new board by default
       const board = new Board({ title, members: [req.userID], admins: [req.userID], color, customLabels: [],
-        creator: { email: user.email, fullName: user.fullName }, desc: '', teamID: null });
+        creator: { email: user.email, fullName: user.fullName }, desc: '', teamID: null, customFields: [] });
       const boardID = board._id;
 
       // add board to user's boards
@@ -139,7 +139,7 @@ router.post('/teamBoard',
 
       // user is admin of new board by default
       const board = new Board({ title, members: [req.userID], admins: [req.userID], color, customLabels: [],
-        creator: { email: user.email, fullName: user.fullName }, desc: '', teamID });
+        creator: { email: user.email, fullName: user.fullName }, desc: '', teamID, customFields: [] });
       const boardID = board._id;
 
       // add board to user's boards
@@ -608,6 +608,110 @@ router.delete('/customLabel/:boardID/:labelID',
       }
       await Promise.all([board.save(), ...listsToUpdate.map(list => list.save())]);
 
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: board member
+// add a custom field to board
+router.post('/customField',
+  validate([body('boardID').isMongoId(), body('fieldType').notEmpty(), body('fieldTitle').isLength({ min: 1, max: 150 })]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, fieldType, fieldTitle } = req.body;
+      const fieldTypes = ['Text', 'Number', 'Date', 'Checkbox'];
+      if (!fieldTypes.includes(fieldType)) { throw 'Invalid field type'; }
+      const board = await Board.findById(boardID);
+      if (!board) { throw 'No board data found'; }
+
+      board.customFields.push({ fieldType, fieldTitle });
+      const fieldID = board.customFields[board.customFields.length - 1]._id;
+
+      await board.save();
+
+      res.status(200).json({ fieldID });
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: board member
+// edit a board custom field title
+router.put('/customField/title',
+  validate([body('boardID').isMongoId(), body('fieldID').isMongoId(), body('fieldTitle').isLength({ min: 1, max: 150 })]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, fieldID, fieldTitle } = req.body;
+      const board = await Board.findById(boardID);
+      if (!board) { throw 'No board data found'; }
+
+      const field = board.customFields.id(fieldID);
+      if (!field) { throw 'Custom field not found'; }
+      field.fieldTitle = fieldTitle;
+
+      await board.save();
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: board member
+// delete a custom field from board, deletes field from all cards
+router.delete('/customField/:boardID/:fieldID',
+  validate([param('boardID').isMongoId(), param('fieldID').isMongoId()]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, fieldID } = req.params;
+      const [board, lists] = await Promise.all([
+        Board.findById(boardID),
+        List.find({ boardID })
+      ]);
+      if (!board || !lists) { throw 'Board or list data not found'; }
+
+      const field = board.customFields.id(fieldID);
+      if (!field) { throw 'Field not found'; }
+      field.remove();
+
+      // remove custom field from all cards/archivedCards in board
+      for (let list of lists) {
+        for (let card of list.cards) {
+          const newFields = card.customFields.filter(field => field.fieldID !== fieldID);
+          card.customFields = newFields.length !== card.customFields.length ? newFields : card.customFields;
+        }
+        for (let card of list.archivedCards) {
+          const newFields = card.customFields.filter(field => field.fieldID !== fieldID);
+          card.customFields = newFields.length !== card.customFields.length ? newFields : card.customFields;
+        }
+      }
+
+      await Promise.all([board.save(), ...lists.map(list => list.save())]);
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
+// authorization: board member
+// change position of custom field
+router.put('/customField/move',
+  validate([body('boardID').isMongoId(), body('sourceIndex').isInt({ min: 0 }), body('destIndex').isInt({ min: 0 })]),
+  useIsMember,
+  async (req, res) => {
+    try {
+      const { boardID, sourceIndex, destIndex } = req.body;
+      const board = await Board.findById(boardID);
+      if (!board) { throw 'No board data found'; }
+
+      if (sourceIndex >= board.customFields.length || destIndex >= board.customFields.length) {
+        throw 'Invalid indexes';
+      }
+      const field = board.customFields.splice(sourceIndex, 1)[0];
+      board.customFields.splice(destIndex, 0, field);
+
+      await board.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }

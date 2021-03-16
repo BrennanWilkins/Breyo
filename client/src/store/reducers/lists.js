@@ -73,14 +73,13 @@ const reducer = (state = initialState, action) => {
     case actionTypes.MOVE_CHECKLIST_ITEM: return moveChecklistItem(state, action);
     case actionTypes.TOGGLE_COMMENT_LIKE: return toggleCommentLike(state, action);
     case actionTypes.ADD_CUSTOM_FIELD: return addCustomField(state, action);
-    case actionTypes.UPDATE_CUSTOM_FIELD_TITLE: return updateCustomFieldTitle(state, action);
     case actionTypes.UPDATE_CUSTOM_FIELD_VALUE: return updateCustomFieldValue(state, action);
     case actionTypes.DELETE_CUSTOM_FIELD: return deleteCustomField(state, action);
+    case actionTypes.DELETE_CUSTOM_FIELD_FROM_CARD: return deleteCustomFieldFromCard(state, action);
     case actionTypes.TOGGLE_LIST_VOTING: return toggleListVoting(state, action);
     case actionTypes.TOGGLE_CARD_VOTE: return toggleCardVote(state, action);
     case actionTypes.SET_LIST_LIMIT: return setListLimit(state, action);
     case actionTypes.REMOVE_LIST_LIMIT: return removeListLimit(state, action);
-    case actionTypes.MOVE_CUSTOM_FIELD: return moveCustomField(state, action);
     case actionTypes.SORT_LIST: return sortList(state, action);
     case actionTypes.SET_VOTING_RESULTS_ID: return { ...state, votingResultsListID: action.listID };
     case actionTypes.CLOSE_VOTING_RESULTS: return { ...state, votingResultsListID: null };
@@ -130,7 +129,11 @@ const updateLists = (cards, cardIndex, card, list, lists, listIndex, state) => {
   list.cards = cards;
   lists[listIndex] = list;
   const filteredLists = getFilteredLists(state, lists);
-  return { ...state, lists, currentCard: { ...card, listIsVoting: list.isVoting }, filteredLists };
+  let currentCard = state.currentCard;
+  if (state.shownCardID === card.cardID) {
+    currentCard = { ...card, listIsVoting: list.isVoting };
+  }
+  return { ...state, lists, currentCard, filteredLists };
 };
 
 // finds checklist items within a card based on ID
@@ -164,12 +167,7 @@ const formatCardData = (card, fromList) => ({
     return { ...restComment, commentID };
   }).reverse(),
   members: card.members,
-  customFields: card.customFields.map(field => ({
-    fieldType: field.fieldType,
-    fieldTitle: field.fieldTitle,
-    value: field.value,
-    fieldID: field._id
-  })),
+  customFields: card.customFields,
   votes: fromList ? [] : card.votes,
   customLabels: card.customLabels
 });
@@ -744,14 +742,8 @@ const moveChecklistItem = (state, action) => {
 const addCustomField = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
   const value = action.fieldType === 'Date' ? null : action.fieldType === 'Checkbox' ? false : '';
-  const newField = { fieldID: action.fieldID, fieldType: action.fieldType, fieldTitle: action.fieldTitle, value };
+  const newField = { fieldID: action.fieldID, value };
   card.customFields = [...card.customFields, newField];
-  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
-};
-
-const updateCustomFieldTitle = (state, action) => {
-  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  card.customFields = card.customFields.map(field => field.fieldID === action.fieldID ? { ...field, fieldTitle: action.fieldTitle } : field);
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
@@ -761,10 +753,39 @@ const updateCustomFieldValue = (state, action) => {
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
 };
 
-const deleteCustomField = (state, action) => {
+const deleteCustomFieldFromCard = (state, action) => {
   const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
   card.customFields = card.customFields.filter(({ fieldID }) => fieldID !== action.fieldID);
   return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
+};
+
+const deleteCustomField = (state, action) => {
+  let currentCard = state.currentCard;
+
+  const updateCard = card => {
+    const customFields = card.customFields.filter(({ fieldID }) => fieldID !== action.fieldID);
+    if (customFields.length === card.customFields.length) { return card; }
+    if (state.shownCardID === card.cardID) {
+      currentCard = { ...currentCard, customFields };
+    }
+    return { ...card, customFields };
+  };
+
+  const lists = state.lists.map(list => ({
+    ...list,
+    cards: list.cards.map(card => updateCard(card))
+  }));
+
+  const archivedLists = state.archivedLists.map(list => ({
+    ...list,
+    cards: list.cards.map(card => updateCard(card))
+  }));
+
+  const allArchivedCards = state.allArchivedCards.map(card => updateCard(card));
+
+  const filteredLists = getFilteredLists(state, lists);
+
+  return { ...state, lists, filteredLists, currentCard, archivedLists, allArchivedCards };
 };
 
 const toggleListVoting = (state, action) => {
@@ -807,15 +828,6 @@ const removeListLimit = (state, action) => ({
   lists: state.lists.map(list => list.listID === action.listID ? { ...list, limit: null } : list),
   filteredLists: state.cardsAreFiltered ? state.filteredLists.map(list => list.listID === action.listID ? { ...list, limit: null } : list) : state.filteredLists
 });
-
-const moveCustomField = (state, action) => {
-  const { lists, listIndex, list, cards, cardIndex, card } = findCard(state, action.listID, action.cardID);
-  const customFields = [...card.customFields];
-  const field = customFields.splice(action.sourceIndex, 1)[0];
-  customFields.splice(action.destIndex, 0, field);
-  card.customFields = customFields;
-  return updateLists(cards, cardIndex, card, list, lists, listIndex, state);
-};
 
 const sortList = (state, action) => {
   const lists = state.lists.map(list => list.listID === action.listID ? { ...list, cards: action.cards.map(card => formatCardData(card)) } : list);

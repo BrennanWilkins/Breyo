@@ -39,7 +39,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  max-width: 210px;
+  max-width: 206px;
 }
 .FieldIcon, .Btns div {
   display: flex;
@@ -109,4 +109,15 @@
 .SubTitle {
   text-align: center;
   font-size: 15px;
+}
+.CheckIcon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  font-size: 16px;
+  min-width: 16px;
+}
+.Option:hover .CheckIcon {
+  display: none;
 }

@@ -3,7 +3,7 @@ export { createBoard, toggleIsStarred, updateActiveBoard, updateBoardTitle, send
 addAdmin, removeAdmin, demoteSelf, updateColor, updateBoardDesc, deleteBoard, acceptInvite,
 rejectInvite, leaveBoard, setShownBoardView, toggleCreateBoard, openCreateTeamBoard,
 createTeamBoard, createCustomLabel, updateCustomLabel, deleteCustomLabel, changeCreateBoardTeam,
-resetBoardView } from './board';
+resetBoardView, createCustomField, updateCustomFieldTitle, deleteCustomField } from './board';
 export { addNotif, deleteNotif } from './notifications';
 export { updateListTitle, addList, copyList, archiveList, recoverList, deleteList,
 archiveAllCards, moveAllCards, toggleVoting, setListLimit, removeListLimit, sortList,
@@ -13,10 +13,10 @@ removeCardLabel, toggleDueDateIsComplete, addDueDate, removeDueDate, addChecklis
 deleteChecklist, addChecklistItem, toggleChecklistItemIsComplete, editChecklistItem,
 deleteChecklistItem, copyCard, archiveCard, recoverCard, deleteCard, addCardMember,
 removeCardMember, removeCardMemberCurrentCard, addComment, updateComment, deleteComment,
-editChecklistTitle, setCardDetailsInitial, toggleCommentLike,
-addCustomField, updateCustomFieldTitle, updateCustomFieldValue, deleteCustomField,
-toggleCardVote, addCardCustomLabel, deleteCardCustomLabel, changeChecklistItemMember,
-removeChecklistItemMember, changeChecklistItemDueDate, removeChecklistItemDueDate } from './card';
+editChecklistTitle, setCardDetailsInitial, toggleCommentLike, addCustomField,
+updateCustomFieldValue, deleteCustomFieldFromCard, toggleCardVote, addCardCustomLabel,
+deleteCardCustomLabel, changeChecklistItemMember, removeChecklistItemMember,
+changeChecklistItemDueDate, removeChecklistItemDueDate } from './card';
 export { dndHandler, manualMoveCardHandler, checklistDndHandler, customFieldDndHandler } from './dndActions';
 export { getRecentCardActivity, resetCardActivity, setShownMemberActivity, deleteBoardActivity,
 getAllCardActivity, fetchFirstPageBoardActivity, fetchAllBoardActivity,

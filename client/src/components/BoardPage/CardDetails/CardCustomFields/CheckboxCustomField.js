@@ -10,7 +10,7 @@ const CheckboxCustomField = props => (
 );
 
 CheckboxCustomField.propTypes = {
-  value: PropTypes.bool,
+  value: PropTypes.bool.isRequired,
   updateValue: PropTypes.func.isRequired
 };
 

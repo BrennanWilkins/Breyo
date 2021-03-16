@@ -31,8 +31,8 @@ const DateCustomField = props => {
   };
 
   return (
-    <div style={showModalDown ? null : { position: 'relative' }}>
-      <div ref={valueRef} className={classes.DateValue} onClick={showDateModalHandler}>{shownDate}</div>
+    <div className={classes.DateValue} style={showModalDown ? null : { position: 'relative' }}>
+      <div ref={valueRef} onClick={showDateModalHandler}>{shownDate}</div>
       {showDateModal &&
         <DatePickerModal className={showModalDown ? classes.DateModalDown : classes.DateModalUp}
         title={props.title} close={() => setShowDateModal(false)}

@@ -513,11 +513,7 @@ router.post('/copy',
           items: checklist.items.map(item => ({ title: item.title, isComplete: item.isComplete, member: item.member, dueDate: item.dueDate })),
           title: checklist.title
         })) : [],
-        customFields: sourceCard.customFields.map(field => ({
-          fieldType: field.fieldType,
-          fieldTitle: field.fieldTitle,
-          value: field.value
-        })),
+        customFields: sourceCard.customFields,
         desc: '',
         dueDate: sourceCard.dueDate,
         members: sourceCard.members,
@@ -784,38 +780,21 @@ router.put('/comments/like',
 
 // add a custom field to card
 router.post('/customField',
-  validate([...areAllMongo(['boardID', 'listID', 'cardID'], 'body'), body('fieldType').notEmpty(), body('fieldTitle').isLength({ min: 1, max: 150 })]),
+  validate(areAllMongo(['boardID', 'listID', 'cardID', 'fieldID'], 'body')),
   useIsMember,
   async (req, res) => {
     try {
-      const { boardID, listID, cardID, fieldType, fieldTitle } = req.body;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
-      const fieldTypes = ['Text', 'Number', 'Date', 'Checkbox'];
-      if (!fieldTypes.includes(fieldType)) { throw 'Invalid field type'; }
+      const { boardID, listID, cardID, fieldID } = req.body;
+      const [board, [list, card]] = await Promise.all([
+        Board.findById(boardID).select('customFields').lean(),
+        getListAndValidate(boardID, listID, cardID)
+      ]);
+      if (!board) { throw 'Board not found with given fieldID'; }
+      const field = board.customFields.find(({ _id }) => String(_id) === fieldID);
+      if (!field) { throw 'Custom field not found on board'; }
 
-      const value = fieldType === 'Checkbox' ? false : fieldType === 'Date' ? null : '';
-      card.customFields.push({ fieldType, fieldTitle, value });
-      const fieldID = card.customFields[card.customFields.length - 1]._id;
-
-      await list.save();
-
-      res.status(200).json({ fieldID });
-    } catch (err) { res.sendStatus(500); }
-  }
-);
-
-// edit a card custom field title
-router.put('/customField/title',
-  validate([...areAllMongo(['boardID', 'listID', 'cardID', 'fieldID'], 'body'), body('fieldTitle').isLength({ min: 1, max: 150 })]),
-  useIsMember,
-  async (req, res) => {
-    try {
-      const { boardID, listID, cardID, fieldID, fieldTitle } = req.body;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
-
-      const field = card.customFields.id(fieldID);
-      if (!field) { throw 'Custom field not found'; }
-      field.fieldTitle = fieldTitle;
+      const value = field.fieldType === 'Checkbox' ? false : field.fieldType === 'Date' ? null : '';
+      card.customFields.push({ fieldID, value });
 
       await list.save();
 
@@ -831,36 +810,43 @@ router.put('/customField/value',
   async (req, res) => {
     try {
       const { boardID, listID, cardID, fieldID, value } = req.body;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
-      const field = card.customFields.id(fieldID);
-      if (!field) { throw 'Custom field not found'; }
+      const [board, [list, card]] = await Promise.all([
+        Board.findById(boardID).select('customFields').lean(),
+        getListAndValidate(boardID, listID, cardID)
+      ]);
+      if (!board) { throw 'No board data found'; }
+      const boardField = board.customFields.find(({ _id }) => String(_id) === fieldID);
+      if (!boardField) { throw 'Custom field data not found'; }
+      const cardField = card.customFields.find(field => field.fieldID === fieldID);
+      if (!cardField) { throw 'Card custom field not found'; }
 
-      switch (field.fieldType) {
+      switch (boardField.fieldType) {
         case 'Text': {
           if (typeof value !== 'string') { throw 'Invalid value type'; }
           if (value.length > 300) { throw 'Invalid field value length'; }
-          field.value = value;
+          cardField.value = value;
           break;
         }
         case 'Checkbox': {
-          field.value = !field.value;
+          cardField.value = !cardField.value;
           break;
         }
         case 'Number': {
           if (isNaN(value) || value > 1e20 || value < -1e20) { throw 'Field value is not a number'; }
           // if value is float then can have max 12 decimal places
-          field.value = value % 1 ? String(+parseFloat(value).toFixed(12)) : value;
+          cardField.value = value % 1 ? String(+parseFloat(value).toFixed(12)) : value
           break;
         }
         case 'Date': {
           if (value && isNaN(new Date(value).getDate())) { throw 'Field value is not a date'; }
           // date value defaults to null if empty
-          field.value = value !== '' ? value : null;
+          cardField.value = value !== '' ? value : null;
           break;
         }
         default: throw 'Invalid field type';
       }
-
+      card.customFields = card.customFields.map(field => field.fieldID === fieldID ? { ...cardField } : field);
+      card.markModified('customFields');
       await list.save();
 
       res.sendStatus(200);
@@ -877,32 +863,9 @@ router.delete('/customField/:fieldID/:cardID/:listID/:boardID',
       const { boardID, listID, cardID, fieldID } = req.params;
       const [list, card] = await getListAndValidate(boardID, listID, cardID);
 
-      const field = card.customFields.id(fieldID);
-      if (!field) { throw 'Field not found'; }
-      field.remove();
+      card.customFields = card.customFields.filter(field => field.fieldID !== fieldID);
       await list.save();
 
-      res.sendStatus(200);
-    } catch (err) { res.sendStatus(500); }
-  }
-);
-
-// change position of custom field in card
-router.put('/customField/move',
-  validate([...areAllMongo(['boardID', 'listID', 'cardID'], 'body'), body('sourceIndex').isInt({ min: 0 }), body('destIndex').isInt({ min: 0 })]),
-  useIsMember,
-  async (req, res) => {
-    try {
-      const { boardID, listID, cardID, sourceIndex, destIndex } = req.body;
-      const [list, card] = await getListAndValidate(boardID, listID, cardID);
-
-      if (sourceIndex >= card.customFields.length || destIndex >= card.customFields.length) {
-        throw 'Invalid indexes';
-      }
-      const field = card.customFields.splice(sourceIndex, 1)[0];
-      card.customFields.splice(destIndex, 0, field);
-
-      await list.save();
       res.sendStatus(200);
     } catch (err) { res.sendStatus(500); }
   }

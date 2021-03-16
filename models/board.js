@@ -6,6 +6,11 @@ const CustomLabelSchema = new Schema({
   title: String
 });
 
+const CustomFieldSchema = new Schema({
+  fieldType: String,
+  fieldTitle: String
+});
+
 const BoardSchema = new Schema({
   members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   admins: [String],
@@ -14,7 +19,8 @@ const BoardSchema = new Schema({
   desc: String,
   creator: {},
   teamID: String,
-  customLabels: [CustomLabelSchema]
+  customLabels: [CustomLabelSchema],
+  customFields: [CustomFieldSchema]
 });
 
 module.exports = mongoose.model('Board', BoardSchema);

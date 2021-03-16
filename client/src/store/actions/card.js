@@ -383,26 +383,13 @@ export const toggleCommentLike = commentID => async (dispatch, getState) => {
   }
 };
 
-export const addCustomField = (fieldType, fieldTitle) => async (dispatch, getState) => {
+export const addCustomField = (fieldID, fieldType) => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID } = getCardState(getState);
-    const payload = { boardID, listID, cardID, fieldType, fieldTitle };
-    const res = await axios.post('/card/customField', payload);
-    payload.fieldID = res.data.fieldID;
-    dispatch({ type: actionTypes.ADD_CUSTOM_FIELD, ...payload });
-    sendBoardUpdate('post/card/customField', payload);
-  } catch (err) {
-    dispatch(serverErr());
-  }
-};
-
-export const updateCustomFieldTitle = (fieldID, fieldTitle) => async (dispatch, getState) => {
-  try {
-    const { boardID, listID, cardID } = getCardState(getState);
-    const payload = { boardID, listID, cardID, fieldID, fieldTitle };
-    dispatch({ type: actionTypes.UPDATE_CUSTOM_FIELD_TITLE, ...payload });
-    await axios.put('/card/customField/title', payload);
-    sendBoardUpdate('put/card/customField/title', payload);
+    const payload = { boardID, listID, cardID, fieldID };
+    dispatch({ type: actionTypes.ADD_CUSTOM_FIELD, ...payload, fieldType });
+    await axios.post('/card/customField', payload);
+    sendBoardUpdate('post/card/customField', { ...payload, fieldType });
   } catch (err) {
     dispatch(serverErr());
   }
@@ -420,11 +407,11 @@ export const updateCustomFieldValue = (fieldID, value) => async (dispatch, getSt
   }
 };
 
-export const deleteCustomField = fieldID => async (dispatch, getState) => {
+export const deleteCustomFieldFromCard = fieldID => async (dispatch, getState) => {
   try {
     const { boardID, listID, cardID } = getCardState(getState);
-    const payload = { listID, cardID, fieldID };
-    dispatch({ type: actionTypes.DELETE_CUSTOM_FIELD, ...payload });
+    const payload = { boardID, listID, cardID, fieldID };
+    dispatch({ type: actionTypes.DELETE_CUSTOM_FIELD_FROM_CARD, ...payload });
     await axios.delete(`/card/customField/${fieldID}/${cardID}/${listID}/${boardID}`);
     sendBoardUpdate('delete/card/customField', payload);
   } catch (err) {
