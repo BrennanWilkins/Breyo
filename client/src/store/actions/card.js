@@ -104,9 +104,17 @@ export const removeCardLabel = color => async (dispatch, getState) => {
   }
 };
 
-export const toggleDueDateIsComplete = () => async (dispatch, getState) => {
+export const toggleDueDateIsComplete = payload => async (dispatch, getState) => {
   try {
-    const { boardID, listID, cardID } = getCardState(getState);
+    let boardID; let cardID; let listID;
+    if (payload) {
+      // payload provided if toggling is complete from card front
+      ({ cardID, listID } = payload);
+      boardID = getState().board.boardID;
+    } else {
+      // get current card data when toggled from card details
+      ({ boardID, listID, cardID } = getCardState(getState));
+    }
     dispatch({ type: actionTypes.TOGGLE_DUE_DATE, cardID, listID });
     const res = await axios.put('/card/dueDate/isComplete', { cardID, listID, boardID });
     sendBoardUpdate('put/card/dueDate/isComplete', { cardID, listID });

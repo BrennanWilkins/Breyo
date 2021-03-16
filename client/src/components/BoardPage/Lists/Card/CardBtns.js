@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { clockIcon, checklistIcon, commentIcon, descIcon, voteIcon } from '../../../UI/icons';
 import { format, isPast, isToday } from 'date-fns';
 import formatDate from '../../../../utils/formatDate';
+import { toggleDueDateIsComplete } from '../../../../store/actions';
+import { connect } from 'react-redux';
 
 const CardBtns = props => {
   const [completedChecklists, setCompletedChecklists] = useState(0);
@@ -21,13 +23,22 @@ const CardBtns = props => {
   }, [props.checklists]);
 
   const date = props.dueDate ? new Date(props.dueDate.dueDate) : null;
+  const isComplete = props.dueDate?.isComplete;
+
+  const toggleDateCompleteHandler = e => {
+    e.stopPropagation();
+    props.toggleIsComplete({ cardID: props.cardID, listID: props.listID });
+  };
 
   return (
     <div className={classes.Btns}>
       {props.dueDate &&
-        <div title={'Due ' + formatDate(date)}
-        className={`${classes.Btn} ${props.dueDate.isComplete ? classes.BtnComplete : isPast(date) ? classes.PastDue : isToday(date) ? classes.DueSoon : ''}`}>
-          {clockIcon}{format(date, 'MMM d')}
+        <div title={'Due ' + formatDate(date)} onClick={toggleDateCompleteHandler}
+        className={`${classes.Btn} ${classes.DueDateBtn} ${isComplete ? classes.BtnComplete : isPast(date) ? classes.PastDue : isToday(date) ? classes.DueSoon : ''}`}>
+          {!isComplete && <span className={classes.BoxIcon} />}
+          <span className={classes.ClockIcon}>{clockIcon}</span>
+          {isComplete && <span className={classes.DueDateCompleteIcon}>{checklistIcon}</span>}
+          {format(date, 'MMM d')}
         </div>}
       {props.hasDesc && <div className={`${classes.Btn} ${classes.DescBtn}`}>{descIcon}</div>}
       {totalChecklists > 0 &&
@@ -46,7 +57,14 @@ CardBtns.propTypes = {
   hasDesc: PropTypes.bool.isRequired,
   checklists: PropTypes.array.isRequired,
   isVoting: PropTypes.bool.isRequired,
-  voteLength: PropTypes.number.isRequired
+  voteLength: PropTypes.number.isRequired,
+  listID: PropTypes.string.isRequired,
+  cardID: PropTypes.string.isRequired,
+  toggleIsComplete: PropTypes.func.isRequired
 };
 
-export default CardBtns;
+const mapDispatchToProps = dispatch => ({
+  toggleIsComplete: payload => dispatch(toggleDueDateIsComplete(payload))
+});
+
+export default connect(null, mapDispatchToProps)(CardBtns);

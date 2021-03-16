@@ -30,7 +30,7 @@ const Card = props => {
           <div className={classes.EditIcon}>{editIcon}</div>
           <div className={classes.Title}>{props.title}</div>
           <CardBtns dueDate={props.dueDate} hasDesc={props.desc !== ''} checklists={props.checklists} commentLength={props.comments.length}
-          voteLength={props.votes.length} isVoting={props.isVoting} />
+          voteLength={props.votes.length} isVoting={props.isVoting} listID={props.listID} cardID={props.cardID} />
           {props.members.length > 0 && <CardMembers members={props.members} clickHandler={accountBtnClickHandler} />}
         </div>
       )}

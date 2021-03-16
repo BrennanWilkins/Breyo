@@ -76,6 +76,7 @@
   color: rgb(89, 89, 89);
   display: flex;
   align-items: center;
+  margin-left: -5px;
 }
 .Btn {
   margin: 8px 5px 0 5px;
@@ -90,12 +91,6 @@
 }
 .DescBtn svg {
   margin-right: 0;
-}
-.BtnComplete {
-  border-radius: 3px;
-  background: rgb(var(--green));
-  color: white;
-  padding: 3px 5px;
 }
 .Members {
   display: flex;
@@ -118,12 +113,60 @@
 .Title {
   word-wrap: break-word;
 }
-.PastDue, .DueSoon {
+.DueDateBtn {
   border-radius: 3px;
   padding: 3px 5px;
+  cursor: pointer;
+}
+.DueDateBtn:hover {
+  background: rgba(0,0,0,0.05);
+}
+.BtnComplete {
+  background: rgb(var(--green));
+  color: white;
+}
+.BtnComplete:hover {
+  background: rgb(19, 150, 25);
+}
+.PastDue {
   background: rgb(242, 121, 104);
   color: white;
 }
+.PastDue .BoxIcon, .DueSoon .BoxIcon {
+  border: 1.2px solid white;
+}
+.PastDue:hover {
+  background: rgb(242, 77, 55);
+}
 .DueSoon {
   background: rgb(241, 222, 80);
+  color: white;
+}
+.DueSoon:hover {
+  background: rgb(230, 206, 30);
+}
+.ClockIcon, .DueDateCompleteIcon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+.BoxIcon {
+  display: none;
+  width: 9px;
+  height: 9px;
+  margin-right: 5px;
+  border-radius: 3px;
+  border: 1.2px solid rgb(89, 89, 89);
+}
+.DueDateCompleteIcon {
+  display: none;
+}
+.DueDateBtn:hover .ClockIcon {
+  display: none;
+}
+.BtnComplete:hover .DueDateCompleteIcon {
+  display: inline-flex;
+}
+.DueDateBtn:hover .BoxIcon {
+  display: block;
 }
