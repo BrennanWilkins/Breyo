@@ -231,5 +231,31 @@ router.post('/forgotPassword',
   }
 );
 
+router.post('/feedback',
+  auth,
+  validate([body('email').exists(), body('msg').isLength({ min: 1, max: 1000 })]),
+  async (req, res) => {
+    try {
+      const { email, msg } = req.body;
+
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        secure: false,
+        tls: { rejectUnauthorized: false },
+        auth: { user: config.get('BREYO_EMAIL'), pass: config.get('BREYO_PASS') }
+      });
+      const mailOptions = {
+        from: config.get('BREYO_EMAIL'),
+        to: config.get('BREYO_EMAIL'),
+        subject: `Breyo feedback from ${req.fullName}`,
+        html: `<p>Provided email: ${email || 'No email provided'}</p><p>User email: ${req.email}</p><p>${msg}</p>`
+      };
+      await transporter.sendMail(mailOptions);
+
+      res.sendStatus(200);
+    } catch (err) { res.sendStatus(500); }
+  }
+);
+
 module.exports = router;
 module.exports.signNewToken = signNewToken;

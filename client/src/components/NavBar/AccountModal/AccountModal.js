@@ -31,9 +31,11 @@ const AccountModal = props => {
         </div>
         <div className={classes.Link} onClick={props.close}><Link to="/my-account?view=activity">Activity</Link></div>
         <div className={classes.Link} onClick={props.close}><Link to="/my-account?view=settings">Settings</Link></div>
-        <span className={classes.LineBreak}></span>
+        <span className={classes.LineBreak} />
         <div className={classes.Link} onClick={props.close}><Link to="/help">Help</Link></div>
         <div className={classes.Option} onClick={props.logout}>Log Out</div>
+        <span className={classes.LineBreak} />
+        <div className={classes.Option} onClick={props.showFeedback}>Send feedback</div>
       </div></>}
     </div>
   );
@@ -46,7 +48,8 @@ AccountModal.propTypes = {
   close: PropTypes.func.isRequired,
   invites: PropTypes.array.isRequired,
   teamInvites: PropTypes.array.isRequired,
-  avatar: PropTypes.string
+  avatar: PropTypes.string,
+  showFeedback: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({

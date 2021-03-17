@@ -13,12 +13,14 @@ import LogoTitle from '../../UI/LogoTitle/LogoTitle';
 import { toggleCreateBoard } from '../../../store/actions';
 import CreateMenu from '../CreateMenu/CreateMenu';
 const CreateTeam = React.lazy(() => import('../CreateTeam/CreateTeam'));
+const FeedbackModal = React.lazy(() => import('../FeedbackModal/FeedbackModal'));
 
 const NavBar = props => {
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showBoardMenu, setShowBoardMenu] = useState(false);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
   const [showCreateTeam, setShowCreateTeam] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const location = useLocation();
 
   return location.pathname === '/help' ? null : (
@@ -35,9 +37,10 @@ const NavBar = props => {
       {showCreateMenu && <CreateMenu close={() => setShowCreateMenu(false)} openCreateBoard={props.toggleCreateBoard} openCreateTeam={() => setShowCreateTeam(true)} />}
       <CreateBoard show={props.showCreateBoard} close={props.toggleCreateBoard} />
       {showCreateTeam && <Suspense fallback=""><CreateTeam close={() => setShowCreateTeam(false)} /></Suspense>}
-      {showAccountModal && <AccountModal close={() => setShowAccountModal(false)} />}
+      {showAccountModal && <AccountModal close={() => setShowAccountModal(false)} showFeedback={() => setShowFeedbackModal(true)} />}
       {showBoardMenu && <SearchBoardMenu close={() => setShowBoardMenu(false)} />}
-      {(props.showCreateBoard || showCreateTeam) && <div className={classes.Backdrop}></div>}
+      {showFeedbackModal && <Suspense fallback=""><FeedbackModal close={() => setShowFeedbackModal(false)} /></Suspense>}
+      {(props.showCreateBoard || showCreateTeam || showFeedbackModal) && <div className={classes.Backdrop}></div>}
     </div>
   );
 };

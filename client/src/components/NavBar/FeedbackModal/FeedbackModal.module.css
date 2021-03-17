@@ -1,0 +1,101 @@
+.Container {
+  position: fixed;
+  max-width: 600px;
+  max-height: 400px;
+  width: 94%;
+  height: calc(98% - 50px);
+  top: 50px;
+  left: max(calc(50% - 300px), 3%);
+  background: white;
+  border-radius: 4px;
+  box-shadow: var(--box-shadow1);
+  box-sizing: border-box;
+  z-index: 2;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 15px;
+  animation: dropIn 200ms ease-out forwards;
+}
+@keyframes dropIn {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.Title {
+  text-align: center;
+  margin: 5px 0 30px;
+  font-weight: 500;
+}
+.SubTitle {
+  text-align: center;
+  font-size: 14px;
+}
+.Content {
+  width: 90%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.Input {
+  width: 100%;
+}
+.Label span {
+  color: rgb(130,130,130);
+  font-weight: 400;
+  margin-left: 2px;
+}
+.Label {
+  font-weight: 500;
+  font-size: 13.5px;
+  margin: 0 0 3px 3px;
+}
+.TextArea {
+  width: 100%;
+  margin: 10px 0;
+  display: block;
+  padding: 6px 7px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 2px solid #ddd;
+  outline: none;
+  background: rgb(250,250,250);
+  overflow-y: auto;
+}
+.TextArea:hover {
+  background: rgb(240,240,240);
+}
+.TextArea:focus {
+  border: 2px solid rgb(var(--red));
+  background: white;
+}
+.SendBtn {
+  color: white;
+  background: rgba(var(--green), 0.8);
+  padding: 10px 9px;
+  font-size: 15px;
+}
+.SendBtn:hover, .SendBtn:active {
+  background: rgb(var(--green));
+}
+.SendBtn:disabled {
+  background: rgb(220,220,220);
+  cursor: default;
+}
+.ErrMsg, .HideErrMsg {
+  font-size: 15px;
+  width: 100%;
+  margin: 10px 0;
+  color: red;
+  transition: opacity 200ms;
+}
+.HideErrMsg {
+  opacity: 0;
+}
+.SendSuccess {
+  font-size: 15px;
+  width: 100%;
+  margin: 10px 0;
+  color: rgb(var(--green));
+}
